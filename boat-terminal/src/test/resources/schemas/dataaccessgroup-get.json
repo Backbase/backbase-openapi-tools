@@ -1,9 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-03/schema#",
-  "type": "array",
-  "uniqueItems": true,
-  "required": true,
-  "items": {
-    "$ref": "dataaccessgroup-item.json"
-  }
-}

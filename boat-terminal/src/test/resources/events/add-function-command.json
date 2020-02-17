@@ -1,8 +1,0 @@
-{
-  "type": "object",
-  "properties": {
-    "function": {
-      "$ref": "../schemas/function-item.json"
-    }
-  }
-}

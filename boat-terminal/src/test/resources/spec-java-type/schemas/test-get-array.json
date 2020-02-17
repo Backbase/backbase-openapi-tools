@@ -1,8 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "array",
-  "description": "Array of items",
-  "items": {
-    "$ref": "test-get.json"
-  }
-}

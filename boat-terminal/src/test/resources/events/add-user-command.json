@@ -1,8 +1,0 @@
-{
-  "type": "object",
-  "properties": {
-    "user": {
-      "$ref": "../schemas/user-item.json"
-    }
-  }
-}
