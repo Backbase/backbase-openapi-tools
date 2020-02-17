@@ -68,14 +68,6 @@
         <tag></tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>Backbase Artifact Builds Repository</id>
-            <name>artifacts.backbase.com-builds</name>
-            <url>https://artifacts.backbase.com/staging</url>
-        </repository>
-    </distributionManagement>
-
     <build>
 
         <plugins>
