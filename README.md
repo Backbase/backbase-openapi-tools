@@ -62,9 +62,9 @@ Configuration
     <build>
         <plugins>
             <plugin>
-                <groupId>com.backbase.codegen</groupId>
-                <artifactId>raml2openapi-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <groupId>com.backbase.boat</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <version>${boat-maven-plugin.version}</version>
                 <configuration>
                     <inputFiles>
                         <inputFile>${basedir}/src/main/resources/api.raml</inputFile>
@@ -78,20 +78,20 @@ Configuration
 
 Execution
 ```bash
-mvn raml2openapi:export
+mvn boat:raml2openapi
 ```
 
 
 ## Export All Specifications in Bill-Of-Materials pom file
 If you want to export all specifications referenced in a pom file, you can use the following mojo
 
-```
+```xml
     <build>
         <plugins>
             <plugin>
-                <groupId>com.backbase.codegen</groupId>
-                <artifactId>raml2openapi-maven-plugin</artifactId>
-                <version>0.1.2.11-SNAPSHOT</version>
+                <groupId>com.backbase.boat</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <version>${boat-maven-plugin.version}</version>
                 <configuration>
                     <specBom>
                         <groupId>com.backbase.dbs</groupId>-->
@@ -124,9 +124,3 @@ Please provide feedback in the `#s-raml2openapi` Slack channel.
 ```bash
 mvn raml2openapi:export-bom
 ```
-
-
-TODO: 
-
-// SET BASE PATH TO ROOT
-// FIX SCHEMA NAMES
