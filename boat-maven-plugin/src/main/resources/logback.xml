@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="COLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%highlight([%level]) [%logger{10}] %msg%n</pattern>
+            <!--             ^^^^^^^^^^ -->
+        </encoder>
+    </appender>
+    <root level="DEBUG">
+        <appender-ref ref="COLOR"/>
+    </root>
+
+
+    <logger name="io.swagger.v3.parser" level="INFO"/>
+</configuration>

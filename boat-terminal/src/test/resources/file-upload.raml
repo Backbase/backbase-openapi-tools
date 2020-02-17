@@ -1,0 +1,29 @@
+#%RAML 1.0
+---
+#===============================================================
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md
+#===============================================================
+title: FileUpload
+version: v1
+baseUri: "{version}"
+mediaType: [multipart/form-data, application/json]
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+# API resource definitions
+#===============================================================
+/upload/:
+  displayName: Upload
+  post:
+    description: Upload file
+    body:
+      multipart/form-data:
+        type: object
+        properties:
+          file:
+            description: The file to upload.
+            type: file
+            required: true
+    responses:
+      200:
+        description: Ok

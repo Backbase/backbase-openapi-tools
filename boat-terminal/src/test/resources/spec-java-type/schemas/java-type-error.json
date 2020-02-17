@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.buildingblocks.codegen.test.ReUsedJavaTypeExceptionClass",
+  "properties": {
+    "message": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,25 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md
+#===============================================================
+title: AuditSingle
+version: v1
+baseUri: "{version}/"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+# API resource definitions
+#===============================================================
+/audit-messages:
+  displayName: AuditSingle
+  get:
+    description: Returns list of audit messages as CSV
+    responses:
+      200:
+        body:
+          text/csv:

@@ -1,0 +1,9 @@
+#%RAML 1.0 DataType
+
+uses:
+  animal-lib: animal.lib.raml
+
+type: animal-lib.Animal
+properties:
+  canBark: boolean
+discriminatorValue: dog

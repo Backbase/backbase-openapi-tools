@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "base_event": {
+      "$ref": "./base.json#/definitions/base_event"
+    },
+    "dataAccessGroup": {
+      "$ref": "../schemas/dataaccessgroup-item.json"
+    }
+  }
+}

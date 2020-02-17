@@ -1,0 +1,12 @@
+#%RAML 1.0
+title: My Sample API
+
+types:
+  userPicture:
+    type: file
+    fileTypes: ['image/jpeg', 'image/png'] # only JPEG and PNG allowed
+    maxLength: 307200
+  customFile:
+    type: file
+    fileTypes: ['*/*'] # any file type allowed
+    maxLength: 1048576

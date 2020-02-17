@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.buildingblocks.codegen.test.CommonExceptionClass",
+  "properties": {
+    "message": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

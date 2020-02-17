@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "base_event": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "dateTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "required": [
+      "uuid"
+    ]
+  }
+}

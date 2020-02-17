@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "functionAccessGroupId": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "legalEntityId": {
+      "type": "string",
+      "required": true
+    },
+    "permissions": {
+      "type": "array",
+      "required": false,
+      "items": {
+        "$ref": "permissions-item.json"
+      }
+    }
+  }
+}

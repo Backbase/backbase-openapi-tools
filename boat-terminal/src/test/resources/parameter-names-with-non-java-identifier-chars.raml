@@ -1,0 +1,44 @@
+#%RAML 1.0
+---
+title: Example
+uses:
+  traits: traits/traits.raml
+version: v1
+baseUri: "{version}/test"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+
+/foo/bar/{guid.blablabla}/{Hello world}:
+  displayName: foo
+  uriParameters:
+    guid.blablabla:
+      type: string
+      description: Test URI parameter with a dot in the name
+      example: Whatever, dude
+      required: true
+    Hello world:
+      type: string
+      description: Test URI parameter with a space in the name
+      example: Whatever, dude
+      required: true
+  get:
+    queryParameters:
+      some.param:
+        type: string
+        description: Test query parameter with a dot in the name
+        example: Anything you want
+        required: true
+      IS_VALID:
+        type: boolean
+        description: Test query parameter in uppercase with underscore
+        example: false
+        required: true
+      "bigCharacter\U00020B9F":
+        type: string
+        description: Test query parameter with a unicode character that's too big for a single UTF-16 char
+        example: Yo
+        required: true
+    responses:
+      200:
+        body:
+          text/plain:

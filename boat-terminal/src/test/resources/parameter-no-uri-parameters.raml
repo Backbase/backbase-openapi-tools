@@ -1,0 +1,42 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md
+#===============================================================
+title: Message Center
+version: v1
+baseUri: "{version}/"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+# API resource definitions
+#===============================================================
+/users:
+  displayName: Messages
+  /{userId}:
+    /conversations:
+      displayName: Conversations
+      /{conversationId}:
+        /drafts:
+          displayName: ConversationDrafts
+          get:
+            description: Returns drafts that have been created in the conversation by given user
+            queryParameters:
+              limit:
+                type: integer
+                description: maximum amount of drafts to provide
+            responses:
+              200:
+                body:
+                  application/json:
+                    schema: {
+                            "type": "object",
+                            "properties": {
+                              "userId": {
+                                "type": "string",
+                                "required": true
+                              }
+                            }
+                          }

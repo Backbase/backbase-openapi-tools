@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "required": true
+    },
+    "functionAccessGroupId": {
+      "type": "string",
+      "required": true
+    },
+    "revoke": {
+      "type": "boolean",
+      "required": true
+    }
+  }
+}

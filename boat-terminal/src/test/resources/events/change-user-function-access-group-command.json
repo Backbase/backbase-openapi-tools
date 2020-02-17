@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "assignFunctionAccessGroupToUser": {
+      "$ref": "../schemas/assignfunctionaccessgroup-item.json"
+    }
+  }
+}

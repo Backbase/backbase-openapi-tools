@@ -1,0 +1,8 @@
+#%RAML 1.0
+title: Products API
+
+resourceTypes:
+  collection: !include collection.resourceType.raml # include ResourceType fragment
+
+/products:
+  type: collection # reference to global resource type declaration

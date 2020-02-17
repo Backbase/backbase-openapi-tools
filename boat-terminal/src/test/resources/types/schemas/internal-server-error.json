@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "integer",
+      "description": "HTTP Status Code",
+      "default": "500"
+    },
+    "message": {
+      "type": "string",
+      "description": "Further Information"
+    }
+  },
+  "required": [
+    "message"
+  ]
+}

@@ -1,0 +1,44 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-1.0.md
+#===============================================================
+title: Message Center
+version: v1
+baseUri: "{version}/"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+documentation:
+  - title: Message Center
+    content: !include docs/api.md
+#===============================================================
+# API resource definitions
+#===============================================================
+/users:
+  displayName: User
+  /{userId}:
+    uriParameters:
+      userId:
+        displayName: userId
+        type: string
+    /drafts:
+      displayName: Drafts
+      /{draftId}:
+        uriParameters:
+          draftId:
+            displayName: draftId
+            type: string
+        delete:
+          description: "Delete a draft."
+          responses:
+            200:
+              description: "Draft deleted"
+            400:
+              description: "BadRequest"
+              body:
+                schema: !include schemas/bad-request.json

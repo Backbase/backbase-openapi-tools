@@ -1,0 +1,10 @@
+#%RAML 1.0 DataType
+
+description: |
+  defines an object that restricts all additional properties in any
+  instance to be a `string`
+type: object
+properties:
+  name: string
+  address: string
+  //: string # every additional property has to be a string

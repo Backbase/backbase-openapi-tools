@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+
+description: |
+  defines an object that restricts certain additional properties in any
+  instance to be a `string`
+type: object
+properties:
+  name: string
+  address: string
+  /^note\d+$/: string # every additional property whose keys start with 'note'
+                      # followed by one or more digits to be a string

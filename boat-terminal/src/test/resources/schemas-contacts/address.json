@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "city": {
+      "type": "string",
+      "required": true
+    },
+    "zipCode": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
