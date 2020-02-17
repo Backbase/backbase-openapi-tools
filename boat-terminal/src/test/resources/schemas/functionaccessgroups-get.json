@@ -1,7 +1,0 @@
-{
-  "type": "array",
-  "required": true,
-  "items": {
-    "$ref": "functionaccessgroup-item.json"
-  }
-}
