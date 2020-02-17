@@ -1,3 +1,5 @@
+![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
+
 # Backbase OpenApi Tools 
 
 The Backbase Open API Tools is a collection of tools created to work effeciently with OpenAPI
