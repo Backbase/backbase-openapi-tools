@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.backbase.test.ExampleWithJavaType",
+  "description": "Example With Message",
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "The Message"
+    }
+  }
+}

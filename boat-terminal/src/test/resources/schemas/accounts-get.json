@@ -1,0 +1,7 @@
+{
+  "type": "array",
+  "required": true,
+  "items": {
+    "$ref": "account-item.json"
+  }
+}

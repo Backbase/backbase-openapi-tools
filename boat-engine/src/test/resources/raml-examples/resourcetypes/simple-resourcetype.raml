@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: Example API
+
+resourceTypes:
+  collection:
+    usage: This resourceType should be used for any collection of items
+    description: The collection of <<resourcePathName>>
+    get:
+      description: Get all <<resourcePathName>>, optionally filtered
+    post:
+      description: Create a new <<resourcePathName | !singularize>>
+
+/products:
+  type: collection

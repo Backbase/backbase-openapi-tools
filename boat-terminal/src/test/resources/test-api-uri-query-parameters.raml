@@ -1,0 +1,140 @@
+#%RAML 1.0
+---
+#===============================================================
+# Example which tests query and uri parameter scala types
+#===============================================================
+title: Example
+uses:
+  traits: traits/traits.raml
+version: v1
+baseUri: "{version}/test"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+documentation:
+  - title: Example
+    content: Test Schema to test all common types
+
+#===============================================================
+# API resource definitions
+#===============================================================
+/items/{stringUriParam}/{booleanUriParam}/{integerUriParam}/{numberUriParam}/{dateOnlyUriParam}/{timeOnlyUriParam}/{datetimeOnlyUriParam}/{datetimeUriParam}:
+  description: Retrieve all items.
+  displayName: items
+  uriParameters: 
+    stringUriParam:
+      displayName: stringUriParam
+      type: string
+      description: Example String
+      example: Hello World
+      required: false
+      default: Hello World
+    booleanUriParam:
+      displayName: booleanUriParam
+      type: boolean
+      description: Example Boolean
+      example: false
+      required: false
+      default: true  
+    integerUriParam:
+      displayName: integerUriParam
+      type: integer
+      description: Example Integer
+      example: 512
+      required: false
+      default: 512
+    numberUriParam:
+      displayName: numberUriParam
+      type: number
+      description: Example BigDecimal
+      example: 50.194295
+      required: false
+      default: 50.194295
+    dateOnlyUriParam:
+      displayName: dateOnlyUriParam
+      type: date-only
+      description: Example Date Only
+      example: 2015-05-23
+      required: false
+    timeOnlyUriParam:
+      displayName: timeOnlyUriParam
+      type: time-only
+      description: Example time Only
+      example: 12:30:00
+      required: false
+    datetimeOnlyUriParam:
+      displayName: datetimeOnlyUriParam
+      type: datetime-only
+      description: Example Date Time Only
+      example: 2015-07-04T21:00:00
+      required: false
+    datetimeUriParam:
+      displayName: datetimeUriParam
+      type: datetime
+      description: Example Date
+      example: 2016-02-28T16:41:41.090Z
+      required: false  
+  get:
+    is: [traits.orderable: {fieldsList: param1}]
+    description: "Retrieve list of all items."
+    queryParameters:
+      stringParam:
+        displayName: stringParam
+        type: string
+        description: Example String
+        example: Hello World
+        required: false
+        default: Hello World
+      booleanParam:
+        displayName: booleanParam
+        type: boolean
+        description: Example Boolean
+        example: false
+        required: false
+        default: true  
+      integerParam:
+        displayName: integerParam
+        type: integer
+        description: Example Integer
+        example: 512
+        required: false
+        default: 512
+      numberParam:
+        displayName: numberParam
+        type: number
+        description: Example BigDecimal
+        example: 50.194295
+        required: false
+      dateOnlyQueryParam:
+        displayName: dateOnlyQueryParam
+        type: date-only
+        description: Example Date Only
+        example: 2015-05-23
+        required: false
+      timeOnlyQueryParam:
+        displayName: timeOnlyQueryParam
+        type: time-only
+        description: Example time Only
+        example: 12:30:00
+        required: false
+      datetimeOnlyQueryParam:
+        displayName: datetimeOnlyQueryParam
+        type: datetime-only
+        description: Example Date Time Only
+        example: 2015-07-04T21:00:00
+        required: false
+      datetimeQueryParam:
+        displayName: datetimeQueryParam
+        type: datetime
+        description: Example Date
+        example: 2016-02-28T16:41:41.090Z
+        required: false  
+    responses:
+      200:
+        description: Test Schema
+        body:
+          application/json:
+            schema: !include schemas/test-item.json
+            example: !include examples/example-item.json

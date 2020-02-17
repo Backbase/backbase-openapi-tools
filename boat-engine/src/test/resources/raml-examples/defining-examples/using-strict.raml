@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: Using strict=false API
+
+/person:
+  get:
+    queryParameters:
+      sort?:
+        type: string[]
+        description: |
+          The sort order in the format `property,property[,asc|desc]`. The default sort direction is ascending.
+          Can be used multiple times for different properties.
+        example:
+          strict: false
+          value: ?sort=givenName&sort=surname,asc

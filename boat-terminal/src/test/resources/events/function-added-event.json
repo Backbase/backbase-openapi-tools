@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "base_event": {
+      "$ref": "./base.json#/definitions/base_event"
+    },
+    "function": {
+      "$ref": "../schemas/function-item.json"
+    }
+  }
+}

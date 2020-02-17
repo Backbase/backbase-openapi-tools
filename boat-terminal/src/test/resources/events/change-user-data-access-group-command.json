@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "assignDataAccessGroupToUser": {
+      "$ref": "../schemas/assigndataaccessgroup-item.json"
+    }
+  }
+}

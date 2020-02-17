@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.pandp.accesscontrol.command.rest.spec.v1.accesscontrol.accessgroups.function.Permission",
+  "properties": {
+    "functionId": {
+      "type": "string"
+    },
+    "assignedPrivileges": {
+      "type": "array",
+      "items": {
+        "$ref": "privilege-item.json#"
+      }
+    }
+  },
+  "required": [
+    "functionId",
+    "assignedPrivileges"
+  ]
+}

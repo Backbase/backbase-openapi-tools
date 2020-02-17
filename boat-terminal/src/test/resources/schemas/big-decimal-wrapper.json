@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "BigDecimal wrapper",
+  "description": "Schema with some BigDecimal fields.",
+  "properties": {
+    "asString": {
+      "type": "string",
+      "javaType": "java.math.BigDecimal",
+      "description": "Should be serialised as a string"
+    },
+    "asNumber": {
+      "type": "number",
+      "javaType": "java.math.BigDecimal",
+      "description": "Should be serialised as a number"
+    }
+  },
+  "required": [
+    "asString",
+    "asNumber"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.presentation.transaction.rest.spec.v1.accesscontrol.accessgroups.function.Privilege",
+  "required": true,
+  "properties": {
+    "privilege": {
+      "type": "string"
+    }
+  }
+}

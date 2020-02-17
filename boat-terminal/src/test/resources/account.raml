@@ -1,0 +1,123 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Accounts - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-1.0.md
+#===============================================================
+title: Accounts
+version: v1
+# No baseuri here as optional
+# baseUri: "{version}/accounts"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+types:
+  AllAccounts: !include schemas/accounts-get.json
+  SingleAccount: !include schemas/account-item.json
+  BadRequest: !include schemas/bad-request.json
+  InternalServerError: !include schemas/internal-server-error.json
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+documentation:
+  - title: Accounts
+    content: !include docs/api.md
+#===============================================================
+# API resource definitions
+#===============================================================
+/accounts:
+  description: Retrieve all a customer's accounts.
+  displayName: Accounts
+  uriParameters: null
+  get:
+    description: Retrieve details of all accounts.
+    queryParameters:
+      localdatetime:
+        description: Local Date-time param example
+        required: false
+        type: datetime-only
+        example: 2017-10-04T14:54:36
+      datetime:
+        description: Zoned RFC3339 Date-time param example
+        required: false
+        type: datetime
+        format: rfc3339
+        example: 2017-10-04T14:54:36Z
+      datetime2616:
+        description: Zoned RFC2616 Date-time param example
+        required: false
+        type: datetime
+        format: rfc2616
+        example: Wed, 4 Jul 2001 12:08:56 PDT
+      date:
+        description: Date-only param example
+        required: false
+        type: date-only
+        example: 2017-10-04
+      time:
+        description: time-only param example
+        required: false
+        type: time-only
+        example: 14:54:36
+      dates:
+        description: Date-only param example
+        required: false
+        type: array
+        items: date-only
+        example: [2017-10-04, 2017-10-04]
+      legalEntityId:
+        description: The legal entity id to limit the accounts by
+        required: false
+        minLength: 0
+        type: string
+      legalEntityIds:
+        description: The legal entity id to limit the accounts by
+        required: false
+        type: string[]
+      arbitaryNumber:
+        displayName: Amount
+        type: number
+        description: This should not be a double
+        required: true  
+    responses:
+      200:
+        description: Accounts
+        body:
+          application/json:
+            type: AllAccounts
+      400:
+        description: BadRequest
+        body:
+          application/json:
+            type: BadRequest
+      500:
+        description: InternalServerError
+        body:
+          application/json:
+            type: InternalServerError
+  /{id}:
+    displayName: AccountById
+    description: Retrieve an account by accountId
+    uriParameters:
+      id:
+        displayName: Account ID
+        type: string
+    get:
+      description: Retrieve a single account by ID
+      queryParameters:
+      responses:
+        200:
+          description: Single Account
+          body:
+            application/json:
+              type: SingleAccount
+        400:
+          description: BadRequest
+          body:
+            application/json:
+              type: BadRequest
+        500:
+          description: InternalServerError
+          body:
+            application/json:
+              type: InternalServerError

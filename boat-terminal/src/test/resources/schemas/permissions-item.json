@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.presentation.transaction.rest.spec.v1.accesscontrol.accessgroups.function.Permission",
+  "properties": {
+    "functionId": {
+      "type": "string",
+      "required": true
+    },
+    "assignedPrivileges": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "$ref": "privilege-item.json"
+      }
+    }
+  }
+}

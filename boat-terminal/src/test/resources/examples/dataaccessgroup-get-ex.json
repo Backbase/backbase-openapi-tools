@@ -1,0 +1,14 @@
+[
+  {
+    "dataAccessGroupId": "00001",
+    "name": "Account group 1",
+    "description": "Simple account group",
+    "legalEntityId": "001",
+    "type": "arrangement",
+    "subtype": "account",
+    "items": [
+      "000001",
+      "000002"
+    ]
+  }
+]

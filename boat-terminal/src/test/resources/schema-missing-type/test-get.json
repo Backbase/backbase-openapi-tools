@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "this schema has no type property defined",
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  }
+}

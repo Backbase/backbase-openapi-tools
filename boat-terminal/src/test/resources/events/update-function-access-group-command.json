@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "functionAccessGroup": {
+      "$ref": "../schemas/functionaccessgroup-item.json"
+    }
+  }
+}

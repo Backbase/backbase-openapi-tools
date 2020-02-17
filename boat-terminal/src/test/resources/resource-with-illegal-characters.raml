@@ -1,0 +1,28 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md
+#===============================================================
+title: Message Center
+version: v1
+baseUri: "{version}/"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+# API resource definitions
+#===============================================================
+/active-users/{userId}:
+  displayName: Messages
+  /message_drafts:
+    displayName: Drafts
+    get:
+      description: Returns list of user drafts
+      responses:
+        200:
+          body:
+            application/json:
+              schema: !include schemas/accounts-get.json

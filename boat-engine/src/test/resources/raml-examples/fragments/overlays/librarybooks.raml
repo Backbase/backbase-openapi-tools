@@ -1,0 +1,50 @@
+#%RAML 1.0
+
+title: Book Library API
+documentation:
+  - title: Introduction
+    content: Automated access to books
+  - title: Licensing
+    content: Please respect copyrights on our books.
+/books:
+  description: sdngdfsljgksdhjgs
+  get:
+    description: The collection of library books
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              {
+                "title": "Song",
+                "type": "object",
+                "properties": {
+                  "description?": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Yesterday"
+                  },
+                  "artist": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "example": "The Beatles"
+                        },
+                        "is_band": {
+                          "type": "boolean",
+                          "example": "true"
+                        }
+                      }
+                  }
+                },
+                "$schema": "http://json-schema.org/draft-04/schema#"
+              }
+            example: |
+              {
+
+              }
+/library:
+  get:

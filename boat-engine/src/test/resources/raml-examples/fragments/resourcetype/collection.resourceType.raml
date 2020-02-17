@@ -1,0 +1,13 @@
+#%RAML 1.0 ResourceType
+
+usage: Use this to describe resource that list items # explains the purpose of this fragment
+
+description: A collection of <<resourcePathName>> # resource-level description
+get:
+  description: Retrieve all <<resourcePathName>> # method-level description
+post:
+  description: Add an <<resourcePathName | !singularize>> # method-level description
+  responses:
+    201:
+      headers:
+        Location:

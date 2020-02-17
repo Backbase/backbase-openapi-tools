@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "testId": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

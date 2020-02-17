@@ -1,0 +1,58 @@
+#%RAML 1.0
+---
+#===============================================================
+# API example which uses common.raml libary
+#===============================================================
+title: Example
+uses:
+  common: common.raml
+version: v1
+baseUri: "{version}"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+documentation:
+  - title: Example
+    content: Test Schema to test a client-api
+#===============================================================
+# API resource definitions
+#===============================================================
+/types:
+  description: Retrieve all items.
+  displayName: fromtypes
+  uriParameters: null
+  get:
+    description: "Retrieve list of all items."
+    responses:
+      200:
+        description: Test Schema
+        body:
+          application/json:
+            type: common.MyType
+/schema:
+  description: Retrieve all items.
+  displayName: fromschema
+  uriParameters: null
+  get:
+    description: "Retrieve list of all items."
+    responses:
+      200:
+        description: Test Schema
+        body:
+          application/json:
+            type: common.MySchemaTypes
+  /{id}:
+    displayName: My Schema Type
+    uriParameters:
+      id:
+        type: string
+    get:
+      description: "Specific Item."
+      responses:
+        200:
+          description: Test Schema
+          body:
+            application/json:
+              type: common.MySchemaType        

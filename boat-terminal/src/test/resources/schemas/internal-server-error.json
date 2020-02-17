@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "javaType": "com.backbase.test.InternalServerError",
+  "properties": {
+    "message": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

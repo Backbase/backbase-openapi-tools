@@ -1,0 +1,98 @@
+#%RAML 1.0
+---
+#===============================================================
+#  DataAccessGroup - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-0.8.md
+#===============================================================
+title: AccessControl
+version: v1
+baseUri: "{version}"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+types:
+  DataAccessGroup: !include schemas/dataaccessgroup-item.json
+  BadRequest: !include schemas/bad-request.json
+  InternalServerError: !include schemas/internal-server-error.json
+  FunctionAccessGroup: !include schemas/functionaccessgroup-item.json
+#===============================================================
+#  API documentation - Overall documentation.
+#===============================================================
+documentation:
+  - title: AccessControl
+    content: !include docs/api.md
+#===============================================================
+# API resource definitions
+#===============================================================
+/accesscontrol/accessgroups/function:
+  description: Function access groups by legal entity id.
+  displayName: FunctionAccessGroups
+  uriParameters: null
+  post:
+    description: "Create new function access group."
+    body:
+       application/json:
+         type: FunctionAccessGroup
+    responses:
+      200:
+        description: "New Function Access Group created successfully."
+      400:
+        description: BadRequest
+        body:
+          application/json:
+            type: BadRequest
+      500:
+        description: InternalServerError
+        body:
+          application/json:
+            type: InternalServerError
+  get:
+    description: "Retrieve function access group."
+    queryParameters:
+      serviceAgreementId:
+        displayName: Service agreement id
+        type: string
+        description: Service agreement which the function access group is created under.
+        example: 8a48e2c963683916016368afcb340000
+        required: false
+    body:
+      application/json:
+        type: FunctionAccessGroup
+    responses:
+      200:
+        description:  "Function Access group updated successfully."
+      400:
+        description: BadRequest
+        body:
+          application/json:
+            type: BadRequest
+      500:
+        description: InternalServerError
+        body:
+          application/json:
+            type: InternalServerError
+  /{id}:
+    displayName: FunctionAccessGroupById
+    uriParameters:
+      id:
+        displayName: Function Access Group by ID
+        type: string
+    put:
+      description: "Update existing Function access group."
+      queryParameters:
+      body:
+        application/json:
+          type: FunctionAccessGroup
+      responses:
+        200:
+          description:  "Function access group updated successfully."
+        400:
+          description: BadRequest
+          body:
+            application/json:
+              type: BadRequest
+        500:
+          description: InternalServerError
+          body:
+            application/json:
+              type: InternalServerError

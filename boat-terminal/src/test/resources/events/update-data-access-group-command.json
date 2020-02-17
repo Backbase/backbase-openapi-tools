@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "dataAccessGroup": {
+      "$ref": "../schemas/dataaccessgroup-item.json"
+    }
+  }
+}

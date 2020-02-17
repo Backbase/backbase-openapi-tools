@@ -1,0 +1,25 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Test for invalid schema - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/raml-1.0.md
+#===============================================================
+title: Test Center
+version: v1
+baseUri: "{version}/"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+# API resource definitions
+#===============================================================
+/tests/{testId}:
+    get:
+      displayName: Tests
+      description: Returns list of tests
+      responses:
+        200:
+          body:
+            application/json:
+              schema: !include schemas/test-invalid-get.json
+              example: !include examples/test-invalid-get-ex.json

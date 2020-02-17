@@ -1,0 +1,16 @@
+{
+  "functionId": "1",
+  "resource": "Payments",
+  "name": "International",
+  "privileges": [
+    {
+      "privilege": "view"
+    },
+    {
+      "privilege": "execute"
+    },
+    {
+      "privilege": "verify"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+
+usage: provides a type that stores user information
+
+description: A simple User
+properties:
+  name: string
+  email: !include Email.dataType.raml
+  homepage:
+    description: User's homepage
+    type: !include Url.dataType.raml

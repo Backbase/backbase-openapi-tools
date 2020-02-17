@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "ExtendedTestItemTwo",
+  "extends": {
+    "$ref": "test-extends-item.json"
+  },
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Description of the item",
+      "maxLength": 70
+    }
+  },
+  "required": [
+    "description"
+  ]
+}

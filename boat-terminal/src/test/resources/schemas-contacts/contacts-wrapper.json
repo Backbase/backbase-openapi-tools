@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "required": true
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "$ref": "./contacts.json"
+      }
+    }
+  }
+}
