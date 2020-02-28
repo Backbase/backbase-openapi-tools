@@ -14,6 +14,7 @@ import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.DateSchema;
 import io.swagger.v3.oas.models.media.DateTimeSchema;
+import io.swagger.v3.oas.models.media.EmailSchema;
 import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.raml.v2.api.model.v10.datamodel.JSONTypeDeclaration;
 
-@SuppressWarnings({"unchecked", "WeakerAccess"})
+@SuppressWarnings({"unchecked", "WeakerAccess", "rawtypes"})
 @Slf4j
 class JsonSchemaToOpenApi {
 
@@ -190,7 +191,11 @@ class JsonSchemaToOpenApi {
                 }
                 break;
             case "string":
+            case "time-only":
                 schema = new StringSchema();
+                break;
+            case "email":
+                schema = new EmailSchema();
                 break;
             case "number":
                 schema = new NumberSchema();
@@ -241,7 +246,8 @@ class JsonSchemaToOpenApi {
                 ((ComposedSchema) schema).setAnyOf(anyOfSchemas);
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported type: " + type);
+                schema = new StringSchema();
+//                throw new UnsupportedOperationException("Unsupported type: " + type);
         }
 
         schema.addExtension(X_RAML_BASE, baseUrl);
@@ -311,9 +317,12 @@ class JsonSchemaToOpenApi {
 
     private String determineJsonSchemaType(JsonNode type) {
         assert type != null;
-        if (type.get("type") != null && type.get("type").isTextual()) {
-            return determineTypeFromJavaType(type, type.get("type").asText());
-        } else if (type.get("type") != null && type.get("type").isArray()) {
+        JsonNode jsonType = type.get("type");
+        if (jsonType != null && jsonType.isTextual() && !type.has("format")) {
+            return determineTypeFromJavaType(type, jsonType.asText());
+        } else if (jsonType != null && type.has("format")) {
+            return type.get("format").textValue();
+        } else if (jsonType != null && jsonType.isArray()) {
             return "anyOf";
         } else if (type.hasNonNull("enum")) {
             return "string";

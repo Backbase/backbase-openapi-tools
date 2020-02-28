@@ -1,0 +1,2127 @@
+openapi: 3.0.1
+info:
+  title: Backbase Stream Entitlement Saga API
+  version: 1.0.0
+  x-logo:
+    url: "http://www.backbase.com/wp-content/uploads/2017/04/backbase-logo-png.png"
+    backgroundColor: "#FFFFFF"
+    altText: "Backbase logo"
+servers:
+  - url: http://legal-entity-http.proto.backbasecloud.com/
+    description: The server
+paths:
+  ###############################################
+  ## Legal Entity
+  ###############################################
+  /legal-entity:
+    post:
+      tags:
+        - legal-entity
+      summary: Create Legal Entity
+      description: Create a new Legal Entity and their supporting objects from Legal Entity
+      operationId: createLegalEntity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LegalEntity'
+            examples:
+              rootLegalEntityHierarchyExample:
+                $ref: '#/components/examples/RootLegalEntityHierarchyExample'
+              rootLegalEntityForMambu:
+                $ref: '#/components/examples/RootLegalEntityForMambu'
+              rootLegalEntityHierarchyWithArrangements:
+                $ref: '#/components/examples/RootLegalEntityHierarchyWithArrangements'
+              legalEntitiesForMockBack:
+                $ref: '#/components/examples/LegalEntitiesForMockBack'
+      responses:
+        200:
+          description: The created legal entity and all their objects with internal ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LegalEntity'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /legal-entity-extended:
+    post:
+      tags:
+        - legal-entity
+      summary: Create Legal Entity
+      description: Create a new Legal Entity and their supporting objects from Legal Entity
+      operationId: createLegalEntityWithExtendedResponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LegalEntity'
+            examples:
+              rootLegalEntityHierarchyExample:
+                $ref: '#/components/examples/RootLegalEntityHierarchyExample'
+              rootLegalEntityForMambu:
+                $ref: '#/components/examples/RootLegalEntityForMambu'
+              rootLegalEntityHierarchyWithArrangements:
+                $ref: '#/components/examples/RootLegalEntityHierarchyWithArrangements'
+              legalEntitiesForMockBack:
+                $ref: '#/components/examples/LegalEntitiesForMockBack'
+      responses:
+        200:
+          description: The created legal entity and all their objects with internal ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LegalEntityResult'
+        default:
+          description: Errro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    ###############################################
+    ## Products
+    ###############################################
+    ProductGroup:
+      type: object
+      description: "Products assigned to service agreement"
+      properties:
+        internalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        productGroupType:
+          type: string
+          default: ARRANGEMENTS
+          enum:
+            - ARRANGEMENTS
+            - JOURNEYS
+        name:
+          maxLength: 128
+          minLength: 1
+          pattern: ^\S(.*(\S))?$
+          type: string
+          description: Product group name
+        description:
+          maxLength: 255
+          minLength: 1
+          pattern: ^\S(.*(\S))?$
+          type: string
+          description: Product group description
+        legalEntity:
+          $ref: '#/components/schemas/LegalEntity'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobProfileUser'
+        assignedPermissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssignedPermission'
+        currentAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrentAccount'
+        savingAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingsAccount'
+        debitCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCard'
+        creditCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditCard'
+        loans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Loan'
+        termDeposits:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermDeposit'
+        investmentAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvestmentAccount'
+        customProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        customDataGroupItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataGroupItem'
+    BaseProduct:
+      title: Base Product
+      description: |
+        The Base product holds all common properties between different product types
+      type: object
+      properties:
+        internalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        externalId:
+          minLength: 1
+          maxLength: 50
+          type: string
+          description: A unique identifier for the product coming from the core banking system.
+        productTypeExternalId:
+          title: External ID of the Product Type as setup in Product Summary
+          maxLength: 64
+          minLength: 1
+          pattern: ^[^\r\n]{1,64}$
+          type: string
+        legalEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntity'
+        name:
+          type: string
+          maxLength: 50
+          description: The name that can be assigned by the bank to label a product.
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed.
+        crossCurrencyAllowed:
+          type: boolean
+          description: Defines if cross currency transfer is allowed
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label the product.
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system.
+          format: 'date-time'
+        lastUpdateDate:
+          type: string
+          format: 'date-time'
+          description: Last date of balance (or other) parameter update for the particular product
+        state:
+          type: object
+          properties:
+            externalStateId:
+              maxLength: 50
+              type: string
+              description: An external unique identifier for the product state object.
+            state:
+              maxLength: 50
+              type: string
+              description: Name that describes the specific product state.
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+    CurrentAccount:
+      properties:
+        bookedBalance:
+          $ref: '#/components/schemas/BookedBalance'
+        availableBalance:
+          $ref: '#/components/schemas/AvailableBalance'
+        creditLimit:
+          $ref: '#/components/schemas/CreditLimit'
+        IBAN:
+          $ref: '#/components/schemas/IBAN'
+        BBAN:
+          $ref: '#/components/schemas/BBAN'
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        BIC:
+          $ref: '#/components/schemas/BIC'
+        bankBranchCode:
+          $ref: '#/components/schemas/BankBranchCode'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        valueDateBalance:
+          $ref: '#/components/schemas/ValueDateBalance'
+        creditLimitUsage:
+          $ref: '#/components/schemas/CreditLimitUsage'
+        creditLimitInterestRate:
+          $ref: '#/components/schemas/CreditLimitInterestRate'
+        creditLimitExpiryDate:
+          $ref: '#/components/schemas/CreditLimitExpiryDate'
+        accruedInterest:
+          $ref: '#/components/schemas/AccruedInterest'
+        debitCardsItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        startDate:
+          $ref: '#/components/schemas/StartDate'
+        minimumRequiredBalance:
+          $ref: '#/components/schemas/MinimumRequiredBalance'
+        accountHolderAddressLine1:
+          $ref: '#/components/schemas/AccountHolderAddressLine1'
+        accountHolderAddressLine2:
+          $ref: '#/components/schemas/AccountHolderAddressLine2'
+        accountHolderStreetName:
+          $ref: '#/components/schemas/AccountHolderStreetName'
+        town:
+          $ref: '#/components/schemas/Town'
+        postCode:
+          $ref: '#/components/schemas/PostCode'
+        countrySubDivision:
+          $ref: '#/components/schemas/CountrySubDivision'
+        creditAccount:
+          $ref: '#/components/schemas/CreditAccount'
+        debitAccount:
+          $ref: '#/components/schemas/DebitAccount'
+        accountHolderCountry:
+          $ref: '#/components/schemas/AccountHolderCountry'
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+    SavingsAccount:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        bookedBalance:
+          $ref: '#/components/schemas/BookedBalance'
+        accruedInterest:
+          $ref: '#/components/schemas/AccruedInterest'
+        IBAN:
+          $ref: '#/components/schemas/IBAN'
+        BBAN:
+          $ref: '#/components/schemas/BBAN'
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        BIC:
+          $ref: '#/components/schemas/BIC'
+        bankBranchCode:
+          $ref: '#/components/schemas/BankBranchCode'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        minimumRequiredBalance:
+          $ref: '#/components/schemas/MinimumRequiredBalance'
+        startDate:
+          $ref: '#/components/schemas/StartDate'
+        termUnit:
+          $ref: '#/components/schemas/TermUnit'
+        termNumber:
+          $ref: '#/components/schemas/TermNumber'
+        maturityDate:
+          $ref: '#/components/schemas/MaturityDate'
+        maturityAmount:
+          $ref: '#/components/schemas/MaturityAmount'
+        autoRenewalIndicator:
+          $ref: '#/components/schemas/AutoRenewalIndicator'
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/InterestPaymentFrequencyUnit'
+        interestPaymentFrequencyNumber:
+          $ref: '#/components/schemas/InterestPaymentFrequencyNumber'
+        principalAmount:
+          $ref: '#/components/schemas/PrincipalAmount'
+        interestSettlementAccount:
+          $ref: '#/components/schemas/InterestSettlementAccount'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        valueDateBalance:
+          $ref: '#/components/schemas/ValueDateBalance'
+        accountHolderAddressLine1:
+          $ref: '#/components/schemas/AccountHolderAddressLine1'
+        accountHolderAddressLine2:
+          $ref: '#/components/schemas/AccountHolderAddressLine2'
+        accountHolderStreetName:
+          $ref: '#/components/schemas/AccountHolderStreetName'
+        town:
+          $ref: '#/components/schemas/Town'
+        postCode:
+          $ref: '#/components/schemas/PostCode'
+        countrySubDivision:
+          $ref: '#/components/schemas/CountrySubDivision'
+        accountHolderCountry:
+          $ref: '#/components/schemas/AccountHolderCountry'
+        creditAccount:
+          $ref: '#/components/schemas/CreditAccount'
+        debitAccount:
+          $ref: '#/components/schemas/DebitAccount'
+    DebitCard:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits will/to be masked. Be aware that using card number differently is potential PCI risk.
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        cardNumber:
+          $ref: '#/components/schemas/CardNumber'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        debitCardsItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        startDate:
+          $ref: '#/components/schemas/StartDate'
+        validThru:
+          $ref: '#/components/schemas/ValidThru'
+    CreditCard:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        bookedBalance:
+          $ref: '#/components/schemas/BookedBalance'
+        availableBalance:
+          $ref: '#/components/schemas/AvailableBalance'
+        creditLimit:
+          $ref: '#/components/schemas/CreditLimit'
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits will/to be masked. Be aware that using card number differently is potential PCI risk.
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        cardNumber:
+          $ref: '#/components/schemas/CardNumber'
+        creditCardAccountNumber:
+          $ref: '#/components/schemas/CreditCardAccountNumber'
+        validThru:
+          $ref: '#/components/schemas/ValidThru'
+        applicableInterestRate:
+          $ref: '#/components/schemas/ApplicableInterestRate'
+        remainingCredit:
+          $ref: '#/components/schemas/RemainingCredit'
+        outstandingPayment:
+          $ref: '#/components/schemas/OutstandingPayment'
+        minimumPayment:
+          $ref: '#/components/schemas/MinimumPayment'
+        minimumPaymentDueDate:
+          $ref: '#/components/schemas/MinimumPaymentDueDate'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        creditLimitUsage:
+          $ref: '#/components/schemas/CreditLimitUsage'
+        creditLimitInterestRate:
+          $ref: '#/components/schemas/CreditLimitInterestRate'
+        accruedInterest:
+          $ref: '#/components/schemas/AccruedInterest'
+    Loan:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        bookedBalance:
+          $ref: '#/components/schemas/BookedBalance'
+        principalAmount:
+          $ref: '#/components/schemas/PrincipalAmount'
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        productNumber:
+          $ref: '#/components/schemas/ProductNumber'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        termUnit:
+          $ref: '#/components/schemas/TermUnit'
+        termNumber:
+          $ref: '#/components/schemas/TermNumber'
+        outstandingPrincipalAmount:
+          $ref: '#/components/schemas/OutstandingPrincipalAmount'
+        monthlyInstalmentAmount:
+          $ref: '#/components/schemas/MonthlyInstalmentAmount'
+        amountInArrear:
+          $ref: '#/components/schemas/AmountInArrear'
+        interestSettlementAccount:
+          $ref: '#/components/schemas/InterestSettlementAccount'
+        accruedInterest:
+          $ref: '#/components/schemas/AccruedInterest'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        maturityDate:
+          $ref: '#/components/schemas/MaturityDate'
+        valueDateBalance:
+          $ref: '#/components/schemas/ValueDateBalance'
+        creditAccount:
+          $ref: '#/components/schemas/CreditAccount'
+        debitAccount:
+          $ref: '#/components/schemas/DebitAccount'
+        IBAN:
+          $ref: '#/components/schemas/IBAN'
+        BBAN:
+          $ref: '#/components/schemas/BBAN'
+    TermDeposit:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        bookedBalance:
+          $ref: '#/components/schemas/BookedBalance'
+        principalAmount:
+          $ref: '#/components/schemas/PrincipalAmount'
+        accruedInterest:
+          $ref: '#/components/schemas/AccruedInterest'
+        IBAN:
+          $ref: '#/components/schemas/IBAN'
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        productNumber:
+          $ref: '#/components/schemas/ProductNumber'
+        accountInterestRate:
+          $ref: '#/components/schemas/AccountInterestRate'
+        startDate:
+          $ref: '#/components/schemas/StartDate'
+        termUnit:
+          $ref: '#/components/schemas/TermUnit'
+        termNumber:
+          $ref: '#/components/schemas/TermNumber'
+        maturityDate:
+          $ref: '#/components/schemas/MaturityDate'
+        maturityAmount:
+          $ref: '#/components/schemas/MaturityAmount'
+        autoRenewalIndicator:
+          $ref: '#/components/schemas/AutoRenewalIndicator'
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/InterestPaymentFrequencyUnit'
+        interestPaymentFrequencyNumber:
+          $ref: '#/components/schemas/InterestPaymentFrequencyNumber'
+        interestSettlementAccount:
+          $ref: '#/components/schemas/InterestSettlementAccount'
+        valueDateBalance:
+          $ref: '#/components/schemas/ValueDateBalance'
+        accountHolderName:
+          $ref: '#/components/schemas/AccountHolderName'
+        outstandingPrincipalAmount:
+          $ref: '#/components/schemas/OutstandingPrincipalAmount'
+        creditAccount:
+          $ref: '#/components/schemas/CreditAccount'
+        debitAccount:
+          $ref: '#/components/schemas/DebitAccount'
+        minimumRequiredBalance:
+          $ref: '#/components/schemas/MinimumRequiredBalance'
+    InvestmentAccount:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        currentInvestment:
+          $ref: '#/components/schemas/CurrentInvestment'
+        urgentTransferAllowed:
+          $ref: '#/components/schemas/UrgentTransfer'
+        productNumber:
+          $ref: '#/components/schemas/ProductNumber'
+        IBAN:
+          $ref: '#/components/schemas/IBAN'
+        BBAN:
+          $ref: '#/components/schemas/BBAN'
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/CurrentAccount'
+        - $ref: '#/components/schemas/DebitCard'
+        - $ref: '#/components/schemas/CreditCard'
+        - $ref: '#/components/schemas/Loan'
+        - $ref: '#/components/schemas/TermDeposit'
+        - $ref: '#/components/schemas/InvestmentAccount'
+        - $ref: '#/components/schemas/BaseProduct'
+      properties:
+        productTypeExternalId:
+          title: External ID of the Product Type as setup in Product Summary
+          maxLength: 64
+          minLength: 1
+          pattern: ^[^\r\n]{1,64}$
+          type: string
+    DebitCardItem:
+      type: object
+      properties:
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits will/to be masked. Be aware that using card number differently is potential PCI risk
+        expiryDate:
+          maxLength: 32
+          type: string
+          description: Expiration date of a credit card, after which is no longer valid
+          format: date-time
+        cardId:
+          maxLength: 32
+          type: string
+          description: External ID of the card
+        cardholderName:
+          maxLength: 64
+          type: string
+          description: First Name and Last Name of card holder.
+        cardType:
+          maxLength: 32
+          type: string
+          description: Card type to change card image based on it, ex. Maestro Gold
+        cardStatus:
+          maxLength: 32
+          type: string
+          description: Status of the card ex. Active, Expired etc
+
+    ###############################################
+    ## Legal Entity
+    ###############################################
+    LegalEntityResult:
+      title: Legal Entity Result
+      description: "Ingestion Result of the Ingested Legal Entity"
+      type: object
+      properties:
+        initialLegalEntity:
+          $ref: '#/components/schemas/LegalEntity'
+        processedLegalEntity:
+          $ref: '#/components/schemas/LegalEntity'
+        created:
+          type: string
+          format: 'date-time'
+        success:
+          type: boolean
+        retries:
+          type: integer
+        state:
+          type: string
+          enum:
+            - NEW
+            - UPDATED
+            - CREATED
+            - FAILED
+            - REJECTED
+        messages:
+          type: array
+          description: "(Optional) List of messages created during Ingestion of Legal Entity"
+          items:
+            type: string
+        time:
+          type: integer
+          description: "Number of milliseconds to process the Legal Entity"
+
+    LegalEntity:
+      title: Legal Entity
+      description: |
+        A Legal Entity is any personal or non-personal entity that is involved in a transaction or an product with the bank. Both the bank and its customers are legal entities
+
+        A Legal Entity:
+        * Has one or more users that act on its behalf.
+        * Owns one or more products.
+        * A legal entity hierarchy is a collection of parent-child relationships. For example, within the same deployment, this allows you to:
+        * Set up a holding structure for a corporate customer of the bank.
+        * Set up a structure within the bank to support country and regional offices.
+      type: object
+      properties:
+        name:
+          type: string
+        internalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        externalId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        legalEntityType:
+          $ref: '#/components/schemas/LegalEntityType'
+        parentExternalId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        parentInternalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        subsidiaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntity'
+        productGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductGroup"
+        limit:
+          $ref: '#/components/schemas/Limit'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobProfileUser'
+        businessFunctionGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessFunctionGroup'
+        administrators:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        masterServiceAgreement:
+          $ref: '#/components/schemas/ServiceAgreement'
+      required:
+        - name
+        - external
+        - legalEntityType
+        - administrators
+        - jobProfile
+    JobProfileUser:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        jobProfileTemplateId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        businessFunctionGroups:
+          type: array
+          description: Mutually exclusive with jobProfileTemplateId
+          items:
+            $ref: '#/components/schemas/BusinessFunctionGroup'
+    LegalEntityType:
+      type: string
+      title: Legal Entity Type
+      description: Type of the legal entity. Bank or Customer.
+      enum:
+        - CUSTOMER
+        - BANK
+    User:
+      title: User
+      description: |
+        User that accessses the system on behalf of the Legal Entity
+        A User is a person who interacts with the bank and who uses Backbase applications on behalf of the legal entity they are representing.
+      type: object
+      properties:
+        internalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        externalId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        legalEntityId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        emailAddress:
+          $ref: '#/components/schemas/EmailAddress'
+        mobileNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        #        emailAddresess:
+        #          type: array
+        #          title: "The electronic addresses the user can be reached by."
+        #          items:
+        #            $ref: '#/components/schemas/EmailAddress'
+        #        phoneNumbers:
+        #          type: array
+        #          title: "The phone numbers the user can be reached by."
+        #          items:
+        #            $ref: '#/components/schemas/PhoneNumber'
+        #        postalAddresses:
+        #          type: array
+        #          title: "The postal addresses the user can be reached by."
+        #          items:
+        #            $ref: '#/components/schemas/PostalAddress'
+        fullName:
+          type: string
+        limit:
+          $ref: '#/components/schemas/Limit'
+      required:
+        - externalId
+        - fullName
+    EmailAddress:
+      title: "The email addresses the user can be reached by."
+      required:
+        - address
+        - key
+        - type
+      type: object
+      properties:
+        key:
+          maxLength: 70
+          minLength: 1
+          type: string
+          description: Unique key identifying the email address.
+        type:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Key identifying the type of electronic address, e.g. work or personal.
+        primary:
+          type: boolean
+          description: Flag denoting whether this is the main electronic address.
+        address:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Address.
+    PhoneNumber:
+      required:
+        - key
+        - number
+        - type
+      type: object
+      properties:
+        key:
+          maxLength: 70
+          minLength: 1
+          type: string
+          description: Unique key identifying the phone address.
+        type:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Key identifying the type of phone number, e.g. mobile or land line.
+        primary:
+          type: boolean
+          description: Flag denoting whether this is the main phone number.
+        number:
+          maxLength: 30
+          minLength: 1
+          type: string
+          description: Phone number.
+    PostalAddress:
+      required:
+        - key
+        - type
+      type: object
+      properties:
+        key:
+          maxLength: 70
+          minLength: 1
+          type: string
+          description: Unique key identifying the postal address.
+        type:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Key identifying the type of postal address, e.g. residential, business, po-box, mail-to, delivery-to.
+        primary:
+          type: boolean
+          description: Flag denoting whether this is the main postal address.
+        department:
+          maxLength: 70
+          type: string
+          description: Department.
+        subDepartment:
+          maxLength: 70
+          type: string
+          description: Sub Department.
+        addressLine:
+          maxLength: 70
+          type: string
+          description: Address Line.
+        buildingNumber:
+          maxLength: 255
+          type: string
+          description: Building number.
+        streetName:
+          maxLength: 255
+          type: string
+          description: Street.
+        townName:
+          maxLength: 35
+          type: string
+          description: Town.
+        postalCode:
+          maxLength: 16
+          type: string
+          description: Postcode.
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Country sub-division.
+        country:
+          maxLength: 3
+          type: string
+          description: Country code - ISO 3166.
+    Limit:
+      title: Limit
+      type: object
+      properties:
+        transactional:
+          $ref: '#/components/schemas/TransactionalLimit'
+        daily:
+          $ref: '#/components/schemas/DailyLimit'
+        weekly:
+          $ref: '#/components/schemas/WeeklyLimit'
+        monthly:
+          $ref: '#/components/schemas/MonthlyLimit'
+        quarterly:
+          $ref: '#/components/schemas/QuarterlyLimit'
+        yearly:
+          $ref: '#/components/schemas/YearlyLimit'
+    ServiceAgreement:
+      title:  Service Agreement
+      description: |
+        The formal vehicle that allows users of one entity to access products of that or other entities
+        A Service agreement is:
+        - A contract that includes one or more legal entities. A legal entity that is participating in a service agreement can allow a subset of its users to act through that service agreement and/or allow a subset of its products to be accessed through the service agreement. Within each service agreement, permissions to perform specific tasks are granted to users, including access to products shared by one or more legal entities (participating in that service agreement). As such, a service agreement is a way to give third party users specific access to your products.
+        - A special kind of service agreement is called the master service agreement. This service agreement has one legal entity participant and once configured, the participant cannot be changed. Important to know is that once the user is granted with administrative permissions (e.g. manage account groups), he or she has the power to execute the task in any service agreement lower in the hierarchy. For example, if the user of the bank is assigned with manage account groups permission in the master service agreement of the bank, the user can manage account groups in any service agreement lower in the hierarchy.
+        - A service agreement may be restricted in time, by setting a time bound. Permissions granted to users in the time-restricted service agreement, are active and may be consumed, only while the time bound is valid.
+      properties:
+        internalId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        externalId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        name:
+          maxLength: 128
+          minLength: 1
+          pattern: ^\S(.*(\S))?$
+          type: string
+          description: The service agreement name
+        description:
+          maxLength: 255
+          minLength: 1
+          pattern: ^(\S|\n)((.|\n)*(\S|\n))?$
+          type: string
+          description: Description
+        participants:
+          type: array
+          description: Participants of the service agreement
+          items:
+            $ref: '#/components/schemas/LegalEntityParticipant'
+        validFromDate:
+          type: string
+          format: date
+          description: Start date of the service agreement.
+        validFromTime:
+          type: string
+          description: Start time of the service agreement.
+        validUntilDate:
+          type: string
+          format: date
+          description: End date of the service agreement.
+        validUntilTime:
+          type: string
+          description: End time of the service agreement.
+        status:
+          $ref: '#/components/schemas/LegalEntityStatus'
+        isMaster:
+          type: boolean
+          description: Master flag
+    LegalEntityParticipant:
+      required:
+        - externalId
+        - sharingAccounts
+        - sharingUsers
+      type: object
+      properties:
+        externalId:
+          $ref: '#/components/schemas/ExternalIdentifier'
+        sharingUsers:
+          type: boolean
+          description: Boolean value if the Participant is sharing users
+        sharingAccounts:
+          type: boolean
+          description: Boolean value if the participant is sharing accounts
+        admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIdentifier'
+        users:
+          type: array
+          description: User external ids
+          items:
+            $ref: '#/components/schemas/ExternalIdentifier'
+    LegalEntityStatus:
+      type: string
+      description: Status of the entity
+      enum:
+        - ENABLED
+        - DISABLED
+    ###############################################
+    ## Reusable Fields
+    ###############################################
+    InternalIdentifier:
+      title: Interal Identifier
+      type: string
+      description: Internal Read Only Identifier
+      readOnly: true
+    ExternalIdentifier:
+      title: External Identifier
+      maxLength: 64
+      minLength: 1
+      pattern: ^[^\r\n]{1,64}$
+      type: string
+      description: External legal entity identifier.
+    UrgentTransfer:
+      type: boolean
+      description: Defines if urgent transfer is allowed.
+    ValidThru:
+      type: string
+      format: date
+      description: Expiration date of a credit card, after which is no longer valid.
+    ValueDateBalance:
+      type: number
+      description: The balance of the account on a specific date that needs to be used for the calculation of interest. NB! If no date is specified (like for the book date balance) the current date can be assumed.
+    ProductNumber:
+      maxLength: 36
+      type: string
+      description: The number identifying the contract.
+    BBAN:
+      maxLength: 50
+      type: string
+      description: Specifying the BBAN of the account.
+    BIC:
+      maxLength: 11
+      type: string
+      description: Bank Identifier Code - international bank code that identifies particular banks worldwide
+    CardNumber:
+      type: number
+    CreditCardAccountNumber:
+      maxLength: 32
+      type: string
+      description: The number of the account the credit card transactions settle on (so actually the reference to the settlement account of the card)?
+    CreditLimitExpiryDate:
+      type: string
+      description: The date after which overdraft will no longer be available to the account (renewed automatically or cancelled).
+    CreditLimitInterestRate:
+      type: number
+      description: Overdraft Interest is an interest applied to the account for any time throughout the month when the account is overdrawn.
+    CreditLimitUsage:
+      type: number
+      description: Monetary amount of the used overdraft.
+    CrossCurrency:
+      type: boolean
+      description: Defines if cross currency transfer is allowed
+    AccountHolderAddressLine1:
+      maxLength: 70
+      type: string
+      description: Address of the Payer/Payee - Alternate address line for the account.
+    AccountHolderAddressLine2:
+      maxLength: 70
+      type: string
+      description: Address of the Payer/Payee - Alternate address line for the account.
+    AccountHolderCountry:
+      pattern: ^[A-Z]{2}$
+      type: string
+      description: Country of the account holder
+    AccountHolderName:
+      maxLength: 256
+      type: string
+      description: Name of the Payer/Payee i.e. Owner of the Account
+    AccountHolderStreetName:
+      maxLength: 70
+      type: string
+      description: Street name of the Payer/Payee - Alternate street name for the account.
+    AccountInterestRate:
+      type: number
+      description: The annualized cost of credit or debt-capital computed as the percentage ratio of interest to the principal.
+    AccountOpeningDate:
+      type: string
+    AccruedInterest:
+      description: The interest that is earned (credit interest) or due (debit interest) but not settled yet.
+      type: number
+    AmountInArrear:
+      type: number
+      format: double
+      description: The part of a debt that is overdue after missing one or more required payments. The amount of the arrears is the amount accrued from the date on which the first missed payment was due.
+    ApplicableInterestRate:
+      type: number
+      description: The interest rate or rates which would be used for a particular product.
+    AutoRenewalIndicator:
+      type: boolean
+      description: Indicates whether or not an product is to be continued after maturity automatically. Usually the product is renewed using the same principal and term unless renegotiation has taken place prior to expiration.
+    RemainingCredit:
+      type: number
+      description: Amount of money the user is available to use from the Credit limit of the account
+    OutstandingPayment:
+      type: number
+      description: Outstanding payment refers to the outstanding [unpaid] balance, i.e., the current amount due.
+    OutstandingPrincipalAmount:
+      type: number
+      format: double
+      description: This IS the value date balance of the product.
+    MaturityAmount:
+      type: number
+      format: double
+      description: Amount payable at the end of a holding period of a product (maturity date). For deposit all of the interest is usualy paid at maturity date (IF the term is shorter then one year).
+    MaturityDate:
+      type: string
+      description: End term of a holding period.
+    MinimumPayment:
+      type: number
+      format: double
+      description: The minimum payment set a percentage of balance, or a fixed cash amount.
+    MinimumPaymentDueDate:
+      type: string
+      description: Minimum Payment Due Date shown on your monthly statement to remain in good standing.
+    MinimumRequiredBalance:
+      type: number
+      format: double
+      description: Minimum amount that a customer must have in an account in order to receive some sort of service, such as keeping the account open or receive interest.
+    MonthlyInstalmentAmount:
+      type: number
+      format: double
+      description: A fixed payment amount paid by a borrower to the bank at a specified date each calendar month.
+    TermNumber:
+      type: number
+      description: The number of times interest rate is paid on the settlement account.
+    TermUnit:
+      type: string
+      description: The period of time and/or the interest rate arranged between Bank and customer.
+      enum:
+        - "Daily"
+        - "Weekly"
+        - "Monthly"
+        - "Quarterly"
+        - "Yearly"
+    Town:
+      maxLength: 35
+      type: string
+      description: Town of the Payer/Payee - Alternate town for the account.
+    InterestSettlementAccount:
+      maxLength: 32
+      type: string
+      description: Account that provides quick access to accumulated cash to facilitate daily settlements with other businesses.
+    CreditAccount:
+      type: boolean
+      description: Indicator whether or not the product can be used in payment orders as credit account.
+    DebitAccount:
+      type: boolean
+      description: Indicator whether or not the product can be used in payment orders as debit account.
+    IBAN:
+      maxLength: 34
+      pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+      type: string
+      description: Specifying the IBAN of the account.
+    BankBranchCode:
+      maxLength: 20
+      type: string
+      description: (This is to accomodate additional country specific fields like Sort Code in UK)
+    StartDate:
+      type: string
+      format: 'date-time'
+    PostCode:
+      maxLength: 16
+      type: string
+      description: Post Code of the Payer/Payee
+    CountrySubDivision:
+      maxLength: 35
+      type: string
+      description: Country SubDivision of the Payer/Payee
+    InterestPaymentFrequencyNumber:
+      type: number
+      description: Number of times per year when the accumulated interest is settled to the account on a regular basis. The frequency could be yearly, half-yearly, quarterly, monthly, weekly, daily (or not at all, until maturity)
+    InterestPaymentFrequencyUnit:
+      type: string
+      description: The period of time and/or the interest rate arranged between Bank and customer.
+      enum:
+        - "Daily"
+        - "Weekly"
+        - "Monthly"
+        - "Quarterly"
+        - "Yearly"
+    CurrencyCode:
+      pattern: ^[A-Z]{3}$
+      type: string
+      description: The alpha-3 code (complying with ISO 4217) of the currency that qualifies the amount
+    BookedBalance:
+      type: object
+      description: "Booked Balance"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    AvailableBalance:
+      type: object
+      description: "Available Balance"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    CreditLimit:
+      type: object
+      description: "Credit Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    PrincipalAmount:
+      type: object
+      description: "The amount that was (originally) contracted for the respective product. This is mainly used in the context of loans and deposits."
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    CurrentInvestment:
+      type: object
+      description: The total current value of all the securities kept in the account.
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    TransactionalLimit:
+      type: object
+      description: "Transactional Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    DailyLimit:
+      type: object
+      description: "Daily Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    WeeklyLimit:
+      type: object
+      description: "Weekly Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    MonthlyLimit:
+      type: object
+      description: "Monthly Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    QuarterlyLimit:
+      type: object
+      description: "Quarterly Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+    YearlyLimit:
+      type: object
+      description: "Yearly Limit"
+      properties:
+        amount:
+          type: number
+          format: double
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+
+    ProductState:
+      type: object
+      properties:
+        externalStateId:
+          maxLength: 50
+          type: string
+          description: An external unique identifier for the product state object.
+        state:
+          maxLength: 50
+          type: string
+          description: Name that describes the specific product state.
+
+    ApprovalStatus:
+      type: string
+      description: Presentation approval status
+      enum:
+        - APPROVED
+        - PENDING
+        - REJECTED
+      x-java-type: com.backbase.presentation.accessgroup.rest.spec.v2.accessgroups.ApprovalStatus
+      x-java-enum-names:
+        - APPROVED
+        - PENDING
+        - REJECTED
+
+
+    BusinessFunctionGroup:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InternalIdentifier'
+        legalEntityId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        serviceAgreementId:
+          $ref: '#/components/schemas/InternalIdentifier'
+        name:
+          maxLength: 128
+          minLength: 1
+          pattern: ^\S(.*(\S))?$
+          type: string
+          description: Function group name
+        description:
+          maxLength: 255
+          minLength: 1
+          pattern: ^(\S|\n)((.|\n)*(\S|\n))?$
+          type: string
+          description: Function group description
+        dataGroupsAllowed:
+          type: boolean
+          description: Wether this function group can be applied to data groups
+        functions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessFunction'
+    BusinessFunction:
+      required:
+        - name
+        - functionCode
+        - functionId
+        - privileges
+        - resourceCode
+        - resourceName
+      type: object
+      properties:
+        name:
+          maxLength: 32
+          description: |-
+            Name of the business function and unique In the system
+            <project_prefix> <descriptive name>
+          minLength: 1
+          type: string
+          example: "bankA PISP"
+        functionId:
+          description: |-
+            Unique ID in the system
+            Guidelines: <project_prefix>.<1xxx>
+          maxLength: 36
+          minLength: 1
+          type: string
+          example: "bankA.1000"
+        functionCode:
+          maxLength: 32
+          minLength: 1
+          type: string
+          description: |-
+            Unique code used for internationalization on front-end (Widget)
+            Guidelines: same as function name in lower case, use dots instead of spaces
+            On front-end you can map this code with the descriptive name of the business function. For example, Make payments from the business’s bank accounts using third party websites or software.
+          example: bankA.pisp
+        resourceName:
+          description: |-
+            Logical Grouping of Business Functions (not real usage at the moment, might be helpful in future)
+            Guidelines: <project_prefix> <if the BF is part of some logical grouping or use the same name as the BF>
+          maxLength: 32
+          minLength: 1
+          type: string
+          example: bankA psd2
+        resourceCode:
+          description: |-
+            Unique code used for internationalization on front-end (Widget) if required (for now we are not using this at all)
+            Guidelines: same as resource_name in lower case, use dots instead of spaces
+          maxLength: 32
+          minLength: 1
+          type: string
+          example: bankA.psd2
+        privileges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Privilege'
+    Privilege:
+      required:
+        - privilege
+      type: object
+      properties:
+        privilege:
+          maxLength: 16
+          minLength: 1
+          type: string
+        supportsLimit:
+          type: boolean
+        limit:
+          $ref: '#/components/schemas/Limit'
+    AssignedPermission:
+      type: object
+      properties:
+        permittedObjectInternalIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalIdentifier'
+        permittedObjectExternalIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIdentifier'
+        approvalStatus:
+          $ref: '#/components/schemas/ApprovalStatus'
+        resourceName:
+          type: string
+        functionName:
+          type: string
+        privileges:
+          $ref: '#/components/schemas/Privilege'
+        permittedObjects:
+          type: object
+          additionalProperties: true
+
+    ###############################################
+    ## Additional Data Group Items
+    ###############################################
+
+    CustomDataGroupItem:
+      type: object
+      properties:
+        externalId:
+          type: string
+          description: "Data Group Item Internal Id"
+        internalId:
+          type: string
+          description: "Data Group Item External Id"
+
+
+
+    ###############################################
+    ## Generic Schemas
+    ###############################################
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Default Message. Any further information.
+              key:
+                type: string
+                description: '{capability-name}.api.{api-key-name}. For generated
+                  validation errors this is the path in the document the error resolves
+                  to. e.g. object name + ''.'' + field'
+              context:
+                type: object
+                description: Context can be anything used to construct localised messages.
+                x-java-type: java.util.Map<String,String>
+            description: A validation error
+  examples:
+    RootLegalEntityHierarchyExample:
+      description: "Example Request for setting up Root Legal Entity Structure as described on Backbase Community"
+      value:
+        name: "Bank"
+        externalId: "bank"
+        legalEntityType: "BANK"
+        subsidiaries:
+          - name: "John"
+            externalId: "john"
+            legalEntityType: "CUSTOMER"
+            administrators:
+              - externalId: "john"
+                fullName: "John"
+          - name: "Sara"
+            externalId: "sara"
+            legalEntityType: "CUSTOMER"
+            administrators:
+              - externalId: "sara"
+                fullName: "Sara"
+          - name: "Backbase"
+            externalId: "backbase"
+            legalEntityType: "CUSTOMER"
+            subsidiaries:
+              - name: "Cardiff"
+                externalId: "cardiff"
+                legalEntityType: "CUSTOMER"
+            administrators:
+              - externalId: "backbaseAdmin"
+                fullName: "Backbase Admin"
+          - name: "ASP"
+            externalId: "asp"
+            legalEntityType: "CUSTOMER"
+            administrators:
+              - externalId: "ASPAdmin"
+                fullName: "ASP Admin"
+        administrators:
+          - externalId: "admin"
+            fullName: "Administrator"
+    RootLegalEntityForMambu:
+      description: "Root Legal Entity Setup for Mambu Integration"
+      value:
+        name: "Backbase Root Bank"
+        externalId: "bank"
+        legalEntityType: "BANK"
+        administrators:
+          - externalId: "admin"
+            fullName: "Administrator"
+            users:
+              - externalId: "admin"
+                fullName: "admin"
+                businessFunctionGroups:
+                  - name: "Entitlements"
+                    functions:
+                      - functionId: "1019"
+                        functionCode: "manage.data.groups"
+                        resourceName: "Entitlements"
+                        resourceCode: "entitlements"
+                        privileges:
+                          - privilege: "view"
+                          - privilege: "create"
+                          - privilege: "edit"
+                          - privilege: "delete"
+                      - functionId: "1020"
+                        functionCode: "manage.function.groups"
+                        resourceName: "Entitlements"
+                        resourceCode: "entitlements"
+                        privileges:
+                          - privilege: "view"
+                          - privilege: "create"
+                          - privilege: "edit"
+                          - privilege: "delete"
+                  - name: "Legal Entity"
+                    functions:
+                      - functionId: "1011"
+                        functionCode: "manage.legalentities"
+                        resourceName: "Legal Entity"
+                        resourceCode: "legalentity"
+                        privileges:
+                          - privilege: "create"
+                          - privilege: "edit"
+                          - privilege: "delete"
+                          - privilege: "view"
+                  - name: "Service Agreement"
+                    functions:
+                      - functionId: "1007"
+                        functionCode: "assign.users"
+                        resourceName: "Service Agreement"
+                        resourceCode: "service.agreement"
+                        privileges:
+                          - privilege: "view"
+                          - privilege: "create"
+                          - privilege: "edit"
+                      - functionId: "1028"
+                        functionCode: "manage.service.agreements"
+                        resourceName: "Service Agreement"
+                        resourceCode: "service.agreement"
+                        privileges:
+                          - privilege: "view"
+                          - privilege: "create"
+                          - privilege: "edit"
+                          - privilege: "delete"
+                      - functionId: "1009"
+                        functionCode: "assign.permissions"
+                        resourceName: "Service Agreement"
+                        resourceCode: "service.agreement"
+                        privileges:
+                          - privilege: "view"
+                          - privilege: "create"
+                          - privilege: "edit"
+                  - name: "User"
+                    functions:
+                      - functionId: "1010"
+                        functionCode: "manage.users"
+                        resourceName: "User"
+                        resourceCode: "user"
+                        privileges:
+                          - privilege: "view"
+        subsidiaries:
+          - name: "Mambu"
+            externalId: "mambu-bank"
+            legalEntityType: "CUSTOMER"
+            administrators:
+              - externalId: "mambu-admin"
+                fullName: "Mambu Admin"
+            users:
+              - externalId: "mambu-admin"
+                fullName: "Mambu Admin"
+                jobProfileTemplateId: "admin"
+    RootLegalEntityHierarchyWithArrangements:
+      description: "Example setup with arrangements"
+      value:
+        name: "Bank"
+        externalId: "bank"
+        legalEntityType: "BANK"
+        subsidiaries:
+          - name: "John"
+            externalId: "john"
+            legalEntityType: "CUSTOMER"
+            productGroups:
+              - productGroupType: "ARRANGEMENTS"
+                users:
+                  - user:
+                      externalId: "john"
+                      fullName: "John"
+                    jobProfileTemplateId: "full-access-sepa"
+                currentAccounts:
+                  - iban: "NL40INGB1876219181"
+                    bookedBalance:
+                      amount: 5245070.50
+                      currencyCode: "EUR"
+                    availableBalance:
+                      amount: 504096.90
+                      currencyCode: "EUR"
+                    creditLimit:
+                      amount: 732884.60
+                      currencyCode: "EUR"
+                    IBAN: "NL40INGB1876219181"
+                    urgentTransferAllowed: true
+                    bankBranchCode: "ING_AMSTERDAM"
+                    accruedInterest: 3
+                    startDate: "2016-02-10T15:49:55.457+01:00"
+                    externalId: "current-account"
+                    productTypeExternalId: "current-account"
+                    name: "My Current Account "
+                    externalTransferAllowed: true
+                    crossCurrencyAllowed: true
+                    bankAlias: "Johns Current Account"
+                    accountOpeningDate: "2016-02-10T15:49:55.459+01:00"
+                    currency: "EUR"
+                savingAccounts:
+                  - iban: "NL42INGB4416709382"
+                    bookedBalance:
+                      amount: 8930709.60
+                      currencyCode: "EUR"
+                    accruedInterest: 3
+                    IBAN: "NL42INGB4416709382"
+                    urgentTransferAllowed: true
+                    bankBranchCode: "ING_AMSTERDAM"
+                    startDate: "2016-02-10T15:49:55.465+01:00"
+                    externalId: "savings-account"
+                    productTypeExternalId: "savings-account"
+                    name: "My Savings Account "
+                    externalTransferAllowed: true
+                    crossCurrencyAllowed: true
+                    bankAlias: "Johns savings Account"
+                    accountOpeningDate: "2016-02-10T15:49:55.465+01:00"
+                    currency: "EUR"
+            users:
+              - user:
+                  externalId: "john"
+                  fullName: "John"
+                jobProfileTemplateId: "full-access-sepa"
+            administrators:
+              - externalId: "john"
+                fullName: "John"
+        administrators:
+          - externalId: "admin"
+            fullName: "Administrator"
+    LegalEntitiesForMockBack:
+      description: "10 Random Legal Entities"
+      value:
+        - name: "Arjuna Zariouh"
+          externalId: "arjuna.zariouh"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "arjuna.zariouh"
+                    fullName: "Arjuna Zariouh"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL21IXPV8312940653"
+                  bban: "IXPV8312940653"
+                  availableBalance:
+                    amount: 1361.15
+                    currencyCode: "EUR"
+                  IBAN: "NL21IXPV8312940653"
+                  BBAN: "IXPV8312940653"
+                  externalId: "MMUUM38"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL44NRPK3529411394"
+                  bban: "NRPK3529411394"
+                  bookedBalance:
+                    amount: 2543.44
+                    currencyCode: "EUR"
+                  IBAN: "NL44NRPK3529411394"
+                  BBAN: "NRPK3529411394"
+                  externalId: "KVLDC47"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 4971.49
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2227260382671058"
+                  externalId: "ZUAXC65"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "arjuna.zariouh"
+                fullName: "Arjuna Zariouh"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "arjuna.zariouh"
+              fullName: "Arjuna Zariouh"
+        - name: "Wilko Kortenoeven"
+          externalId: "wilko.kortenoeven"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "wilko.kortenoeven"
+                    fullName: "Wilko Kortenoeven"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL15QPIF5788308370"
+                  bban: "QPIF5788308370"
+                  availableBalance:
+                    amount: 1124.83
+                    currencyCode: "EUR"
+                  IBAN: "NL15QPIF5788308370"
+                  BBAN: "QPIF5788308370"
+                  externalId: "KRRIK92"
+                  productTypeExternalId: "deluxe-account"
+                  name: "Deluxe Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL10CSZK4161467530"
+                  bban: "CSZK4161467530"
+                  bookedBalance:
+                    amount: 16415.62
+                    currencyCode: "EUR"
+                  IBAN: "NL10CSZK4161467530"
+                  BBAN: "CSZK4161467530"
+                  externalId: "LHVFB27"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 4816.44
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2568939075636117"
+                  externalId: "WWWZJ28"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "wilko.kortenoeven"
+                fullName: "Wilko Kortenoeven"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "wilko.kortenoeven"
+              fullName: "Wilko Kortenoeven"
+        - name: "Dianda Ameijde"
+          externalId: "dianda.ameijde"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "dianda.ameijde"
+                    fullName: "Dianda Ameijde"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL70BVOS8480903574"
+                  bban: "BVOS8480903574"
+                  availableBalance:
+                    amount: 2900.29
+                    currencyCode: "EUR"
+                  IBAN: "NL70BVOS8480903574"
+                  BBAN: "BVOS8480903574"
+                  externalId: "ZUYJD68"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL83HYNH8661536895"
+                  bban: "HYNH8661536895"
+                  bookedBalance:
+                    amount: 5493.11
+                    currencyCode: "EUR"
+                  IBAN: "NL83HYNH8661536895"
+                  BBAN: "HYNH8661536895"
+                  externalId: "RIAXC66"
+                  productTypeExternalId: "children-savings-account"
+                  name: "Children Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 220.13
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2234696751464685"
+                  externalId: "VPJEW52"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "dianda.ameijde"
+                fullName: "Dianda Ameijde"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "dianda.ameijde"
+              fullName: "Dianda Ameijde"
+        - name: "Tuur Hijden"
+          externalId: "tuur.hijden"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "tuur.hijden"
+                    fullName: "Tuur Hijden"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL84EJZE8641983563"
+                  bban: "EJZE8641983563"
+                  availableBalance:
+                    amount: 3145.22
+                    currencyCode: "EUR"
+                  IBAN: "NL84EJZE8641983563"
+                  BBAN: "EJZE8641983563"
+                  externalId: "PSOPS99"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL37WJCX4987126138"
+                  bban: "WJCX4987126138"
+                  bookedBalance:
+                    amount: 14381.17
+                    currencyCode: "EUR"
+                  IBAN: "NL37WJCX4987126138"
+                  BBAN: "WJCX4987126138"
+                  externalId: "TFJPP55"
+                  productTypeExternalId: "children-savings-account"
+                  name: "Children Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 3478.56
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2557299869077900"
+                  externalId: "BIMQC87"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "tuur.hijden"
+                fullName: "Tuur Hijden"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "tuur.hijden"
+              fullName: "Tuur Hijden"
+        - name: "Josha Dirkzwager"
+          externalId: "josha.dirkzwager"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "josha.dirkzwager"
+                    fullName: "Josha Dirkzwager"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL24SDXC6440314763"
+                  bban: "SDXC6440314763"
+                  availableBalance:
+                    amount: 410.51
+                    currencyCode: "EUR"
+                  IBAN: "NL24SDXC6440314763"
+                  BBAN: "SDXC6440314763"
+                  externalId: "GZZYC91"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL53YXAR1504815484"
+                  bban: "YXAR1504815484"
+                  bookedBalance:
+                    amount: 3104.43
+                    currencyCode: "EUR"
+                  IBAN: "NL53YXAR1504815484"
+                  BBAN: "YXAR1504815484"
+                  externalId: "ZDTHZ31"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 4876.23
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "5390161801797850"
+                  externalId: "NJZXT99"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "josha.dirkzwager"
+                fullName: "Josha Dirkzwager"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "josha.dirkzwager"
+              fullName: "Josha Dirkzwager"
+        - name: "Susy Vaes"
+          externalId: "susy.vaes"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "susy.vaes"
+                    fullName: "Susy Vaes"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL86RAJI2240638455"
+                  bban: "RAJI2240638455"
+                  availableBalance:
+                    amount: 2886.68
+                    currencyCode: "EUR"
+                  IBAN: "NL86RAJI2240638455"
+                  BBAN: "RAJI2240638455"
+                  externalId: "GLKYX22"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL33BTQX9871921637"
+                  bban: "BTQX9871921637"
+                  bookedBalance:
+                    amount: 8757.94
+                    currencyCode: "EUR"
+                  IBAN: "NL33BTQX9871921637"
+                  BBAN: "BTQX9871921637"
+                  externalId: "GVHCA22"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 1537.67
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "5585151937982752"
+                  externalId: "ZFUFS33"
+                  productTypeExternalId: "platinum-cart"
+                  name: "Platinum Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "susy.vaes"
+                fullName: "Susy Vaes"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "susy.vaes"
+              fullName: "Susy Vaes"
+        - name: "Jeanot Klokgieters"
+          externalId: "jeanot.klokgieters"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "jeanot.klokgieters"
+                    fullName: "Jeanot Klokgieters"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL35JSDF8142179308"
+                  bban: "JSDF8142179308"
+                  availableBalance:
+                    amount: 1495.99
+                    currencyCode: "EUR"
+                  IBAN: "NL35JSDF8142179308"
+                  BBAN: "JSDF8142179308"
+                  externalId: "VZUQB63"
+                  productTypeExternalId: "deluxe-account"
+                  name: "Deluxe Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL37XKCX1742469136"
+                  bban: "XKCX1742469136"
+                  bookedBalance:
+                    amount: 19834.08
+                    currencyCode: "EUR"
+                  IBAN: "NL37XKCX1742469136"
+                  BBAN: "XKCX1742469136"
+                  externalId: "MMTZB72"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 3908.74
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "5146419545323194"
+                  externalId: "MRPOO64"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "jeanot.klokgieters"
+                fullName: "Jeanot Klokgieters"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "jeanot.klokgieters"
+              fullName: "Jeanot Klokgieters"
+        - name: "Shannon Dame"
+          externalId: "shannon.dame"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "shannon.dame"
+                    fullName: "Shannon Dame"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL08UGRA6786713418"
+                  bban: "UGRA6786713418"
+                  availableBalance:
+                    amount: 4541.55
+                    currencyCode: "EUR"
+                  IBAN: "NL08UGRA6786713418"
+                  BBAN: "UGRA6786713418"
+                  externalId: "TSINZ84"
+                  productTypeExternalId: "standard-account"
+                  name: "Standard Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL29EXPS7705976984"
+                  bban: "EXPS7705976984"
+                  bookedBalance:
+                    amount: 9574.37
+                    currencyCode: "EUR"
+                  IBAN: "NL29EXPS7705976984"
+                  BBAN: "EXPS7705976984"
+                  externalId: "EZPOS24"
+                  productTypeExternalId: "children-savings-account"
+                  name: "Children Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 4352.69
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2229412477276685"
+                  externalId: "ZLGTV24"
+                  productTypeExternalId: "platinum-cart"
+                  name: "Platinum Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "shannon.dame"
+                fullName: "Shannon Dame"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "shannon.dame"
+              fullName: "Shannon Dame"
+        - name: "Jorit Lennep"
+          externalId: "jorit.lennep"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "jorit.lennep"
+                    fullName: "Jorit Lennep"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL60XXNV1524366379"
+                  bban: "XXNV1524366379"
+                  availableBalance:
+                    amount: 2997.96
+                    currencyCode: "EUR"
+                  IBAN: "NL60XXNV1524366379"
+                  BBAN: "XXNV1524366379"
+                  externalId: "AAFNL54"
+                  productTypeExternalId: "deluxe-account"
+                  name: "Deluxe Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL63NJXD5706850638"
+                  bban: "NJXD5706850638"
+                  bookedBalance:
+                    amount: 13276.21
+                    currencyCode: "EUR"
+                  IBAN: "NL63NJXD5706850638"
+                  BBAN: "NJXD5706850638"
+                  externalId: "OUVGW51"
+                  productTypeExternalId: "flexible-savings-account"
+                  name: "Flexible Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 4082.10
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2224980286782171"
+                  externalId: "LGKOX46"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "jorit.lennep"
+                fullName: "Jorit Lennep"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "jorit.lennep"
+              fullName: "Jorit Lennep"
+        - name: "Brechtje Spekle"
+          externalId: "brechtje.spekle"
+          legalEntityType: "CUSTOMER"
+          parentExternalId: "mock-bank"
+          productGroups:
+            - productGroupType: "ARRANGEMENTS"
+              name: "Generated Product Group"
+              users:
+                - user:
+                    externalId: "brechtje.spekle"
+                    fullName: "Brechtje Spekle"
+                  jobProfileTemplateId: "full-access-sepa"
+              currentAccounts:
+                - iban: "NL23MIHV0010555394"
+                  bban: "MIHV0010555394"
+                  availableBalance:
+                    amount: 2551.85
+                    currencyCode: "EUR"
+                  IBAN: "NL23MIHV0010555394"
+                  BBAN: "MIHV0010555394"
+                  externalId: "NZWPX81"
+                  productTypeExternalId: "deluxe-account"
+                  name: "Deluxe Account"
+                  currency: "EUR"
+              savingAccounts:
+                - iban: "NL91OXZW2557522236"
+                  bban: "OXZW2557522236"
+                  bookedBalance:
+                    amount: 16709.35
+                    currencyCode: "EUR"
+                  IBAN: "NL91OXZW2557522236"
+                  BBAN: "OXZW2557522236"
+                  externalId: "SZWUK55"
+                  productTypeExternalId: "children-savings-account"
+                  name: "Children Savings"
+                  currency: "EUR"
+              creditCards:
+                - availableBalance:
+                    amount: 2333.64
+                    currencyCode: "EUR"
+                  creditCardAccountNumber: "2720716351832783"
+                  externalId: "IAQJR47"
+                  productTypeExternalId: "gold-card"
+                  name: "Gold Card"
+                  currency: "EUR"
+          users:
+            - user:
+                externalId: "brechtje.spekle"
+                fullName: "Brechtje Spekle"
+              jobProfileTemplateId: "full-access-sepa"
+          administrators:
+            - externalId: "brechtje.spekle"
+              fullName: "Brechtje Spekle"
