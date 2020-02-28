@@ -41,6 +41,16 @@ public class ExporterTest {
         validateExport(export);
     }
 
+    @Test
+    public void testBackbaseWalletApi() throws Exception {
+
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
+
     protected void validateExport(String export) throws IOException, com.backbase.boat.ExportException {
         if (export == null)
             throw new ExportException("Invalid Export");
