@@ -43,7 +43,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.backbase.boat.BoatTerminal</mainClass>
+                            <mainClass>com.backbase.oss.BoatTerminal</mainClass>
                         </manifest>
                     </archive>
 
@@ -62,11 +62,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.backbase.boat.BoatTerminal</mainClass>
+                            <mainClass>com.backbase.oss.boat.BoatTerminal</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

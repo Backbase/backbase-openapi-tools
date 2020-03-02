@@ -14,17 +14,25 @@
         <developer>
             <id>bartv</id>
             <name>Bart Veenstra</name>
+            <organization>Backbase</organization>
+            <organizationUrl>https://www.backbase.com</organizationUrl>
             <email>bartv@backbase.com</email>
         </developer>
     </developers>
 
     <licenses>
         <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <name>Backbase License 2.0</name>
+            <url>https://raw.githubusercontent.com/Backbase/backbase-openapi-tools/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:Backbase/backbase-openapi-tools.git</connection>
+        <developerConnection>scm:git:ssh://github.com:Backbase/backbase-openapi-tools.git</developerConnection>
+        <url>https://github.com/Backbase/backbase-openapi-tools/tree/master</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
