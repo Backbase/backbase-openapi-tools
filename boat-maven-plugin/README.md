@@ -15,9 +15,9 @@ Configuration example
    <build>
        <plugins>
             <plugin>
-                <groupId>com.backbase.codegen</groupId>
+                <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>0.0.31-SNAPSHOT</version>
+                <version>0.1.0.0-SNAPSHOT</version>
                 <configuration>
                     <!-- Showing defaults - do not configure defaults! -->
                     <!-- The input directory -->
@@ -26,6 +26,13 @@ Configuration example
                     <output>${project.basedir}/target/openapi</output>
                     <!-- Whether to fail the build on errors -->
                     <failOnError>true</failOnError>
+                    <!-- Override the default server entry -->
+                    <servers>
+                        <server>
+                            <url>http://localhost:4010</url>
+                            <description>mock-api-server</description>
+                        </server>
+                    </servers>
                 </configuration>
             </plugin>
         </plugins>
