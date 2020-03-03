@@ -10,6 +10,8 @@
 
     <name>Backbase OpenApi Tools</name>
 
+    <url>https://github.com/Backbase/backbase-openapi-tools</url>
+
     <developers>
         <developer>
             <id>bartv</id>
