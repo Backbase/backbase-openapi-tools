@@ -1,4 +1,5 @@
 ![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
+![Release](https://github.com/Backbase/backbase-openapi-tools/workflows/Release/badge.svg)
 
 # Backbase OpenApi Tools 
 
