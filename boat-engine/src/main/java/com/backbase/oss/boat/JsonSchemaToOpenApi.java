@@ -59,17 +59,18 @@ class JsonSchemaToOpenApi {
     private final URL baseUrl;
     private final Components components;
     private final Map<String, String> ramlTypeReferences;
-    private final boolean convertJsonExamplesToYaml;
+    private final boolean addJavaTypeExtensions;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonSchemaToOpenApi(URL baseUrl, Components components, Map<String, String> ramlTypeReferences, boolean convertJsonExamplesToYaml) {
+    public JsonSchemaToOpenApi(URL baseUrl, Components components, Map<String, String> ramlTypeReferences, boolean addJavaTypeExtensions) {
+
         this.baseUrl = baseUrl;
         this.components = components;
         this.jsonSchemas = new TreeMap<>();
         this.referenceNames = HashBiMap.create();
         this.ramlTypeReferences = ramlTypeReferences;
-        this.convertJsonExamplesToYaml = convertJsonExamplesToYaml;
+        this.addJavaTypeExtensions = addJavaTypeExtensions;
     }
 
     private Map<String, JsonNode> jsonSchemas;
@@ -106,7 +107,7 @@ class JsonSchemaToOpenApi {
                 if (schema == null) {
                     referenceNames.put(baseUrl.toString() + "/" + name + ".raml", name);
                     schema = createNewSchema(null, jsonSchema, name, components, baseUrl);
-                    schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), convertJsonExamplesToYaml));
+                    schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), true));
                     components.addSchemas(name, schema);
                 }
                 log.debug("Created new schema from: {} as: {}", name, schemaName);
@@ -118,7 +119,7 @@ class JsonSchemaToOpenApi {
             throw new ExportException("Cannot dereference json schema from type: " + typeDeclaration.name(), e);
         }
 
-        schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), convertJsonExamplesToYaml));
+        schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), true));
 
         return schema;
 
@@ -283,11 +284,13 @@ class JsonSchemaToOpenApi {
             $ref = getReferenceFromParent($ref, parent);
         }
         schema.set$ref($ref);
-        if (type.hasNonNull(JAVA_TYPE)) {
-            schema.addExtension(X_JAVA_TYPE, type.get(JAVA_TYPE).textValue());
-        }
-        if (type.hasNonNull("javaEnumNames")) {
-            schema.addExtension("x-java-enum-names", getEnum(type, "javaEnumNames"));
+        if (addJavaTypeExtensions) {
+            if (type.hasNonNull(JAVA_TYPE)) {
+                schema.addExtension(X_JAVA_TYPE, type.get(JAVA_TYPE).textValue());
+            }
+            if (type.hasNonNull("javaEnumNames")) {
+                schema.addExtension("x-java-enum-names", getEnum(type, "javaEnumNames"));
+            }
         }
         schema.setEnum(getEnum(type));
         return schema;

@@ -1,8 +1,10 @@
 package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.serializer.SerializerUtils;
+import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
 import com.backbase.oss.boat.transformers.Decomposer;
 import com.backbase.oss.boat.transformers.Deprecator;
+import com.backbase.oss.boat.transformers.LicenseAdder;
 import com.backbase.oss.boat.transformers.Transformer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -16,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -58,16 +58,11 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "includeGroupId", defaultValue = "com.backbase.")
     protected String includeGroupIds;
 
-    @Parameter(property = "includeArtifactIds", defaultValue = "presentation,integration,persistence,pandp")
-    protected String includeArtifactIds;
-
-
     @Parameter(property = "xLogoUrl")
     protected String xLogoUrl;
 
     @Parameter(property = "xLogoAltText")
     protected String xLogoAltText;
-
 
     @Parameter(property = "licenseName")
     protected String licenseName;
@@ -87,7 +82,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "convertJsonExamplesToYaml", defaultValue = "true")
     protected boolean convertJsonExamplesToYaml;
 
-
     @Parameter(property = "appendDeprecatedMetadataInDescription", defaultValue = "true")
     protected boolean appendDeprecatedMetadataInDescription = true;
 
@@ -99,6 +93,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     @Parameter(property = "includeVersionInOutputDirectory", defaultValue = "true")
     protected boolean includeVersionInOutputDirectory;
+
+    @Parameter(property = "addAdditionalProperties")
+    protected List<String> addAdditionalProperties = new ArrayList<>();
 
 
     /**
@@ -129,8 +126,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     protected boolean isRamlSpec(File file) {
         return file.getName().equals("api.raml")
-                || file.getName().equals("service-api.raml")
-                || file.getName().equals("client-api.raml");
+            || file.getName().equals("service-api.raml")
+            || file.getName().equals("client-api.raml");
     }
 
     protected File export(String name, Optional<String> version, File ramlFile, File outputDirectory) throws ExportException, IOException {
@@ -169,6 +166,13 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         if (decompose) {
             transformers.add(new Decomposer());
         }
+        if (!addAdditionalProperties.isEmpty()) {
+            transformers.add(new AdditionalPropertiesAdder(addAdditionalProperties));
+        }
+
+        if (licenseName != null && licenseUrl != null) {
+            transformers.add(new LicenseAdder(licenseName, licenseUrl));
+        }
 
         OpenAPI openApi = Exporter.export(ramlFile, convertJsonExamplesToYaml, transformers);
         pimpInfo(name, version, ramlFile, openApi);
@@ -176,22 +180,22 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             // Iterate over all operations and update the description
             openApi.getPaths().values().stream().forEach(pathItem -> {
                 pathItem.readOperationsMap().entrySet().stream()
-                        .filter(this::isDeprecated)
-                        .forEach(httpMethodOperationEntry -> {
-                                    Operation operation = httpMethodOperationEntry.getValue();
-                                    Optional<String> deprecatedInformationOptional = generateMarkdownForDeprecationExtention(operation);
+                    .filter(this::isDeprecated)
+                    .forEach(httpMethodOperationEntry -> {
+                            Operation operation = httpMethodOperationEntry.getValue();
+                            Optional<String> deprecatedInformationOptional = generateMarkdownForDeprecationExtention(operation);
 
-                                    deprecatedInformationOptional.ifPresent(deprecatedInformation -> {
-                                        log.debug("Inserting deprecated information: \n{}", deprecatedInformation);
-                                        if (operation.getDescription() == null) {
-                                            operation.setDescription(deprecatedInformation);
-                                        } else {
-                                            operation.setDescription(operation.getDescription() + "\n" + deprecatedInformation);
-                                        }
-                                    });
-                                    pathItem.operation(httpMethodOperationEntry.getKey(), operation);
+                            deprecatedInformationOptional.ifPresent(deprecatedInformation -> {
+                                log.debug("Inserting deprecated information: \n{}", deprecatedInformation);
+                                if (operation.getDescription() == null) {
+                                    operation.setDescription(deprecatedInformation);
+                                } else {
+                                    operation.setDescription(operation.getDescription() + "\n" + deprecatedInformation);
                                 }
-                        );
+                            });
+                            pathItem.operation(httpMethodOperationEntry.getKey(), operation);
+                        }
+                    );
             });
         }
         return openApi;
@@ -236,8 +240,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     private void pimpInfo(String name, Optional<String> version, File ramlFile, OpenAPI openApi) {
         Info info = openApi.getInfo();
         String apiName = name + " - "
-                + info.getTitle() + " - "
-                + StringUtils.substringBeforeLast(ramlFile.getName(), ".");
+            + info.getTitle() + " - "
+            + StringUtils.substringBeforeLast(ramlFile.getName(), ".");
 //        info.setTitle(apiName);
         version.ifPresent(info::setVersion);
 
@@ -324,14 +328,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         }
     }
 
-    protected boolean isSpecification(Artifact artifact) {
-        return Arrays.stream(includeArtifactIds.split(","))
-                .filter(StringUtils::isNotEmpty)
-                .anyMatch(artifactId -> {
-                    return artifact.getArtifactId().contains(artifactId);
-                });
-    }
-
     public void setProject(MavenProject project) {
         this.project = project;
     }
@@ -401,10 +397,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         this.includeGroupIds = includeGroupIds;
     }
 
-    public void setIncludeArtifactIds(String includeArtifactIds) {
-        this.includeArtifactIds = includeArtifactIds;
-    }
-
     public void setxLogoUrl(String xLogoUrl) {
         this.xLogoUrl = xLogoUrl;
     }
@@ -445,9 +437,13 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         this.output = output;
     }
 
-    public List<Server> getServers() { return servers; }
+    public List<Server> getServers() {
+        return servers;
+    }
 
-    public void setServers(List<Server> servers) { this.servers = servers; }
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
+    }
 
     public ArtifactResult resolveArtifactFromRepositories(org.eclipse.aether.artifact.Artifact artifact) {
         ArtifactRequest artifactRequest = getArtifactRequest(artifact);
@@ -469,10 +465,10 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     protected DefaultArtifact createNewDefaultArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId()
-                , dependency.getArtifactId()
-                , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getClassifier()) ? dependency.getClassifier() : null)
-                , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getType()) ? dependency.getType() : null)
-                , dependency.getVersion());
+            , dependency.getArtifactId()
+            , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getClassifier()) ? dependency.getClassifier() : null)
+            , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getType()) ? dependency.getType() : null)
+            , dependency.getVersion());
     }
 
 

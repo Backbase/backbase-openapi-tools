@@ -11,6 +11,7 @@ Finds files name `api.raml`, `client-api.raml` or `service-api.raml`.
 Processes these files (and the json schemes they refer to) to produce `open-api.yaml` files in the output directory. 
 
 Configuration example
+
 ```$xml
    <build>
        <plugins>
@@ -33,6 +34,10 @@ Configuration example
                             <description>mock-api-server</description>
                         </server>
                     </servers>
+                    <addAdditionalProperties>
+                        <schema>User</schema>
+                        <schema>UserItem</schema>
+                    </addAdditionalProperties>
                 </configuration>
             </plugin>
         </plugins>

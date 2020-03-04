@@ -81,21 +81,21 @@ public class Exporter {
     public static final String NO_DESCRIPTION_AVAILABLE = "No description available";
     private static ObjectMapper mapper = Utils.createObjectMapper();
 
-    private static boolean convertJsonExamplesToYaml;
+    private static boolean addJavaTypeExtensions;
 
     private Exporter() {
         throw new AssertionError("Private constructor");
     }
 
-    public static OpenAPI export(File inputFile, boolean convertJsonExamplesToYaml, List<Transformer> transformers)
+    public static OpenAPI export(File inputFile, boolean addJavaTypeExtensions, List<Transformer> transformers)
         throws ExportException {
-        OpenAPI exported = export(inputFile, convertJsonExamplesToYaml);
+        OpenAPI exported = export(inputFile, addJavaTypeExtensions);
         transformers.forEach(transformer -> transformer.transform(exported, new HashMap()));
         return exported;
     }
 
 
-    public static OpenAPI export(File inputFile, boolean convertJsonExamplesToYaml) throws ExportException {
+    public static OpenAPI export(File inputFile, boolean addJavaTypeExtensions) throws ExportException {
 
         // Guess Service Name
         AtomicReference<String> serviceName = new AtomicReference<>("serviceName");
@@ -105,12 +105,11 @@ public class Exporter {
             .findFirst()
             .ifPresent(s -> serviceName.set(s.replaceAll("-spec", "-service")));
 
-        return export(serviceName.get(), inputFile, convertJsonExamplesToYaml);
+        return export(serviceName.get(), inputFile, addJavaTypeExtensions);
     }
 
-    public static OpenAPI export(String serviceName, File inputFile, boolean convertJsonExamplesToYaml)
+    public static OpenAPI export(String serviceName, File inputFile, boolean addJavaTypeExtensions)
         throws ExportException {
-        Exporter.convertJsonExamplesToYaml = convertJsonExamplesToYaml;
 
         File parentFile = inputFile.getParentFile();
         URL baseUrl;
@@ -142,9 +141,13 @@ public class Exporter {
         Components components = new Components();
         components.setSchemas(new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
 
-        JsonSchemaToOpenApi jsonSchemaToOpenApi = new JsonSchemaToOpenApi(baseUrl, components, ramlTypeReferences,
-            convertJsonExamplesToYaml);
+        JsonSchemaToOpenApi jsonSchemaToOpenApi = new JsonSchemaToOpenApi(
+            baseUrl,
+            components,
+            ramlTypeReferences,
+            addJavaTypeExtensions);
 
+        assert ramlApi != null;
         Map<String, TypeDeclaration> types = collectTypesFromRamlSpec(ramlApi);
         List<Operation> operations = new ArrayList<>();
 
