@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.serializer.SerializerUtils;
+import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
 import com.backbase.oss.boat.transformers.Decomposer;
 import com.backbase.oss.boat.transformers.Deprecator;
 import com.backbase.oss.boat.transformers.Transformer;
@@ -16,7 +17,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -58,16 +57,11 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "includeGroupId", defaultValue = "com.backbase.")
     protected String includeGroupIds;
 
-    @Parameter(property = "includeArtifactIds", defaultValue = "presentation,integration,persistence,pandp")
-    protected String includeArtifactIds;
-
-
     @Parameter(property = "xLogoUrl")
     protected String xLogoUrl;
 
     @Parameter(property = "xLogoAltText")
     protected String xLogoAltText;
-
 
     @Parameter(property = "licenseName")
     protected String licenseName;
@@ -87,7 +81,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "convertJsonExamplesToYaml", defaultValue = "true")
     protected boolean convertJsonExamplesToYaml;
 
-
     @Parameter(property = "appendDeprecatedMetadataInDescription", defaultValue = "true")
     protected boolean appendDeprecatedMetadataInDescription = true;
 
@@ -99,6 +92,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     @Parameter(property = "includeVersionInOutputDirectory", defaultValue = "true")
     protected boolean includeVersionInOutputDirectory;
+
+    @Parameter(property = "addAdditionalProperties")
+    protected List<String> addAdditionalProperties = new ArrayList<>();
 
 
     /**
@@ -168,6 +164,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         }
         if (decompose) {
             transformers.add(new Decomposer());
+        }
+        if( !addAdditionalProperties.isEmpty()) {
+            transformers.add(new AdditionalPropertiesAdder(addAdditionalProperties));
         }
 
         OpenAPI openApi = Exporter.export(ramlFile, convertJsonExamplesToYaml, transformers);
@@ -324,14 +323,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         }
     }
 
-    protected boolean isSpecification(Artifact artifact) {
-        return Arrays.stream(includeArtifactIds.split(","))
-                .filter(StringUtils::isNotEmpty)
-                .anyMatch(artifactId -> {
-                    return artifact.getArtifactId().contains(artifactId);
-                });
-    }
-
     public void setProject(MavenProject project) {
         this.project = project;
     }
@@ -399,10 +390,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     public void setIncludeGroupIds(String includeGroupIds) {
         this.includeGroupIds = includeGroupIds;
-    }
-
-    public void setIncludeArtifactIds(String includeArtifactIds) {
-        this.includeArtifactIds = includeArtifactIds;
     }
 
     public void setxLogoUrl(String xLogoUrl) {

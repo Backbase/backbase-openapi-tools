@@ -37,7 +37,7 @@ import org.eclipse.aether.resolution.MetadataResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Mojo(name = "raml2openapi-bom", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
+@Mojo(name = "export-bom", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 public class ExportBomMojo extends AbstractRamlToOpenApi {
 
     public static final String X_CHANGELOG = "x-changelog";
