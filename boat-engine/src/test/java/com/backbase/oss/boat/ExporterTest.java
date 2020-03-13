@@ -31,6 +31,17 @@ public class ExporterTest {
         validateExport(export);
     }
 
+    @Test
+    public void testWallet() throws Exception {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+                .addJavaTypeExtensions(true)
+                .convertExamplesToYaml(false)
+                .transformers(Collections.singletonList(new Decomposer())));
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
 
     @Test
     public void testBankingApi() throws Exception {
