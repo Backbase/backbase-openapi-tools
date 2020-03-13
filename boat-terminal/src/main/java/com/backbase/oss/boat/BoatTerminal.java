@@ -43,7 +43,7 @@ public class BoatTerminal {
             if (!inputFile.exists()) {
                 throw new ParseException("Input file does not exist");
             }
-            OpenAPI openApi = Exporter.export(inputFile, true);
+            OpenAPI openApi = Exporter.export(inputFile, new ExporterOptions().convertExamplesToYaml(true));
 
             String yaml = SerializerUtils.toYamlString(openApi);
             if (hasOutputFile) {

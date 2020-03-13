@@ -34,10 +34,15 @@ Configuration example
                             <description>mock-api-server</description>
                         </server>
                     </servers>
+                    <!-- Add additional properties ('additions') element to specified types -->
                     <addAdditionalProperties>
                         <schema>User</schema>
                         <schema>UserItem</schema>
                     </addAdditionalProperties>
+                    <!-- Adding 'x-java-type' extension when json schema includes 'javaType' (default false) -->
+                    <addJavaTypeExtensions>false</addJavaTypeExtensions>
+                    <!-- Convert request and response body examples to yaml (default true) -->
+                    <convertJsonExamplesToYaml>false</convertJsonExamplesToYaml>
                 </configuration>
             </plugin>
         </plugins>

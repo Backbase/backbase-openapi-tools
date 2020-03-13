@@ -5,7 +5,6 @@ import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
 import com.backbase.oss.boat.transformers.Decomposer;
 import com.backbase.oss.boat.transformers.Deprecator;
 import com.backbase.oss.boat.transformers.LicenseAdder;
-import com.backbase.oss.boat.transformers.Transformer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -81,6 +80,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     @Parameter(property = "convertJsonExamplesToYaml", defaultValue = "true")
     protected boolean convertJsonExamplesToYaml;
+
+    @Parameter(property = "addJavaTypeExtensions", defaultValue = "true")
+    protected boolean addJavaTypeExtensions;
 
     @Parameter(property = "appendDeprecatedMetadataInDescription", defaultValue = "true")
     protected boolean appendDeprecatedMetadataInDescription = true;
@@ -158,23 +160,25 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
 
     protected OpenAPI convert(String name, Optional<String> version, File ramlFile) throws ExportException {
-        List<Transformer> transformers = new ArrayList<>();
+        ExporterOptions options = new ExporterOptions()
+            .addJavaTypeExtensions(addJavaTypeExtensions)
+            .convertExamplesToYaml(convertJsonExamplesToYaml);
 
         if (removeDeprecated) {
-            transformers.add(new Deprecator());
+            options.getTransformers().add(new Deprecator());
         }
         if (decompose) {
-            transformers.add(new Decomposer());
+            options.getTransformers().add(new Decomposer());
         }
         if (!addAdditionalProperties.isEmpty()) {
-            transformers.add(new AdditionalPropertiesAdder(addAdditionalProperties));
+            options.getTransformers().add(new AdditionalPropertiesAdder(addAdditionalProperties));
         }
 
         if (licenseName != null && licenseUrl != null) {
-            transformers.add(new LicenseAdder(licenseName, licenseUrl));
+            options.getTransformers().add(new LicenseAdder(licenseName, licenseUrl));
         }
 
-        OpenAPI openApi = Exporter.export(ramlFile, convertJsonExamplesToYaml, transformers);
+        OpenAPI openApi = Exporter.export(ramlFile, options);
         pimpInfo(name, version, ramlFile, openApi);
         if (appendDeprecatedMetadataInDescription) {
             // Iterate over all operations and update the description
