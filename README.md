@@ -3,7 +3,7 @@
 
 # Backbase OpenApi Tools 
 
-The Backbase Open API Tools is a collection of tools created to work effeciently with OpenAPI
+The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI
 
 It currently consists of
 
