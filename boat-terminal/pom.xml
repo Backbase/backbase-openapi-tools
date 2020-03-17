@@ -43,7 +43,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.backbase.oss.BoatTerminal</mainClass>
+                            <mainClass>com.backbase.oss.boat.BoatTerminal</mainClass>
                         </manifest>
                     </archive>
 
