@@ -81,6 +81,7 @@ public class Exporter {
     private static final Pattern placeholderPattern = Pattern.compile("(\\{[^\\}]*\\})");
     public static final String X_EXAMPLES = "x-examples";
     public static final String NO_DESCRIPTION_AVAILABLE = "No description available";
+    private static final String NEW_LINE = "\n";
     private static ObjectMapper mapper = Utils.createObjectMapper();
 
     private final ExporterOptions exporterOptions;
@@ -254,36 +255,46 @@ public class Exporter {
     }
 
     private Info setupInfo(Api ramlApi) {
-        String description = getDescription(ramlApi.description()); // todo not used
         log.debug("Setup Description");
 
-        String value = ramlApi.version() != null ? ramlApi.version().value() : "1.0";
+        String version = ramlApi.version() != null ? ramlApi.version().value() : "1.0";
         Info info = new Info()
             .title(ramlApi.title().value())
-            .version(value);
+            .version(version);
 
-        if (ramlApi.documentation() != null && !ramlApi.documentation().isEmpty()) {
-            final StringBuilder markdown = new StringBuilder();
-            ramlApi.documentation().stream().forEach(
+        final StringBuilder markdown = new StringBuilder();
+        if (isNotBlank(ramlApi.description())) {
+            markdown
+                .append(ramlApi.description().value())
+                .append(NEW_LINE);
+        }
+        if (ramlApi.documentation() != null) {
+            ramlApi.documentation().forEach(
                 documentationItem -> {
-                    MarkdownString content = documentationItem.content();
-
-                    String markdownString = cleanupMarkdownString(content.value());
-
-                    markdown.append(markdownString);
-                    markdown.append("\n");
+                    if (isNotBlank(documentationItem.title())) {
+                        markdown
+                            .append("# ")
+                            .append(documentationItem.title().value())
+                            .append(NEW_LINE);
+                    }
+                    if (isNotBlank(documentationItem.content())) {
+                        markdown.append(cleanupMarkdownString(documentationItem.content().value()));
+                        markdown.append(NEW_LINE);
+                    }
                 }
             );
-
-            if (info.getDescription() == null) {
-                info.setDescription(markdown.toString());
-            } else {
-                info.setDescription(info.getDescription() + "\n" + markdown);
-            }
+        }
+        if (markdown.length() != 0) {
+            info.setDescription( markdown.toString());
         } else {
             info.setDescription(NO_DESCRIPTION_AVAILABLE);
+            log.warn("No description available.");
         }
         return info;
+    }
+
+    private boolean isNotBlank(AnnotableStringType annotableStringType) {
+        return annotableStringType != null && StringUtils.isNotBlank(annotableStringType.value());
     }
 
     private List<Tag> setupTags(Api ramlApi) {
@@ -293,13 +304,13 @@ public class Exporter {
 
     private String cleanupMarkdownString(String value) {
         StringBuilder stringBuilder = new StringBuilder();
-        String[] lines = value.split("\n");
+        String[] lines = value.split(NEW_LINE);
         for (int i = 0; i < lines.length; i++) {
             if (i == 0 && lines[i].startsWith("#")) {
                 String title = "# " + StringUtils.substringAfterLast(lines[i], "#").trim();
-                stringBuilder.append(title).append("\n");
+                stringBuilder.append(title).append(NEW_LINE);
             } else {
-                stringBuilder.append(lines[i]).append("\n");
+                stringBuilder.append(lines[i]).append(NEW_LINE);
             }
         }
         return stringBuilder.toString().trim();
@@ -550,7 +561,7 @@ public class Exporter {
         if (description == null) {
             return null;
         }
-        return Stream.of(description.value().split("\n"))
+        return Stream.of(description.value().split(NEW_LINE))
             .findFirst()
             .map(firstLine -> firstLine.replaceAll("#", ""))
             .map(String::trim)
