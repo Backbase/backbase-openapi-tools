@@ -742,8 +742,11 @@ public class Exporter {
                 parameter.getExamples().put(exampleSpec.name(), example);
             });
         } else {
-            parameter.setExample(
-                getExampleObject(typeDeclaration.example(), true));
+            parameter.setExamples(new LinkedHashMap<>());
+            Example example = new Example();
+            example.setValue(getExampleObject(typeDeclaration.example(), true));
+            example.setSummary("example");
+            parameter.getExamples().put("example", example);
         }
 
     }
@@ -847,8 +850,10 @@ public class Exporter {
                 mediaType.setExample(null);
             });
         } else {
-            mediaType.setExamples(null);
-            mediaType.setExample(getExampleObject(body.example(), exporterOptions.isConvertExamplesToYaml()));
+            Example example = new Example();
+            example.setValue(getExampleObject(body.example(), exporterOptions.isConvertExamplesToYaml()));
+            mediaType.addExamples("example", example);
+            mediaType.setExample(null);
         }
     }
 
