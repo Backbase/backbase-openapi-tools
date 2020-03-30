@@ -221,7 +221,7 @@ public class Exporter {
             new Server()
                 .url(url)
                 .description("The server")
-                .variables(new ServerVariables()));
+                .variables(null));
 
         Paths paths = new Paths();
 
@@ -271,15 +271,29 @@ public class Exporter {
         if (ramlApi.documentation() != null) {
             ramlApi.documentation().forEach(
                 documentationItem -> {
+                    String title = null;
+                    String documentation = null;
+
                     if (isNotBlank(documentationItem.title())) {
-                        markdown
-                            .append("# ")
-                            .append(documentationItem.title().value())
-                            .append(NEW_LINE);
+                        title = documentationItem.title().value();
                     }
                     if (isNotBlank(documentationItem.content())) {
-                        markdown.append(cleanupMarkdownString(documentationItem.content().value()));
+                        documentation = documentationItem.content().value(); ;
+                    }
+
+                    if (documentation != null && documentation.startsWith("# ")) {
+                        markdown.append(documentationItem.content().value());
                         markdown.append(NEW_LINE);
+                    } else if (title != null) {
+                        if(!title.startsWith("# ")) {
+                            markdown.append("# ");
+                        }
+                        markdown.append(title);
+                        markdown.append(NEW_LINE);
+                        if (documentation != null) {
+                            markdown.append(cleanupMarkdownString(documentationItem.content().value()));
+                            markdown.append(NEW_LINE);
+                        }
                     }
                 }
             );
