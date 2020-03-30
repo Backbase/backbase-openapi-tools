@@ -94,9 +94,9 @@ public class Exporter {
     /**
      * Better to use {@link #export(File, ExporterOptions)}
      *
-     * @param inputFile The input file.
+     * @param inputFile             The input file.
      * @param addJavaTypeExtensions whether to annotate with x-java-type when json schema contains javaType.
-     * @param transformers a list of transformers.
+     * @param transformers          a list of transformers.
      * @return OpenApi
      * @throws ExportException things going south.
      */
@@ -111,7 +111,7 @@ public class Exporter {
      * Guesses the service name from the file path and calls {@link #export(String, File)}.
      *
      * @param inputFile The input file.
-     * @param options options.
+     * @param options   options.
      * @return OpenApi
      * @throws ExportException things going south.
      */
@@ -285,7 +285,7 @@ public class Exporter {
             );
         }
         if (markdown.length() != 0) {
-            info.setDescription( markdown.toString());
+            info.setDescription(markdown.toString());
         } else {
             info.setDescription(NO_DESCRIPTION_AVAILABLE);
             log.warn("No description available.");
@@ -861,10 +861,14 @@ public class Exporter {
                 mediaType.setExample(null);
             });
         } else {
-            Example example = new Example();
-            example.setValue(getExampleObject(body.example(), exporterOptions.isConvertExamplesToYaml()));
-            mediaType.addExamples("example", example);
-            mediaType.setExample(null);
+
+            Object exampleObject = getExampleObject(body.example(), exporterOptions.isConvertExamplesToYaml());
+            if (exampleObject != null) {
+                Example example = new Example();
+                example.setValue(exampleObject);
+                mediaType.addExamples("example", example);
+                mediaType.setExample(null);
+            }
         }
     }
 
