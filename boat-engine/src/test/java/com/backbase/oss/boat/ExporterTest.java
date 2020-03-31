@@ -25,7 +25,7 @@ public class ExporterTest {
 
     @Test
     public void testHelloWorld() throws Exception {
-        File inputFile = getFile("/raml-examples/helloworld/helloworld.raml");
+        File inputFile = new File("/Users/bartv/IdeaProjects/stash/apollo/api/target/raml/2.17.3/payment-order-presentation-spec/api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);

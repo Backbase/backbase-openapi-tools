@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,6 +16,7 @@
 
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
+        <openapi-generator.version>4.2.3</openapi-generator.version>
     </properties>
 
     <dependencies>
@@ -31,29 +33,12 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.qdesrame</groupId>-->
-        <!--            <artifactId>openapi-diff</artifactId>-->
-        <!--            <version>2.0.0-SNAPSHOT</version>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.projectlombok</groupId>-->
-        <!--                    <artifactId>lombok</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.slf4j</groupId>-->
-        <!--                    <artifactId>slf4j-log4j12</artifactId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.8</version>
             <scope>provided</scope>
         </dependency>
-
 
         <!-- Maven Dependencies -->
         <dependency>
@@ -73,6 +58,18 @@
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-common-artifact-filters</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator</artifactId>
+            <version>${openapi-generator.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sonatype.plexus</groupId>
+            <artifactId>plexus-build-api</artifactId>
+            <version>0.0.7</version>
         </dependency>
 
         <dependency>
@@ -98,6 +95,11 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/templates</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -113,6 +115,26 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>overlay</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <includeArtifactIds>openapi-generator-maven-plugin</includeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
