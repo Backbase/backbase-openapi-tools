@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class Deunuser implements Transformer {
 
-    public void transform(OpenAPI openAPI, HashMap<String, Object> options) {
+    public void transform(OpenAPI openAPI, Map<String, Object> options) {
 
         Set<Schema> requestSchemas = openAPI.getPaths().values().stream()
             .flatMap(pathItem -> pathItem.readOperations().stream())

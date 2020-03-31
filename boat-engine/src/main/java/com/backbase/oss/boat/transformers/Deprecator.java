@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Deprecator implements Transformer {
 
     @Override
-    public void transform(OpenAPI openAPI, HashMap<String, Object> options) {
+    public void transform(OpenAPI openAPI, Map<String, Object> options) {
 
         openAPI.getPaths().forEach((s, pathItem) -> {
 
