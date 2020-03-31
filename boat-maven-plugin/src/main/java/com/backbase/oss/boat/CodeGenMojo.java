@@ -61,6 +61,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 /**
  * Goal which generates client/server code from a OpenAPI json/yaml definition.
  */
+@SuppressWarnings("DefaultAnnotationParam")
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 @Slf4j
 public class CodeGenMojo extends AbstractMojo {
@@ -71,328 +72,328 @@ public class CodeGenMojo extends AbstractMojo {
      * It is used to update the eclipse-m2e-layer when the plugin is executed inside the IDE.
      */
     @Component
-    private BuildContext buildContext = new DefaultBuildContext();
+    protected BuildContext buildContext = new DefaultBuildContext();
 
     @Parameter(name = "verbose", required = false, defaultValue = "false")
-    private boolean verbose;
+    protected boolean verbose;
 
     /**
      * Client language to generate.
      */
     @Parameter(name = "language")
-    private String language;
+    protected String language;
 
 
     /**
      * The name of the generator to use.
      */
     @Parameter(name = "generatorName")
-    private String generatorName;
+    protected String generatorName;
 
     /**
      * Location of the output directory.
      */
     @Parameter(name = "output", property = "openapi.generator.maven.plugin.output",
         defaultValue = "${project.build.directory}/generated-sources/openapi")
-    private File output;
+    protected File output;
 
 
     /**
      * Copy input spec file to location.
      */
     @Parameter(name = "copyTo")
-    private File copyTo;
+    protected File copyTo;
 
 
     /**
      * Location of the OpenAPI spec, as URL or file.
      */
     @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
-    private String inputSpec;
+    protected String inputSpec;
 
     /**
      * Git host, e.g. gitlab.com.
      */
     @Parameter(name = "gitHost", property = "openapi.generator.maven.plugin.gitHost", required = false)
-    private String gitHost;
+    protected String gitHost;
 
     /**
      * Git user ID, e.g. swagger-api.
      */
     @Parameter(name = "gitUserId", property = "openapi.generator.maven.plugin.gitUserId", required = false)
-    private String gitUserId;
+    protected String gitUserId;
 
     /**
      * Git repo ID, e.g. openapi-generator.
      */
     @Parameter(name = "gitRepoId", property = "openapi.generator.maven.plugin.gitRepoId", required = false)
-    private String gitRepoId;
+    protected String gitRepoId;
 
     /**
      * Folder containing the template files.
      */
     @Parameter(name = "templateDirectory", property = "openapi.generator.maven.plugin.templateDirectory")
-    private File templateDirectory;
+    protected File templateDirectory;
 
     /**
      * The name of templating engine to use, "mustache" (default) or "handlebars" (beta).
      */
     @Parameter(name = "engine", defaultValue = "mustache", property="openapi.generator.maven.plugin.engine")
-    private String engine;
+    protected String engine;
 
     /**
      * Adds authorization headers when fetching the swagger definitions remotely. " Pass in a
      * URL-encoded string of name:header with a comma separating multiple values
      */
     @Parameter(name = "auth", property = "openapi.generator.maven.plugin.auth")
-    private String auth;
+    protected String auth;
 
     /**
      * Path to separate json configuration file.
      */
     @Parameter(name = "configurationFile", property = "openapi.generator.maven.plugin.configurationFile", required = false)
-    private String configurationFile;
+    protected String configurationFile;
 
     /**
      * Specifies if the existing files should be overwritten during the generation.
      */
     @Parameter(name = "skipOverwrite", property = "openapi.generator.maven.plugin.skipOverwrite", required = false)
-    private Boolean skipOverwrite;
+    protected Boolean skipOverwrite;
 
     /**
      * The package to use for generated api objects/classes.
      */
     @Parameter(name = "apiPackage", property = "openapi.generator.maven.plugin.apiPackage")
-    private String apiPackage;
+    protected String apiPackage;
 
     /**
      * The package to use for generated model objects/classes.
      */
     @Parameter(name = "modelPackage", property = "openapi.generator.maven.plugin.modelPackage")
-    private String modelPackage;
+    protected String modelPackage;
 
     /**
      * The package to use for the generated invoker objects.
      */
     @Parameter(name = "invokerPackage", property = "openapi.generator.maven.plugin.invokerPackage")
-    private String invokerPackage;
+    protected String invokerPackage;
 
     /**
      * The default package to use for the generated objects.
      */
     @Parameter(name = "packageName", property = "openapi.generator.maven.plugin.packageName")
-    private String packageName;
+    protected String packageName;
 
     /**
      * groupId in generated pom.xml.
      */
     @Parameter(name = "groupId", property = "openapi.generator.maven.plugin.groupId")
-    private String groupId;
+    protected String groupId;
 
     /**
      * artifactId in generated pom.xml.
      */
     @Parameter(name = "artifactId", property = "openapi.generator.maven.plugin.artifactId")
-    private String artifactId;
+    protected String artifactId;
 
     /**
      * artifact version in generated pom.xml.
      */
     @Parameter(name = "artifactVersion", property = "openapi.generator.maven.plugin.artifactVersion")
-    private String artifactVersion;
+    protected String artifactVersion;
 
     /**
      * Sets the library.
      */
     @Parameter(name = "library", property = "openapi.generator.maven.plugin.library", required = false)
-    private String library;
+    protected String library;
 
     /**
      * Sets the prefix for model enums and classes.
      */
     @Parameter(name = "modelNamePrefix", property = "openapi.generator.maven.plugin.modelNamePrefix", required = false)
-    private String modelNamePrefix;
+    protected String modelNamePrefix;
 
     /**
      * Sets the suffix for model enums and classes.
      */
     @Parameter(name = "modelNameSuffix", property = "openapi.generator.maven.plugin.modelNameSuffix", required = false)
-    private String modelNameSuffix;
+    protected String modelNameSuffix;
 
     /**
      * Sets an optional ignoreFileOverride path.
      */
     @Parameter(name = "ignoreFileOverride", property = "openapi.generator.maven.plugin.ignoreFileOverride", required = false)
-    private String ignoreFileOverride;
+    protected String ignoreFileOverride;
 
     /**
      * Sets custom User-Agent header value.
      */
     @Parameter(name = "httpUserAgent", property = "openapi.generator.maven.plugin.httpUserAgent", required = false)
-    private String httpUserAgent;
+    protected String httpUserAgent;
 
     /**
      * To remove operationId prefix (e.g. user_getName => getName).
      */
     @Parameter(name = "removeOperationIdPrefix", property = "openapi.generator.maven.plugin.removeOperationIdPrefix", required = false)
-    private Boolean removeOperationIdPrefix;
+    protected Boolean removeOperationIdPrefix;
 
     /**
      * To write all log messages (not just errors) to STDOUT.
      */
     @Parameter(name = "logToStderr", property = "openapi.generator.maven.plugin.logToStderr", required = false)
-    private Boolean logToStderr;
+    protected Boolean logToStderr;
 
     /**
      * To file post-processing hook.
      */
     @Parameter(name = "enablePostProcessFile", property = "openapi.generator.maven.plugin.enablePostProcessFile", required = false)
-    private Boolean enablePostProcessFile;
+    protected Boolean enablePostProcessFile;
 
     /**
      * To skip spec validation.
      */
     @Parameter(name = "skipValidateSpec", property = "openapi.generator.maven.plugin.skipValidateSpec", required = false)
-    private Boolean skipValidateSpec;
+    protected Boolean skipValidateSpec;
 
     /**
      * To treat a document strictly against the spec.
      */
     @Parameter(name = "strictSpec", property = "openapi.generator.maven.plugin.strictSpec", required = false)
-    private Boolean strictSpec;
+    protected Boolean strictSpec;
 
     /**
      * To generate alias (array, map) as model.
      */
     @Parameter(name = "generateAliasAsModel", property = "openapi.generator.maven.plugin.generateAliasAsModel", required = false)
-    private Boolean generateAliasAsModel;
+    protected Boolean generateAliasAsModel;
 
     /**
      * A map of language-specific parameters as passed with the -c option to the command line.
      */
     @Parameter(name = "configOptions")
-    private Map<?, ?> configOptions;
+    protected Map<?, ?> configOptions;
 
     /**
      * A map of types and the types they should be instantiated as.
      */
     @Parameter(name = "instantiationTypes", property = "openapi.generator.maven.plugin.instantiationTypes")
-    private List<String> instantiationTypes;
+    protected List<String> instantiationTypes;
 
     /**
      * A map of classes and the import that should be used for that class.
      */
     @Parameter(name = "importMappings", property = "openapi.generator.maven.plugin.importMappings")
-    private List<String> importMappings;
+    protected List<String> importMappings;
 
     /**
      * A map of swagger spec types and the generated code types to use for them.
      */
     @Parameter(name = "typeMappings", property = "openapi.generator.maven.plugin.typeMappings")
-    private List<String> typeMappings;
+    protected List<String> typeMappings;
 
     /**
      * A map of additional language specific primitive types.
      */
     @Parameter(name = "languageSpecificPrimitives", property = "openapi.generator.maven.plugin.languageSpecificPrimitives")
-    private List<String> languageSpecificPrimitives;
+    protected List<String> languageSpecificPrimitives;
 
     /**
      * A map of additional properties that can be referenced by the mustache templates.
      */
     @Parameter(name = "additionalProperties", property = "openapi.generator.maven.plugin.additionalProperties")
-    private List<String> additionalProperties;
+    protected List<String> additionalProperties;
 
     /**
      * A map of server variable overrides for specs that support server URL templating.
      */
     @Parameter(name = "serverVariableOverrides", property = "openapi.generator.maven.plugin.serverVariableOverrides")
-    private List<String> serverVariableOverrides;
+    protected List<String> serverVariableOverrides;
 
     /**
      * A map of reserved names and how they should be escaped.
      */
     @Parameter(name = "reservedWordsMappings", property = "openapi.generator.maven.plugin.reservedWordMappings")
-    private List<String> reservedWordsMappings;
+    protected List<String> reservedWordsMappings;
 
     /**
      * Generate the apis.
      */
     @Parameter(name = "generateApis", property = "openapi.generator.maven.plugin.generateApis", required = false)
-    private Boolean generateApis = true;
+    protected Boolean generateApis = true;
 
     /**
      * Generate the models.
      */
     @Parameter(name = "generateModels", property = "openapi.generator.maven.plugin.generateModels", required = false)
-    private Boolean generateModels = true;
+    protected Boolean generateModels = true;
 
     /**
      * A comma separated list of models to generate. All models is the default.
      */
     @Parameter(name = "modelsToGenerate", property = "openapi.generator.maven.plugin.modelsToGenerate", required = false)
-    private String modelsToGenerate = "";
+    protected String modelsToGenerate = "";
 
     /**
      * Generate the supporting files.
      */
     @Parameter(name = "generateSupportingFiles", property = "openapi.generator.maven.plugin.generateSupportingFiles", required = false)
-    private Boolean generateSupportingFiles = true;
+    protected Boolean generateSupportingFiles = true;
 
     /**
      * A comma separated list of models to generate. All models is the default.
      */
     @Parameter(name = "supportingFilesToGenerate", property = "openapi.generator.maven.plugin.supportingFilesToGenerate", required = false)
-    private String supportingFilesToGenerate = "";
+    protected String supportingFilesToGenerate = "";
 
     /**
      * Generate the model tests.
      */
     @Parameter(name = "generateModelTests", property = "openapi.generator.maven.plugin.generateModelTests", required = false)
-    private Boolean generateModelTests = true;
+    protected Boolean generateModelTests = true;
 
     /**
      * Generate the model documentation.
      */
     @Parameter(name = "generateModelDocumentation", property = "openapi.generator.maven.plugin.generateModelDocumentation", required = false)
-    private Boolean generateModelDocumentation = true;
+    protected Boolean generateModelDocumentation = true;
 
     /**
      * Generate the api tests.
      */
     @Parameter(name = "generateApiTests", property = "openapi.generator.maven.plugin.generateApiTests", required = false)
-    private Boolean generateApiTests = true;
+    protected Boolean generateApiTests = true;
 
     /**
      * Generate the api documentation.
      */
     @Parameter(name = "generateApiDocumentation", property = "openapi.generator.maven.plugin.generateApiDocumentation", required = false)
-    private Boolean generateApiDocumentation = true;
+    protected Boolean generateApiDocumentation = true;
 
     /**
      * Generate the api documentation.
      */
     @Parameter(name = "withXml", property = "openapi.generator.maven.plugin.withXml", required = false)
-    private Boolean withXml = false;
+    protected Boolean withXml = false;
 
     /**
      * Skip the execution.
      */
     @Parameter(name = "skip", property = "codegen.skip", required = false, defaultValue = "false")
-    private Boolean skip;
+    protected Boolean skip;
 
     /**
      * Skip the execution if the source file is older than the output folder.
      */
     @Parameter(name = "skipIfSpecIsUnchanged", property = "codegen.skipIfSpecIsUnchanged", required = false, defaultValue = "false")
-    private Boolean skipIfSpecIsUnchanged;
+    protected Boolean skipIfSpecIsUnchanged;
 
     /**
      * Add the output directory to the project as a source root, so that the generated java types
      * are compiled and included in the project artifact.
      */
     @Parameter(defaultValue = "true")
-    private boolean addCompileSourceRoot = true;
+    protected boolean addCompileSourceRoot = true;
 
     @Parameter
     protected Map<String, String> environmentVariables = new HashMap<String, String>();
@@ -401,13 +402,13 @@ public class CodeGenMojo extends AbstractMojo {
     protected Map<String, String> originalEnvironmentVariables = new HashMap<String, String>();
 
     @Parameter(property = "codegen.configHelp")
-    private boolean configHelp = false;
+    protected boolean configHelp = false;
 
     /**
      * The project being built.
      */
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
-    private MavenProject project;
+    protected MavenProject project;
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
