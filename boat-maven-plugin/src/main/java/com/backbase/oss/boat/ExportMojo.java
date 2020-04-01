@@ -1,43 +1,89 @@
 package com.backbase.oss.boat;
 
 import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.maven.artifact.Artifact;
+import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "export", requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME, threadSafe = true)
+@Mojo(name = "export", threadSafe = true)
 public class ExportMojo extends AbstractRamlToOpenApi {
+
+    /**
+     * Source directory to scan for raml files. Use location relative to the project.baseDir.
+     * Default is 'src/main/resources'.
+     */
+    @Parameter(property = "input", defaultValue = "src/main/resources")
+    private File input;
+
+    /**
+     * Fails on errors by default, but can be set to ignore.
+     */
+    @Parameter(property = "failOnError", defaultValue = "true")
+    private boolean failOnError = true;
 
     @Override
     public void execute() throws MojoExecutionException {
-
-        List<org.apache.maven.artifact.Artifact> collect1 = project.getArtifacts().stream()
-            .filter(dependency -> dependency.getGroupId().startsWith(includeGroupIds))
-            .filter(dependency -> dependency.getArtifactId().endsWith("-spec"))
-            .collect(Collectors.toList());
-
-        for (Artifact artifact : collect1) {
-            export(artifact);
+        if (!input.exists()) {
+            String msg = "Input does not exist: " + input.getAbsolutePath();
+            getLog().error(msg);
+            if (failOnError) {
+                throw new MojoExecutionException(msg);
+            }
         }
 
-        writeSummary("Exported Project Dependencies");
+        File[] files = input.listFiles(this::isRamlSpec);
+        if (files == null) {
+            String msg = "Failed to find raml files in " + input.getAbsolutePath();
+            getLog().error(msg);
+            if (failOnError) {
+                throw new MojoExecutionException(msg);
+            } else {
+                // Avoid the NPE
+                return;
+            }
+        }
+
+        for (File file : files) {
+            String ramlName = StringUtils.substringBeforeLast(file.getName(), ".");
+            try {
+                File outputDirectory = new File(output, ramlName);
+                String name = project.getArtifactId() + ":" + project.getVersion() + ":" + ramlName;
+                export(name, Optional.empty(), file, outputDirectory);
+                getLog().info("Exported RAML Spec: " + ramlName);
+            } catch (Throwable e) {
+                failed.put(ramlName, e.getMessage());
+                String msg = "Failed to export RAML Spec: " + file.getName()
+                    + " due to: [" + e.getClass() + "] " + e.getMessage();
+                getLog().error(msg);
+                if (failOnError) {
+                    throw new MojoExecutionException(msg, e);
+                }
+            }
+        }
+
+        writeSummary("Converted RAML Specs to OpenAPI Summary");
 
         if (!success.isEmpty()) {
             writeSwaggerUrls(output);
         }
     }
 
-
-    private void export(Artifact artifact) throws MojoExecutionException {
-        File outputDirectory = new File(this.output, artifact.getGroupId().replace('.', '/'));
-        exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
+    public File getInput() {
+        return input;
     }
 
-    private void export(org.eclipse.aether.artifact.Artifact artifact) throws MojoExecutionException {
-        File outputDirectory = new File(this.output, artifact.getGroupId().replace('.', '/'));
-        exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
+    public void setInput(File input) {
+        this.input = input;
     }
+
+    public boolean isFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
 }
