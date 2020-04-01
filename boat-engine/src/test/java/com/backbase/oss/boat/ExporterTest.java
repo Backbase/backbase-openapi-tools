@@ -19,13 +19,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExporterTest {
+public class ExporterTest extends AbstractBoatEngineTests {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 
     @Test
     public void testHelloWorld() throws Exception {
-        File inputFile = new File("/Users/bartv/IdeaProjects/stash/apollo/api/target/raml/2.17.3/payment-order-presentation-spec/api.raml");
+        File inputFile = getFile("/raml-examples/helloworld/helloworld.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
@@ -81,15 +81,7 @@ public class ExporterTest {
 
     }
 
-    protected void writeOutput(String yaml, String fileName) throws IOException {
-        File directory = new File("target");
-        directory.mkdirs();
-        File file = new File(directory, fileName);
-        file.delete();
-        file.createNewFile();
-        Path path = file.toPath();
-        Files.write(path, yaml.getBytes());
-    }
+
 
     protected File getFile(String name) {
         URL resource = getClass().getResource(name);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
@@ -28,7 +29,7 @@ public class SerializerUtils {
             YAMLFactory factory = (YAMLFactory) mapper.getFactory();
 
 //            factory.disable(YAMLGenerator.Feature.SPLIT_LINES);
-//            factory.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE);
+            factory.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE);
 
             return mapper.writeValueAsString(openAPI);
 
