@@ -62,7 +62,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
  * Goal which generates client/server code from a OpenAPI json/yaml definition.
  */
 @SuppressWarnings("DefaultAnnotationParam")
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "generate")
 @Slf4j
 public class CodeGenMojo extends AbstractMojo {
 
