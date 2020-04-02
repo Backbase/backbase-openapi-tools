@@ -12,11 +12,14 @@
     <artifactId>boat-maven-plugin</artifactId>
 
     <packaging>maven-plugin</packaging>
+
+    <name>BOAT :: Maven Plugin</name>
     <description>Open API Converter</description>
 
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
         <openapi-generator.version>4.2.3</openapi-generator.version>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
