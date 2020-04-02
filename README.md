@@ -14,6 +14,19 @@ It currently consists of
 
 The project is very much Work In Progress and will be published on maven central when considered ready enough. 
 
+# Release Notes
+
+## 0.12 - Halve Maen
+
+* Added Code Generator Mojo from on openapi-generator.tech with custom templates for Java, JavaSpring and HTML2
+* Renamed `export` to `export-dep` mojo for converting RAML specs to oas from dependencies
+* Added `export` mojo for converting RAML specs from input file
+* Added Normaliser transformer for transforming examples names to be used in Java code generation  as example names cannot have special characters.
+* Improve Title and Descriptions of converted RAML specs
+* Always wrap examples in example object
+* Many code improvements to be not ashamed of Sonar Reports.  
+
+
 # Build & Install
 
 ```bash
