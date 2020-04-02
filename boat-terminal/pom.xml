@@ -10,6 +10,12 @@
 
     <artifactId>boat-terminal</artifactId>
 
+    <name>BOAT :: Terminal</name>
+
+    <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-cli</groupId>
