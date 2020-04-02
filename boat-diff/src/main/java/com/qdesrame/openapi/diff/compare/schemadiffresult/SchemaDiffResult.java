@@ -65,8 +65,8 @@ public class SchemaDiffResult {
         .diff(left.getDescription(), right.getDescription(), context)
         .ifPresent(changedSchema::setDescription);
 
-    Map<String, Schema> leftProperties = null == left ? null : left.getProperties();
-    Map<String, Schema> rightProperties = null == right ? null : right.getProperties();
+    Map<String, Schema> leftProperties =  left.getProperties();
+    Map<String, Schema> rightProperties =  right.getProperties();
     MapKeyDiff<String, Schema> propertyDiff = MapKeyDiff.diff(leftProperties, rightProperties);
 
     for (String key : propertyDiff.getSharedKey()) {

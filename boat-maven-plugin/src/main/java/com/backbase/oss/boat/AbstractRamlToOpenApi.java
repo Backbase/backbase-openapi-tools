@@ -127,9 +127,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
 
     protected boolean isRamlSpec(File file) {
-        return file.getName().equals("api.raml")
-            || file.getName().equals("service-api.raml")
-            || file.getName().equals("client-api.raml");
+        return file.getName().endsWith("-api.raml")
+            || file.getName().endsWith("service-api.raml")
+            || file.getName().endsWith("client-api.raml");
     }
 
     protected File export(String name, Optional<String> version, File ramlFile, File outputDirectory) throws ExportException, IOException {

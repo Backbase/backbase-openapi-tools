@@ -18,18 +18,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@UtilityClass
 public class BatchOpenApiDiff {
 
     private static final Logger log = LoggerFactory.getLogger(BatchOpenApiDiff.class);
     private static final String X_CHANGELOG = "x-changelog";
     private static MarkdownRender markdownRender = new MarkdownRender();
 
-    public static void diff(Path outputDirectory, Map<File, OpenAPI> success, Map<String, String> failed, boolean insertIntoSpec, boolean writeChangeLogToSeparateFile) throws IOException {
+    @SuppressWarnings("squid:S2095")
+    public static void diff(Path outputDirectory, Map<File, OpenAPI> success, Map<String, String> failed,
+        boolean insertIntoSpec, boolean writeChangeLogToSeparateFile) throws IOException {
         Map<Path, OpenAPI> specs = new LinkedHashMap<>();
 
         Files.walk(outputDirectory)
@@ -40,12 +44,10 @@ public class BatchOpenApiDiff {
                 return Pair.of(path, right);
             })
             .filter(pair -> pair.getRight().getMessages().isEmpty())
-            .map(pair -> {
-                return Pair.of(pair.getKey(), pair.getRight().getOpenAPI());
-            })
-            .sorted((pair1, pair2) -> compareVersions(pair1.getRight().getInfo().getVersion(), pair2.getRight().getInfo().getVersion()))
+            .map(pair -> Pair.of(pair.getKey(), pair.getRight().getOpenAPI()))
+            .sorted((pair1, pair2) -> compareVersions(pair1.getRight().getInfo().getVersion(),
+                pair2.getRight().getInfo().getVersion()))
             .forEach(tuple -> specs.put(tuple.getKey(), tuple.getValue()));
-
 
         for (Map.Entry<Path, OpenAPI> entry : specs.entrySet()) {
             Path openApiFilePath = entry.getKey();
@@ -62,7 +64,7 @@ public class BatchOpenApiDiff {
                     changeLog.add(compare);
                     String changelogMarkdown = renderChangeLog(markdownRender, changeLog);
                     if (insertIntoSpec) {
-                        writeChangelogInOpenAPI(openApiFilePath, openAPI, changeLog, changelogMarkdown);
+                        writeChangelogInOpenAPI(openApiFilePath, changelogMarkdown);
                     }
                     if (writeChangeLogToSeparateFile) {
                         Path changeLogFile = openApiFilePath.getParent().resolve("changelog.md");
@@ -77,7 +79,7 @@ public class BatchOpenApiDiff {
         }
     }
 
-    private static void writeChangelogInOpenAPI(Path openApiFilePath, OpenAPI openAPI, List<ChangedOpenApi> changeLog, String changelogMarkdown) throws IOException {
+    private static void writeChangelogInOpenAPI(Path openApiFilePath, String changelogMarkdown) throws IOException {
         OpenAPI diffedApi = parseOpenAPI(openApiFilePath).getOpenAPI();
         if (diffedApi.getInfo().getDescription() == null) {
             diffedApi.getInfo().setDescription(changelogMarkdown);
@@ -124,6 +126,7 @@ public class BatchOpenApiDiff {
         return changeLog;
     }
 
+    @SuppressWarnings({"java:S2629","java:S1075", "java:S2095"})
     private static Optional<OpenAPI> previousVersion(OpenAPI openApi, Path openApiPath, Map<Path, OpenAPI> specs) throws IOException {
         List<Path> lowerVersions = Files.list(openApiPath.getParent().getParent())
             .filter(otherVersionPath -> {
@@ -153,9 +156,8 @@ public class BatchOpenApiDiff {
         parseOptions.setFlatten(true);
         parseOptions.setResolveFully(true);
 
-        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(file.toFile().toURI().toString(), new ArrayList<>(), parseOptions);
-
-        OpenAPI openAPI = swaggerParseResult.getOpenAPI();
+        SwaggerParseResult swaggerParseResult = openAPIParser
+            .readLocation(file.toFile().toURI().toString(), new ArrayList<>(), parseOptions);
 
         for (String message : swaggerParseResult.getMessages()) {
             log.warn(message);

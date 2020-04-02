@@ -1,5 +1,6 @@
 ![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
 ![Release](https://github.com/Backbase/backbase-openapi-tools/workflows/Release/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
 
 # Backbase OpenApi Tools 
 
@@ -15,8 +16,9 @@ It currently consists of
 The project is very much Work In Progress and will be published on maven central when considered ready enough. 
 
 # Release Notes
+BOAT is still under development and subject to change. 
 
-## 0.12 - Halve Maen
+## 0.1.3- Halve Maen
 
 * Added Code Generator Mojo from on openapi-generator.tech with custom templates for Java, JavaSpring and HTML2
 * Renamed `export` to `export-dep` mojo for converting RAML specs to oas from dependencies
@@ -94,7 +96,7 @@ Configuration
 
 Execution
 ```bash
-mvn boat:raml2openapi
+mvn boat:export
 ```
 
 
@@ -120,9 +122,7 @@ If you want to export all specifications referenced in a pom file, you can use t
                     <xLogoUrl>http://www.backbase.com/wp-content/uploads/2017/04/backbase-logo-png.png</xLogoUrl>
                     <xLogoAltText>Backbase</xLogoAltText>
                     <markdownBottom># Disclaimer
-This API is converted from RAML1.0 using the raml2openapi-maven-plugin and is not final or validated!
-
-Please provide feedback in the `#s-raml2openapi` Slack channel.
+This API is converted from RAML1.0 using the boat-maven-plugin and is not final or validated!
                     </markdownBottom>
                     <addChangeLog>true</addChangeLog>
                 </configuration>
@@ -138,5 +138,5 @@ Please provide feedback in the `#s-raml2openapi` Slack channel.
 * The `includeVersionsRegEx` can be used to filter out certain versions. By default it's set to `^(\d+\.)?(\d+\.)?(\d+)$` to only allow x.x.x versions. To also include patch versions, set it to `^(\d+\.)?(\d+\.)?(\d+\.)?(\*|\d+)$`
 
 ```bash
-mvn raml2openapi:export-bom
+mvn boat:export-bom
 ```

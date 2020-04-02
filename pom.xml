@@ -51,10 +51,9 @@
 
         <jacoco.version>0.8.4</jacoco.version>
 
-        <!--        <sonar.projectKey>Backbase_backbase-openapi-tools</sonar.projectKey>-->
-        <!--        <sonar.organization>backbase-technology-prototyping</sonar.organization>-->
-        <!--        <sonar.host.url>https://sonarcloud.io</sonar.host.url>-->
-        <!--        <sonar.login>84b7c2f6a994f9a2356b24e045ff95cbedfb7a34</sonar.login>-->
+        <sonar.organization>backbase-technology-prototyping</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>84b7c2f6a994f9a2356b24e045ff95cbedfb7a34</sonar.login>
 
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 
@@ -211,41 +210,7 @@
             </activation>
             <build>
                 <plugins>
-
-                    <plugin>
-                        <groupId>org.sonarsource.scanner.maven</groupId>
-                        <artifactId>sonar-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sonar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!--Failsafe plugin - for running integration tests-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-failsafe-plugin</artifactId>-->
-<!--                        <version>2.22.2</version>-->
-<!--                        <executions>-->
-<!--                            <execution>-->
-<!--                                <id>integration-test</id>-->
-<!--                                <goals>-->
-<!--                                    <goal>integration-test</goal>-->
-<!--                                    <goal>verify</goal>-->
-<!--                                </goals>-->
-<!--                                <configuration>-->
-<!--                                    &lt;!&ndash; Sets the VM argument line used when integration tests are run. &ndash;&gt;-->
-<!--                                    <argLine>${failsafeArgLine}</argLine>-->
-<!--                                    <skipTests>${skip.integration.tests}</skipTests>-->
-<!--                                </configuration>-->
-<!--                            </execution>-->
-<!--                        </executions>-->
-<!--                    </plugin>-->
-<!--                    &lt;!&ndash; Surefire plugin - for running unit tests&ndash;&gt;-->
+                    <!-- Surefire plugin - for running unit tests-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>

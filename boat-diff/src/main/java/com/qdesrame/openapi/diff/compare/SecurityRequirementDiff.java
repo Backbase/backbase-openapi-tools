@@ -76,7 +76,7 @@ public class SecurityRequirementDiff {
       if (rightSec.isEmpty()) {
         changedSecurityRequirement.addMissing(leftSchemeRef, left.get(leftSchemeRef));
       } else {
-        String rightSchemeRef = rightSec.keySet().stream().findFirst().get();
+        String rightSchemeRef = rightSec.keySet().stream().findFirst().orElseThrow(NullPointerException::new);
         right.remove(rightSchemeRef);
         Optional<ChangedSecurityScheme> diff =
             openApiDiff
