@@ -16,7 +16,6 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServ
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
-import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
@@ -24,6 +23,7 @@ import com.google.common.io.Files;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -34,16 +34,17 @@ import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -61,12 +62,19 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 /**
  * Goal which generates client/server code from a OpenAPI json/yaml definition.
  */
-@SuppressWarnings("DefaultAnnotationParam")
+@SuppressWarnings({"DefaultAnnotationParam","java:S3776","java:S5411"})
 @Mojo(name = "generate")
 @Slf4j
 public class CodeGenMojo extends AbstractMojo {
 
 
+    public static final String INSTANTIATION_TYPES = "instantiation-types";
+    public static final String IMPORT_MAPPINGS = "import-mappings";
+    public static final String TYPE_MAPPINGS = "type-mappings";
+    public static final String LANGUAGE_SPECIFIC_PRIMITIVES = "language-specific-primitives";
+    public static final String ADDITIONAL_PROPERTIES = "additional-properties";
+    public static final String SERVER_VARIABLES = "server-variables";
+    public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
     /**
      * The build context is only avail when running from within eclipse.
      * It is used to update the eclipse-m2e-layer when the plugin is executed inside the IDE.
@@ -396,10 +404,10 @@ public class CodeGenMojo extends AbstractMojo {
     protected boolean addCompileSourceRoot = true;
 
     @Parameter
-    protected Map<String, String> environmentVariables = new HashMap<String, String>();
+    protected Map<String, String> environmentVariables = new HashMap<>();
 
     @Parameter
-    protected Map<String, String> originalEnvironmentVariables = new HashMap<String, String>();
+    protected Map<String, String> originalEnvironmentVariables = new HashMap<>();
 
     @Parameter(property = "codegen.configHelp")
     protected boolean configHelp = false;
@@ -415,6 +423,7 @@ public class CodeGenMojo extends AbstractMojo {
     }
 
     @Override
+    @SuppressWarnings({"java:S3776", "java:S1874"})
     public void execute() throws MojoExecutionException {
         File inputSpecFile = new File(inputSpec);
         addCompileSourceRootIfConfigured();
@@ -425,31 +434,22 @@ public class CodeGenMojo extends AbstractMojo {
                 return;
             }
 
-            if (buildContext != null) {
-                if (buildContext.isIncremental()) {
-                    if (inputSpec != null) {
-                        if (inputSpecFile.exists()) {
-                            if (!buildContext.hasDelta(inputSpecFile)) {
-                                getLog().info(
-                                    "Code generation is skipped in delta-build because source-json was not modified.");
-                                return;
-                            }
-                        }
-                    }
-                }
+            if (buildContext != null && buildContext.isIncremental() && inputSpec != null && inputSpecFile.exists()
+                && !buildContext.hasDelta(inputSpecFile)) {
+                getLog().info(
+                    "Code generation is skipped in delta-build because source-json was not modified.");
+                return;
             }
 
-            if (skipIfSpecIsUnchanged) {
-                if (inputSpecFile.exists()) {
-                    File storedInputSpecHashFile = getHashFile(inputSpecFile);
-                    if(storedInputSpecHashFile.exists()) {
-                        String inputSpecHash = calculateInputSpecHash(inputSpecFile);
-                        String storedInputSpecHash = Files.asCharSource(storedInputSpecHashFile, Charsets.UTF_8).read();
-                        if (inputSpecHash.equals(storedInputSpecHash)) {
-                            getLog().info(
-                                "Code generation is skipped because input was unchanged");
-                            return;
-                        }
+            if (skipIfSpecIsUnchanged && inputSpecFile.exists()) {
+                File storedInputSpecHashFile = getHashFile(inputSpecFile);
+                if (storedInputSpecHashFile.exists()) {
+                    String inputSpecHash = calculateInputSpecHash(inputSpecFile);
+                    String storedInputSpecHash = Files.asCharSource(storedInputSpecHashFile, StandardCharsets.UTF_8).read();
+                    if (inputSpecHash.equals(storedInputSpecHash)) {
+                        getLog().info(
+                            "Code generation is skipped because input was unchanged");
+                        return;
                     }
                 }
             }
@@ -523,7 +523,6 @@ public class CodeGenMojo extends AbstractMojo {
                 configurator.setGenerateAliasAsModel(generateAliasAsModel);
             }
 
-            // TODO: After 3.0.0 release (maybe for 3.1.0): Fully deprecate lang.
             if (isNotEmpty(generatorName)) {
                 configurator.setGeneratorName(generatorName);
 
@@ -623,83 +622,88 @@ public class CodeGenMojo extends AbstractMojo {
 
             if (configOptions != null) {
                 // Retained for backwards-compataibility with configOptions -> instantiation-types
-                if (instantiationTypes == null && configOptions.containsKey("instantiation-types")) {
-                    applyInstantiationTypesKvp(configOptions.get("instantiation-types").toString(),
+                if (instantiationTypes == null && configOptions.containsKey(INSTANTIATION_TYPES)) {
+                    applyInstantiationTypesKvp(configOptions.get(INSTANTIATION_TYPES).toString(),
                         configurator);
                 }
 
                 // Retained for backwards-compataibility with configOptions -> import-mappings
-                if (importMappings == null && configOptions.containsKey("import-mappings")) {
-                    applyImportMappingsKvp(configOptions.get("import-mappings").toString(),
+                if (importMappings == null && configOptions.containsKey(IMPORT_MAPPINGS)) {
+                    applyImportMappingsKvp(configOptions.get(IMPORT_MAPPINGS).toString(),
                         configurator);
                 }
 
                 // Retained for backwards-compataibility with configOptions -> type-mappings
-                if (typeMappings == null && configOptions.containsKey("type-mappings")) {
-                    applyTypeMappingsKvp(configOptions.get("type-mappings").toString(), configurator);
+                if (typeMappings == null && configOptions.containsKey(TYPE_MAPPINGS)) {
+                    applyTypeMappingsKvp(configOptions.get(TYPE_MAPPINGS).toString(), configurator);
                 }
 
                 // Retained for backwards-compataibility with configOptions -> language-specific-primitives
-                if (languageSpecificPrimitives == null && configOptions.containsKey("language-specific-primitives")) {
+                if (languageSpecificPrimitives == null && configOptions.containsKey(LANGUAGE_SPECIFIC_PRIMITIVES)) {
                     applyLanguageSpecificPrimitivesCsv(configOptions
-                        .get("language-specific-primitives").toString(), configurator);
+                        .get(LANGUAGE_SPECIFIC_PRIMITIVES).toString(), configurator);
                 }
 
                 // Retained for backwards-compataibility with configOptions -> additional-properties
-                if (additionalProperties == null && configOptions.containsKey("additional-properties")) {
-                    applyAdditionalPropertiesKvp(configOptions.get("additional-properties").toString(),
+                if (additionalProperties == null && configOptions.containsKey(ADDITIONAL_PROPERTIES)) {
+                    applyAdditionalPropertiesKvp(configOptions.get(ADDITIONAL_PROPERTIES).toString(),
                         configurator);
                 }
 
-                if (serverVariableOverrides == null && configOptions.containsKey("server-variables")) {
-                    applyServerVariablesKvp(configOptions.get("server-variables").toString(), configurator);
+                if (serverVariableOverrides == null && configOptions.containsKey(SERVER_VARIABLES)) {
+                    applyServerVariablesKvp(configOptions.get(SERVER_VARIABLES).toString(), configurator);
                 }
 
                 // Retained for backwards-compataibility with configOptions -> reserved-words-mappings
-                if (reservedWordsMappings == null && configOptions.containsKey("reserved-words-mappings")) {
-                    applyReservedWordsMappingsKvp(configOptions.get("reserved-words-mappings")
+                if (reservedWordsMappings == null && configOptions.containsKey(RESERVED_WORDS_MAPPINGS)) {
+                    applyReservedWordsMappingsKvp(configOptions.get(RESERVED_WORDS_MAPPINGS)
                         .toString(), configurator);
                 }
             }
 
             // Apply Instantiation Types
-            if (instantiationTypes != null && (configOptions == null || !configOptions.containsKey("instantiation-types"))) {
+            if (instantiationTypes != null && (configOptions == null || !configOptions.containsKey(
+                INSTANTIATION_TYPES))) {
                 applyInstantiationTypesKvpList(instantiationTypes, configurator);
             }
 
             // Apply Import Mappings
-            if (importMappings != null && (configOptions == null || !configOptions.containsKey("import-mappings"))) {
+            if (importMappings != null && (configOptions == null || !configOptions.containsKey(IMPORT_MAPPINGS))) {
                 applyImportMappingsKvpList(importMappings, configurator);
             }
 
             // Apply Type Mappings
-            if (typeMappings != null && (configOptions == null || !configOptions.containsKey("type-mappings"))) {
+            if (typeMappings != null && (configOptions == null || !configOptions.containsKey(TYPE_MAPPINGS))) {
                 applyTypeMappingsKvpList(typeMappings, configurator);
             }
 
             // Apply Language Specific Primitives
             if (languageSpecificPrimitives != null
-                && (configOptions == null || !configOptions.containsKey("language-specific-primitives"))) {
+                && (configOptions == null || !configOptions.containsKey(LANGUAGE_SPECIFIC_PRIMITIVES))) {
                 applyLanguageSpecificPrimitivesCsvList(languageSpecificPrimitives, configurator);
             }
 
             // Apply Additional Properties
-            if (additionalProperties != null && (configOptions == null || !configOptions.containsKey("additional-properties"))) {
+            if (additionalProperties != null && (configOptions == null || !configOptions.containsKey(
+                ADDITIONAL_PROPERTIES))) {
                 applyAdditionalPropertiesKvpList(additionalProperties, configurator);
             }
 
-            if (serverVariableOverrides != null && (configOptions == null || !configOptions.containsKey("server-variables"))) {
+            if (serverVariableOverrides != null && (configOptions == null || !configOptions.containsKey(
+                SERVER_VARIABLES))) {
                 applyServerVariablesKvpList(serverVariableOverrides, configurator);
             }
 
             // Apply Reserved Words Mappings
-            if (reservedWordsMappings != null && (configOptions == null || !configOptions.containsKey("reserved-words-mappings"))) {
+            if (reservedWordsMappings != null && (configOptions == null || !configOptions.containsKey(
+                RESERVED_WORDS_MAPPINGS))) {
                 applyReservedWordsMappingsKvpList(reservedWordsMappings, configurator);
             }
 
             if (environmentVariables != null) {
 
-                for (String key : environmentVariables.keySet()) {
+                for (Entry<String,String> entry : environmentVariables.entrySet()) {
+                    String key = entry.getKey();
                     originalEnvironmentVariables.put(key, GlobalSettings.getProperty(key));
                     String value = environmentVariables.get(key);
                     if (value == null) {
@@ -725,10 +729,9 @@ public class CodeGenMojo extends AbstractMojo {
 
             if (configHelp) {
                 for (CliOption langCliOption : config.cliOptions()) {
-                    System.out.println("\t" + langCliOption.getOpt());
-                    System.out.println("\t    "
+                    getLog().info("\t" + langCliOption.getOpt());
+                    getLog().info("\t    "
                         + langCliOption.getOptionHelp().replaceAll("\n", "\n\t    "));
-                    System.out.println();
                 }
                 return;
             }
@@ -747,7 +750,7 @@ public class CodeGenMojo extends AbstractMojo {
                 File parent = new File(storedInputSpecHashFile.getParent());
                 parent.mkdirs();
             }
-            Files.asCharSink(storedInputSpecHashFile, Charsets.UTF_8).write(inputSpecHash);
+            Files.asCharSink(storedInputSpecHashFile, StandardCharsets.UTF_8).write(inputSpecHash);
 
         } catch (Exception e) {
             // Maven logs exceptions thrown by plugins only if invoked with -e
@@ -770,6 +773,7 @@ public class CodeGenMojo extends AbstractMojo {
      * @return openapi specification file hash
      * @throws IOException When cannot read the file
      */
+    @SuppressWarnings("java:S2095")
     private String calculateInputSpecHash(File inputSpecFile) throws IOException {
 
         URL inputSpecRemoteUrl = inputSpecRemoteUrl();
@@ -782,16 +786,19 @@ public class CodeGenMojo extends AbstractMojo {
             URLConnection conn = inputSpecRemoteUrl.openConnection();
             if (isNotEmpty(auth)) {
                 List<AuthorizationValue> authList = AuthParser.parse(auth);
-                for (AuthorizationValue auth : authList) {
-                    conn.setRequestProperty(auth.getKeyName(), auth.getValue());
+                for (AuthorizationValue authorizationValue : authList) {
+                    conn.setRequestProperty(authorizationValue.getKeyName(), authorizationValue.getValue());
                 }
             }
             ReadableByteChannel readableByteChannel = Channels.newChannel(conn.getInputStream());
 
-            FileOutputStream fileOutputStream = new FileOutputStream(inputSpecTempFile);
-            FileChannel fileChannel = fileOutputStream.getChannel();
+            try(FileOutputStream fileOutputStream = new FileOutputStream(inputSpecTempFile)) {
+                FileChannel fileChannel = fileOutputStream.getChannel();
+                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            } catch (FileNotFoundException e) {
+                throw new IOException(e);
+            }
 
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         }
 
         ByteSource inputSpecByteSource =
@@ -799,7 +806,7 @@ public class CodeGenMojo extends AbstractMojo {
                 ? Files.asByteSource(inputSpecTempFile)
                 : CharSource
                     .wrap(ClasspathHelper.loadFileFromClasspath(inputSpecTempFile.toString().replaceAll("\\\\","/")))
-                .asByteSource(Charsets.UTF_8);
+                .asByteSource(StandardCharsets.UTF_8);
 
         return inputSpecByteSource.hash(Hashing.sha256()).toString();
     }

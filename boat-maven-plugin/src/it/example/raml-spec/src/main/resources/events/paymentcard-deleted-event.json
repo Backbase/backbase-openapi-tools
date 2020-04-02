@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": true,
+  "properties": {
+    "paymentcard": {
+      "type": "object",
+      "$ref": "../common-schemas/body/paymentcard-item.json"
+    },    
+    "emitDateTime": {
+      "description": "The dateTime parameter formatted as 'date-time', java.util.Date or java.time.ZoneDateTime",
+      "type": "string",
+      "format": "date-time"
+    },
+    "emitDate": {
+      "description": "The date parameter formatted as 'date', String or java.time.LocalDate",
+      "type": "string",
+      "format": "date"
+    },
+    "emitTime": {
+      "description": "The time parameter formatted as 'time', String or java.time.LocalTime",
+      "type": "string",
+      "format": "time"
+    },
+    "emitMillisec": {
+      "description": "The dateTime parameter formatted as 'date', long",
+      "type": "string",
+      "format": "utc-millisec"
+    }
+  }
+}

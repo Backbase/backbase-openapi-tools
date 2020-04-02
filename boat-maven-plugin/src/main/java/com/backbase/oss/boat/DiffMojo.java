@@ -23,11 +23,13 @@ public class DiffMojo extends AbstractRamlToOpenApi {
 
     @Override
     public void execute() throws MojoExecutionException {
-        try {
-            BatchOpenApiDiff.diff(output.toPath(), success, failed, insertIntoSpec, writeChangeLogToSeparateFile);
-            writeSummary("Calculated Change log for APIs");
-        } catch (Exception e) {
-            throw new MojoExecutionException("Cannot create diff", e);
+        if (output.exists()) {
+            try {
+                BatchOpenApiDiff.diff(output.toPath(), success, failed, insertIntoSpec, writeChangeLogToSeparateFile);
+                writeSummary("Calculated Change log for APIs");
+            } catch (Exception e) {
+                throw new MojoExecutionException("Cannot create diff", e);
+            }
         }
     }
 

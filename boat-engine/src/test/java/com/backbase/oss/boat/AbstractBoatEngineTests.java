@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AbstractBoatEngineTests {
 
 
@@ -22,6 +24,9 @@ public class AbstractBoatEngineTests {
         file.delete();
         file.createNewFile();
         Path path = file.toPath();
+        log.info("Writing output to: {}", path);
         Files.write(path, yaml.getBytes());
+
+
     }
 }

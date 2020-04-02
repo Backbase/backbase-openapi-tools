@@ -1,0 +1,15 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"javaType": "com.backbase.buildingblocks.presentation.errors.InternalServerErrorException",
+	"description": "Represents HTTP 500 Internal Server Error",
+	"properties": {
+		"message": {
+			"type": "string",
+			"description": "Further Information"
+		}
+	},
+	"required": [
+		"message"
+	]
+}

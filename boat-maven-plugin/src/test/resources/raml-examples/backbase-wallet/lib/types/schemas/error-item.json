@@ -1,0 +1,24 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"description": "A validation error",
+	"javaInterfaces": [
+		"java.io.Serializable",
+		"Cloneable"
+	],
+	"properties": {
+		"message": {
+			"type": "string",
+			"description": "Default Message. Any further information."
+		},
+		"key": {
+			"type": "string",
+			"description": "{capability-name}.api.{api-key-name}. For generated validation errors this is the path in the document the error resolves to. e.g. object name + '.' + field"
+		},
+		"context": {
+			"type": "object",
+			"description": "Context can be anything used to construct localised messages.",
+			"javaType": "java.util.Map<String,String>"
+		}
+	}
+}
