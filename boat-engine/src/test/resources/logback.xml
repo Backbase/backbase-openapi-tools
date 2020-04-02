@@ -4,7 +4,7 @@
             <pattern>%highlight([%level]) [%logger{10}] %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="COLOR"/>
     </root>
 </configuration>
