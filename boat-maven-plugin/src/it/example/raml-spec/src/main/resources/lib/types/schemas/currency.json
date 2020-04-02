@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Monetary Amount",
+  "description": "Schema defining monetary amount in given currency.",
+  "javaType": "com.backbase.rest.spec.common.types.Currency",
+  "properties": {
+    "amount": {
+      "type": "string",
+      "javaType": "java.math.BigDecimal",
+      "description": "The amount in the specified currency"
+    },
+    "currencyCode": {
+      "type": "string",
+      "description": "The alpha-3 code (complying with ISO 4217) of the currency that qualifies the amount",
+      "pattern": "^[A-Z]{3}$"
+    }
+  },
+  "required": [
+    "amount",
+    "currencyCode"
+  ]
+}

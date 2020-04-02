@@ -11,11 +11,18 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class ExportMojo extends AbstractRamlToOpenApi {
 
     /**
-     * Source directory to scan for raml files. Use location relative to the project.baseDir.
-     * Default is 'src/main/resources'.
+     * Source directory to scan for raml files. Use location relative to the project.baseDir. Default is
+     * 'src/main/resources'.
      */
     @Parameter(property = "input", defaultValue = "src/main/resources")
-    private File input;
+    protected File input;
+
+
+    /**
+     * Explicit RAML File location
+     */
+    @Parameter(property = "inputFile")
+    protected File inputFile;
 
     /**
      * Fails on errors by default, but can be set to ignore.
@@ -25,22 +32,27 @@ public class ExportMojo extends AbstractRamlToOpenApi {
 
     @Override
     public void execute() throws MojoExecutionException {
-        if (!input.exists()) {
-            String msg = "Input does not exist: " + input.getAbsolutePath();
-            getLog().error(msg);
-            if (failOnError) {
-                throw new MojoExecutionException(msg);
+        File[] files = null;
+        if (inputFile != null) {
+            getLog().info("Converting RAML Input File: " + inputFile);
+            files = new File[]{inputFile};
+        } else {
+            getLog().info("Converting RAML specs from Input Directory: " + input);
+            if (!input.exists()) {
+                String msg = "Input does not exist: " + input.getAbsolutePath();
+                getLog().error(msg);
+                if (failOnError) {
+                    throw new MojoExecutionException(msg);
+                }
             }
-        }
 
-        File[] files = input.listFiles(this::isRamlSpec);
-        if (files == null) {
-            String msg = "Failed to find raml files in " + input.getAbsolutePath();
-            getLog().error(msg);
-            if (failOnError) {
-                throw new MojoExecutionException(msg);
-            } else {
-                // Avoid the NPE
+            files = input.listFiles(this::isRamlSpec);
+            if (files == null || files.length == 0) {
+                String msg = "Failed to find raml files in " + input.getAbsolutePath();
+                getLog().error(msg);
+                if (failOnError) {
+                    throw new MojoExecutionException(msg);
+                }
                 return;
             }
         }
@@ -52,7 +64,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
                 String name = project.getArtifactId() + ":" + project.getVersion() + ":" + ramlName;
                 export(name, Optional.empty(), file, outputDirectory);
                 getLog().info("Exported RAML Spec: " + ramlName);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 failed.put(ramlName, e.getMessage());
                 String msg = "Failed to export RAML Spec: " + file.getName()
                     + " due to: [" + e.getClass() + "] " + e.getMessage();
