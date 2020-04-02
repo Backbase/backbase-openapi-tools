@@ -67,9 +67,11 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             .collect(Collectors.toSet());
         VersionRange versionRange = getVersionRange();
 
-        Map<String, Map<String, List<File>>> specAndVersions = new TreeMap<>();
+        log.debug("BOAT: Remote repositories: {}", remoteRepositories);
 
+        Map<String, Map<String, List<File>>> specAndVersions = new TreeMap<>();
         List<MetadataResult> metadataResults = metadataResolver.resolveMetadata(repositorySession, metadataRequests);
+        log.debug("BOAT: Metadata Results: {}", metadataRequests);
         List<Pair<String, TreeMap<String, Set<ArtifactResult>>>> versionCapabilitySpecs = metadataResults.stream()
             .filter(MetadataResult::isResolved)
             .map(metadataResult -> metadataResult.getMetadata().getFile())
@@ -86,9 +88,15 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             .map(this::groupArtifactsPerVersionAndCapability)
             .collect(Collectors.toList());
 
+        if(versionCapabilitySpecs.isEmpty()) {
+            log.info("No specs found in bom!");
+            return;
+        }
+        log.info("Converting {} RAML specs found in bom", versionCapabilitySpecs.size());
+
         export(versionCapabilitySpecs, specAndVersions);
         writeSummary("Converted RAML Specs to OpenAPI Summary");
-        if (addChangeLog) {
+        if (addChangeLog && !specAndVersions.isEmpty()) {
             try {
                 success.clear();
                 failed.clear();
@@ -158,6 +166,7 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     private MetadataRequest createMetadataRequest(RemoteRepository remoteRepository) {
         MetadataRequest metadataRequest = new MetadataRequest();
         metadataRequest.setRepository(remoteRepository);
+//        metadataRequest.setFavorLocalRepository(true);
         metadataRequest.setMetadata(new DefaultMetadata(specBom.getGroupId(), specBom.getArtifactId(), "maven-metadata.xml", Metadata.Nature.RELEASE));
         return metadataRequest;
     }
