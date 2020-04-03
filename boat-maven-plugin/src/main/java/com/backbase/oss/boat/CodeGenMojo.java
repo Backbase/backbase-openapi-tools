@@ -109,7 +109,7 @@ public class CodeGenMojo extends AbstractMojo {
     /**
      * Copy input spec file to location.
      */
-    @Parameter(name = "copyTo")
+    @Parameter(name = "copyTo", defaultValue = "${project.build.outputDirectory}/META-INF/openapi/openapi.yaml")
     protected File copyTo;
 
 

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -101,8 +102,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
 
     /**
-     * Target directory for generated code. Use location relative to the project.baseDir. Default value
-     * is "target/openapi".
+     * Target directory for generated code. Use location relative to the project.baseDir. Default value is
+     * "target/openapi".
      */
     @Parameter(property = "output", defaultValue = "${project.build.directory}/openapi")
     protected File output = new File("${project.build.directory}/openapi");
@@ -132,11 +133,11 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             || file.getName().endsWith("client-api.raml");
     }
 
-    protected File export(String name, Optional<String> version, File ramlFile, File outputDirectory) throws ExportException, IOException {
+    protected File export(String name, String version, File ramlFile, File outputDirectory)
+        throws ExportException, IOException {
         getLog().info("Exporting " + name + " to: " + outputDirectory);
 
-
-        OpenAPI openApi = convert(name, version, ramlFile);
+        OpenAPI openApi = convert(version, ramlFile);
 
         String yaml = SerializerUtils.toYamlString(openApi);
 
@@ -149,7 +150,7 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
         File indexFile = new File(outputDirectory, "index.html");
         InputStream resourceAsStream = getClass().getResourceAsStream("/index.html");
-        String index = IOUtils.toString(resourceAsStream, "UTF-8");
+        String index = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         index = StringUtils.replace(index, "@title@", openApi.getInfo().getTitle());
         Files.write(indexFile.toPath(), index.getBytes());
 
@@ -159,7 +160,7 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     }
 
 
-    protected OpenAPI convert(String name, Optional<String> version, File ramlFile) throws ExportException {
+    protected OpenAPI convert(String version, File ramlFile) throws ExportException {
         ExporterOptions options = new ExporterOptions()
             .addJavaTypeExtensions(addJavaTypeExtensions)
             .convertExamplesToYaml(convertJsonExamplesToYaml);
@@ -179,28 +180,27 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         }
 
         OpenAPI openApi = Exporter.export(ramlFile, options);
-        pimpInfo(name, version, ramlFile, openApi);
+        pimpInfo(version, openApi);
         if (appendDeprecatedMetadataInDescription) {
             // Iterate over all operations and update the description
-            openApi.getPaths().values().stream().forEach(pathItem -> {
-                pathItem.readOperationsMap().entrySet().stream()
-                    .filter(this::isDeprecated)
-                    .forEach(httpMethodOperationEntry -> {
-                            Operation operation = httpMethodOperationEntry.getValue();
-                            Optional<String> deprecatedInformationOptional = generateMarkdownForDeprecationExtention(operation);
+            openApi.getPaths().values().forEach(pathItem -> pathItem.readOperationsMap().entrySet()
+                .stream()
+                .filter(this::isDeprecated)
+                .forEach(httpMethodOperationEntry -> {
+                        Operation operation = httpMethodOperationEntry.getValue();
+                        Optional<String> deprecatedInformationOptional = generateMarkdownForDeprecationExtention(operation);
 
-                            deprecatedInformationOptional.ifPresent(deprecatedInformation -> {
-                                log.debug("Inserting deprecated information: \n{}", deprecatedInformation);
-                                if (operation.getDescription() == null) {
-                                    operation.setDescription(deprecatedInformation);
-                                } else {
-                                    operation.setDescription(operation.getDescription() + "\n" + deprecatedInformation);
-                                }
-                            });
-                            pathItem.operation(httpMethodOperationEntry.getKey(), operation);
-                        }
-                    );
-            });
+                        deprecatedInformationOptional.ifPresent(deprecatedInformation -> {
+                            log.debug("Inserting deprecated information: \n{}", deprecatedInformation);
+                            if (operation.getDescription() == null) {
+                                operation.setDescription(deprecatedInformation);
+                            } else {
+                                operation.setDescription(operation.getDescription() + "\n" + deprecatedInformation);
+                            }
+                        });
+                        pathItem.operation(httpMethodOperationEntry.getKey(), operation);
+                    }
+                ));
         }
         return openApi;
     }
@@ -211,11 +211,12 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     }
 
     private Optional<String> generateMarkdownForDeprecationExtention(Operation operation) {
-        if (operation.getExtensions() == null)
+        if (operation.getExtensions() == null) {
             return Optional.empty();
+        }
 
-
-        String deprecatedFromVersion = (String) operation.getExtensions().get("x-BbApiDeprecation-deprecatedFromVersion");
+        String deprecatedFromVersion = (String) operation.getExtensions()
+            .get("x-BbApiDeprecation-deprecatedFromVersion");
         String removedFromVersion = (String) operation.getExtensions().get("x-BbApiDeprecation-removedFromVersion");
         String reason = (String) operation.getExtensions().get("x-BbApiDeprecation-reason");
         String description = (String) operation.getExtensions().get("x-BbApiDeprecation-description");
@@ -225,8 +226,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         }
 
         StringBuilder sb = new StringBuilder("## Deprecated\n");
-        if (deprecatedFromVersion != null)
+        if (deprecatedFromVersion != null) {
             sb.append("* **Deprecated from:** ").append(deprecatedFromVersion).append("\n");
+        }
         if (removedFromVersion != null) {
             sb.append("* **Removed from:** ").append(removedFromVersion).append("\n");
         }
@@ -241,14 +243,13 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     }
 
-    private void pimpInfo(String name, Optional<String> version, File ramlFile, OpenAPI openApi) {
+    private void pimpInfo(String version, OpenAPI openApi) {
         Info info = openApi.getInfo();
-        String apiName = name + " - "
-            + info.getTitle() + " - "
-            + StringUtils.substringBeforeLast(ramlFile.getName(), ".");
-//        info.setTitle(apiName);
-        version.ifPresent(info::setVersion);
+        if (version != null) {
+            log.info("Overriding version: {}", version);
+            info.setVersion(version);
 
+        }
         if (StringUtils.isNotEmpty(xLogoUrl)) {
             Map<String, String> xLogo = new HashMap<>();
             xLogo.put("url", xLogoUrl);
@@ -345,12 +346,12 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     }
 
 
-    protected List<File> exportArtifact(String groupId, String artifactId, String version, File artifactFile, File outputDirectory) throws MojoExecutionException {
+    protected List<File> exportArtifact(String groupId, String artifactId, String version, File artifactFile,
+        File outputDirectory) throws MojoExecutionException {
 
+        log.info("Converting RAML specs from Artifact {}:{}:{}", groupId, artifactId, version);
 
-        String specName = artifactId;
-
-        File specUnzipDirectory = new File(project.getBuild().getDirectory() + "/raml/" + version, specName);
+        File specUnzipDirectory = new File(project.getBuild().getDirectory() + "/raml/" + version, artifactId);
         unzipSpec(artifactFile, specUnzipDirectory);
         File[] files = specUnzipDirectory.listFiles(this::isRamlSpec);
         assert files != null;
@@ -358,17 +359,18 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         for (File file : files) {
             String ramlName = StringUtils.substringBeforeLast(file.getName(), ".");
             try {
-                File parent = new File(outputDirectory, specName);
+                File parent = new File(outputDirectory, artifactId);
                 File openApiOutputDirectory = new File(parent, ramlName);
                 if (includeVersionInOutputDirectory) {
                     openApiOutputDirectory = new File(openApiOutputDirectory, version);
                 }
                 String name = artifactId + ":" + version + ":" + ramlName;
-                File exportedTo = export(name, Optional.of(version), file, openApiOutputDirectory);
+                File exportedTo = export(name, version, file, openApiOutputDirectory);
                 exported.add(exportedTo);
-                getLog().info("Exported RAML Spec: " + specName + " to: " + file);
-            } catch (Throwable e) {
-                getLog().warn("Failed to export RAML Spec: " + artifactId + " due to: [" + e.getClass() + "] " + e.getMessage());
+                getLog().info("Exported RAML Spec: " + artifactId + " to: " + file);
+            } catch (Exception e) {
+                getLog().warn(
+                    "Failed to export RAML Spec: " + artifactId + " due to: [" + e.getClass() + "] " + e.getMessage());
                 failed.put(artifactId + ":" + ramlName, e.getMessage());
             }
         }
@@ -458,7 +460,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         } catch (ArtifactResolutionException e) {
             throw new IllegalArgumentException("Cannot resolve artifact: " + artifact);
         }
-        log.debug("Resolved artifact: {}", artifactResult);
         return artifactResult;
 
     }
@@ -470,7 +471,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     protected DefaultArtifact createNewDefaultArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId()
             , dependency.getArtifactId()
-            , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getClassifier()) ? dependency.getClassifier() : null)
+            , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getClassifier()) ? dependency.getClassifier()
+            : null)
             , (org.codehaus.plexus.util.StringUtils.isNotEmpty(dependency.getType()) ? dependency.getType() : null)
             , dependency.getVersion());
     }
