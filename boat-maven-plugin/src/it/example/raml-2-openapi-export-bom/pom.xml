@@ -21,7 +21,9 @@
                         <groupId>com.backbase.oss.boat</groupId>
                         <artifactId>raml-spec-bom</artifactId>
                         <version>[1.0.0,)</version>
+                        <type>pom</type>
                     </specBom>
+                    <includeVersionsRegEx>.*</includeVersionsRegEx>
                     <xLogoUrl>http://www.backbase.com/wp-content/uploads/2017/04/backbase-logo-png.png</xLogoUrl>
                     <xLogoAltText>Backbase</xLogoAltText>
                     <markdownBottom># Disclaimer

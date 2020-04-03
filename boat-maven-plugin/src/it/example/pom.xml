@@ -12,7 +12,9 @@
 
     <modules>
         <module>raml-spec</module>
+        <module>raml-spec-version-2</module>
         <module>raml-spec-bom</module>
+        <module>raml-spec-bom-version-2</module>
         <module>raml-2-openapi-export-dep</module>
         <module>raml-2-openapi-export-bom</module>
     </modules>
