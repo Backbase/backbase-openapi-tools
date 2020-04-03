@@ -62,7 +62,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
             try {
                 File outputDirectory = new File(output, ramlName);
                 String name = project.getArtifactId() + ":" + project.getVersion() + ":" + ramlName;
-                export(name, Optional.empty(), file, outputDirectory);
+                export(name, null, file, outputDirectory);
                 getLog().info("Exported RAML Spec: " + ramlName);
             } catch (Exception e) {
                 failed.put(ramlName, e.getMessage());
