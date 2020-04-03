@@ -9,11 +9,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@UtilityClass
 public class SerializerUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SerializerUtils.class);
 
     public static String toYamlString(OpenAPI openAPI) {
         if (openAPI == null) {
@@ -28,16 +29,12 @@ public class SerializerUtils {
 
             YAMLFactory factory = (YAMLFactory) mapper.getFactory();
 
-//            factory.disable(YAMLGenerator.Feature.SPLIT_LINES);
             factory.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE);
 
             return mapper.writeValueAsString(openAPI);
 
-//            return Yaml.pretty(openAPI);
-//                    .replace("\r\n", "\n");
         } catch (Exception e) {
-            System.err.println("Can not create yaml content");
-            e.printStackTrace();
+            log.error("Failed to serialize open Api", e);
         }
         return null;
     }
@@ -52,8 +49,7 @@ public class SerializerUtils {
                 .writeValueAsString(schema)
                 .replace("\r\n", "\n");
         } catch (JsonProcessingException e) {
-            System.err.println("Can not create yaml content");
-            e.printStackTrace();
+            log.error("Failed to serialize open Api", e);
         }
         return null;
     }
