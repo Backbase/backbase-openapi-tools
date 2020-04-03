@@ -1,0 +1,23 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"resource": {
+			"type": "string",
+			"description": "Resource being protected, e.g. 'User'"
+		},
+		"function": {
+			"type": "string",
+			"description": "Business function, e.g. 'Manage Users'"
+		},
+		"privilege": {
+			"type": "string",
+			"description": "The privilege required, e.g. 'view'"
+		}
+	},
+	"required": [
+		"resource",
+		"function",
+		"privilege"
+	]
+}
