@@ -32,7 +32,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
 
     @Override
     public void execute() throws MojoExecutionException {
-        File[] files = null;
+        File[] files;
         if (inputFile != null) {
             getLog().info("Converting RAML Input File: " + inputFile);
             files = new File[]{inputFile};
