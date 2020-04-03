@@ -51,9 +51,9 @@
 
         <jacoco.version>0.8.4</jacoco.version>
 
-        <sonar.organization>backbase-technology-prototyping</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.login>***REMOVED***</sonar.login>
+<!--        <sonar.organization>backbase-technology-prototyping</sonar.organization>-->
+<!--        <sonar.host.url>https://sonarcloud.io</sonar.host.url>-->
+<!--        <sonar.login>***REMOVED***</sonar.login>-->
 
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 
