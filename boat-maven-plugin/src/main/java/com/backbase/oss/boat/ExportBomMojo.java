@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -14,6 +17,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -21,6 +25,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -44,9 +49,6 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
 
     private static final Logger log = LoggerFactory.getLogger(ExportBomMojo.class);
 
-    @Parameter(property = "includeGroupId")
-    private String includeGroupIds;
-
     @Parameter(property = "includeVersionsRegEx", defaultValue = "^(\\d+\\.)?(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$")
     private String includeVersionsRegEx;
 
@@ -62,33 +64,66 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
 
     @Override
     public void execute() throws MojoExecutionException {
+
         Set<MetadataRequest> metadataRequests = remoteRepositories.stream()
-            .map(this::createMetadataRequest)
+            .map(remoteRepository -> createMetadataRequest(remoteRepository, "maven-metadata.xml"))
             .collect(Collectors.toSet());
+        metadataRequests.add(createMetadataRequest(null, "maven-metadata.xml"));
         VersionRange versionRange = getVersionRange();
 
-        Map<String, Map<String, List<File>>> specAndVersions = new TreeMap<>();
+        log.info("Checking BOM Meta Data for: {}:{}", specBom.getGroupId(), specBom.getArtifactId());
 
         List<MetadataResult> metadataResults = metadataResolver.resolveMetadata(repositorySession, metadataRequests);
-        List<Pair<String, TreeMap<String, Set<ArtifactResult>>>> versionCapabilitySpecs = metadataResults.stream()
+
+        List<MetadataResult> remoteMetaData = metadataResults.stream()
             .filter(MetadataResult::isResolved)
+            .collect(Collectors.toList());
+
+        if (remoteMetaData.isEmpty()) {
+            log.warn("Failed to resolve meta data for: {}:{}. Exiting", specBom.getGroupId(), specBom.getArtifactId());
+            return;
+        }
+
+        List<File> metaDataList = remoteMetaData.stream()
             .map(metadataResult -> metadataResult.getMetadata().getFile())
+            .collect(Collectors.toList());
+
+        log.info("Resolved meta data for: {}:{} in: {}", specBom.getGroupId(), specBom.getArtifactId(), metaDataList);
+
+        List<String> versions = metaDataList.stream()
             .map(this::parseMetadataFile)
             .flatMap(metadata -> metadata.getVersioning().getVersions().stream())
-            .filter(version -> version.matches(includeVersionsRegEx))
+            .filter(version -> {
+                    if (!StringUtils.isEmpty(includeVersionsRegEx)) {
+                        return version.matches(includeVersionsRegEx);
+                    } else {
+                        return true;
+                    }
+                }
+            )
+            .collect(Collectors.toList());
+
+        log.info("Resolved versions: {}", versions);
+
+        List<Pair<String, TreeMap<String, Set<ArtifactResult>>>> versionCapabilitySpecs = versions.stream()
             .map(DefaultArtifactVersion::new)
             .filter(versionRange::containsVersion)
             .distinct()
-            .peek(defaultArtifactVersion -> log.info("Resolving Specs for version: {}", defaultArtifactVersion))
             .map(this::convertToArtifact)
             .map(this::resolveArtifactFromRepositories)
             .map(this::parsePomFile)
             .map(this::groupArtifactsPerVersionAndCapability)
             .collect(Collectors.toList());
 
-        export(versionCapabilitySpecs, specAndVersions);
+        if (versionCapabilitySpecs.isEmpty()) {
+            log.info("No specs found in bom!");
+            return;
+        }
+        log.info("Converting {} RAML specs found in bom", versionCapabilitySpecs.size());
+
+        export(versionCapabilitySpecs);
         writeSummary("Converted RAML Specs to OpenAPI Summary");
-        if (addChangeLog) {
+        if (addChangeLog && !versionCapabilitySpecs.isEmpty()) {
             try {
                 success.clear();
                 failed.clear();
@@ -102,31 +137,58 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
 
 
     private Pair<String, TreeMap<String, Set<ArtifactResult>>> groupArtifactsPerVersionAndCapability(Model model) {
+
+        Set<Dependency> dependencies = getAllDependenciesFromBom(model);
+
+        TreeMap<String, Set<ArtifactResult>> collect = dependencies.stream()
+            .filter(this::isIncludedSpec)
+            .map(this::createNewDefaultArtifact)
+            .distinct()
+            .map(this::resolveArtifactFromRepositories)
+            .collect(Collectors
+                .groupingBy(artifactResult -> artifactResult.getArtifact().getGroupId(), TreeMap::new,
+                    Collectors.toSet()));
+
         return Pair.of(model.getVersion(),
-            model.getDependencyManagement().getDependencies().stream()
-                .filter(this::isIncludedSpec)
-                .map(this::createNewDefaultArtifact)
-                .distinct()
-                .map(this::resolveArtifactFromRepositories)
-                .collect(Collectors.groupingBy(artifactResult -> artifactResult.getArtifact().getGroupId(), TreeMap::new, Collectors.toSet())));
+            collect);
     }
 
-    protected void export(List<Pair<String, TreeMap<String, Set<ArtifactResult>>>> versionCapabilitySpecs, Map<String, Map<String, List<File>>> specAndVersions) {
+    private Set<Dependency> getAllDependenciesFromBom(Model model) {
+        Set<Dependency> dependencies = new HashSet<>();
+        if (model.getDependencyManagement() != null) {
+            dependencies.addAll(model.getDependencyManagement().getDependencies());
+        }
+        if (model.getDependencies() != null) {
+            dependencies.addAll(model.getDependencies());
+        }
+        if (model.getProfiles() != null) {
+            model.getProfiles().forEach(profile -> dependencies.addAll(profile.getDependencies()));
+        }
+        return dependencies;
+    }
+
+    protected void export(List<Pair<String, TreeMap<String, Set<ArtifactResult>>>> versionCapabilitySpecs)
+        throws MojoExecutionException {
         for (Pair<String, TreeMap<String, Set<ArtifactResult>>> versionSpecs : versionCapabilitySpecs) {
             String version = versionSpecs.getKey();
 
-            versionSpecs.getValue().entrySet().stream().forEach(entry -> {
+            for (Entry<String, Set<ArtifactResult>> entry : versionSpecs.getValue().entrySet()) {
                 String capabilty = entry.getKey();
                 Set<ArtifactResult> specs = entry.getValue();
 
                 File capabilityDirectory = new File(output, capabilty);
-                capabilityDirectory.mkdirs();
+                try {
+                    Files.createDirectories(capabilityDirectory.toPath());
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Cannot create output directory: " + capabilityDirectory);
+                }
 
                 specs.stream().filter(ArtifactResult::isResolved)
                     .map(ArtifactResult::getArtifact)
                     .forEach(artifact -> {
                         try {
-                            List<File> files = exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), version, artifact.getFile(), capabilityDirectory);
+                            List<File> files = exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), version,
+                                artifact.getFile(), capabilityDirectory);
 
                             log.info("Successfully exported artifact: {} to: {}", artifact, files);
                         } catch (MojoExecutionException e) {
@@ -134,9 +196,10 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
                         }
                     });
 
-                specs.stream().filter(ArtifactResult::isMissing).forEach(artifactResult -> log.error("Failed to resolve: {}", artifactResult));
+                specs.stream().filter(ArtifactResult::isMissing)
+                    .forEach(artifactResult -> log.error("Failed to resolve: {}", artifactResult));
 
-            });
+            }
         }
 
     }
@@ -155,10 +218,13 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
         }
     }
 
-    private MetadataRequest createMetadataRequest(RemoteRepository remoteRepository) {
+    private MetadataRequest createMetadataRequest(RemoteRepository remoteRepository, String type) {
         MetadataRequest metadataRequest = new MetadataRequest();
-        metadataRequest.setRepository(remoteRepository);
-        metadataRequest.setMetadata(new DefaultMetadata(specBom.getGroupId(), specBom.getArtifactId(), "maven-metadata.xml", Metadata.Nature.RELEASE));
+        if (remoteRepository != null) {
+            metadataRequest.setRepository(remoteRepository);
+        }
+        metadataRequest.setMetadata(new DefaultMetadata(specBom.getGroupId(), specBom.getArtifactId(),
+            type, Metadata.Nature.RELEASE_OR_SNAPSHOT));
         return metadataRequest;
     }
 
@@ -175,33 +241,54 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     public Model parsePomFile(ArtifactResult pom) {
         File pomFile = pom.getArtifact().getFile();
         MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = null;
+        Model model;
         try {
             model = reader.read(new FileReader(pomFile));
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot read pom file");
         }
-
         // Merge dependencies version numbers inside the poms
-
         Properties properties = model.getProperties();
-        List<org.apache.maven.model.Dependency> dependencyManagementDependencies = model.getDependencyManagement().getDependencies();
-        dependencyManagementDependencies.forEach(dependency -> dependency.setVersion(replacePlaceholders(properties, dependency.getVersion())));
+        List<org.apache.maven.model.Dependency> dependencyManagementDependencies = new ArrayList<>();
+        if (model.getDependencyManagement() != null) {
+            dependencyManagementDependencies = model.getDependencyManagement().getDependencies().stream()
+                .map(dependency -> setVersion(properties, dependency))
+                .collect(Collectors.toList());
+        }
+        if (model.getDependencies() != null) {
+            for (Dependency dependency : model.getDependencies()) {
+                if (dependency.getVersion() == null) {
+                    setManagedVersionDependency(dependencyManagementDependencies, dependency);
+                }
+            }
 
-        model.getProfiles().forEach(profile -> profile.getDependencies().forEach(profileDependency ->
-            setManagedVersionDependency(dependencyManagementDependencies, profileDependency)
-        ));
-
+        }
+        if (model.getProfiles() != null) {
+            for (Profile profile : model.getProfiles()) {
+                for (Dependency dependency : profile.getDependencies()) {
+                    setManagedVersionDependency(dependencyManagementDependencies, dependency);
+                }
+            }
+        }
         return model;
-
     }
 
-    private void setManagedVersionDependency(List<org.apache.maven.model.Dependency> dependencyManagementDependencies, org.apache.maven.model.Dependency profileDependency) {
-        Optional<org.apache.maven.model.Dependency> managedDependency = resolveDependencyVersion(dependencyManagementDependencies, profileDependency);
+    private Dependency setVersion(Properties properties, Dependency dependency) {
+        dependency.setVersion(replacePlaceholders(properties, dependency.getVersion()));
+        return dependency;
+    }
+
+    private void setManagedVersionDependency
+        (List<org.apache.maven.model.Dependency> dependencyManagementDependencies,
+            org.apache.maven.model.Dependency profileDependency) {
+        Optional<org.apache.maven.model.Dependency> managedDependency = resolveDependencyVersion(
+            dependencyManagementDependencies, profileDependency);
         managedDependency.ifPresent(dependency -> profileDependency.setVersion(dependency.getVersion()));
     }
 
-    private Optional<org.apache.maven.model.Dependency> resolveDependencyVersion(List<org.apache.maven.model.Dependency> dependencyManagementDependencies, org.apache.maven.model.Dependency profileDependency) {
+    private Optional<org.apache.maven.model.Dependency> resolveDependencyVersion(
+        List<org.apache.maven.model.Dependency> dependencyManagementDependencies,
+        org.apache.maven.model.Dependency profileDependency) {
         return dependencyManagementDependencies.stream().
             filter(dependency ->
                 profileDependency.getArtifactId().equals(dependency.getArtifactId())
@@ -220,7 +307,8 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             if (properties.containsKey(matcher.group(1))) {
                 String replacement = properties.get(matcher.group(1)).toString();
                 // quote to work properly with $ and {,} signs
-                matcher.appendReplacement(buffer, replacement != null ? Matcher.quoteReplacement(replacement) : "null");
+                matcher.appendReplacement(buffer,
+                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
             }
         }
         matcher.appendTail(buffer);
@@ -231,7 +319,9 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     protected DefaultArtifact convertToArtifact(DefaultArtifactVersion defaultArtifactVersion) {
         return new DefaultArtifact(specBom.getGroupId()
             , specBom.getArtifactId()
-            , (org.codehaus.plexus.util.StringUtils.isNotEmpty(specBom.getClassifier()) ? specBom.getClassifier() : null)
+            ,
+            (org.codehaus.plexus.util.StringUtils.isNotEmpty(specBom.getClassifier()) ? specBom.getClassifier()
+                : null)
             , (org.codehaus.plexus.util.StringUtils.isNotEmpty(specBom.getType()) ? specBom.getType() : null)
             , defaultArtifactVersion.toString());
     }

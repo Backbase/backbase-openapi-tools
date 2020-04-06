@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"java:S116","java:S1845", "java:S1170", "java:S1172", })
 public class MarkdownRender implements Render {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MarkdownRender.class);
@@ -60,9 +61,6 @@ public class MarkdownRender implements Render {
      */
     protected boolean showChangedMetadata;
 
-    public MarkdownRender() {
-    }
-
     public String render(ChangedOpenApi diff) {
         this.diff = diff;
         return listEndpoints("What's New", diff.getNewEndpoints())
@@ -76,7 +74,7 @@ public class MarkdownRender implements Render {
     }
 
     protected String listEndpoints(String title, List<Endpoint> endpoints) {
-        if (null == endpoints || endpoints.size() == 0) return "";
+        if (null == endpoints || endpoints.isEmpty()) return "";
         StringBuilder sb = new StringBuilder(sectionTitle(title));
         endpoints.stream()
             .map(e -> itemEndpoint(e.getMethod().toString(), e.getPathUrl(), e.getSummary()))
@@ -97,7 +95,7 @@ public class MarkdownRender implements Render {
     }
 
     protected String listEndpoints(List<ChangedOperation> changedOperations) {
-        if (null == changedOperations || changedOperations.size() == 0) return "";
+        if (null == changedOperations || changedOperations.isEmpty()) return "";
         StringBuilder sb = new StringBuilder(sectionTitle("What's Changed"));
         changedOperations.stream()
             .map(
@@ -132,7 +130,7 @@ public class MarkdownRender implements Render {
     }
 
     protected String responses(ChangedApiResponse changedApiResponse) {
-        StringBuilder sb = new StringBuilder("\n");
+        StringBuilder sb = new StringBuilder("%n");
         sb.append(listResponse("New response", changedApiResponse.getIncreased()));
         sb.append(listResponse("Deleted response", changedApiResponse.getMissing()));
         changedApiResponse.getChanged().entrySet().stream()
@@ -175,7 +173,7 @@ public class MarkdownRender implements Render {
         if (!code.equals("default")) {
             status = HttpStatus.getStatusText(Integer.parseInt(code));
         }
-        sb.append(format("%s : **%s %s**\n", title, code, status));
+        sb.append(format("%s : **%s %s**%n", title, code, status));
         sb.append(metadata(description));
         return sb.toString();
     }
@@ -212,7 +210,7 @@ public class MarkdownRender implements Render {
     }
 
     protected String itemHeader(String title, String mediaType, String description) {
-        return format("%s : `%s`\n\n", title, mediaType) + metadata(description) + '\n';
+        return format("%s : `%s`%n%n", title, mediaType) + metadata(description) + '\n';
     }
 
     protected String bodyContent(String prefix, ChangedContent changedContent) {
@@ -247,7 +245,7 @@ public class MarkdownRender implements Render {
     }
 
     protected String itemContent(String title, String mediaType) {
-        return format("%s : `%s`\n\n", title, mediaType);
+        return format("%s : `%s`%n%n", title, mediaType);
     }
 
     protected String itemContent(String title, String mediaType, MediaType content) {
@@ -268,27 +266,27 @@ public class MarkdownRender implements Render {
             .getMissing()
             .keySet()
             .forEach(
-                key -> sb.append(format("%sDeleted '%s' %s\n", indent(deepness), key, discriminator)));
+                key -> sb.append(format("%sDeleted '%s' %s%n", indent(deepness), key, discriminator)));
         schema
             .getIncreased()
             .forEach(
                 (key, sub) ->
-                    sb.append(format("%sAdded '%s' %s:\n", indent(deepness), key, discriminator))
+                    sb.append(format("%sAdded '%s' %s:%n", indent(deepness), key, discriminator))
                         .append(schema(deepness, sub, schema.getContext())));
         schema
             .getChanged()
             .forEach(
                 (key, sub) ->
-                    sb.append(format("%sUpdated `%s` %s:\n", indent(deepness), key, discriminator))
+                    sb.append(format("%sUpdated `%s` %s:%n", indent(deepness), key, discriminator))
                         .append(schema(deepness, sub)));
         return sb.toString();
     }
 
     protected String required(int deepness, String title, List<String> required) {
         StringBuilder sb = new StringBuilder();
-        if (required.size() > 0) {
-            sb.append(format("%s%s:\n", indent(deepness), title));
-            required.forEach(s -> sb.append(format("%s- `%s`\n", indent(deepness), s)));
+        if (!required.isEmpty()) {
+            sb.append(format("%s%s:%n", indent(deepness), title));
+            required.forEach(s -> sb.append(format("%s- `%s`%n", indent(deepness), s)));
             sb.append("\n");
         }
         return sb.toString();
@@ -336,15 +334,15 @@ public class MarkdownRender implements Render {
 
     protected String schema(int deepness, ComposedSchema schema, DiffContext context) {
         StringBuilder sb = new StringBuilder();
-        if (schema.getAllOf() != null && schema.getAllOf() != null) {
+        if (schema.getAllOf() != null ) {
             LOGGER.debug("All of schema");
             schema.getAllOf().stream()
                 .map(this::resolve)
                 .forEach(composedChild -> sb.append(schema(deepness, composedChild, context)));
         }
-        if (schema.getOneOf() != null && schema.getOneOf() != null) {
+        if (schema.getOneOf() != null ) {
             LOGGER.debug("One of schema");
-            sb.append(format("%sOne of:\n\n", indent(deepness)));
+            sb.append(format("%sOne of:%n%n", indent(deepness)));
             schema.getOneOf().stream()
                 .map(this::resolve)
                 .forEach(composedChild -> sb.append(schema(deepness + 1, composedChild, context)));
@@ -382,7 +380,7 @@ public class MarkdownRender implements Render {
 
     protected String items(int deepness, String title, String type, String description) {
         return format(
-            "%s%s (%s):" + "\n%s\n",
+            "%s%s (%s):" + "%n%s%n",
             indent(deepness), title, type, metadata(indent(deepness + 1), description));
     }
 
@@ -424,7 +422,7 @@ public class MarkdownRender implements Render {
     protected String property(
         int deepness, String title, String name, String type, String description) {
         return format(
-            "%s* %s `%s` (%s)\n%s\n",
+            "%s* %s `%s` (%s)%n%s%n",
             indent(deepness), title, name, type, metadata(indent(deepness + 1), description));
     }
 
@@ -438,9 +436,9 @@ public class MarkdownRender implements Render {
 
     protected <T> String listItem(int deepness, String name, List<T> list) {
         StringBuilder sb = new StringBuilder();
-        if (list != null && list.size() > 0) {
-            sb.append(format("%s%s value%s:\n\n", indent(deepness), name, list.size() > 1 ? "s" : ""));
-            list.forEach(p -> sb.append(format("%s* `%s`\n", indent(deepness), p)));
+        if (list != null && !list.isEmpty() ) {
+            sb.append(format("%s%s value%s:%n%n", indent(deepness), name, list.size() > 1 ? "s" : ""));
+            list.forEach(p -> sb.append(format("%s* `%s`%n", indent(deepness), p)));
         }
         return sb.toString();
     }
@@ -499,7 +497,7 @@ public class MarkdownRender implements Render {
         }
         if (!isUnchanged(changedMetadata) && showChangedMetadata) {
             return format(
-                "Changed %s:\n%s\nto:\n%s\n\n",
+                "Changed %s:%n%s%nto:%n%s%n%n",
                 name,
                 metadata(beginning, changedMetadata.getLeft()),
                 metadata(beginning, changedMetadata.getRight()));
