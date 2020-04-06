@@ -1,0 +1,38 @@
+#%RAML 1.0 Library
+
+securitySchemes:
+# Custom 'bbAccessControl' security schema
+# RAML 1-0 does not allow settings in an x-other security scheme, so no opportunity to describe extra information here
+  bbAccessControl:
+    displayName: Backbase Access Control
+    description: |
+      This API is secured by DBS Access Control
+    type: x-bb-access-control
+
+# RAML annotation and associated types that can be included in API specification files
+annotationTypes:
+  x-bb-api-type:
+    displayName: API Type
+    description: |
+      Signals whether this API endpoint is intended for use by users (HTTP APIs exposed by presentation services) or by
+      systems (HTTP APIs exposed by inbound integration services)
+    type: array
+    items:
+      type: string
+      enum: [user, system]
+  x-bb-access-control:
+    displayName: Backbase Access Control
+    description: |
+      Describes which Resource, Function and Privilege need to be granted to the user to allow access to this API
+    type: BB-Access-Control
+  x-bb-api-deprecation:
+    displayName: API Deprecation
+    description: |
+      Signals that the API endpoint is deprecated, providing details on when the API was deprecated, when it will be
+      removed, the reason for deprecation and a more general description in Markdown that can be used to provide more
+      information on the deprecation and migration strategy
+    type: BB-Api-Deprecation
+
+schemas:
+  BB-Access-Control: !include ../types/schemas/bb-access-control.json
+  BB-Api-Deprecation: !include ../types/schemas/bb-api-deprecation.json

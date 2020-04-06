@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExporterTest {
+public class ExporterTest extends AbstractBoatEngineTests {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 
@@ -81,15 +81,7 @@ public class ExporterTest {
 
     }
 
-    protected void writeOutput(String yaml, String fileName) throws IOException {
-        File directory = new File("target");
-        directory.mkdirs();
-        File file = new File(directory, fileName);
-        file.delete();
-        file.createNewFile();
-        Path path = file.toPath();
-        Files.write(path, yaml.getBytes());
-    }
+
 
     protected File getFile(String name) {
         URL resource = getClass().getResource(name);

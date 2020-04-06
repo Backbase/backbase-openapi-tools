@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class Decomposer implements Transformer {
 
-    public void transform(OpenAPI openAPI, HashMap<String, Object> options) {
+    public void transform(OpenAPI openAPI, Map<String, Object> options) {
 
         List<Schema> composedSchemas = openAPI.getComponents().getSchemas().values().stream()
             .filter(schema -> schema instanceof ComposedSchema)
