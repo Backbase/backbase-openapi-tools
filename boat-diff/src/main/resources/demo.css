@@ -22,7 +22,7 @@ th, td /* table elements 表格元素 */ {
 body,
 button, input, select, textarea /* for ie */ {
   font: 16px/1.5 sans-serif, tahoma, arial, \5b8b\4f53;
-  font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
+  font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal,serif;
   font-weight: normal;
 }
 h1, h2, h3, h4, h5, h6 { font-size: 100%; }

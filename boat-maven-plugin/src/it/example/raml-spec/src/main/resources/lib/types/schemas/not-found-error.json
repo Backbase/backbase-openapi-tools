@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.backbase.buildingblocks.presentation.errors.NotFoundException",
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "Any further information"
+    },
+    "errors": {
+      "type": "array",
+      "description": "Detailed error information",
+      "items": {
+        "$ref": "error-item.json"
+      }
+    }
+  }
+}
