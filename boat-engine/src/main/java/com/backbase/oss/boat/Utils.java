@@ -196,7 +196,7 @@ public class Utils {
         return normalizeSchemaName(proposedName);
     }
 
-    protected static String normalizeSchemaName(String name) {
+    public static String normalizeSchemaName(String name) {
         if (name.contains("-")) {
             name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, name);
         } else {

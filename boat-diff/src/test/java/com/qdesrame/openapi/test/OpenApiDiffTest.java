@@ -7,6 +7,7 @@ import com.qdesrame.openapi.diff.OpenApiCompare;
 import com.qdesrame.openapi.diff.model.ChangedOpenApi;
 import com.qdesrame.openapi.diff.model.ChangedOperation;
 import com.qdesrame.openapi.diff.model.Endpoint;
+import com.qdesrame.openapi.diff.output.ConsoleRender;
 import com.qdesrame.openapi.diff.output.HtmlRender;
 import com.qdesrame.openapi.diff.output.MarkdownRender;
 import java.io.FileWriter;
@@ -102,5 +103,21 @@ public class OpenApiDiffTest {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    assertThat(diff.getChangedOperations()).isNotEmpty();
+  }
+
+  @Test
+  public void testDiffAndConsole() {
+    ChangedOpenApi diff = OpenApiCompare.fromLocations(OPENAPI_DOC1, OPENAPI_DOC2);
+    String render = new ConsoleRender().render(diff);
+    try {
+      FileWriter fw = new FileWriter("target/testDiff.console.txt");
+      fw.write(render);
+      fw.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    assertThat(diff.getChangedOperations()).isNotEmpty();
   }
 }
