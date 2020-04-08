@@ -241,7 +241,7 @@ public class CodeGenMojo extends AbstractMojo {
     protected String httpUserAgent;
 
     /**
-     * To remove operationId prefix (e.g. user_getName => getName).
+     * To remove operationId prefix (e.g. user_getName =&gt; getName).
      */
     @Parameter(name = "removeOperationIdPrefix", property = "openapi.generator.maven.plugin.removeOperationIdPrefix", required = false)
     protected Boolean removeOperationIdPrefix;
