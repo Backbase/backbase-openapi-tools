@@ -310,7 +310,7 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     /**
      * @param outputDir The output directory to write to.
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException Execution when failing to write Swagger URLS
      */
     protected void writeSwaggerUrls(File outputDir) throws MojoExecutionException {
         List<Map> swaggerUrls = new LinkedList<>();
