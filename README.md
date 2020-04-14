@@ -70,6 +70,7 @@ Configuration
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>my.project</groupId>
@@ -77,19 +78,27 @@ Configuration
     <version>1.0</version>
     <packaging>pom</packaging>
 
+    <properties>
+      <boat-maven-plugin.version>0.1.3</boat-maven-plugin.version>
+    </properties>
+
     <build>
-        <plugins>
-            <plugin>
-                <groupId>com.backbase.boat</groupId>
-                <artifactId>boat-maven-plugin</artifactId>
-                <version>${boat-maven-plugin.version}</version>
+      <plugins>
+        <plugin>
+          <groupId>com.backbase.oss</groupId>
+          <artifactId>boat-maven-plugin</artifactId>
+          <version>${boat-maven-plugin.version}</version>
+            <executions>
+              <execution>
                 <configuration>
-                    <inputFiles>
-                        <inputFile>${basedir}/src/main/resources/api.raml</inputFile>
-                    </inputFiles>
+                  <inputFiles>
+                    <inputFile>${basedir}/src/main/resources/api.raml</inputFile>
+                  </inputFiles>
                 </configuration>
-            </plugin>
-        </plugins>
+              </execution>
+            </executions>
+        </plugin>
+     </plugins>
     </build>
 </project>
 ```
