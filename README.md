@@ -196,5 +196,5 @@ Configuration
 The following command will generate `index.html` file in the specified folder that contains API endpoints description.  
  
 ```bash
-mvn boat:export@generate-docs
+mvn boat:generate@generate-docs
 ```
