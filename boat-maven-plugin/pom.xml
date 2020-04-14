@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.1.3</version>
+        <version>0.1.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>boat-maven-plugin</artifactId>
@@ -191,7 +191,7 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <debug>true</debug>
+                    <debug>false</debug>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <pomIncludes>
                         <pomInclude>*/pom.xml</pomInclude>
