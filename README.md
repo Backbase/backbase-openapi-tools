@@ -193,7 +193,7 @@ Configuration
 <!-- ... -->
 ```
 
-The following command will generate `index.html` file in the specified folder that contains API endpoints description.  
+The following command will generate `index.html` file in the specified output folder that contains API endpoints description.  
  
 ```bash
 mvn boat:generate@generate-docs
