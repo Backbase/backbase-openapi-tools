@@ -18,9 +18,13 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change. 
 
-## 0.1.3- Halve Maen
+## 0.1.4
 
-* Added Code Generator Mojo from on openapi-generator.tech with custom templates for Java, JavaSpring and HTML2
+* Fixed template for HTML2 generator
+
+## 0.1.3 – Halve Maen
+
+* Added Code Generator Mojo from on [openapi-generator.tech](https://openapi-generator.tech/) with custom templates for Java, JavaSpring and HTML2
 * Renamed `export` to `export-dep` mojo for converting RAML specs to oas from dependencies
 * Added `export` mojo for converting RAML specs from input file
 * Added Normaliser transformer for transforming examples names to be used in Java code generation  as example names cannot have special characters.
@@ -79,7 +83,7 @@ Configuration
     <packaging>pom</packaging>
 
     <properties>
-      <boat-maven-plugin.version>0.1.3</boat-maven-plugin.version>
+      <boat-maven-plugin.version>0.1.4</boat-maven-plugin.version>
     </properties>
 
     <build>
@@ -90,10 +94,13 @@ Configuration
           <version>${boat-maven-plugin.version}</version>
             <executions>
               <execution>
+                <id>export-raml-spec</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>export</goal>
+                </goals>
                 <configuration>
-                  <inputFiles>
-                    <inputFile>${basedir}/src/main/resources/api.raml</inputFile>
-                  </inputFiles>
+                  <inputFile>${basedir}/src/main/resources/client-api.raml</inputFile>
                 </configuration>
               </execution>
             </executions>
@@ -103,11 +110,13 @@ Configuration
 </project>
 ```
 
-Execution
+The following command will convert the given `client-api.raml` file into Open API 3.0 format.
+ 
 ```bash
 mvn boat:export
 ```
 
+**NOTE:** RAML file name should end with `-api.raml`, `service-api.raml` or `client-api.raml`. 
 
 ## Export All Specifications in Bill-Of-Materials pom file
 If you want to export all specifications referenced in a pom file, you can use the following mojo
@@ -148,4 +157,44 @@ This API is converted from RAML1.0 using the boat-maven-plugin and is not final 
 
 ```bash
 mvn boat:export-bom
+```
+
+## Generate API docs
+
+Configuration
+
+```xml
+<!-- ... -->
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.backbase.oss</groupId>
+      <artifactId>boat-maven-plugin</artifactId>
+      <version>${boat-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>generate-docs</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
+              <output>${project.build.directory}/generated-sources</output>
+              <generatorName>html2</generatorName>
+            </configuration>
+          </execution>
+        </executions>
+    </plugin>
+ </plugins>
+</build>
+
+<!-- ... -->
+```
+
+The following command will generate `index.html` file in the specified folder that contains API endpoints description.  
+ 
+```bash
+mvn boat:export@generate-docs
 ```
