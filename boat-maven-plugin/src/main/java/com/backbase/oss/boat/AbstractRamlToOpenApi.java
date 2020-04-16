@@ -128,7 +128,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
 
     protected boolean isRamlSpec(File file) {
-        return file.getName().endsWith("-api.raml")
+        return file.getName().equals("api.raml")
+            || file.getName().endsWith("-api.raml")
             || file.getName().endsWith("service-api.raml")
             || file.getName().endsWith("client-api.raml");
     }
@@ -306,31 +307,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             }
         }
 
-    }
-
-    /**
-     * @param outputDir The output directory to write to.
-     * @throws MojoExecutionException Execution when failing to write Swagger URLS
-     */
-    protected void writeSwaggerUrls(File outputDir) throws MojoExecutionException {
-        List<Map> swaggerUrls = new LinkedList<>();
-        Path current = outputDir.toPath();
-        success.forEach((file, openAPI) -> {
-            Path relative = current.relativize(file.toPath());
-            Map entry = new HashMap();
-            entry.put("url", relative.toString());
-            entry.put("name", openAPI.getInfo().getTitle());
-            swaggerUrls.add(entry);
-        });
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            File swaggerUrlsFile = new File(output, "swaggerUrls.json");
-            String jsonList = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(swaggerUrls);
-            Files.write(swaggerUrlsFile.toPath(), jsonList.getBytes());
-        } catch (IOException e) {
-            throw new MojoExecutionException("Cannot write swagger results");
-        }
     }
 
     public void setProject(MavenProject project) {
