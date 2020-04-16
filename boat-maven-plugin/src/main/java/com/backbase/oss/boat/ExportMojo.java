@@ -76,10 +76,6 @@ public class ExportMojo extends AbstractRamlToOpenApi {
         }
 
         writeSummary("Converted RAML Specs to OpenAPI Summary");
-
-        if (!success.isEmpty()) {
-            writeSwaggerUrls(output);
-        }
     }
 
     public File getInput() {

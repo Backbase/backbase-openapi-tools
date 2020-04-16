@@ -24,10 +24,6 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
         }
 
         writeSummary("Exported Project Dependencies");
-
-        if (!success.isEmpty()) {
-            writeSwaggerUrls(output);
-        }
     }
 
 

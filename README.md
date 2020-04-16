@@ -21,6 +21,7 @@ BOAT is still under development and subject to change.
 ## 0.1.4
 
 * Fixed template for HTML2 generator
+* Include conversion of api.raml files found in dependencies
 
 ## 0.1.3 – Halve Maen
 
