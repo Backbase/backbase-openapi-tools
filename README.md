@@ -18,12 +18,19 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change. 
 
+## 0.1.5
+
+* Upgraded openapi-generator to 4.3.0
+* Fixed java doc in the Java templates to allow usage in Java 11 projects
+* Rename variable name `accept` to `acceptMediaType` in Java templates to allow OpenAPI Specs with parameters called `accept`
+
+
 ## 0.1.4
 
 * Fixed template for HTML2 generator
 * Include conversion of api.raml files found in dependencies
 
-## 0.1.3 – Halve Maen
+## 0.1.3  
 
 * Added Code Generator Mojo from on [openapi-generator.tech](https://openapi-generator.tech/) with custom templates for Java, JavaSpring and HTML2
 * Renamed `export` to `export-dep` mojo for converting RAML specs to oas from dependencies
