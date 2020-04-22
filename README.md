@@ -1,7 +1,7 @@
 ![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
 ![Release](https://github.com/Backbase/backbase-openapi-tools/workflows/Release/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
-
+[![Mvn Central](https://maven-badges.herokuapp.com/maven-central/com.backbase.oss/backbase-openapi-tools/badge.svg)](https://mvnrepository.com/artifact/com.backbase.oss/boat-maven-plugin)
 # Backbase OpenApi Tools 
 
 The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI
