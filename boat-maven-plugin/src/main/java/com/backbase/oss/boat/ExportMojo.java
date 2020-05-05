@@ -7,6 +7,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+/**
+ * Converts a RAML spec to an OpenAPI spec.
+ */
 @Mojo(name = "export", threadSafe = true)
 public class ExportMojo extends AbstractRamlToOpenApi {
 

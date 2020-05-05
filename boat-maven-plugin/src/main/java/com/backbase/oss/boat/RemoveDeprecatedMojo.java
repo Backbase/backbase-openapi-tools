@@ -17,6 +17,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+/**
+ * Removing deprecated elements in an OpenAPI spec.
+ */
 @Mojo(name = "remove-deprecated", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
 public class RemoveDeprecatedMojo extends AbstractMojo {
