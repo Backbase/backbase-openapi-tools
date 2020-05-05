@@ -1,4 +1,4 @@
-#boat maven plugin.
+# boat maven plugin.
 
 The boat plugin has 9 goals:
 
