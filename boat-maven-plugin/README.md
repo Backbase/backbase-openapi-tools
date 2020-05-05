@@ -1,9 +1,49 @@
 #boat maven plugin.
 
-Three mojos:
-- Generate
-- Export
-- compare
+The boat plugin has 9 goals:
+
+- bundle
+
+    Description: Bundles all references in the OpenAPI specification into one
+    file.
+
+- decompose
+
+    Description: Merges any components using allOf references.
+
+- diff
+
+    Calculates a Change log for APIs.
+
+- export
+
+    Converts a RAML spec to an OpenAPI spec.
+
+- export-bom
+
+    Converts all RAML Spec dependencies to OpenAPI Specs.
+
+- export-dep
+
+    Exports project dependencies where the ArtifactId ends with
+    '-spec'.
+
+- generate
+
+    Generates client/server code from a OpenAPI json/yaml
+    definition.
+
+- remove-deprecated
+
+    Removing deprecated elements in an OpenAPI spec.
+
+- boat:validate
+
+    Validates OpenAPI specs.
+
+For more information, run 
+
+`mvn help:describe -Dplugin=com.backbase.oss:boat-maven-plugin -Ddetail`
 
 ## boat:generate
 

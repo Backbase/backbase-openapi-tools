@@ -43,6 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Mojo(name = "export-bom", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
+/**
+ * Converts all RAML Spec dependencies to OpenAPI Specs.
+ */
 public class ExportBomMojo extends AbstractRamlToOpenApi {
 
     public static final String X_CHANGELOG = "x-changelog";
