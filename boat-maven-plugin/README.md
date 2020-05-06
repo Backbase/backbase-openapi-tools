@@ -4,12 +4,12 @@ The boat plugin has 9 goals:
 
 - bundle
 
-    Description: Bundles all references in the OpenAPI specification into one
+    Bundles all references in the OpenAPI specification into one
     file.
 
 - decompose
 
-    Description: Merges any components using allOf references.
+    Merges any components using allOf references.
 
 - diff
 
@@ -21,7 +21,7 @@ The boat plugin has 9 goals:
 
 - export-bom
 
-    Converts all RAML Spec dependencies to OpenAPI Specs.
+    Converts all RAML spec dependencies to OpenAPI Specs.
 
 - export-dep
 
@@ -30,12 +30,12 @@ The boat plugin has 9 goals:
 
 - generate
 
-    Generates client/server code from a OpenAPI json/yaml
+    Generates client/server code from an OpenAPI json/yaml
     definition.
 
 - remove-deprecated
 
-    Removing deprecated elements in an OpenAPI spec.
+    Removes deprecated elements in an OpenAPI spec.
 
 - boat:validate
 
