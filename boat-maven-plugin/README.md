@@ -1,8 +1,8 @@
 # boat maven plugin.
 
-The boat plugin has 9 goals:
+The `boat` plugin has 9 goals:
 
-- bundle
+- bundle (Not fully implemented)
 
     Bundles all references in the OpenAPI specification into one
     file.
@@ -30,8 +30,9 @@ The boat plugin has 9 goals:
 
 - generate
 
-    Generates client/server code from an OpenAPI json/yaml
-    definition.
+    Generates client/server code from a OpenAPI json/yaml
+    definition. Finds files name `api.raml`, `client-api.raml` or `service-api.raml`. Processes these files (and the 
+    json schemes they refer to) to produce `open-api.yaml` files in the output directory. 
 
 - remove-deprecated
 
@@ -45,12 +46,7 @@ For more information, run
 
 `mvn help:describe -Dplugin=com.backbase.oss:boat-maven-plugin -Ddetail`
 
-## boat:generate
-
-Finds files name `api.raml`, `client-api.raml` or `service-api.raml`.
-Processes these files (and the json schemes they refer to) to produce `open-api.yaml` files in the output directory. 
-
-Configuration example
+## Configuration examples
 
 ```$xml
    <build>
