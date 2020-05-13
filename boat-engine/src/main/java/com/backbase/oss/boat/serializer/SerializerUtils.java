@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
@@ -20,23 +22,9 @@ public class SerializerUtils {
         if (openAPI == null) {
             return null;
         }
-        SimpleModule module = new SimpleModule("OpenAPIModule");
-        module.addSerializer(OpenAPI.class, new OpenAPISerializer());
-        try {
-            ObjectMapper mapper = Yaml.mapper()
-                .registerModule(module)
-                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false);
 
-            YAMLFactory factory = (YAMLFactory) mapper.getFactory();
+        return Yaml.pretty(openAPI);
 
-            factory.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE);
-
-            return mapper.writeValueAsString(openAPI);
-
-        } catch (Exception e) {
-            log.error("Failed to serialize open Api", e);
-        }
-        return null;
     }
 
     public static String toYamlString(Schema schema) {
