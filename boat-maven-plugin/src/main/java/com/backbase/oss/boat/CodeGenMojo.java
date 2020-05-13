@@ -75,6 +75,8 @@ public class CodeGenMojo extends AbstractMojo {
     public static final String ADDITIONAL_PROPERTIES = "additional-properties";
     public static final String SERVER_VARIABLES = "server-variables";
     public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
+    public static final String USE_CLASS_LEVEL_BEANVALIDATION = "useClassLevelBeanValidation";
+
     /**
      * The build context is only avail when running from within eclipse.
      * It is used to update the eclipse-m2e-layer when the plugin is executed inside the IDE.
@@ -413,6 +415,11 @@ public class CodeGenMojo extends AbstractMojo {
     protected boolean configHelp = false;
 
     /**
+     * Add @Validated to class-level Api interfaces. Defaults to false
+     */
+    protected boolean useClassLevelBeanValidation = false;
+
+    /**
      * The project being built.
      */
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
@@ -621,6 +628,14 @@ public class CodeGenMojo extends AbstractMojo {
             GlobalSettings.setProperty(CodegenConstants.WITH_XML, withXml.toString());
 
             if (configOptions != null) {
+
+                // Configures the Class Level Validation for API interfaces.
+                if (configOptions.containsKey(USE_CLASS_LEVEL_BEANVALIDATION)) {
+                    useClassLevelBeanValidation = Boolean
+                        .parseBoolean((String) configOptions.get(USE_CLASS_LEVEL_BEANVALIDATION));
+                }
+                configurator.addAdditionalProperty(USE_CLASS_LEVEL_BEANVALIDATION, useClassLevelBeanValidation);
+
                 // Retained for backwards-compataibility with configOptions -> instantiation-types
                 if (instantiationTypes == null && configOptions.containsKey(INSTANTIATION_TYPES)) {
                     applyInstantiationTypesKvp(configOptions.get(INSTANTIATION_TYPES).toString(),
