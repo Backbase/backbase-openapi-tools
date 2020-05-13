@@ -41,8 +41,6 @@ public class BundleMojo extends AbstractMojo {
         try {
             openAPI = OpenAPILoader.load(input);
             new Bundler().transform(openAPI, Collections.singletonMap("input", input));
-//            new Decomposer().transform(openAPI, null);
-
 
             File directory = output.getParentFile();
             if (!directory.exists()) {
