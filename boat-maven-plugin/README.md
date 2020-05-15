@@ -1,16 +1,52 @@
-#boat maven plugin.
+# boat maven plugin.
 
-Three mojos:
-- Generate
-- Export
-- compare
+The `boat` plugin has 9 goals:
 
-## boat:generate
+- bundle (Not fully implemented)
 
-Finds files name `api.raml`, `client-api.raml` or `service-api.raml`.
-Processes these files (and the json schemes they refer to) to produce `open-api.yaml` files in the output directory. 
+    Bundles all references in the OpenAPI specification into one
+    file.
 
-Configuration example
+- decompose
+
+    Merges any components using allOf references.
+
+- diff
+
+    Calculates a Change log for APIs.
+
+- export
+
+    Converts a RAML spec to an OpenAPI spec.
+
+- export-bom
+
+    Converts all RAML spec dependencies to OpenAPI Specs.
+
+- export-dep
+
+    Exports project dependencies where the ArtifactId ends with
+    '-spec'.
+
+- generate
+
+    Generates client/server code from a OpenAPI json/yaml
+    definition. Finds files name `api.raml`, `client-api.raml` or `service-api.raml`. Processes these files (and the 
+    json schemes they refer to) to produce `open-api.yaml` files in the output directory. 
+
+- remove-deprecated
+
+    Removes deprecated elements in an OpenAPI spec.
+
+- boat:validate
+
+    Validates OpenAPI specs.
+
+For more information, run 
+
+`mvn help:describe -Dplugin=com.backbase.oss:boat-maven-plugin -Ddetail`
+
+## Configuration examples
 
 ```$xml
    <build>
