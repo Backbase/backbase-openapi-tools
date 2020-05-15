@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.jknack.handlebars.internal.Files;
 import com.google.common.base.CaseFormat;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -36,6 +35,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -142,7 +142,8 @@ public class Exporter {
         Map<String, String> ramlTypeReferences = new TreeMap<>();
         // Parse raml document as yaml instead to reverse engineer json references from types
         try {
-            String ramlAsString = Files.read(inputFile, Charset.defaultCharset());
+
+            String ramlAsString = new String(Files.readAllBytes(inputFile.toPath()), Charset.defaultCharset());
             JsonNode jsonNode = mapper.readTree(ramlAsString);
             parseRamlTypeReferences(baseUrl, ramlTypeReferences, jsonNode);
         } catch (Exception e) {
@@ -284,7 +285,7 @@ public class Exporter {
                         markdown.append(documentationItem.content().value());
                         markdown.append(NEW_LINE);
                     } else if (title != null) {
-                        if(!title.startsWith("# ")) {
+                        if (!title.startsWith("# ")) {
                             markdown.append("# ");
                         }
                         markdown.append(title);
@@ -411,7 +412,7 @@ public class Exporter {
         JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
         for (Resource resource : resources) {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Mapping RAML Resource displayName: {} relativeUrl: {} with description: {} resourcePath: {}",
                     resource.displayName().value(),
                     resource.relativeUri().value(),
@@ -639,7 +640,7 @@ public class Exporter {
             operationId += httpMethod + StringUtils.capitalize(Utils.normalizeDisplayName(resourceName));
 
         }
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Resolve operationId: {} from resource: {} with method: {} and path: {}", operationId,
                 resource.displayName().value(), httpMethod, resource.resourcePath());
         }
@@ -840,7 +841,7 @@ public class Exporter {
             }
 
         } else if (body instanceof XMLTypeDeclaration) {
-            log.debug("No OpenAPI  schema for: {} " ,name);
+            log.debug("No OpenAPI  schema for: {} ", name);
         } else {
             bodySchema = RamlSchemaToOpenApi.convert(name, body, components);
             mediaType = new MediaType();

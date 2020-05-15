@@ -1,6 +1,9 @@
 package com.backbase.oss.boat;
 
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 import ch.qos.logback.classic.Level;
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.nio.file.Files;
@@ -10,7 +13,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.openapitools.codegen.serializer.SerializerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,8 @@ public class BoatTerminal {
             boolean hasOutputFile = commandLine.hasOption(CLI_FILE_OUTPUT_OPTION);
             boolean verbose = commandLine.hasOption(CLI_VERBOSE_OPTION);
 
-            ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+            ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
+                .getLogger(ROOT_LOGGER_NAME);
 
             if (verbose) {
                 root.setLevel(Level.INFO);
