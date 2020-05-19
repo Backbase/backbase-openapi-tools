@@ -31,6 +31,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,10 +50,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.raml.v2.api.RamlModelBuilder;
@@ -101,10 +105,10 @@ public class Exporter {
      * @throws ExportException things going south.
      */
     public static OpenAPI export(File inputFile, boolean addJavaTypeExtensions, List<Transformer> transformers)
-        throws ExportException {
+            throws ExportException {
 
         return export(inputFile,
-            new ExporterOptions().addJavaTypeExtensions(addJavaTypeExtensions).transformers(transformers));
+                new ExporterOptions().addJavaTypeExtensions(addJavaTypeExtensions).transformers(transformers));
     }
 
     /**
@@ -121,9 +125,9 @@ public class Exporter {
         AtomicReference<String> serviceName = new AtomicReference<>("serviceName");
 
         Arrays.stream(inputFile.getPath().split("/"))
-            .filter(part -> part.endsWith("-spec"))
-            .findFirst()
-            .ifPresent(s -> serviceName.set(s.replace("-spec", "-service")));
+                .filter(part -> part.endsWith("-spec"))
+                .findFirst()
+                .ifPresent(s -> serviceName.set(s.replace("-spec", "-service")));
 
         return new Exporter(options).export(serviceName.get(), inputFile);
     }
@@ -150,7 +154,7 @@ public class Exporter {
         }
 
         CachingResourceLoader resourceLoader = new CachingResourceLoader(
-            new RamlResourceLoader(inputFile, inputFile.getParentFile()));
+                new RamlResourceLoader(inputFile, inputFile.getParentFile()));
         RamlModelBuilder ramlModelBuilder = new RamlModelBuilder(resourceLoader);
         RamlModelResult ramlModelResult = ramlModelBuilder.buildApi(inputFile);
 
@@ -161,10 +165,10 @@ public class Exporter {
         components.setSchemas(new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
 
         JsonSchemaToOpenApi jsonSchemaToOpenApi = new JsonSchemaToOpenApi(
-            baseUrl,
-            components,
-            ramlTypeReferences,
-            exporterOptions.isAddJavaTypeExtensions());
+                baseUrl,
+                components,
+                ramlTypeReferences,
+                exporterOptions.isAddJavaTypeExtensions());
 
         assert ramlApi != null;
         Map<String, TypeDeclaration> types = collectTypesFromRamlSpec(ramlApi);
@@ -183,10 +187,10 @@ public class Exporter {
             }
             if (typeDeclaration.examples() != null && !typeDeclaration.examples().isEmpty()) {
                 List<Example> examples = typeDeclaration.examples().stream()
-                    .map(exampleSpec -> new Example()
-                        .value(getExampleObject(exampleSpec, exporterOptions.isConvertExamplesToYaml()))
-                        .summary(exampleSpec.name()))
-                    .collect(Collectors.toList());
+                        .map(exampleSpec -> new Example()
+                                .value(getExampleObject(exampleSpec, exporterOptions.isConvertExamplesToYaml()))
+                                .summary(exampleSpec.name()))
+                        .collect(Collectors.toList());
                 typeSchema.addExtension(X_EXAMPLES, examples);
             }
 
@@ -216,10 +220,10 @@ public class Exporter {
 
         List<Server> servers = new LinkedList<>();
         servers.add(
-            new Server()
-                .url(url)
-                .description("The server")
-                .variables(null));
+                new Server()
+                        .url(url)
+                        .description("The server")
+                        .variables(null));
 
         Paths paths = new Paths();
 
@@ -236,6 +240,11 @@ public class Exporter {
         openAPI.setComponents(components);
         openAPI.setPaths(paths);
 
+        List<String> tagNames = tags.stream()
+                .map(Tag::getName)
+                .collect(Collectors.toList());
+        operations.forEach(op -> op.setTags(tagNames));
+
         // Start dereference Process
         schemas = new ArrayList<>(components.getSchemas().values());
         for (Schema schema : schemas) {
@@ -247,7 +256,7 @@ public class Exporter {
         }
         components.getSchemas().values().forEach(Utils::cleanUp);
 
-        exporterOptions.getTransformers().forEach(transformer -> transformer.transform(openAPI, new HashMap()));
+        exporterOptions.getTransformers().forEach(transformer -> transformer.transform(openAPI, new HashMap<>()));
 
         return openAPI;
     }
@@ -258,43 +267,43 @@ public class Exporter {
 
         String version = ramlApi.version() != null ? ramlApi.version().value() : "1.0";
         Info info = new Info()
-            .title(ramlApi.title().value())
-            .version(version);
+                .title(ramlApi.title().value())
+                .version(version);
 
         final StringBuilder markdown = new StringBuilder();
         if (isNotBlank(ramlApi.description())) {
             markdown
-                .append(ramlApi.description().value())
-                .append(NEW_LINE);
+                    .append(ramlApi.description().value())
+                    .append(NEW_LINE);
         }
         if (ramlApi.documentation() != null) {
             ramlApi.documentation().forEach(
-                documentationItem -> {
-                    String title = null;
-                    String documentation = null;
+                    documentationItem -> {
+                        String title = null;
+                        String documentation = null;
 
-                    if (isNotBlank(documentationItem.title())) {
-                        title = documentationItem.title().value();
-                    }
-                    if (isNotBlank(documentationItem.content())) {
-                        documentation = documentationItem.content().value();
-                    }
-
-                    if (documentation != null && documentation.startsWith("# ")) {
-                        markdown.append(documentationItem.content().value());
-                        markdown.append(NEW_LINE);
-                    } else if (title != null) {
-                        if(!title.startsWith("# ")) {
-                            markdown.append("# ");
+                        if (isNotBlank(documentationItem.title())) {
+                            title = documentationItem.title().value();
                         }
-                        markdown.append(title);
-                        markdown.append(NEW_LINE);
-                        if (documentation != null) {
-                            markdown.append(cleanupMarkdownString(documentationItem.content().value()));
+                        if (isNotBlank(documentationItem.content())) {
+                            documentation = documentationItem.content().value();
+                        }
+
+                        if (documentation != null && documentation.startsWith("# ")) {
+                            markdown.append(documentationItem.content().value());
                             markdown.append(NEW_LINE);
+                        } else if (title != null) {
+                            if (!title.startsWith("# ")) {
+                                markdown.append("# ");
+                            }
+                            markdown.append(title);
+                            markdown.append(NEW_LINE);
+                            if (documentation != null) {
+                                markdown.append(cleanupMarkdownString(documentationItem.content().value()));
+                                markdown.append(NEW_LINE);
+                            }
                         }
                     }
-                }
             );
         }
         if (markdown.length() != 0) {
@@ -311,7 +320,7 @@ public class Exporter {
     }
 
     private List<Tag> setupTags(Api ramlApi) {
-        String title = ramlApi.title().value().toLowerCase(Locale.ROOT);
+        String title = ramlApi.title().value().toLowerCase(Locale.ROOT).replaceAll(" ", "-");
         return Collections.singletonList(new Tag().name(title));
     }
 
@@ -330,7 +339,7 @@ public class Exporter {
     }
 
     private void parseRamlTypeReferences(URL baseUrl, Map<String, String> ramlTypeReferences,
-        JsonNode jsonNode) {
+                                         JsonNode jsonNode) {
         if (jsonNode.hasNonNull("types")) {
             ObjectNode types = (ObjectNode) jsonNode.get("types");
             types.fields().forEachRemaining(nodeEntry -> parseRamlRefEntry(baseUrl, ramlTypeReferences, nodeEntry));
@@ -362,7 +371,7 @@ public class Exporter {
     }
 
     private void parseRamlRefEntry(URL baseUrl, Map<String, String> ramlTypeReferences,
-        Map.Entry<String, JsonNode> nodeEntry) {
+                                   Map.Entry<String, JsonNode> nodeEntry) {
         String key = nodeEntry.getKey();
         JsonNode typeReference = nodeEntry.getValue();
         if (typeReference.has("type") && typeReference instanceof ObjectNode) {
@@ -398,7 +407,7 @@ public class Exporter {
         if (ramlModelResult.hasErrors()) {
             log.error("Error validating RAML document: {}", file);
             ramlModelResult.getValidationResults()
-                .forEach(validationResult -> log.error(validationResult.getMessage()));
+                    .forEach(validationResult -> log.error(validationResult.getMessage()));
             throw new ExportException("Error validation RAML");
         }
 
@@ -408,18 +417,18 @@ public class Exporter {
     }
 
     private void convertResources(List<Resource> resources, Paths paths, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
-        throws ExportException, DerefenceException {
+                                  JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
+            throws ExportException, DerefenceException {
         for (Resource resource : resources) {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Mapping RAML Resource displayName: {} relativeUrl: {} with description: {} resourcePath: {}",
-                    resource.displayName().value(),
-                    resource.relativeUri().value(),
-                    resource.description() != null ? resource.description().value() : null,
-                    resource.resourcePath());
+                        resource.displayName().value(),
+                        resource.relativeUri().value(),
+                        resource.description() != null ? resource.description().value() : null,
+                        resource.resourcePath());
             }
             PathItem pathItem = convertResource(resource.resourcePath(), resource, components, jsonSchemaToOpenApi,
-                operations);
+                    operations);
             if (!pathItem.readOperations().isEmpty()) {
                 paths.addPathItem(resource.resourcePath(), pathItem);
             }
@@ -428,8 +437,8 @@ public class Exporter {
     }
 
     private PathItem convertResource(String resourcePath, Resource resource, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
-        throws ExportException, DerefenceException {
+                                     JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
+            throws ExportException, DerefenceException {
         PathItem pathItem = new PathItem();
         pathItem.summary(getDisplayName(resource.displayName()));
         pathItem.description(getDescription(resource));
@@ -439,7 +448,7 @@ public class Exporter {
     }
 
     private void mapUriParameters(String resourcePath, Resource resource, PathItem pathItem,
-        Components components) {
+                                  Components components) {
         Resource current = resource;
         Resource parent = current.parentResource();
 
@@ -450,10 +459,10 @@ public class Exporter {
                 Parameter parameter = new PathParameter();
                 convertTypeToParameter(type, parameter, components);
                 if (pathItem.getParameters() != null && pathItem.getParameters().stream().anyMatch(
-                    existingParam -> existingParam.getName().equals(parameter.getName()) && existingParam.getIn()
-                        .equals(parameter.getIn()))) {
+                        existingParam -> existingParam.getName().equals(parameter.getName()) && existingParam.getIn()
+                                .equals(parameter.getIn()))) {
                     log.warn("{} has double Parameter {} in path: {} Detected. ignoring", resourcePath,
-                        parameter.getName(), pathItem.getDescription());
+                            parameter.getName(), pathItem.getDescription());
                 } else {
                     pathItem.addParametersItem(parameter);
                 }
@@ -482,12 +491,12 @@ public class Exporter {
                 pathItem.setParameters(new ArrayList<>());
             }
             Optional<Parameter> optionalParameter = pathItem.getParameters().stream()
-                .filter(parameter -> parameter.getName().equals(placeholderName))
-                .findFirst();
+                    .filter(parameter -> parameter.getName().equals(placeholderName))
+                    .findFirst();
 
             if (!optionalParameter.isPresent()) {
                 log.debug("Unspecified URI parameter: {} in RAML. Generating URI Parameter in OpenAPI",
-                    placeholderName);
+                        placeholderName);
                 Parameter parameter = new PathParameter();
                 parameter.setName(placeholderName);
                 parameter.setRequired(true);
@@ -502,8 +511,8 @@ public class Exporter {
         String description = getDescription(typeDeclaration.description());
         if (log.isDebugEnabled()) {
             log.debug("Type name: {} type: {} displayName: {} defaultValue: {} description: {}"
-                , typeDeclaration.name(), typeDeclaration.type(), getDisplayName(typeDeclaration.displayName()),
-                typeDeclaration.defaultValue(), description);
+                    , typeDeclaration.name(), typeDeclaration.type(), getDisplayName(typeDeclaration.displayName()),
+                    typeDeclaration.defaultValue(), description);
 
         }
     }
@@ -522,8 +531,8 @@ public class Exporter {
     }
 
     private void mapMethods(String resourcePath, Resource resource, PathItem pathItem, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
-        throws ExportException, DerefenceException {
+                            JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
+            throws ExportException, DerefenceException {
         for (Method ramlMethod : resource.methods()) {
             PathItem.HttpMethod httpMethod = getHttpMethod(ramlMethod);
             ApiResponses apiResponses = mapResponses(resource, ramlMethod, components, jsonSchemaToOpenApi);
@@ -541,7 +550,6 @@ public class Exporter {
 
             Operation operation = new Operation();
 
-            operation.addTagsItem(tag);
             operation.setDescription(description);
             operation.setResponses(apiResponses);
             operation.setSummary(summary);
@@ -551,7 +559,7 @@ public class Exporter {
 
             if (httpMethod.equals(PathItem.HttpMethod.DELETE) && requestBody != null) {
                 log.warn("{} is a DELETE operation and must NOT have an requestBody. Removing operation entirely",
-                    resourcePath);
+                        resourcePath);
             } else {
                 operation.setRequestBody(requestBody);
             }
@@ -571,16 +579,16 @@ public class Exporter {
             return null;
         }
         return Stream.of(description.value().split(NEW_LINE))
-            .findFirst()
-            .map(firstLine -> firstLine.replace("#", ""))
-            .map(String::trim)
-            .map(firstLine -> firstLine.endsWith(".") ? firstLine : firstLine + ".")
-            .orElse(null);
+                .findFirst()
+                .map(firstLine -> firstLine.replace("#", ""))
+                .map(String::trim)
+                .map(firstLine -> firstLine.endsWith(".") ? firstLine : firstLine + ".")
+                .orElse(null);
     }
 
     @SuppressWarnings("java:S3776")
     private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations, String tag,
-        RequestBody requestBody) {
+                                  RequestBody requestBody) {
         AnnotableStringType annotableStringType = ramlMethod.displayName();
         String httpMethod;
         if (annotableStringType == null) {
@@ -600,7 +608,7 @@ public class Exporter {
         // If that name contains spaces, concat the name with capitalizing each word
         if (operationId.contains(" ")) {
             operationId = Arrays.stream(operationId.split(" ")).map(StringUtils::capitalize)
-                .collect(Collectors.joining());
+                    .collect(Collectors.joining());
         }
 
         // prepend http name ot to the operationId and ensure the rest has a capital
@@ -610,7 +618,7 @@ public class Exporter {
         Set<String> placeHolders = Utils.getPlaceholders(resource.resourcePath());
         if (!placeHolders.isEmpty()) {
             String suffix =
-                "By" + placeHolders.stream().map(StringUtils::capitalize).collect(Collectors.joining("And"));
+                    "By" + placeHolders.stream().map(StringUtils::capitalize).collect(Collectors.joining("And"));
             if (!operationId.toLowerCase().endsWith(suffix.toLowerCase())) {
                 operationId += suffix;
             }
@@ -639,9 +647,9 @@ public class Exporter {
             operationId += httpMethod + StringUtils.capitalize(Utils.normalizeDisplayName(resourceName));
 
         }
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Resolve operationId: {} from resource: {} with method: {} and path: {}", operationId,
-                resource.displayName().value(), httpMethod, resource.resourcePath());
+                    resource.displayName().value(), httpMethod, resource.resourcePath());
         }
         return operationId;
     }
@@ -651,8 +659,8 @@ public class Exporter {
     }
 
     private void processMethodAnnotations(String resourcePath, Components components, Method ramlMethod,
-        PathItem.HttpMethod httpMethod, Operation operation, JsonSchemaToOpenApi jsonSchemaToOpenApi)
-        throws ExportException {
+                                          PathItem.HttpMethod httpMethod, Operation operation, JsonSchemaToOpenApi jsonSchemaToOpenApi)
+            throws ExportException {
         for (AnnotationRef annotationRef : ramlMethod.annotations()) {
             TypeDeclaration annotation = annotationRef.annotation();
             TypeInstance typeInstance = annotationRef.structuredValue();
@@ -669,14 +677,14 @@ public class Exporter {
                     operation.addExtension("-" + annotationSchema.getName() + "-" + property.name(), property.values());
                 } else {
                     operation.addExtension("x-" + annotationSchema.getName() + "-" + property.name(),
-                        property.value().value());
+                            property.value().value());
                 }
             }
         }
     }
 
     private Schema getAnnotationSchema(String resourcePath, Components components, TypeDeclaration annotation,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException {
+                                       JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException {
         Schema annotationSchema;
         if (annotation instanceof JSONTypeDeclaration) {
             JSONTypeDeclaration jsonType = (JSONTypeDeclaration) annotation;
@@ -687,8 +695,8 @@ public class Exporter {
                     jsonSchemaToOpenApi.dereferenceSchema(annotationSchema, components);
                 } catch (DerefenceException e) {
                     throw new ExportException(
-                        "Cannot dereference inline schema: : " + jsonType.schemaContent() + " for response: "
-                            + resourcePath);
+                            "Cannot dereference inline schema: : " + jsonType.schemaContent() + " for response: "
+                                    + resourcePath);
                 }
                 Utils.cleanUp(annotationSchema);
             } else {
@@ -696,7 +704,7 @@ public class Exporter {
                 annotationSchema = components.getSchemas().get(modelName);
                 if (annotationSchema == null) {
                     throw new ExportException(
-                        "Cannot find schema definition for: " + jsonType.type() + " for response: " + resourcePath);
+                            "Cannot find schema definition for: " + jsonType.type() + " for response: " + resourcePath);
                 }
             }
         } else {
@@ -706,7 +714,7 @@ public class Exporter {
     }
 
     private RequestBody convertRequestBody(Resource resource, Method ramlMethod, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws DerefenceException, ExportException {
+                                           JsonSchemaToOpenApi jsonSchemaToOpenApi) throws DerefenceException, ExportException {
         if (ramlMethod.body() == null || ramlMethod.body().isEmpty()) {
             return null;
         }
@@ -740,10 +748,10 @@ public class Exporter {
     }
 
     private void convertTypeToParameter(TypeDeclaration typeDeclaration, Parameter parameter,
-        Components components) {
+                                        Components components) {
         if (log.isDebugEnabled()) {
             log.debug("Converting Parameter from: {} with type: {} into: {}", typeDeclaration.name(),
-                typeDeclaration.type(), parameter.getClass().getName());
+                    typeDeclaration.type(), parameter.getClass().getName());
         }
         Schema schema = RamlSchemaToOpenApi.convert(typeDeclaration.name(), typeDeclaration, components);
 
@@ -774,7 +782,7 @@ public class Exporter {
     }
 
     private ApiResponses mapResponses(Resource resource, Method ramlMethod, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
+                                      JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
         ApiResponses apiResponses = new ApiResponses();
         for (Response ramlResponse : ramlMethod.responses()) {
             Content apiResponseContent = new Content();
@@ -793,7 +801,7 @@ public class Exporter {
                         // This matches the name generated from RAML, e.g. PaymentCardsGetResponseBody
                         // The response is defined using an inline schema
                         String name = getName(resource, ramlMethod) + StringUtils.capitalize(ramlMethod.method())
-                            + "ResponseBody";
+                                + "ResponseBody";
                         mediaType = convertBody(body, name, components, jsonSchemaToOpenApi);
                         apiResponseContent.addMediaType(contentType, mediaType);
                     }
@@ -808,7 +816,7 @@ public class Exporter {
 
     @SuppressWarnings("java:S3776")
     private MediaType convertBody(TypeDeclaration body, String name, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
+                                  JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
         Schema bodySchema = null;
         MediaType mediaType = null;
 
@@ -833,14 +841,14 @@ public class Exporter {
                 bodySchema = components.getSchemas().get(schemaName);
                 if (bodySchema == null) {
                     log.error("No Schema with the name: {} resolved from: {} is present: ", schemaName,
-                        type);
+                            type);
                     throw new ExportException("Invalid Schema");
                 }
                 mediaType.setSchema(new Schema().$ref(schemaName));
             }
 
         } else if (body instanceof XMLTypeDeclaration) {
-            log.debug("No OpenAPI  schema for: {} " ,name);
+            log.debug("No OpenAPI  schema for: {} ", name);
         } else {
             bodySchema = RamlSchemaToOpenApi.convert(name, body, components);
             mediaType = new MediaType();
@@ -898,9 +906,9 @@ public class Exporter {
         parts.add(ramlMethod.method());
 
         return parts.stream()
-            .filter(StringUtils::isNotEmpty)
-            .map(Exporter::replacePlaceHolder)
-            .map(StringUtils::capitalize).collect(Collectors.joining());
+                .filter(StringUtils::isNotEmpty)
+                .map(Exporter::replacePlaceHolder)
+                .map(StringUtils::capitalize).collect(Collectors.joining());
     }
 
     private static String replacePlaceHolder(String part) {
@@ -923,7 +931,7 @@ public class Exporter {
         String description = getDescription(resource.description());
         if (description == null) {
             return "Generated description for " + resource.displayName().value()
-                + ". Please update RAML spec to provide description for this resource";
+                    + ". Please update RAML spec to provide description for this resource";
         } else {
             return description;
         }
