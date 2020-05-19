@@ -20,6 +20,7 @@ public class BoatTerminal {
 
     private static final String CLI_FILE_INPUT_OPTION = "f";
     private static final String CLI_FILE_OUTPUT_OPTION = "o";
+    private static final String CLI_DIR_OUTPUT_OPTION = "d";
     private static final String CLI_VERBOSE_OPTION = "v";
 
     @SuppressWarnings({"squid:S4823", "squid:S4792", "squid:S106"})
@@ -28,8 +29,10 @@ public class BoatTerminal {
         try {
             CommandLine commandLine = parser.parse(prepareOptions(), args);
             String input = commandLine.getOptionValue(CLI_FILE_INPUT_OPTION);
-            String output = commandLine.getOptionValue(CLI_FILE_OUTPUT_OPTION);
+            String outputFileName = commandLine.getOptionValue(CLI_FILE_OUTPUT_OPTION);
+            String outputDirName = commandLine.getOptionValue(CLI_DIR_OUTPUT_OPTION);
             boolean hasOutputFile = commandLine.hasOption(CLI_FILE_OUTPUT_OPTION);
+            boolean hasOutputDir = commandLine.hasOption(CLI_DIR_OUTPUT_OPTION);
             boolean verbose = commandLine.hasOption(CLI_VERBOSE_OPTION);
 
             ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
@@ -47,8 +50,10 @@ public class BoatTerminal {
 
             String yaml = SerializerUtils.toYamlString(openApi);
             if (hasOutputFile) {
-                File outputFile = new File(output);
+                File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
+            } else if (hasOutputDir) {
+                // todo - explode to dir
             } else {
                 System.out.println(yaml);
             }
@@ -68,7 +73,8 @@ public class BoatTerminal {
     private static Options prepareOptions() {
         Options options = new Options();
         options.addRequiredOption(CLI_FILE_INPUT_OPTION, "file", true, "Input RAML 1.0 file");
-        options.addOption(CLI_FILE_OUTPUT_OPTION, "output", true, "Output OpenAPI file");
+        options.addOption(CLI_FILE_OUTPUT_OPTION, "output-file", true, "Output OpenAPI file");
+        options.addOption(CLI_DIR_OUTPUT_OPTION, "output-dir", true, "Output OpenAPI directory");
         options.addOption(CLI_VERBOSE_OPTION, "verbose", false, "Verbose output");
         return options;
     }
