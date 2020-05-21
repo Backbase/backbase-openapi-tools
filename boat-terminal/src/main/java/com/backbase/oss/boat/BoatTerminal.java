@@ -1,9 +1,13 @@
 package com.backbase.oss.boat;
 
 import ch.qos.logback.classic.Level;
+import com.backbase.oss.boat.transformers.CommonExtractors;
+import com.backbase.oss.boat.transformers.OpenAPIExtractor;
 import io.swagger.v3.oas.models.OpenAPI;
+
 import java.io.File;
 import java.nio.file.Files;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -49,7 +53,8 @@ public class BoatTerminal {
             OpenAPI openApi = Exporter.export(inputFile, new ExporterOptions().convertExamplesToYaml(true));
 
             String yaml = SerializerUtils.toYamlString(openApi);
-            new DirectoryExploder(openApi).serializeIntoDirectory(new File("temp-openapi/"));
+            OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
+            new DirectoryExploder(extractor).serializeIntoDirectory(new File("temp-openapi/"));
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
