@@ -17,12 +17,12 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DirectorySpreader {
+public class DirectoryExploder {
 
     @NotNull
     private final OpenAPI openApi;
 
-    public DirectorySpreader(@NotNull OpenAPI openApi) {
+    public DirectoryExploder(@NotNull OpenAPI openApi) {
         this.openApi = openApi;
     }
 
