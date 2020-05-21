@@ -49,7 +49,7 @@ public class BoatTerminal {
             OpenAPI openApi = Exporter.export(inputFile, new ExporterOptions().convertExamplesToYaml(true));
 
             String yaml = SerializerUtils.toYamlString(openApi);
-            new DirectorySpreader(openApi).serializeIntoDirectory(new File("temp-openapi/"));
+            new DirectoryExploder(openApi).serializeIntoDirectory(new File("temp-openapi/"));
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
