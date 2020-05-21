@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
@@ -29,8 +27,11 @@ public class DirectorySpreader {
     }
 
     public void serializeIntoDirectory(@NotNull File outputDir) {
+        Collection<PathItem> pathItems = Optional.ofNullable(openApi.getPaths())
+                .orElse(new Paths()) // empty
+                .values();
         // pathItemParamsExamples: PathItem > Parameters > examples
-        List<Example> pathItemParamsExamples = openApi.getPaths().values().stream()
+        List<Example> pathItemParamsExamples = pathItems.stream()
                 .filter(pathItem -> pathItem.getParameters() != null)
                 .flatMap(pathItem -> pathItem.getParameters().stream())
                 .flatMap(parameter -> parameterExamples(parameter).stream())
@@ -42,7 +43,7 @@ public class DirectorySpreader {
         //                        + PathItem > Operation > ApiResponses > ApiResponse > Content > Encoding > Headers > Header > examples
         // opResponsesHeadersExamples: PathItem > Operation > ApiResponses > ApiResponse > Headers > Header > examples
         // opResponseLinksExamples: PathItem > Operation > ApiResponses > ApiResponse > Links > Link > Headers > Header > examples
-        List<Operation> ops = openApi.getPaths().values().stream()
+        List<Operation> ops = pathItems.stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
                 .collect(Collectors.toList());
         List<Example> opParamsExamples = ops.stream()
