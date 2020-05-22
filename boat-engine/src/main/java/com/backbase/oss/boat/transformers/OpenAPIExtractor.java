@@ -76,11 +76,10 @@ public class OpenAPIExtractor {
                 .filter(components -> components.getExamples() != null)
                 .map(Components::getExamples)
                 .map(Map::entrySet)
-                .map(entries ->
-                        entries.stream()
-                                .map(entry -> new NamedExample(entry.getKey(), entry.getValue()))
-                                .collect(Collectors.toList())
-                ).orElse(Collections.emptyList());
+                .orElse(Collections.<String, Example>emptyMap().entrySet())
+                .stream()
+                .map(entry -> new NamedExample(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
         Collection<NamedExample> componentsHeadersExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getHeaders() != null)
                 .map(Components::getHeaders)
