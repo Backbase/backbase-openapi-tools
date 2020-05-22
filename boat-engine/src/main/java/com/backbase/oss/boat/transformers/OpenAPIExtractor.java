@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.transformers;
 
+import com.backbase.oss.boat.example.NamedExample;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -17,12 +18,12 @@ public class OpenAPIExtractor {
         this.openApi = openApi;
     }
 
-    public List<Example> extractExamples() {
+    public List<NamedExample> extractExamples() {
         Collection<PathItem> pathItems = Optional.ofNullable(openApi.getPaths())
                 .orElse(new Paths()) // empty
                 .values();
         // pathItemParamsExamples: PathItem > Parameters > examples
-        List<Example> pathItemParamsExamples = pathItems.stream()
+        List<NamedExample> pathItemParamsExamples = pathItems.stream()
                 .filter(pathItem -> pathItem.getParameters() != null)
                 .flatMap(pathItem -> pathItem.getParameters().stream())
                 .flatMap(parameter -> CommonExtractors.parameterExamples(parameter).stream())
@@ -37,12 +38,12 @@ public class OpenAPIExtractor {
         List<Operation> ops = pathItems.stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
                 .collect(Collectors.toList());
-        List<Example> opParamsExamples = ops.stream()
+        List<NamedExample> opParamsExamples = ops.stream()
                 .filter(operation -> operation.getParameters() != null)
                 .flatMap(operation -> operation.getParameters().stream())
                 .flatMap(parameter -> CommonExtractors.parameterExamples(parameter).stream())
                 .collect(Collectors.toList());
-        List<Example> opRequestBodiesExamples = ops.stream()
+        List<NamedExample> opRequestBodiesExamples = ops.stream()
                 .filter(operation -> operation.getRequestBody() != null)
                 .filter(operation -> operation.getRequestBody().getContent() != null)
                 .flatMap(operation -> CommonExtractors.contentExamples(operation.getRequestBody().getContent()).stream())
@@ -51,50 +52,54 @@ public class OpenAPIExtractor {
                 .filter(operation -> operation.getResponses() != null)
                 .flatMap(operation -> operation.getResponses().values().stream())
                 .collect(Collectors.toList());
-        List<Example> opResponsesContentExamples = opResponses.stream()
+        List<NamedExample> opResponsesContentExamples = opResponses.stream()
                 .filter(apiResponse -> apiResponse.getContent() != null)
                 .flatMap(apiResponse -> CommonExtractors.contentExamples(apiResponse.getContent()).stream())
                 .collect(Collectors.toList());
-        List<Example> opResponsesHeadersExamples = opResponses.stream()
+        List<NamedExample> opResponsesHeadersExamples = opResponses.stream()
                 .filter(apiResponse -> apiResponse.getHeaders() != null)
-                .flatMap(apiResponse -> apiResponse.getHeaders().values().stream())
-                .flatMap(header -> CommonExtractors.headerExamples(header).stream())
+                .flatMap(apiResponse -> apiResponse.getHeaders().entrySet().stream())
+                .flatMap(headerEntry -> CommonExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
-        List<Example> opResponseLinksExamples = opResponses.stream()
+        List<NamedExample> opResponseLinksExamples = opResponses.stream()
                 .filter(apiResponse -> apiResponse.getLinks() != null)
                 .flatMap(apiResponse -> apiResponse.getLinks().values().stream())
                 .filter(link -> link.getHeaders() != null)
-                .flatMap(link -> link.getHeaders().values().stream())
-                .flatMap(header -> CommonExtractors.headerExamples(header).stream())
+                .flatMap(link -> link.getHeaders().entrySet().stream())
+                .flatMap(headerEntry -> CommonExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
         // componentsExamples: Components > examples
         // componentsHeadersExamples: Components > Component > Headers > Header > examples
         // componentsLinksExamples: Components > Component > Links > Link > Headers > Header > examples
         // componentsParamsExamples: Components > Component > Links > Link > Headers > Header > examples
-        Collection<Example> componentsExamples = Optional.ofNullable(openApi.getComponents())
+        Collection<NamedExample> componentsExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getExamples() != null)
                 .map(Components::getExamples)
-                .map(Map::values)
-                .orElse(Collections.emptyList());
-        Collection<Example> componentsHeadersExamples = Optional.ofNullable(openApi.getComponents())
+                .map(Map::entrySet)
+                .map(entries ->
+                        entries.stream()
+                                .map(entry -> new NamedExample(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList())
+                ).orElse(Collections.emptyList());
+        Collection<NamedExample> componentsHeadersExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getHeaders() != null)
                 .map(Components::getHeaders)
-                .map(Map::values)
-                .orElse(Collections.emptyList())
+                .orElse(Collections.emptyMap())
+                .entrySet()
                 .stream()
-                .flatMap(header -> CommonExtractors.headerExamples(header).stream())
+                .flatMap(headerEntry -> CommonExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
-        Collection<Example> componentsLinksExamples = Optional.ofNullable(openApi.getComponents())
+        Collection<NamedExample> componentsLinksExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getLinks() != null)
                 .map(Components::getLinks)
                 .map(Map::values)
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(link -> link.getHeaders() != null)
-                .flatMap(link -> link.getHeaders().values().stream())
-                .flatMap(header -> CommonExtractors.headerExamples(header).stream())
+                .flatMap(link -> link.getHeaders().entrySet().stream())
+                .flatMap(headerEntry -> CommonExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
-        Collection<Example> componentsParamsExamples = Optional.ofNullable(openApi.getComponents())
+        Collection<NamedExample> componentsParamsExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getHeaders() != null)
                 .map(Components::getParameters)
                 .map(Map::values)
@@ -103,7 +108,7 @@ public class OpenAPIExtractor {
                 .flatMap(parameter -> CommonExtractors.parameterExamples(parameter).stream())
                 .collect(Collectors.toList());
 
-        List<Example> allExamples = new LinkedList<>();
+        List<NamedExample> allExamples = new LinkedList<>();
         allExamples.addAll(pathItemParamsExamples);
         allExamples.addAll(opParamsExamples);
         allExamples.addAll(opRequestBodiesExamples);
