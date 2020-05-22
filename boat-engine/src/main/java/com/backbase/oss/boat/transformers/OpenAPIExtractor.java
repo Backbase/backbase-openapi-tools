@@ -18,7 +18,7 @@ public class OpenAPIExtractor {
         this.openApi = openApi;
     }
 
-    public List<NamedExample> extractExamples() {
+    public List<NamedExample> extractInlineExamples() {
         Collection<PathItem> pathItems = Optional.ofNullable(openApi.getPaths())
                 .orElse(new Paths()) // empty
                 .values();
@@ -120,7 +120,9 @@ public class OpenAPIExtractor {
         allExamples.addAll(componentsLinksExamples);
         allExamples.addAll(componentsParamsExamples);
 
-        return allExamples;
+        return allExamples.stream()
+                .filter(namedExample -> namedExample.getExample().getValue() != null)
+                .collect(Collectors.toList());
     }
 
 }
