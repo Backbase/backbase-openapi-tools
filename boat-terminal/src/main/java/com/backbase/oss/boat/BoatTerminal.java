@@ -58,12 +58,14 @@ public class BoatTerminal {
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
-            } else if (hasOutputDir) {
+            }
+            if (hasOutputDir) {
                 OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
                 ObjectMapper mapper = new ObjectMapper();
                 ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
                 new DirectoryExploder(extractor, writer).serializeIntoDirectory(outputDirName);
-            } else {
+            }
+            if (!hasOutputFile && !hasOutputDir) {
                 System.out.println(yaml);
             }
 

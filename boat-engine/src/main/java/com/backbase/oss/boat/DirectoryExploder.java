@@ -3,8 +3,6 @@ package com.backbase.oss.boat;
 import com.backbase.oss.boat.example.NamedExample;
 import com.backbase.oss.boat.transformers.OpenAPIExtractor;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.io.FileUtils;
@@ -34,7 +32,7 @@ public class DirectoryExploder {
     }
 
     public void serializeIntoDirectory(@NotNull String outputDir) throws IOException {
-        List<NamedExample> examples = openAPIExtractor.extractExamples();
+        List<NamedExample> examples = openAPIExtractor.extractInlineExamples();
         Path outputPath = Paths.get(outputDir);
         if (Files.notExists(outputPath)) {
             Files.createDirectories(outputPath);
@@ -45,7 +43,7 @@ public class DirectoryExploder {
             String title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, namedExample.getName());
             String serializedValue = "";
             try {
-                serializedValue = writer.writeValueAsString(namedExample.getExample());
+                serializedValue = writer.writeValueAsString(namedExample.getExample().getValue());
                 Path exampleFile = outputPath.resolve(title + ".json");
                 if (Files.notExists(exampleFile)) {
                     Files.createFile(exampleFile);
