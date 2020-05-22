@@ -54,7 +54,7 @@ public class BoatTerminal {
 
             String yaml = SerializerUtils.toYamlString(openApi);
             OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
-            new DirectoryExploder(extractor).serializeIntoDirectory(new File("temp-openapi/"));
+            new DirectoryExploder(extractor).serializeIntoDirectory("temp-openapi/"); // todo - use actual outputDir
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
