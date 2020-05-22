@@ -1,8 +1,10 @@
 package com.backbase.oss.boat;
 
 import ch.qos.logback.classic.Level;
-import com.backbase.oss.boat.transformers.CommonExtractors;
 import com.backbase.oss.boat.transformers.OpenAPIExtractor;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.swagger.v3.oas.models.OpenAPI;
 
 import java.io.File;
@@ -53,13 +55,14 @@ public class BoatTerminal {
             OpenAPI openApi = Exporter.export(inputFile, new ExporterOptions().convertExamplesToYaml(true));
 
             String yaml = SerializerUtils.toYamlString(openApi);
-            OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
-            new DirectoryExploder(extractor).serializeIntoDirectory("temp-openapi/"); // todo - use actual outputDir
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
             } else if (hasOutputDir) {
-                // todo - explode to dir
+                OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+                new DirectoryExploder(extractor, writer).serializeIntoDirectory(outputDirName);
             } else {
                 System.out.println(yaml);
             }

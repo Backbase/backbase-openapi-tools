@@ -25,15 +25,16 @@ public class DirectoryExploder {
 
     @NotNull
     private final OpenAPIExtractor openAPIExtractor;
+    @NotNull
+    private final ObjectWriter writer;
 
-    public DirectoryExploder(@NotNull OpenAPIExtractor openAPIExtractor) {
+    public DirectoryExploder(@NotNull OpenAPIExtractor openAPIExtractor, @NotNull ObjectWriter writer) {
         this.openAPIExtractor = openAPIExtractor;
+        this.writer = writer;
     }
 
     public void serializeIntoDirectory(@NotNull String outputDir) throws IOException {
         List<NamedExample> examples = openAPIExtractor.extractExamples();
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter()); // todo - extract as field
         Path outputPath = Paths.get(outputDir);
         if (Files.notExists(outputPath)) {
             Files.createDirectories(outputPath);
