@@ -40,7 +40,8 @@ public class CommonExtractors {
                 .map(entry -> new NamedExample(exampleName(parameter.getName(), entry.getKey()), entry.getValue()))
                 .collect(Collectors.toList());
         if (parameter.getName() != null && parameter.getExample() != null) {
-            allExamples.add(new NamedExample(parameter.getName(), new Example().value(parameter.getExample())));
+            String name = exampleName("param", parameter.getName());
+            allExamples.add(new NamedExample(name, new Example().value(parameter.getExample())));
         }
         if (parameter.getContent() != null) {
             allExamples.addAll(contentExamples(parameter.getContent()));
