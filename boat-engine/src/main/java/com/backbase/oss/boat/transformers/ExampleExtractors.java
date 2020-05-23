@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CommonExtractors {
+public class ExampleExtractors {
 
     @NotNull
     static List<NamedExample> headerExamples(@NotNull String name, @NotNull Header header) {
