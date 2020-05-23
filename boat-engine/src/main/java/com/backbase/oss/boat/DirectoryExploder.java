@@ -37,19 +37,18 @@ public class DirectoryExploder {
     public void serializeIntoDirectory(@NotNull String outputDir) throws IOException {
         List<NamedExample> examples = openAPIExtractor.extractInlineExamples();
         Path outputPath = Paths.get(outputDir);
-        if (Files.notExists(outputPath)) {
-            Path examplesPath = Paths.get(outputDir, EXAMPLES_DIR);
-            Files.createDirectories(examplesPath);
-        } else {
+        if (Files.exists(outputPath)) {
             FileUtils.cleanDirectory(outputPath.toFile());
         }
+        Path examplesPath = Paths.get(outputDir, EXAMPLES_DIR);
+        Files.createDirectories(examplesPath);
         examples.forEach(namedExample -> {
             String title = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, namedExample.getName());
             String serializedValue = "";
             try {
                 serializedValue = writer.writeValueAsString(namedExample.getExample().getValue());
                 String filename = title + ".json";
-                Path exampleFile = outputPath.resolve(filename);
+                Path exampleFile = examplesPath.resolve(filename);
                 if (Files.notExists(exampleFile)) {
                     Files.createFile(exampleFile);
                 }
