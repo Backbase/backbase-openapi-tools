@@ -28,6 +28,9 @@ public class ExampleExtractors {
         if (header.getExample() != null) {
             allExamples.add(new NamedExample(name, new Example().value(header.getExample())));
         }
+        if (header.getContent() != null) {
+            allExamples.addAll(contentExamples(header.getContent()));
+        }
         return allExamples;
     }
 
