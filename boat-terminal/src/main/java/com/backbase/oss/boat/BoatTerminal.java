@@ -54,16 +54,16 @@ public class BoatTerminal {
             }
             OpenAPI openApi = Exporter.export(inputFile, new ExporterOptions().convertExamplesToYaml(true));
 
-            String yaml = SerializerUtils.toYamlString(openApi);
-            if (hasOutputFile) {
-                File outputFile = new File(outputFileName);
-                Files.write(outputFile.toPath(), yaml.getBytes());
-            }
             if (hasOutputDir) {
                 OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
                 ObjectMapper mapper = new ObjectMapper();
                 ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
                 new DirectoryExploder(extractor, writer).serializeIntoDirectory(outputDirName);
+            }
+            String yaml = SerializerUtils.toYamlString(openApi);
+            if (hasOutputFile) {
+                File outputFile = new File(outputFileName);
+                Files.write(outputFile.toPath(), yaml.getBytes());
             }
             if (!hasOutputFile && !hasOutputDir) {
                 System.out.println(yaml);
