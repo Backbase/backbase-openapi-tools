@@ -48,37 +48,6 @@ public class ExampleExtractorsTest {
     }
 
     @Test
-    public void test_headerExamples_ownExamplePresent() {
-        String name = "X-Items-Count";
-        Header header = new Header().example("1234");
-        List<NamedExample> examples = ExampleExtractors.headerExamples(name, header);
-        assertFalse(examples.isEmpty());
-        assertEquals(1, examples.size());
-        assertEquals(name, examples.get(0).getName());
-    }
-
-    @Test
-    public void test_headerExamples_ownExamplePresentAndExamplesMapNotEmpty() {
-        Schema<?> schema = new Schema<>().$ref("#/components/schemas/MySchema");
-        String name = "X-Items-Count";
-        String key = "example-1";
-        Example example = new Example().value("dummy-val");
-        Header header = new Header()
-                .example("1234")
-                .schema(schema)
-                .addExample(key, example);
-        List<NamedExample> examples = ExampleExtractors.headerExamples(name, header);
-        assertFalse(examples.isEmpty());
-        assertEquals(2, examples.size());
-        assertTrue(examples.stream().anyMatch(namedExample ->
-                namedExample.getExample() == example && namedExample.getName().equals("MySchema-" + key))
-        );
-        assertTrue(examples.stream().anyMatch(namedExample ->
-                namedExample.getExample().getValue() == header.getExample() && namedExample.getName().equals(name))
-        );
-    }
-
-    @Test
     public void test_parameterExamples_nullExamples() {
         Parameter parameter = new Parameter();
         List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
@@ -98,56 +67,22 @@ public class ExampleExtractorsTest {
     }
 
     @Test
-    public void test_parameterExamples_ownExamplePresent() {
-        Parameter parameter = new Parameter()
-                .name("accountId")
-                .example("a8346");
-        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
-        assertEquals(1, examples.size());
-        assertEquals(parameter.getExample(), examples.get(0).getExample().getValue());
-        assertEquals("param-" + parameter.getName(), examples.get(0).getName());
-    }
-
-    @Test
-    public void test_parameterExamples_ownExamplePresentAndExamplesMapNotEmpty() {
-        Example example = new Example().value("some-value");
-        Parameter parameter = new Parameter()
-                .name("accountId")
-                .example("a1234-b5")
-                .addExample("example", example);
-        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
-        assertEquals(2, examples.size());
-        assertTrue(examples.stream().anyMatch(namedExample ->
-                namedExample.getExample() == example && namedExample.getName().equals(parameter.getName())
-        ));
-        assertTrue(examples.stream().anyMatch(namedExample ->
-                namedExample.getExample().getValue() == parameter.getExample()
-                        && namedExample.getName().equals("param-" + parameter.getName())
-        ));
-    }
-
-    @Test
-    public void test_parameterExamples_ownExamplePresentAndExamplesMapNotEmptyAndContentExamples() {
+    public void test_parameterExamples_examplesMapNotEmptyAndContentExamples() {
         Example example = new Example().value("some-value");
         String mediaTypeExampleName = "MediaTypeExampleName1";
         String mediaType$ref = "../openapi.yaml#/components/schemas/SomeName";
         Example mediaTypeExample = new Example().value("some-data");
         Parameter parameter = new Parameter()
                 .name("accountId")
-                .example("a1234-b5")
                 .addExample("example", example).content(new Content()
                         .addMediaType("text/plain", new MediaType()
                                 .schema(new Schema<>().$ref(mediaType$ref))
                                 .addExamples(mediaTypeExampleName, mediaTypeExample)
                         ));
         List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
-        assertEquals(3, examples.size());
+        assertEquals(2, examples.size());
         assertTrue(examples.stream().anyMatch(namedExample ->
                 namedExample.getExample() == example && namedExample.getName().equals(parameter.getName())
-        ));
-        assertTrue(examples.stream().anyMatch(namedExample ->
-                namedExample.getExample().getValue() == parameter.getExample()
-                        && namedExample.getName().equals("param-" + parameter.getName())
         ));
         assertTrue(examples.stream().anyMatch(namedExample ->
                 namedExample.getExample() == mediaTypeExample
