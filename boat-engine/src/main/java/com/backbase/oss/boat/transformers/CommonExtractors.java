@@ -84,7 +84,7 @@ public class CommonExtractors {
         return Optional.ofNullable(optSchema).map(schema ->
                 Optional.ofNullable(schema.getName()).orElse(
                         Optional.ofNullable(schema.get$ref())
-                                .map($ref -> $ref.replaceAll("[a-zA-Z0-9._#]+/", ""))
+                                .map($ref -> $ref.replaceAll("([a-zA-Z0-9._#]+/)*", ""))
                                 .orElse("")
                 )).orElse("");
     }
