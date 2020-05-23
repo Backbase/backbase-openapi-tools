@@ -1,7 +1,6 @@
 package com.backbase.oss.boat.transformers;
 
 import com.backbase.oss.boat.example.NamedExample;
-import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -25,9 +24,6 @@ public class ExampleExtractors {
                 .map(entry -> new NamedExample(exampleName(prefix, entry.getKey()), entry.getValue()))
                 .collect(Collectors.toList());
         // the following if statement can be refactored to use FP, but it'd become less readable.
-        if (header.getExample() != null) {
-            allExamples.add(new NamedExample(name, new Example().value(header.getExample())));
-        }
         if (header.getContent() != null) {
             allExamples.addAll(contentExamples(header.getContent()));
         }
@@ -42,10 +38,6 @@ public class ExampleExtractors {
                 .stream()
                 .map(entry -> new NamedExample(exampleName(parameter.getName(), entry.getKey()), entry.getValue()))
                 .collect(Collectors.toList());
-        if (parameter.getName() != null && parameter.getExample() != null) {
-            String name = exampleName("param", parameter.getName());
-            allExamples.add(new NamedExample(name, new Example().value(parameter.getExample())));
-        }
         if (parameter.getContent() != null) {
             allExamples.addAll(contentExamples(parameter.getContent()));
         }
