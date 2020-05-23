@@ -16,19 +16,19 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class CommonExtractorsTest {
+public class ExampleExtractorsTest {
 
     @Test
     public void test_headerExamples_noExample() {
         Header header = new Header();
-        List<NamedExample> examples = CommonExtractors.headerExamples("some-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples("some-name", header);
         assertTrue(examples.isEmpty());
     }
 
     @Test
     public void test_headerExamples_nullExamplesMap() {
         Header header = new Header().examples(null);
-        List<NamedExample> examples = CommonExtractors.headerExamples("some-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples("some-name", header);
         assertTrue(examples.isEmpty());
     }
 
@@ -40,7 +40,7 @@ public class CommonExtractorsTest {
         Header header = new Header()
                 .addExample(key, example)
                 .schema(schema);
-        List<NamedExample> examples = CommonExtractors.headerExamples("Dummy-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples("Dummy-name", header);
         assertFalse(examples.isEmpty());
         assertEquals(1, examples.size());
         assertEquals(example, examples.get(0).getExample());
@@ -51,7 +51,7 @@ public class CommonExtractorsTest {
     public void test_headerExamples_ownExamplePresent() {
         String name = "X-Items-Count";
         Header header = new Header().example("1234");
-        List<NamedExample> examples = CommonExtractors.headerExamples(name, header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples(name, header);
         assertFalse(examples.isEmpty());
         assertEquals(1, examples.size());
         assertEquals(name, examples.get(0).getName());
@@ -67,7 +67,7 @@ public class CommonExtractorsTest {
                 .example("1234")
                 .schema(schema)
                 .addExample(key, example);
-        List<NamedExample> examples = CommonExtractors.headerExamples(name, header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples(name, header);
         assertFalse(examples.isEmpty());
         assertEquals(2, examples.size());
         assertTrue(examples.stream().anyMatch(namedExample ->
@@ -81,7 +81,7 @@ public class CommonExtractorsTest {
     @Test
     public void test_parameterExamples_nullExamples() {
         Parameter parameter = new Parameter();
-        List<NamedExample> examples = CommonExtractors.parameterExamples(parameter);
+        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertTrue(examples.isEmpty());
     }
 
@@ -91,7 +91,7 @@ public class CommonExtractorsTest {
         Parameter parameter = new Parameter()
                 .name("accountId")
                 .addExample("example", example);
-        List<NamedExample> examples = CommonExtractors.parameterExamples(parameter);
+        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertEquals(1, examples.size());
         assertEquals(example, examples.get(0).getExample());
         assertEquals(parameter.getName(), examples.get(0).getName());
@@ -102,7 +102,7 @@ public class CommonExtractorsTest {
         Parameter parameter = new Parameter()
                 .name("accountId")
                 .example("a8346");
-        List<NamedExample> examples = CommonExtractors.parameterExamples(parameter);
+        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertEquals(1, examples.size());
         assertEquals(parameter.getExample(), examples.get(0).getExample().getValue());
         assertEquals("param-" + parameter.getName(), examples.get(0).getName());
@@ -115,7 +115,7 @@ public class CommonExtractorsTest {
                 .name("accountId")
                 .example("a1234-b5")
                 .addExample("example", example);
-        List<NamedExample> examples = CommonExtractors.parameterExamples(parameter);
+        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertEquals(2, examples.size());
         assertTrue(examples.stream().anyMatch(namedExample ->
                 namedExample.getExample() == example && namedExample.getName().equals(parameter.getName())
@@ -140,7 +140,7 @@ public class CommonExtractorsTest {
                                 .schema(new Schema<>().$ref(mediaType$ref))
                                 .addExamples(mediaTypeExampleName, mediaTypeExample)
                         ));
-        List<NamedExample> examples = CommonExtractors.parameterExamples(parameter);
+        List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertEquals(3, examples.size());
         assertTrue(examples.stream().anyMatch(namedExample ->
                 namedExample.getExample() == example && namedExample.getName().equals(parameter.getName())
@@ -158,7 +158,7 @@ public class CommonExtractorsTest {
     @Test
     public void test_contentExamples_noMediaType() {
         Content content = new Content();
-        List<NamedExample> examples = CommonExtractors.contentExamples(content);
+        List<NamedExample> examples = ExampleExtractors.contentExamples(content);
         assertTrue(examples.isEmpty());
     }
 
@@ -181,7 +181,7 @@ public class CommonExtractorsTest {
                 .addEncoding("my-encoding", encoding);
         Content content = new Content()
                 .addMediaType("text/plain", mediaType);
-        List<NamedExample> examples = CommonExtractors.contentExamples(content);
+        List<NamedExample> examples = ExampleExtractors.contentExamples(content);
         assertEquals(2, examples.size());
         assertTrue(examples.stream().anyMatch(
                 namedExample -> namedExample.getExample() == encodingExample
