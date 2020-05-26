@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.jknack.handlebars.internal.Files;
 import com.google.common.base.CaseFormat;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -146,7 +146,8 @@ public class Exporter {
         Map<String, String> ramlTypeReferences = new TreeMap<>();
         // Parse raml document as yaml instead to reverse engineer json references from types
         try {
-            String ramlAsString = Files.read(inputFile, Charset.defaultCharset());
+
+            String ramlAsString = new String(Files.readAllBytes(inputFile.toPath()), Charset.defaultCharset());
             JsonNode jsonNode = mapper.readTree(ramlAsString);
             parseRamlTypeReferences(baseUrl, ramlTypeReferences, jsonNode);
         } catch (Exception e) {
@@ -282,8 +283,12 @@ public class Exporter {
                         String title = null;
                         String documentation = null;
 
-                        if (isNotBlank(documentationItem.title())) {
-                            title = documentationItem.title().value();
+                    if (documentation != null && documentation.startsWith("# ")) {
+                        markdown.append(documentationItem.content().value());
+                        markdown.append(NEW_LINE);
+                    } else if (title != null) {
+                        if (!title.startsWith("# ")) {
+                            markdown.append("# ");
                         }
                         if (isNotBlank(documentationItem.content())) {
                             documentation = documentationItem.content().value();
