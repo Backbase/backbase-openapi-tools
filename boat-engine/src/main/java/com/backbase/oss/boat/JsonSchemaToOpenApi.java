@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Streams;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
@@ -462,10 +461,7 @@ class JsonSchemaToOpenApi {
         if (type.has("required")) {
             JsonNode requiredNode = type.get("required");
             if (requiredNode.isArray()) {
-                List<String> requiredFields = Streams.stream(requiredNode.elements())
-                    .map(JsonNode::asText)
-                    .collect(Collectors.toList());
-                required.addAll(requiredFields);
+                requiredNode.elements().forEachRemaining(jsonNode -> required.add(jsonNode.asText()));
             } else {
                 log.warn("wut?");
             }
@@ -529,10 +525,8 @@ class JsonSchemaToOpenApi {
             for (Map.Entry<String, Schema> entry : properties.entrySet()) {
                 Schema value = entry.getValue();
                 value.addExtension(X_RAML_PARENT, schema);
-//                if (hasReference(value)) {
                 log.debug("Deference item property: {} from: {}", value.getName(), schema.getName());
                 dereferenceSchema(value, components);
-//                }
             }
         }
     }
