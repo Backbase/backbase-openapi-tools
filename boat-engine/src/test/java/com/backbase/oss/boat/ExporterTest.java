@@ -2,15 +2,13 @@ package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Decomposer;
-import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,9 +33,9 @@ public class ExporterTest extends AbstractBoatEngineTests {
     public void testWallet() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
-                .addJavaTypeExtensions(true)
-                .convertExamplesToYaml(false)
-                .transformers(Collections.singletonList(new Decomposer())));
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(false)
+            .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
     }
@@ -63,16 +61,16 @@ public class ExporterTest extends AbstractBoatEngineTests {
 
 
     protected void validateExport(String export) throws IOException, com.backbase.oss.boat.ExportException {
-        if (export == null)
+        if (export == null) {
             throw new ExportException("Invalid Export");
+        }
 
         String child = "openapi.yaml";
 
         writeOutput(export, child);
 
-        OpenAPIParser openAPIParser = new OpenAPIParser();
+        OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
-        parseOptions.setFlatten(true);
         SwaggerParseResult swaggerParseResult = openAPIParser.readContents(export, new ArrayList<>(), parseOptions);
         for (String message : swaggerParseResult.getMessages()) {
             log.error("Error parsing Open API: {}", message);
@@ -80,7 +78,6 @@ public class ExporterTest extends AbstractBoatEngineTests {
         Assert.assertTrue(swaggerParseResult.getMessages().isEmpty());
 
     }
-
 
 
     protected File getFile(String name) {

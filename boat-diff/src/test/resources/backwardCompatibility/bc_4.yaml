@@ -37,17 +37,17 @@ paths:
       description: ''
       operationId: addPet
       responses:
-        '405':
-          description: Invalid input
-      requestBody:
-        $ref: '#/components/requestBodies/Pet'
-      responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyResponseType'
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Pet'
+
   /pet/findByStatus:
     get:
       tags:

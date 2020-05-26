@@ -8,6 +8,9 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Calculates a Change log for APIs.
+ */
 @Mojo(name = "diff", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 public class DiffMojo extends AbstractRamlToOpenApi {
 
