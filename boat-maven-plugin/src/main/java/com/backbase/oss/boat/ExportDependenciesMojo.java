@@ -8,6 +8,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+/**
+ * Exports project dependencies where the ArtifactId ends with "-spec".
+ */
 @Mojo(name = "export-dep", requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME, threadSafe = true)
 public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
 

@@ -4,10 +4,10 @@ import com.backbase.oss.boat.ExportException;
 import com.backbase.oss.boat.Exporter;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.google.common.base.CaseFormat;
-import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
@@ -36,9 +36,9 @@ public class Referencer {
         File schemasOutputDirectory = new File(outputDirectory, "components/schemas");
         schemasOutputDirectory.mkdirs();
 
-        OpenAPIParser openAPIParser = new OpenAPIParser();
+        OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
-        parseOptions.setFlatten(true);
+        parseOptions.setFlatten(false);
         SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(url.toString(), new ArrayList<>(), parseOptions);
         OpenAPI openAPI = swaggerParseResult.getOpenAPI();
 

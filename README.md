@@ -12,11 +12,20 @@ It currently consists of
 * Create Diff Report between 2 OpenAPI versions of the same spec (Based on https://github.com/quen2404/openapi-diff)
 * Decompose Transformer to remove Composed Schemas from OpenAPI specs to aid in code generators
 * Case Transformer to see how your API looks like when going from camelCase to snake_case  (transforms examples too)
+* [Code Generator](boat-maven-plugin/README.md) based on [openapi-generator.tech](https://openapi-generator.tech/) with optimized templates and fixes.
+ 
 
 The project is very much Work In Progress and will be published on maven central when considered ready enough. 
 
 # Release Notes
 BOAT is still under development and subject to change. 
+
+## 0.1.6
+* Added documentation on boat-maven-plugin
+* Upgraded YAML Libraries to improve output of YAML files
+* Use standardized swagger YAML output
+* Added Bean Validator in Code Generator
+* Changed Open API Loader to correctly resolve references from reading input location insteaf of string
 
 ## 0.1.5
 
@@ -206,3 +215,174 @@ The following command will generate `index.html` file in the specified output fo
 ```bash
 mvn boat:generate@generate-docs
 ```
+
+## Generate API interfaces
+
+Configuration
+```
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.backbase.oss</groupId>
+      <artifactId>boat-maven-plugin</artifactId>
+      <version>${boat-maven-plugin.version}</version>
+      <executions>
+        <execution>
+          <id>generate-api-code</id>
+          <goals>
+            <goal>generate</goal>
+          </goals>
+          <phase>generate-sources</phase>
+          <configuration>
+            <inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
+            <output>${project.build.directory}/generated-sources/api</output>
+            <generatorName>spring</generatorName>
+            [...]
+            <configOptions>
+              <library>spring-boot</library>
+              <apiPackage>com.example.my.service.api.interfaces</apiPackage>
+              <modelPackage>com.example.my.service.models</modelPackage>
+              <hideGenerationTimestamp>true</hideGenerationTimestamp>
+              <dateLibrary>java8</dateLibrary>
+              <interfaceOnly>true</interfaceOnly>
+              <skipDefaultInterface>true</skipDefaultInterface>
+              <useBeanValidation>true</useBeanValidation>
+              <useTags>true</useTags>
+              <java8>true</java8>
+              <useOptional>false</useOptional>
+              [...]
+            </configOptions>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+ </plugins>
+</build>
+```
+
+A comprehensive list of the Configuration options can be found below.
+
+| Option | Property | Description |
+|--------|----------|-------------|
+| `verbose` |  `openapi.generator.maven.plugin.verbose` | verbose mode (`false` by default)
+| `inputSpec` |  `openapi.generator.maven.plugin.inputSpec` | OpenAPI Spec file path
+| `language` |  `openapi.generator.maven.plugin.language` | target generation language (deprecated, replaced by `generatorName` as values here don't represent only 'language' any longer)
+| `generatorName` |  `openapi.generator.maven.plugin.generatorName` | target generator name
+| `output` |  `openapi.generator.maven.plugin.output` | target output path (default is `${project.build.directory}/generated-sources/openapi`. Can also be set globally through the `openapi.generator.maven.plugin.output` property)
+| `gitHost` | `openapi.generator.maven.plugin.gitHost` | The git host, e.g. gitlab.com
+| `gitUserId` |  `openapi.generator.maven.plugin.gitUserId` | sets git information of the project
+| `gitRepoId` | `openapi.generator.maven.plugin.gitRepoId` | sets the repo ID (e.g. openapi-generator)
+| `templateDirectory` |  `openapi.generator.maven.plugin.templateDirectory` | directory with mustache templates
+| `templateResourcePath` |  `openapi.generator.maven.plugin.templateResourcePath` | directory with mustache templates via resource path. This option will overwrite any option defined in `templateDirectory`.
+| `engine` | `openapi.generator.maven.plugin.engine` | The name of templating engine to use, "mustache" (default) or "handlebars" (beta)
+| `auth` |  `openapi.generator.maven.plugin.auth` | adds authorization headers when fetching the OpenAPI definitions remotely. Pass in a URL-encoded string of `name:header` with a comma separating multiple values
+| `configurationFile` |  `openapi.generator.maven.plugin.configurationFile` | Path to separate json configuration file. File content should be in a json format {"optionKey":"optionValue", "optionKey1":"optionValue1"...} Supported options can be different for each language. Run `config-help -g {generator name}` command for language specific config options
+| `skipOverwrite` |  `openapi.generator.maven.plugin.skipOverwrite` | Specifies if the existing files should be overwritten during the generation. (`false` by default)
+| `apiPackage` |  `openapi.generator.maven.plugin.apiPackage` | the package to use for generated api objects/classes
+| `modelPackage` |  `openapi.generator.maven.plugin.modelPackage` | the package to use for generated model objects/classes
+| `invokerPackage` |  `openapi.generator.maven.plugin.invokerPackage` | the package to use for the generated invoker objects
+| `packageName` | `openapi.generator.maven.plugin.packageName` | the default package name to use for the generated objects
+| `groupId` | `openapi.generator.maven.plugin.groupId`  | sets project information in generated pom.xml/build.gradle or other build script. Language-specific conversions occur in non-jvm generators
+| `artifactId` |  `openapi.generator.maven.plugin.artifactId` | sets project information in generated pom.xml/build.gradle or other build script. Language-specific conversions occur in non-jvm generators
+| `artifactVersion` |  `openapi.generator.maven.plugin.artifactVersion` | sets project information in generated pom.xml/build.gradle or other build script. Language-specific conversions occur in non-jvm generators
+| `library` |  `openapi.generator.maven.plugin.library` | library template (sub-template)
+| `modelNamePrefix` |  `openapi.generator.maven.plugin.modelNamePrefix` | Sets the prefix for model classes and enums
+| `modelNameSuffix` |  `openapi.generator.maven.plugin.modelNameSuffix` | Sets the suffix for model classes and enums
+| `ignoreFileOverride` |  `openapi.generator.maven.plugin.ignoreFileOverride` | specifies the full path to a `.openapi-generator-ignore` used for pattern based overrides of generated outputs
+| `httpUserAgent` | `openapi.generator.maven.plugin.httpUserAgent` | Sets custom User-Agent header value
+| `removeOperationIdPrefix` |  `openapi.generator.maven.plugin.removeOperationIdPrefix` | remove operationId prefix (e.g. user_getName => getName)
+| `logToStderr` |  `openapi.generator.maven.plugin.logToStderr` | write all log messages (not just errors) to STDOUT
+| `enablePostProcessFile` |  `openapi.generator.maven.plugin.` | enable file post-processing hook
+| `skipValidateSpec` |  `openapi.generator.maven.plugin.skipValidateSpec` | Whether or not to skip validating the input spec prior to generation. By default, invalid specifications will result in an error.
+| `strictSpec` |  `openapi.generator.maven.plugin.strictSpec` | Whether or not to treat an input document strictly against the spec. 'MUST' and 'SHALL' wording in OpenAPI spec is strictly adhered to. e.g. when false, no fixes will be applied to documents which pass validation but don't follow the spec.
+| `generateAliasAsModel` |  `openapi.generator.maven.plugin.generateAliasAsModel` | generate alias (array, map) as model
+| `configOptions` |  N/A | a **map** of language-specific parameters. To show a full list of generator-specified parameters (options), please use `configHelp` (explained below)
+| `instantiationTypes` |  `openapi.generator.maven.plugin.instantiationTypes` | sets instantiation type mappings in the format of type=instantiatedType,type=instantiatedType. For example (in Java): `array=ArrayList,map=HashMap`. In other words array types will get instantiated as ArrayList in generated code. You can also have multiple occurrences of this option
+| `importMappings` |  `openapi.generator.maven.plugin.importMappings` | specifies mappings between a given class and the import that should be used for that class in the format of type=import,type=import. You can also have multiple occurrences of this option
+| `typeMappings` |  `openapi.generator.maven.plugin.typeMappings` | sets mappings between OpenAPI spec types and generated code types in the format of OpenAPIType=generatedType,OpenAPIType=generatedType. For example: `array=List,map=Map,string=String`. You can also have multiple occurrences of this option
+| `languageSpecificPrimitives` |  `openapi.generator.maven.plugin.languageSpecificPrimitives` | specifies additional language specific primitive types in the format of type1,type2,type3,type3. For example: `String,boolean,Boolean,Double`. You can also have multiple occurrences of this option
+| `additionalProperties` |  `openapi.generator.maven.plugin.additionalProperties` | sets additional properties that can be referenced by the mustache templates in the format of name=value,name=value. You can also have multiple occurrences of this option
+| `serverVariableOverrides` | `openapi.generator.maven.plugin.serverVariableOverrides` | A map of server variable overrides for specs that support server URL templating
+| `reservedWordsMappings` |  `openapi.generator.maven.plugin.reservedWordsMappings` | specifies how a reserved name should be escaped to. Otherwise, the default `_<name>` is used. For example `id=identifier`. You can also have multiple occurrences of this option
+| `generateApis` |  `openapi.generator.maven.plugin.generateApis` | generate the apis (`true` by default). Specific apis may be defined as a CSV via `apisToGenerate`.
+| `apisToGenerate` |  `openapi.generator.maven.plugin.apisToGenerate` | A comma separated list of apis to generate.  All apis is the default.
+| `generateModels` |  `openapi.generator.maven.plugin.generateModels` | generate the models (`true` by default). Specific models may be defined as a CSV via `modelsToGenerate`.
+| `modelsToGenerate` |  `openapi.generator.maven.plugin.modelsToGenerate` | A comma separated list of models to generate.  All models is the default.
+| `generateSupportingFiles` |  `openapi.generator.maven.plugin.generateSupportingFiles` | generate the supporting files (`true` by default)
+| `supportingFilesToGenerate` |  `openapi.generator.maven.plugin.supportingFilesToGenerate` | A comma separated list of supporting files to generate.  All files is the default.
+| `generateModelTests` |  `openapi.generator.maven.plugin.generateModelTests` | generate the model tests (`true` by default. Only available if `generateModels` is `true`)
+| `generateModelDocumentation` |  `openapi.generator.maven.plugin.generateModelDocumentation` | generate the model documentation (`true` by default. Only available if `generateModels` is `true`)
+| `generateApiTests` |  `openapi.generator.maven.plugin.generateApiTests` | generate the api tests (`true` by default. Only available if `generateApis` is `true`)
+| `generateApiDocumentation` |  `openapi.generator.maven.plugin.generateApiDocumentation` | generate the api documentation (`true` by default. Only available if `generateApis` is `true`)
+| `withXml` |  `openapi.generator.maven.plugin.withXml` | enable XML annotations inside the generated models and API (only works with Java `language` and libraries that provide support for JSON and XML)
+| `skip` |  `codegen.skip` | skip code generation (`false` by default. Can also be set globally through the `codegen.skip` property)
+| `skipIfSpecIsUnchanged` |  `codegen.skipIfSpecIsUnchanged` | Skip the execution if the source file is older than the output folder (`false` by default. Can also be set globally through the `codegen.skipIfSpecIsUnchanged` property)
+| `addCompileSourceRoot` |  `openapi.generator.maven.plugin.addCompileSourceRoot` | Add the output directory to the project as a source root, so that the generated java types are compiled and included in the project artifact (`true` by default). Mutually exclusive with `addTestCompileSourceRoot`.
+| `addTestCompileSourceRoot` |  `openapi.generator.maven.plugin.addTestCompileSourceRoot` | Add the output directory to the project as a test source root, so that the generated java types are compiled only for the test classpath of the project (`false` by default). Mutually exclusive with `addCompileSourceRoot`.
+| `environmentVariables` | N/A | A **map** of items conceptually similar to "environment variables" or "system properties". These are merged into a map of global settings available to all aspects of the generation flow. Use this map for any options documented elsewhere as `systemProperties`.
+| `configHelp` |  `codegen.configHelp` | dumps the configuration help for the specified library (generates no sources)
+
+For the `spring` generator, the additional configuration options are:
+
+| Option | Description |
+|--------|-------------|
+| `sortParamsByRequiredFlag` | Sort method arguments to place required parameters before optional parameters. (Default: true) |
+| `sortModelPropertiesByRequiredFlag` | Sort model properties to place required parameters before optional parameters. (Default: true) |
+| `ensureUniqueParams` | Whether to ensure parameter names are unique in an operation (rename parameters that are not). (Default: true) |
+| `allowUnicodeIdentifiers` | boolean, toggles whether unicode identifiers are allowed in names or not, default is false (Default: false) |
+| `prependFormOrBodyParameters` | Add form or body parameters to the beginning of the parameter list. (Default: false) |
+| `modelPackage` | package for generated models (Default: org.openapitools.model) |
+| `apiPackage` | package for generated api classes (Default: org.openapitools.api) |
+| `invokerPackage` | root package for generated code (Default: org.openapitools.api) |
+| `groupId` | groupId in generated pom.xml (Default: org.openapitools) |
+| `artifactId` | artifactId in generated pom.xml. This also becomes part of the generated library's filename (Default: openapi-spring) |
+| `artifactVersion` | artifact version in generated pom.xml. This also becomes part of the generated library's filename (Default: 1.0.0) |
+| `artifactUrl` | artifact URL in generated pom.xml (Default: https://github.com/openapitools/openapi-generator) |
+| `artifactDescription` | artifact description in generated pom.xml (Default: OpenAPI Java) |
+| `scmConnection` | SCM connection in generated pom.xml (Default: scm:git:git@github.com:openapitools/openapi-generator.git) |
+| `scmDeveloperConnection` | SCM developer connection in generated pom.xml (Default: scm:git:git@github.com:openapitools/openapi-generator.git) |
+| `scmUrl` | SCM URL in generated pom.xml (Default: https://github.com/openapitools/openapi-generator) |
+| `developerName` | developer name in generated pom.xml (Default: OpenAPI-Generator Contributors) |
+| `developerEmail` | developer email in generated pom.xml (Default: team@openapitools.org) |
+| `developerOrganization` | developer organization in generated pom.xml (Default: OpenAPITools.org) |
+| `developerOrganizationUrl` | developer organization URL in generated pom.xml (Default: http://openapitools.org) |
+| `licenseName` | The name of the license (Default: Unlicense) |
+| `licenseUrl` | The URL of the license (Default: http://unlicense.org) |
+| `sourceFolder` | source folder for generated code (Default: src/main/java) |
+| `serializableModel` | boolean - toggle "implements Serializable" for generated models (Default: false) |
+| `bigDecimalAsString` | Treat BigDecimal values as Strings to avoid precision loss. (Default: false) |
+| `fullJavaUtil` | whether to use fully qualified name for classes under java.util. This option only works for Java API client (Default: false) |
+| `hideGenerationTimestamp` | Hides the generation timestamp when files are generated. (Default: false) |
+| `withXml` | whether to include support for application/xml content type and include XML annotations in the model (works with libraries that provide support for JSON and XML) (Default: false) |
+| `dateLibrary` | Option. Date library to use (Default: threetenbp)<br>joda - Joda (for legacy app only)<br>legacy - Legacy java.util.Date (if you really have a good reason not to use threetenbp<br>java8-localdatetime - Java 8 using LocalDateTime (for legacy app only)<br>java8 - Java 8 native JSR310 (preferred for jdk 1.8+) - note: this also sets "java8" to true<br>threetenbp - Backport of JSR310 (preferred for jdk < 1.8) |
+| `java8` | Option. Use Java8 classes instead of third party equivalents (Default: false)<br>true - Use Java 8 classes such as Base64. Use java8 default interface when a responseWrapper is used<br>false - Various third party libraries as needed |
+| `disableHtmlEscaping` | Disable HTML escaping of JSON strings when using gson (needed to avoid problems with byte[] fields) (Default: false) |
+| `booleanGetterPrefix` | Set booleanGetterPrefix (Default: get) |
+| `additionalModelTypeAnnotations` | Additional annotations for model type(class level annotations) |
+| `parentGroupId` | parent groupId in generated pom N.B. parentGroupId, parentArtifactId and parentVersion must all be specified for any of them to take effect |
+| `parentArtifactId` | parent artifactId in generated pom N.B. parentGroupId, parentArtifactId and parentVersion must all be specified for any of them to take effect |
+| `parentVersion` | parent version in generated pom N.B. parentGroupId, parentArtifactId and parentVersion must all be specified for any of them to take effect |
+| `snapshotVersion` | Uses a SNAPSHOT version. true - Use a SnapShot Versionfalse - Use a Release Version |
+| `title` | server title name or client service name (Default: OpenAPI Spring) |
+| `configPackage` | configuration package for generated code (Default: org.openapitools.configuration) |
+| `basePackage` | base package (invokerPackage) for generated code (Default: org.openapitools) |
+| `interfaceOnly` | Whether to generate only API interface stubs without the server files. (Default: false) |
+| `delegatePattern` | Whether to generate the server files using the delegate pattern (Default: false) |
+| `singleContentTypes` | Whether to select only one produces/consumes content-type by operation. (Default: false) |
+| `skipDefaultInterface` | Whether to generate default implementations for java8 interfaces (Default: false) |
+| `async` | use async Callable controllers (Default: false) |
+| `reactive` | wrap responses in Mono/Flux Reactor types (spring-boot only) (Default: false) |
+| `responseWrapper` | wrap the responses in given type (Future, Callable, CompletableFuture,ListenableFuture, DeferredResult, HystrixCommand, RxObservable, RxSingle or fully qualified type) |
+| `virtualService` | Generates the virtual service. For more details refer - https://github.com/elan-venture/virtualan/wiki (Default: false) |
+| `useTags` | use tags for creating interface and controller classnames (Default: false) |
+| `useBeanValidation` | Use BeanValidation API annotations (Default: true) |
+| `performBeanValidation` | Use Bean Validation Impl. to perform BeanValidation (Default: false) |
+| `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
+| `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
+| `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
+| `apiFirst` | Generate the API from the OAI spec at server compile time (API first approach) (Default: false) |
+| `useOptional` | Use Optional container for optional parameters (Default: false) |
+| `hateoas` | Use Spring HATEOAS library to allow adding HATEOAS links (Default: false) |
+| `returnSuccessCode` | Generated server returns 2xx code (Default: false) |
+| `unhandledException` | Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives). (Default: false) |
+| `library` | library template (sub-template) (Default: spring-boot)<br>spring-boot - Spring-boot Server application using the SpringFox integration.<br>spring-mvc - Spring-MVC Server application using the SpringFox integration.<br>spring-cloud - Spring-Cloud-Feign client with Spring-Boot auto-configured settings.|
