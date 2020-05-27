@@ -378,6 +378,7 @@ For the `spring` generator, the additional configuration options are:
 | `useBeanValidation` | Use BeanValidation API annotations (Default: true) |
 | `performBeanValidation` | Use Bean Validation Impl. to perform BeanValidation (Default: false) |
 | `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
+| `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
 | `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
 | `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
 | `apiFirst` | Generate the API from the OAI spec at server compile time (API first approach) (Default: false) |
