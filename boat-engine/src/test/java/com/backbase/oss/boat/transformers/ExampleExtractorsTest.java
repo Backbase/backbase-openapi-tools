@@ -21,14 +21,14 @@ public class ExampleExtractorsTest {
     @Test
     public void test_headerExamples_noExample() {
         Header header = new Header();
-        List<NamedExample> examples = ExampleExtractors.headerExamples("some-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples(header);
         assertTrue(examples.isEmpty());
     }
 
     @Test
     public void test_headerExamples_nullExamplesMap() {
         Header header = new Header().examples(null);
-        List<NamedExample> examples = ExampleExtractors.headerExamples("some-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples(header);
         assertTrue(examples.isEmpty());
     }
 
@@ -40,7 +40,7 @@ public class ExampleExtractorsTest {
         Header header = new Header()
                 .addExample(key, example)
                 .schema(schema);
-        List<NamedExample> examples = ExampleExtractors.headerExamples("Dummy-name", header);
+        List<NamedExample> examples = ExampleExtractors.headerExamples(header);
         assertFalse(examples.isEmpty());
         assertEquals(1, examples.size());
         assertEquals(example, examples.get(0).getExample());

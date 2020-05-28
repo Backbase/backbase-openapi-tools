@@ -12,6 +12,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -64,6 +66,10 @@ public class BoatTerminal {
                 new DirectoryExploder(extractor, writer).serializeIntoDirectory(outputDirName);
             }
             String yaml = SerializerUtils.toYamlString(openApi);
+            if (hasOutputDir) {
+                Path mainOpenApiSpec = Paths.get(outputDirName, "openapi.yaml");
+                Files.write(mainOpenApiSpec, yaml.getBytes());
+            }
             if (hasOutputFile) {
                 File outputFile = new File(outputFileName);
                 Files.write(outputFile.toPath(), yaml.getBytes());
