@@ -20,6 +20,9 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change. 
 
+## 0.1.7
+* Added configurable flag to add HttpServletRequest parameters to codegen'd server stubs.
+
 ## 0.1.6
 * Added documentation on boat-maven-plugin
 * Upgraded YAML Libraries to improve output of YAML files
@@ -391,6 +394,7 @@ For the `spring` generator, the additional configuration options are:
 | `useBeanValidation` | Use BeanValidation API annotations (Default: true) |
 | `performBeanValidation` | Use Bean Validation Impl. to perform BeanValidation (Default: false) |
 | `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
+| `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
 | `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
 | `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
 | `apiFirst` | Generate the API from the OAI spec at server compile time (API first approach) (Default: false) |
