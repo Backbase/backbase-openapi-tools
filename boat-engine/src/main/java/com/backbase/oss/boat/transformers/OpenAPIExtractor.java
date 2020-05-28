@@ -3,21 +3,56 @@ package com.backbase.oss.boat.transformers;
 import com.backbase.oss.boat.example.NamedExample;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.headers.Header;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Extracts inline elements from an instance of {@link OpenAPI} into lists that can be processed further.
+ */
 public class OpenAPIExtractor {
 
     @NotNull
     private final OpenAPI openApi;
 
+    /**
+     * Constructs a new instance of this extractor.
+     *
+     * @param openApi the open api instance where inline elements will be extracted from.
+     */
     public OpenAPIExtractor(@NotNull OpenAPI openApi) {
         this.openApi = openApi;
     }
 
+    /**
+     * Extracts inline examples from the given {@link OpenAPI} instance.
+     * A non-exhaustive list of examples that are extracted:
+     * <ul>
+     *     <li>PathItem > Parameters > examples</li>
+     *     <li>PathItem > Operation > Parameters > examples</li>
+     *     <li>PathItem > Operation > Parameters > examples</li>
+     *     <li>PathItem > Operation > RequestBody > Content > MediaType > examples</li>
+     *     <li>PathItem > Operation > RequestBody > Content > MediaType > Encoding > Headers > Header > examples</li>
+     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Content > MediaType > examples</li>
+     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Content > Encoding > Headers > Header > examples</li>
+     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Headers > Header > examples</li>
+     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Links > Link > Headers > Header > examples</li>
+     *     <li>Components > examples</li>
+     *     <li>componentsHeadersExamples: Components > Component > Headers > Header > examples</li>
+     *     <li>Components > Component > Links > Link > Headers > Header > examples</li>
+     *     <li>Components > Component > Links > Link > Headers > Header > examples</li>
+     * </ul>
+     * This list is not exhaustive because there are cases of recursion such as with headers.
+     * Single examples of elements, which are represented as unnamed fields, such as {@link Parameter#getExample()} and
+     * {@link Header#getExample()} are not considered for extraction, because they're not meant to have $ref.
+     *
+     * @return a comprehensive list of all encountered inline examples.
+     * @see ExampleExtractors#headerExamples(Header)
+     */
     public List<NamedExample> extractInlineExamples() {
         Collection<PathItem> pathItems = Optional.ofNullable(openApi.getPaths())
                 .orElse(new Paths()) // empty
@@ -59,14 +94,14 @@ public class OpenAPIExtractor {
         List<NamedExample> opResponsesHeadersExamples = opResponses.stream()
                 .filter(apiResponse -> apiResponse.getHeaders() != null)
                 .flatMap(apiResponse -> apiResponse.getHeaders().entrySet().stream())
-                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
+                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
         List<NamedExample> opResponseLinksExamples = opResponses.stream()
                 .filter(apiResponse -> apiResponse.getLinks() != null)
                 .flatMap(apiResponse -> apiResponse.getLinks().values().stream())
                 .filter(link -> link.getHeaders() != null)
                 .flatMap(link -> link.getHeaders().entrySet().stream())
-                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
+                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
         // componentsExamples: Components > examples
         // componentsHeadersExamples: Components > Component > Headers > Header > examples
@@ -86,7 +121,7 @@ public class OpenAPIExtractor {
                 .orElse(Collections.emptyMap())
                 .entrySet()
                 .stream()
-                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
+                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
         Collection<NamedExample> componentsLinksExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getLinks() != null)
@@ -96,7 +131,7 @@ public class OpenAPIExtractor {
                 .stream()
                 .filter(link -> link.getHeaders() != null)
                 .flatMap(link -> link.getHeaders().entrySet().stream())
-                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getKey(), headerEntry.getValue()).stream())
+                .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
         Collection<NamedExample> componentsParamsExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getHeaders() != null)

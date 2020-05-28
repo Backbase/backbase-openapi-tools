@@ -29,6 +29,7 @@ BOAT is still under development and subject to change.
 * Use standardized swagger YAML output
 * Added Bean Validator in Code Generator
 * Changed Open API Loader to correctly resolve references from reading input location instead of string
+* Extract inline examples from the obtained OpenAPI spec and put them under <output-dir>/examples/ as json files.
 
 ## 0.1.5
 
@@ -55,21 +56,22 @@ BOAT is still under development and subject to change.
 
 # Build & Install
 
-```bash
+```shell script
 mvn install
 ```
 
 ## CLI Usage
 
 ### Convert RAML to Open API 3.0 
-```bash
+```shell script
 cd boat-terminal
 java -jar target/boat-terminal-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
   -f src/test/resources/api.raml
 ```
 
+
 ### Convert RAML to Open API 3.0 && Pipe output to file
-```bash
+```shell script
 cd boat-terminal
 java -jar target/boat-terminal-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
   -f src/test/resources/api.raml \
@@ -78,13 +80,24 @@ java -jar target/boat-terminal-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
 
 
 ### Convert RAML to Open API 3.0 file and verbose logging
-```bash
+```shell script
 cd boat-terminal
 java -jar target/boat-terminal-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
   -f src/test/resources/api.raml \
   -o swagger.yaml \
   -v
 ```
+
+### Convert RAML to Open API 3.0 with examples exploded into <output-dir>/examples/
+```shell script
+cd boat-terminal
+java -jar target/boat-terminal-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
+  -f src/test/resources/api.raml \
+  -o swagger.yaml \
+  -d my-open-api-spec/ \
+  -v
+```
+
 
 ## Maven Plugin Usage
 
