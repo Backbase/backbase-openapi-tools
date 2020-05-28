@@ -22,7 +22,8 @@ BOAT is still under development and subject to change.
 
 ## 0.1.7
 * Added configurable flag to add HttpServletRequest parameters to codegen'd server stubs.
-* Extract inline examples from the obtained OpenAPI spec and put them under <output-dir>/examples/ as json files.
+* Extract inline examples from the obtained OpenAPI spec and put them under '<output-dir>/examples/' as json files.
+* Changed the normalization of Schema Names to ensure existing casing is not lost
 
 ## 0.1.6
 * Added documentation on boat-maven-plugin

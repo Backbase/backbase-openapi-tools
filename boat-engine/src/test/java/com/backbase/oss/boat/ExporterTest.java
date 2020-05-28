@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class ExporterTest extends AbstractBoatEngineTests {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
@@ -27,6 +28,14 @@ public class ExporterTest extends AbstractBoatEngineTests {
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
+    }
+
+    @Test
+    public void normalizeNameTests(){
+        String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
+        System.out.println(s);
+        s = Utils.normalizeSchemaName("batchUpload-GET-Response");
+        System.out.println(s);
     }
 
     @Test
