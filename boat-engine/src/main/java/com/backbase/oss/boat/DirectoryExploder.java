@@ -18,6 +18,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+/**
+ * Explodes inline elements (currently only examples) into the output directory's examples/ subdirectory, as json files.
+ */
 public class DirectoryExploder {
 
     private static final Logger log = LoggerFactory.getLogger(DirectoryExploder.class);
@@ -29,11 +32,28 @@ public class DirectoryExploder {
     @NotNull
     private final ObjectWriter writer;
 
+    /**
+     * Constructs a new instance of a DirectoryExploder.
+     *
+     * @param openAPIExtractor extracts inline elements from the obtained OpenAPI spec.
+     * @param writer           writes the elements into files, with the configured format.
+     */
     public DirectoryExploder(@NotNull OpenAPIExtractor openAPIExtractor, @NotNull ObjectWriter writer) {
         this.openAPIExtractor = openAPIExtractor;
         this.writer = writer;
     }
 
+    /**
+     * Extracts inline examples from the spec by means of {@link OpenAPIExtractor#extractInlineExamples()}.
+     * Uses the extractor passed to the constructor.
+     * Writes the examples into the examples/ directory of {@code outputDir}.
+     * Cleans any existing content inside {@code outputDir} if present, but not that directory itself.
+     *
+     * @param outputDir the directory which will contain the exploded examples in the examples/ subdirectory.
+     *                  Can contain multiple directories, as in my-dir1/my-dir2/my-dir3.
+     *                  Using the correct file separator (/ or \) for the current file system is the responsibility of the caller.
+     * @throws IOException if the existing content of the {@code outputDir} cannot be deleted, or if {@code outputDir} cannot be created.
+     */
     public void serializeIntoDirectory(@NotNull String outputDir) throws IOException {
         List<NamedExample> examples = openAPIExtractor.extractInlineExamples();
         Path outputPath = Paths.get(outputDir);
@@ -54,7 +74,7 @@ public class DirectoryExploder {
                 }
                 Files.write(exampleFile, serializedValue.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
                 namedExample.getExample().setValue(null);
-                String $ref = "'" + EXAMPLES_DIR + File.separator + filename + "'";
+                String $ref = EXAMPLES_DIR + File.separator + filename;
                 namedExample.getExample().set$ref($ref);
             } catch (JsonProcessingException e) {
                 log.error("Could not serialize to JSON", e);
