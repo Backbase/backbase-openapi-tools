@@ -76,6 +76,7 @@ public class CodeGenMojo extends AbstractMojo {
     public static final String SERVER_VARIABLES = "server-variables";
     public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
     public static final String USE_CLASS_LEVEL_BEANVALIDATION = "useClassLevelBeanValidation";
+    public static final String ADD_SERVLET_REQUEST = "addServletRequest";
 
     /**
      * The build context is only avail when running from within eclipse.
@@ -420,6 +421,11 @@ public class CodeGenMojo extends AbstractMojo {
     protected boolean useClassLevelBeanValidation = false;
 
     /**
+     * Adds a HttpServletRequest object to the API definition method.
+     */
+    protected boolean addServletRequest = false;
+
+    /**
      * The project being built.
      */
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
@@ -635,6 +641,14 @@ public class CodeGenMojo extends AbstractMojo {
                         .parseBoolean((String) configOptions.get(USE_CLASS_LEVEL_BEANVALIDATION));
                 }
                 configurator.addAdditionalProperty(USE_CLASS_LEVEL_BEANVALIDATION, useClassLevelBeanValidation);
+
+                // Configures the addition of ServletRequests to API methods
+                if (configOptions.containsKey(ADD_SERVLET_REQUEST)) {
+                    addServletRequest = Boolean
+                        .parseBoolean((String) configOptions.get(ADD_SERVLET_REQUEST));
+                }
+                configurator.addAdditionalProperty(ADD_SERVLET_REQUEST, addServletRequest);
+
 
                 // Retained for backwards-compataibility with configOptions -> instantiation-types
                 if (instantiationTypes == null && configOptions.containsKey(INSTANTIATION_TYPES)) {
