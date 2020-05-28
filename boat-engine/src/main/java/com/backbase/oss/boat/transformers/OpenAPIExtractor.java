@@ -32,19 +32,19 @@ public class OpenAPIExtractor {
      * Extracts inline examples from the given {@link OpenAPI} instance.
      * A non-exhaustive list of examples that are extracted:
      * <ul>
-     *     <li>PathItem > Parameters > examples</li>
-     *     <li>PathItem > Operation > Parameters > examples</li>
-     *     <li>PathItem > Operation > Parameters > examples</li>
-     *     <li>PathItem > Operation > RequestBody > Content > MediaType > examples</li>
-     *     <li>PathItem > Operation > RequestBody > Content > MediaType > Encoding > Headers > Header > examples</li>
-     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Content > MediaType > examples</li>
-     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Content > Encoding > Headers > Header > examples</li>
-     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Headers > Header > examples</li>
-     *     <li>PathItem > Operation > ApiResponses > ApiResponse > Links > Link > Headers > Header > examples</li>
-     *     <li>Components > examples</li>
-     *     <li>componentsHeadersExamples: Components > Component > Headers > Header > examples</li>
-     *     <li>Components > Component > Links > Link > Headers > Header > examples</li>
-     *     <li>Components > Component > Links > Link > Headers > Header > examples</li>
+     *     <li>PathItem&gt;Parameters&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;Parameters&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;Parameters&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;RequestBody&gt;Content&gt;MediaType&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;RequestBody&gt;Content&gt;MediaType&gt;Encoding&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Content&gt;MediaType&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Content&gt;Encoding&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>Components&gt;examples</li>
+     *     <li>componentsHeadersExamples: Components&gt;Component&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>Components&gt;Component&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples</li>
+     *     <li>Components&gt;Component&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples</li>
      * </ul>
      * This list is not exhaustive because there are cases of recursion such as with headers.
      * Single examples of elements, which are represented as unnamed fields, such as {@link Parameter#getExample()} and
@@ -57,19 +57,19 @@ public class OpenAPIExtractor {
         Collection<PathItem> pathItems = Optional.ofNullable(openApi.getPaths())
                 .orElse(new Paths()) // empty
                 .values();
-        // pathItemParamsExamples: PathItem > Parameters > examples
+        // pathItemParamsExamples: PathItem&gt;Parameters&gt;examples
         List<NamedExample> pathItemParamsExamples = pathItems.stream()
                 .filter(pathItem -> pathItem.getParameters() != null)
                 .flatMap(pathItem -> pathItem.getParameters().stream())
                 .flatMap(parameter -> ExampleExtractors.parameterExamples(parameter).stream())
                 .collect(Collectors.toList());
-        // opParamsExamples: PathItem > Operation > Parameters > examples
-        // opRequestBodiesExamples: PathItem > Operation > RequestBody > Content > MediaType > examples
-        //                        + PathItem > Operation > RequestBody > Content > MediaType > Encoding > Headers > Header > examples
-        // opResponsesContentExamples: PathItem > Operation > ApiResponses > ApiResponse > Content > MediaType > examples
-        //                        + PathItem > Operation > ApiResponses > ApiResponse > Content > Encoding > Headers > Header > examples
-        // opResponsesHeadersExamples: PathItem > Operation > ApiResponses > ApiResponse > Headers > Header > examples
-        // opResponseLinksExamples: PathItem > Operation > ApiResponses > ApiResponse > Links > Link > Headers > Header > examples
+        // opParamsExamples: PathItem&gt;Operation&gt;Parameters&gt;examples
+        // opRequestBodiesExamples: PathItem&gt;Operation&gt;RequestBody&gt;Content&gt;MediaType&gt;examples
+        //                        + PathItem&gt;Operation&gt;RequestBody&gt;Content&gt;MediaType&gt;Encoding&gt;Headers&gt;Header&gt;examples
+        // opResponsesContentExamples: PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Content&gt;MediaType&gt;examples
+        //                        + PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Content&gt;Encoding&gt;Headers&gt;Header&gt;examples
+        // opResponsesHeadersExamples: PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Headers&gt;Header&gt;examples
+        // opResponseLinksExamples: PathItem&gt;Operation&gt;ApiResponses&gt;ApiResponse&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples
         List<Operation> ops = pathItems.stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
                 .collect(Collectors.toList());
@@ -103,10 +103,10 @@ public class OpenAPIExtractor {
                 .flatMap(link -> link.getHeaders().entrySet().stream())
                 .flatMap(headerEntry -> ExampleExtractors.headerExamples(headerEntry.getValue()).stream())
                 .collect(Collectors.toList());
-        // componentsExamples: Components > examples
-        // componentsHeadersExamples: Components > Component > Headers > Header > examples
-        // componentsLinksExamples: Components > Component > Links > Link > Headers > Header > examples
-        // componentsParamsExamples: Components > Component > Links > Link > Headers > Header > examples
+        // componentsExamples: Components&gt;examples
+        // componentsHeadersExamples: Components&gt;Component&gt;Headers&gt;Header&gt;examples
+        // componentsLinksExamples: Components&gt;Component&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples
+        // componentsParamsExamples: Components&gt;Component&gt;Links&gt;Link&gt;Headers&gt;Header&gt;examples
         Collection<NamedExample> componentsExamples = Optional.ofNullable(openApi.getComponents())
                 .filter(components -> components.getExamples() != null)
                 .map(Components::getExamples)
