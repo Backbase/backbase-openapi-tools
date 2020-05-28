@@ -20,12 +20,15 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change. 
 
+## 0.1.7
+* Added configurable flag to add HttpServletRequest parameters to codegen'd server stubs.
+
 ## 0.1.6
 * Added documentation on boat-maven-plugin
 * Upgraded YAML Libraries to improve output of YAML files
 * Use standardized swagger YAML output
 * Added Bean Validator in Code Generator
-* Changed Open API Loader to correctly resolve references from reading input location insteaf of string
+* Changed Open API Loader to correctly resolve references from reading input location instead of string
 
 ## 0.1.5
 
