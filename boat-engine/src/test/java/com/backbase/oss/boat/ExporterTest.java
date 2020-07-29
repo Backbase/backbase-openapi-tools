@@ -1,5 +1,7 @@
 package com.backbase.oss.boat;
 
+import static org.junit.Assert.assertNotNull;
+
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Decomposer;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -46,7 +48,10 @@ public class ExporterTest extends AbstractBoatEngineTests {
             .convertExamplesToYaml(false)
             .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
+        SwaggerParseResult swaggerParseResult = validateExport(export);
+        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/wallet/paymentcards"));
+        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/wallet/paymentcards/{cardId}"));
+        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
     }
 
 
@@ -69,7 +74,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
     }
 
 
-    protected void validateExport(String export) throws IOException, com.backbase.oss.boat.ExportException {
+    protected SwaggerParseResult validateExport(String export) throws IOException {
         if (export == null) {
             throw new ExportException("Invalid Export");
         }
@@ -86,6 +91,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         }
         Assert.assertTrue(swaggerParseResult.getMessages().isEmpty());
 
+        return swaggerParseResult;
     }
 
 
