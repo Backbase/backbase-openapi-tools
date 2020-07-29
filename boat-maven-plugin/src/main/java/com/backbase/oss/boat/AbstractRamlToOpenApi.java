@@ -100,6 +100,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "addAdditionalProperties")
     protected List<String> addAdditionalProperties = new ArrayList<>();
 
+    @Parameter(property = "additionalPropertiesType", defaultValue = "object")
+    protected String additionalPropertiesType;
+
 
     /**
      * Target directory for generated code. Use location relative to the project.baseDir. Default value is
@@ -173,7 +176,7 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             options.getTransformers().add(new Decomposer());
         }
         if (!addAdditionalProperties.isEmpty()) {
-            options.getTransformers().add(new AdditionalPropertiesAdder(addAdditionalProperties));
+            options.getTransformers().add(new AdditionalPropertiesAdder(addAdditionalProperties, additionalPropertiesType));
         }
 
         if (licenseName != null && licenseUrl != null) {
