@@ -20,6 +20,9 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change. 
 
+## 0.1.8
+* Reversed normalization of schema names as that causes stack overflow errors. 
+
 ## 0.1.7
 * Added configurable flag to add HttpServletRequest parameters to codegen'd server stubs.
 * Extract inline examples from the obtained OpenAPI spec and put them under '<output-dir>/examples/' as json files.
