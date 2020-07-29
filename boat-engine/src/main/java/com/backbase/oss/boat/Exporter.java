@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 public class Exporter {
 
     private static final Logger log = LoggerFactory.getLogger(Exporter.class);
-    private static final Pattern placeholderPattern = Pattern.compile("(\\{[^\\}]*\\})");
+    private static final Pattern placeholderPattern = Pattern.compile("(\\{[^}]*\\})");
     public static final String X_EXAMPLES = "x-examples";
     public static final String NO_DESCRIPTION_AVAILABLE = "No description available";
     private static final String NEW_LINE = "\n";
@@ -208,12 +208,7 @@ public class Exporter {
         Info info = setupInfo(ramlApi);
         List<Tag> tags = setupTags(ramlApi);
 
-        String ramlBaseUrl = ramlApi.baseUri() != null ? ramlApi.baseUri().value() : "/";
-        if (ramlBaseUrl.contains("{version}")) {
-            ramlBaseUrl = StringUtils.replace(ramlBaseUrl, "{version}", ramlApi.version().value());
-        }
-
-        String url = "/" + serviceName + "/" + ramlBaseUrl;
+        String url = "/" + serviceName + "/";
 
         List<Server> servers = new LinkedList<>();
         servers.add(
@@ -224,8 +219,10 @@ public class Exporter {
 
         Paths paths = new Paths();
 
+        String ramlBaseUrl = buildBaseUri(ramlApi);
+
         try {
-            convertResources(ramlApi.resources(), paths, components, jsonSchemaToOpenApi, operations);
+            convertResources(ramlBaseUrl, ramlApi.resources(), paths, components, jsonSchemaToOpenApi, operations);
         } catch (DerefenceException e) {
             throw new ExportException("Failed to dereference resources", e);
         }
@@ -251,6 +248,20 @@ public class Exporter {
         exporterOptions.getTransformers().forEach(transformer -> transformer.transform(openAPI, new HashMap()));
 
         return openAPI;
+    }
+
+    private String buildBaseUri(Api ramlApi) {
+        if (ramlApi.baseUri() == null) {
+            return  "/";
+        }
+        String ramlBaseUrl = ramlApi.baseUri().value();
+        if (!ramlBaseUrl.startsWith("/")) {
+            ramlBaseUrl = "/" + ramlBaseUrl;
+        }
+        if (ramlBaseUrl.contains("{version}")) {
+            ramlBaseUrl = StringUtils.replace(ramlBaseUrl, "{version}", ramlApi.version().value());
+        }
+        return ramlBaseUrl;
     }
 
     @SuppressWarnings("java:S3776")
@@ -408,7 +419,7 @@ public class Exporter {
         }
     }
 
-    private void convertResources(List<Resource> resources, Paths paths, Components components,
+    private void convertResources(String rootPath, List<Resource> resources, Paths paths, Components components,
         JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
         for (Resource resource : resources) {
@@ -419,27 +430,28 @@ public class Exporter {
                     resource.description() != null ? resource.description().value() : null,
                     resource.resourcePath());
             }
-            PathItem pathItem = convertResource(resource.resourcePath(), resource, components, jsonSchemaToOpenApi,
+            PathItem pathItem = convertResource(resource, components, jsonSchemaToOpenApi,
                 operations);
+            String path = rootPath + resource.resourcePath();
             if (!pathItem.readOperations().isEmpty()) {
-                paths.addPathItem(resource.resourcePath(), pathItem);
+                paths.addPathItem(path, pathItem);
             }
-            convertResources(resource.resources(), paths, components, jsonSchemaToOpenApi, operations);
+            convertResources(rootPath, resource.resources(), paths, components, jsonSchemaToOpenApi, operations);
         }
     }
 
-    private PathItem convertResource(String resourcePath, Resource resource, Components components,
+    private PathItem convertResource(Resource resource, Components components,
         JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
         throws ExportException, DerefenceException {
         PathItem pathItem = new PathItem();
         pathItem.summary(getDisplayName(resource.displayName()));
         pathItem.description(getDescription(resource));
-        mapUriParameters(resourcePath, resource, pathItem, components);
-        mapMethods(resourcePath, resource, pathItem, components, jsonSchemaToOpenApi, operationss);
+        mapUriParameters(resource, pathItem, components);
+        mapMethods(resource, pathItem, components, jsonSchemaToOpenApi, operationss);
         return pathItem;
     }
 
-    private void mapUriParameters(String resourcePath, Resource resource, PathItem pathItem,
+    private void mapUriParameters(Resource resource, PathItem pathItem,
         Components components) {
         Resource current = resource;
         Resource parent = current.parentResource();
@@ -453,7 +465,7 @@ public class Exporter {
                 if (pathItem.getParameters() != null && pathItem.getParameters().stream().anyMatch(
                     existingParam -> existingParam.getName().equals(parameter.getName()) && existingParam.getIn()
                         .equals(parameter.getIn()))) {
-                    log.warn("{} has double Parameter {} in path: {} Detected. ignoring", resourcePath,
+                    log.warn("{} has double Parameter {} in path: {} Detected. ignoring", resource.resourcePath(),
                         parameter.getName(), pathItem.getDescription());
                 } else {
                     pathItem.addParametersItem(parameter);
@@ -502,8 +514,8 @@ public class Exporter {
     private void log(TypeDeclaration typeDeclaration) {
         String description = getDescription(typeDeclaration.description());
         if (log.isDebugEnabled()) {
-            log.debug("Type name: {} type: {} displayName: {} defaultValue: {} description: {}"
-                , typeDeclaration.name(), typeDeclaration.type(), getDisplayName(typeDeclaration.displayName()),
+            log.debug("Type name: {} type: {} displayName: {} defaultValue: {} description: {}",
+                typeDeclaration.name(), typeDeclaration.type(), getDisplayName(typeDeclaration.displayName()),
                 typeDeclaration.defaultValue(), description);
 
         }
@@ -522,7 +534,7 @@ public class Exporter {
         return StringEscapeUtils.unescapeJavaScript(result);
     }
 
-    private void mapMethods(String resourcePath, Resource resource, PathItem pathItem, Components components,
+    private void mapMethods(Resource resource, PathItem pathItem, Components components,
         JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
         for (Method ramlMethod : resource.methods()) {
@@ -534,9 +546,10 @@ public class Exporter {
             addQueryParameters(ramlMethod, parameters, components);
 
             RequestBody requestBody = convertRequestBody(resource, ramlMethod, components, jsonSchemaToOpenApi);
+            String resourcePath = resource.resourcePath();
 
             String tag = Arrays.stream(resourcePath.substring(1).split("/")).findFirst().orElse("tag");
-            String operationId = getOperationId(resource, ramlMethod, operations, tag, requestBody);
+            String operationId = getOperationId(resource, ramlMethod, operations, requestBody);
             String description = getDescription(ramlMethod.description());
             String summary = getSummary(ramlMethod.description());
 
@@ -580,7 +593,7 @@ public class Exporter {
     }
 
     @SuppressWarnings("java:S3776")
-    private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations, String tag,
+    private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations,
         RequestBody requestBody) {
         AnnotableStringType annotableStringType = ramlMethod.displayName();
         String httpMethod;
@@ -593,7 +606,8 @@ public class Exporter {
 
         String operationId = httpMethod;
 
-        // If operationId is equal the http method name, take the display name  or resource path name of the raml resource
+        // If operationId is equal the http method name,
+        // take the display name  or resource path name of the raml resource
         if (operationId.equalsIgnoreCase(ramlMethod.method())) {
             operationId = Utils.normalizeDisplayName(StringUtils.substringAfterLast(resource.resourcePath(), "/"));
         }
@@ -624,8 +638,7 @@ public class Exporter {
             Optional<MediaType> first = requestBody.getContent().values().stream().findFirst();
             if (first.isPresent()) {
                 String ref = first.get().getSchema().get$ref();
-                String name = first.get().getSchema().getName();
-                String suffix = name;
+                String suffix = first.get().getSchema().getName();
                 if (suffix == null && ref != null) {
                     suffix = StringUtils.substringAfterLast(ref, "/");
                 }
@@ -915,7 +928,8 @@ public class Exporter {
     private String getDescription(Response ramlResponse) {
         String description = getDescription(ramlResponse.description());
         if (description == null) {
-            description = "Automagically created by RAML to Open API Exporter. Update RAML to include proper description for each response!";
+            description = "Automagically created by RAML to Open API Exporter. "
+                + "Update RAML to include proper description for each response!";
         }
         return description;
     }
