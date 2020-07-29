@@ -23,7 +23,7 @@ BOAT is still under development and subject to change.
 ## 0.1.8
 * Reversed normalization of schema names as that causes stack overflow errors. 
 * Fixed Base URL Conversion from RAML to OpenAPI
-* Specify ype when adding additional properties
+* Specify schema type when adding additional properties in Maven plugin using `additionalPropertiesType` configuration option
 
 
 ## 0.1.7
