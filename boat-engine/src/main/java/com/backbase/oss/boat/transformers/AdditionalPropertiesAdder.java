@@ -2,29 +2,31 @@ package com.backbase.oss.boat.transformers;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ObjectSchema;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
+@RequiredArgsConstructor
 public class AdditionalPropertiesAdder implements Transformer {
 
     private final List<String> schemaNames;
-
-    public AdditionalPropertiesAdder(List<String> schemaNames) {
-        this.schemaNames = schemaNames;
-    }
+    private final String additionsType;
 
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
-        openAPI.getComponents().getSchemas().values().stream()
-            .filter(schema -> schemaNames.contains(schema.getName()))
-            .forEach(schema -> {
-                log.info("Adding property: \"additions\" to Schema: {}", schema.getName());
+        openAPI.getComponents().getSchemas().entrySet().stream()
+            .filter(stringSchemaEntry -> schemaNames.contains(stringSchemaEntry.getKey()))
+            .forEach(stringSchemaEntry -> {
+                log.info("Adding property: \"additions\" to Schema: {}", stringSchemaEntry.getKey());
+                ObjectSchema additionsTypeSchema = new ObjectSchema();
+                additionsTypeSchema.setType(additionsType);
                 ObjectSchema propertiesItem = new ObjectSchema();
-                propertiesItem.setAdditionalProperties(true);
-                schema.addProperties("additions", propertiesItem);
+                propertiesItem.setType("object");
+                propertiesItem.setAdditionalProperties(additionsTypeSchema);
+                stringSchemaEntry.getValue().addProperties("additions", propertiesItem);
             });
     }
 }

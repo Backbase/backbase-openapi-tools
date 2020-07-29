@@ -35,7 +35,7 @@ public class TransformerTests extends AbstractBoatEngineTests {
     public void testPropertiesAdder() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-client-api/openapi.yaml"), false);
-        new AdditionalPropertiesAdder(Arrays.asList("PaymentCard", "TestValuesGetResponseBody"))
+        new AdditionalPropertiesAdder(Arrays.asList("PaymentCard", "TestValuesGetResponseBody"), "test")
             .transform(openAPI, null);
         String output = SerializerUtils.toYamlString(openAPI);
         writeOutput(output, "/openapi.yaml");
