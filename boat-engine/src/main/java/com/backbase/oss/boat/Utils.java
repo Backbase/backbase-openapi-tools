@@ -1,7 +1,6 @@
 package com.backbase.oss.boat;
 
 import static com.backbase.oss.boat.JsonSchemaToOpenApi.X_JAVA_TYPE;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -199,11 +198,10 @@ public class Utils {
 
     public static String normalizeSchemaName(String name) {
         if (name.contains("-")) {
-            // Split name on hyphens
-            name = name.replace("-", "");
+            name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, name);
+        } else {
+            name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
         }
-
-        name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
 
         name = name.replaceAll("[^A-Za-z0-9]", "");
         name = org.apache.commons.lang3.StringUtils.deleteWhitespace(name);
