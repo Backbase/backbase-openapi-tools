@@ -18,7 +18,10 @@ It currently consists of
 The project is very much Work In Progress and will be published on maven central when considered ready enough. 
 
 # Release Notes
-BOAT is still under development and subject to change. 
+BOAT is still under development and subject to change.
+
+## 0.1.9
+* Improved how services are named after base url conversion was introduced.
 
 ## 0.1.8
 * Reversed normalization of schema names as that causes stack overflow errors. 
