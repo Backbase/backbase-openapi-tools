@@ -136,7 +136,7 @@ public class {{classname}} {
         final String[] accepts = { {{#hasProduces}}
             {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}}
         {{/hasProduces}}};
-        final List<MediaType> acceptMediaTypes = apiClient.selectHeaderAccept(accepts);
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = { {{#hasConsumes}}
             {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}}
         {{/hasConsumes}}};
@@ -145,7 +145,7 @@ public class {{classname}} {
         String[] authNames = new String[] { {{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}} };
 
         {{#returnType}}ParameterizedTypeReference<{{{returnType}}}> returnType = new ParameterizedTypeReference<{{{returnType}}}>() {};{{/returnType}}{{^returnType}}ParameterizedTypeReference<Void> returnType = new ParameterizedTypeReference<Void>() {};{{/returnType}}
-        return apiClient.invokeAPI(path, HttpMethod.{{httpMethod}}, queryParams, postBody, headerParams, cookieParams, formParams, acceptMediaTypes, contentType, authNames, returnType);
+        return apiClient.invokeAPI(path, HttpMethod.{{httpMethod}}, queryParams, postBody, headerParams, cookieParams, formParams, accept, contentType, authNames, returnType);
     }
     {{/operation}}
 }
