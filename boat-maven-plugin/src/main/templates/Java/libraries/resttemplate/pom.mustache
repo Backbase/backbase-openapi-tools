@@ -163,7 +163,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.1.1</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -172,11 +175,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                  {{#java8}}
-                    <source>8</source>
-                  {{/java8}}
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -314,8 +312,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger-annotations-version>1.5.22</swagger-annotations-version>
         <spring-web-version>4.3.9.RELEASE</spring-web-version>
-        <jackson-version>2.10.1</jackson-version>
-        <jackson-databind-version>2.10.1</jackson-databind-version>
+        <jackson-version>2.10.3</jackson-version>
+        <jackson-databind-version>2.10.3</jackson-databind-version>
         <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
         {{#joda}}
         <jodatime-version>2.9.9</jodatime-version>

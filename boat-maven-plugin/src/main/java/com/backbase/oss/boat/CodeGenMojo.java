@@ -63,7 +63,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
  * Generates client/server code from an OpenAPI json/yaml definition.
  */
 @SuppressWarnings({"DefaultAnnotationParam","java:S3776","java:S5411"})
-@Mojo(name = "generate")
+@Mojo(name = "generate", threadSafe = true)
 @Slf4j
 public class CodeGenMojo extends AbstractMojo {
 
