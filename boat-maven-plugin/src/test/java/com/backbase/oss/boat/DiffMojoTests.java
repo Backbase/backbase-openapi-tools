@@ -10,6 +10,7 @@ import org.junit.Test;
 public class DiffMojoTests {
 
     @SneakyThrows
+    @Test
     public void testNonBreakingChange() {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
