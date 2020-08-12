@@ -3,6 +3,7 @@ package com.backbase.oss.boat.diff;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.qdesrame.openapi.diff.compare.OpenApiDiff;
 import com.qdesrame.openapi.diff.model.ChangedOpenApi;
+import com.qdesrame.openapi.diff.output.MarkdownRender;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -29,7 +30,7 @@ public class BatchOpenApiDiff {
 
     private static final Logger log = LoggerFactory.getLogger(BatchOpenApiDiff.class);
     private static final String X_CHANGELOG = "x-changelog";
-    private static MarkdownRender markdownRender = new MarkdownRender();
+    private static final MarkdownRender markdownRender = new MarkdownRender();
 
     @SuppressWarnings("squid:S2095")
     public static void diff(Path outputDirectory, Map<File, OpenAPI> success, Map<String, String> failed,
@@ -62,7 +63,7 @@ public class BatchOpenApiDiff {
                     compare = OpenApiDiff.compare(oldSpec, openAPI);
                     List<ChangedOpenApi> changeLog = getChangeLog(oldSpec);
                     changeLog.add(compare);
-                    String changelogMarkdown = renderChangeLog(markdownRender, changeLog);
+                    String changelogMarkdown = renderChangeLog(changeLog);
                     if (insertIntoSpec) {
                         writeChangelogInOpenAPI(openApiFilePath, changelogMarkdown);
                     }
@@ -92,7 +93,7 @@ public class BatchOpenApiDiff {
         Files.write(openApiFilePath, SerializerUtils.toYamlString(diffedApi).getBytes(), StandardOpenOption.CREATE);
     }
 
-    private static String renderChangeLog(MarkdownRender renderer, List<ChangedOpenApi> changeLog) {
+    private static String renderChangeLog(List<ChangedOpenApi> changeLog) {
         StringBuilder markDown = new StringBuilder();
         markDown.append("# Changelog\n");
         changeLog.forEach(diff -> {
@@ -102,13 +103,13 @@ public class BatchOpenApiDiff {
                 .append(diff.getNewSpecOpenApi().getInfo().getVersion())
                 .append("\n");
 
-            if (diff.isUnchanged()) {
+            if (diff.isDiff()) {
                 markDown.append("No Changes\n");
             } else {
-                if (diff.isIncompatible()) {
+                if (diff.isDiffBackwardCompatible()) {
                     markDown.append("**Note:** API has incompatible changes!!\n");
                 }
-                String changes = renderer.render(diff);
+                String changes = BatchOpenApiDiff.markdownRender.render(diff);
                 markDown.append(changes);
             }
         });
