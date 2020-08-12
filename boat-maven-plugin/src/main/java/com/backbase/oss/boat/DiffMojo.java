@@ -31,8 +31,6 @@ public class DiffMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
-
-
         ChangedOpenApi changedOpenApi = OpenApiCompare.fromFiles(oldFile, newFile);
 
         ConsoleRender consoleRender = new ConsoleRender();
