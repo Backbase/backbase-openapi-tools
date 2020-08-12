@@ -2,24 +2,28 @@ package com.backbase.oss.boat;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "generate-rest-template-embedded", threadSafe = true)
+@Mojo(name = "generate-spring-boot-embedded", threadSafe = true)
 @Slf4j
-public class RestTemplateClientGeneratorMojo extends AbstractCodeGenMojo {
+public class GenerateSpringBootEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
     protected boolean isGenerateSupportingFiles() {
-        return true;
+        return false;
     }
 
     @Override
     protected String getLibrary() {
-        return "resttemplate";
+        return "spring-boot";
     }
 
     @Override
     protected boolean isEmbedded() {
+        return true;
+    }
+
+    @Override
+    protected Boolean isReactive() {
         return true;
     }
 
