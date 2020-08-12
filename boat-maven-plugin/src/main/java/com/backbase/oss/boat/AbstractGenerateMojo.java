@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
 
-public abstract class AbstractCodeGenMojo extends CodeGenMojo {
+public abstract class AbstractGenerateMojo extends GenerateMojo {
 
     public void execute() throws MojoExecutionException {
         generatorName = "java";
@@ -18,6 +18,7 @@ public abstract class AbstractCodeGenMojo extends CodeGenMojo {
         options.put("library", getLibrary());
         options.put("java8", "true");
         options.put("dateLibrary", "java8");
+        options.put("reactive", isReactive().toString());
         configOptions = options;
         super.execute();
     }
@@ -27,4 +28,6 @@ public abstract class AbstractCodeGenMojo extends CodeGenMojo {
     protected abstract String getLibrary();
 
     protected abstract boolean isEmbedded();
+
+    protected abstract Boolean isReactive();
 }
