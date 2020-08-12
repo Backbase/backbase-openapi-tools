@@ -65,7 +65,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 @SuppressWarnings({"DefaultAnnotationParam","java:S3776","java:S5411"})
 @Mojo(name = "generate", threadSafe = true)
 @Slf4j
-public class CodeGenMojo extends AbstractMojo {
+public class GenerateMojo extends AbstractMojo {
 
 
     public static final String INSTANTIATION_TYPES = "instantiation-types";
