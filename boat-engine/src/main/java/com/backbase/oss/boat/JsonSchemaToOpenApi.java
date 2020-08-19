@@ -54,26 +54,23 @@ class JsonSchemaToOpenApi {
     public static final String JAVA_TYPE = "javaType";
     public static final String REF = "$ref";
     public static final String PROPERTIES = "properties";
+    public static final String JAVA_ENUM_NAMES = "javaEnumNames";
+    public static final String X_JAVA_ENUM_NAMES = "x-java-enum-names";
 
     private final URL baseUrl;
     private final Components components;
     private final Map<String, String> ramlTypeReferences;
-    private final boolean addJavaTypeExtensions;
+    private final Map<String, JsonNode> jsonSchemas;
+    private final BiMap<String, String> referenceNames;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    public JsonSchemaToOpenApi(URL baseUrl, Components components, Map<String, String> ramlTypeReferences, boolean addJavaTypeExtensions) {
-
+    public JsonSchemaToOpenApi(URL baseUrl, Components components, Map<String, String> ramlTypeReferences) {
         this.baseUrl = baseUrl;
         this.components = components;
         this.jsonSchemas = new TreeMap<>();
         this.referenceNames = HashBiMap.create();
         this.ramlTypeReferences = ramlTypeReferences;
-        this.addJavaTypeExtensions = addJavaTypeExtensions;
     }
-
-    private Map<String, JsonNode> jsonSchemas;
-    private BiMap<String, String> referenceNames;
 
 
     public Schema convert(String name, JSONTypeDeclaration typeDeclaration) throws ExportException {
@@ -95,7 +92,8 @@ class JsonSchemaToOpenApi {
                         components.addSchemas(schemaName, schema);
                         log.debug("Created new schema from: {} as: {} with ramlRef: {}", name, schemaName, ramlRef);
                     } else {
-                        log.debug("Used existing schema: {} resolved by javaType: {}", schemaName, schema.getExtensions().get(X_JAVA_TYPE));
+                        log.debug("Used existing schema: {} resolved by javaType: {}", schemaName,
+                            schema.getExtensions().get(X_JAVA_TYPE));
                     }
                 } else {
                     log.debug("Using existing schema: {}", schemaName);
@@ -104,7 +102,8 @@ class JsonSchemaToOpenApi {
                 JsonNode jsonSchema = objectMapper.readTree(type);
                 schema = Utils.resolveSchemaByJavaType(jsonSchema, components);
                 if (schema == null) {
-                    referenceNames.put(baseUrl.toString() + "/" + name + ".raml", name);
+                    String referenceName = baseUrl.toString() + "/" + name + ".raml";
+                    referenceNames.put(referenceName, name);
                     schema = createNewSchema(null, jsonSchema, name, components, baseUrl);
                     schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), true));
                     components.addSchemas(name, schema);
@@ -124,7 +123,8 @@ class JsonSchemaToOpenApi {
 
     }
 
-    public Schema createNewSchema(Schema parent, JsonNode type, String name, Components components, URL baseUrl) throws DerefenceException {
+    public Schema createNewSchema(Schema parent, JsonNode type, String name, Components components, URL baseUrl)
+        throws DerefenceException {
         log.debug("Creating Schema for: {} with path: {}", name, baseUrl);
         if (name.contains(" ")) {
             throw new RuntimeException("name cannot contain spaces");
@@ -161,15 +161,18 @@ class JsonSchemaToOpenApi {
 
                         JsonNode dereferenced = getJsonNode(absoluteReference);
                         extendedSchemaName = Utils.getSchemaNameFromJavaClass(dereferenced)
-                            .orElse(Utils.getSchemaNameFromReference(absoluteReference, schema.getName(), referenceNames));
+                            .orElse(
+                                Utils.getSchemaNameFromReference(absoluteReference, schema.getName(), referenceNames));
 
                         if (extendedSchemaName.equals(name)) {
                             extendedSchemaName += "Parent";
                         }
                         Schema extendedSchema = components.getSchemas().get(extendedSchemaName);
                         if (extendedSchema == null) {
-                            log.debug("Creating new schema for extended reference: {} with: {}", absoluteReference, absoluteReferenceParent);
-                            extendedSchema = createNewSchema(parent, dereferencedExtendedNode, extendedSchemaName, components, absoluteReferenceParent);
+                            log.debug("Creating new schema for extended reference: {} with: {}", absoluteReference,
+                                absoluteReferenceParent);
+                            extendedSchema = createNewSchema(parent, dereferencedExtendedNode, extendedSchemaName,
+                                components, absoluteReferenceParent);
 
 //                            dereferenceSchema(extendedSchema, components);
                             components.addSchemas(extendedSchemaName, extendedSchema);
@@ -181,11 +184,13 @@ class JsonSchemaToOpenApi {
                         extendedSchemaName = name + "Parent";
                         Schema extendedSchema = components.getSchemas().get(extendedSchemaName);
                         if (extendedSchema == null) {
-                            extendedSchema = createNewSchema(parent, extendsNode, extendedSchemaName, components, baseUrl);
+                            extendedSchema = createNewSchema(parent, extendsNode, extendedSchemaName, components,
+                                baseUrl);
                             components.addSchemas(extendedSchemaName, extendedSchema);
                         }
                     }
-                    ((ComposedSchema) schema).setAllOf(Collections.singletonList(new Schema().$ref(extendedSchemaName)));
+                    ((ComposedSchema) schema)
+                        .setAllOf(Collections.singletonList(new Schema().$ref(extendedSchemaName)));
                 } else {
                     schema = new ObjectSchema();
                 }
@@ -214,7 +219,8 @@ class JsonSchemaToOpenApi {
                 if (hasReference(itemJsonSchema)) {
                     String itemReference = itemJsonSchema.get("$ref").textValue();
                     String absoluteReference;
-                    if (StringUtils.isNotEmpty(itemReference) && !Utils.isUrl(itemReference) && !Utils.isFragment(itemReference)) {
+                    if (StringUtils.isNotEmpty(itemReference) && !Utils.isUrl(itemReference) && !Utils
+                        .isFragment(itemReference)) {
                         absoluteReference = Utils.getAbsoluteReference(baseUrl, itemReference).toString();
                     } else if (Utils.isFragment(itemReference) && Utils.isDirectory(baseUrl, itemReference)) {
                         absoluteReference = getReferenceFromParent(itemReference, parent);
@@ -225,10 +231,12 @@ class JsonSchemaToOpenApi {
                     if (!absoluteReference.equals(itemReference)) {
                         itemJsonSchema = ((ObjectNode) itemJsonSchema).set("$ref", new TextNode(absoluteReference));
                     }
-                    Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema, baseUrl, false);
+                    Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema,
+                        baseUrl, false);
                     ((ArraySchema) schema).setItems(itemSchema);
                 } else {
-                    Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema, baseUrl, false);
+                    Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema,
+                        baseUrl, false);
                     ((ArraySchema) schema).setItems(itemSchema);
                 }
 //                }
@@ -240,9 +248,10 @@ class JsonSchemaToOpenApi {
             case "anyOf":
                 schema = new ComposedSchema();
                 ArrayNode anyOfJsonSchmema = (ArrayNode) type.get("type");
-                Iterable<JsonNode> iterable = () -> anyOfJsonSchmema.elements();
+                Iterable<JsonNode> iterable = anyOfJsonSchmema::elements;
                 Stream<JsonNode> stream = StreamSupport.stream(iterable.spliterator(), false);
-                List<Schema> anyOfSchemas = stream.map(jsonNode -> new Schema().type(jsonNode.textValue())).collect(Collectors.toList());
+                List<Schema> anyOfSchemas = stream.map(jsonNode -> new Schema().type(jsonNode.textValue()))
+                    .collect(Collectors.toList());
                 ((ComposedSchema) schema).setAnyOf(anyOfSchemas);
                 break;
             default:
@@ -283,13 +292,11 @@ class JsonSchemaToOpenApi {
             $ref = getReferenceFromParent($ref, parent);
         }
         schema.set$ref($ref);
-        if (addJavaTypeExtensions) {
-            if (type.hasNonNull(JAVA_TYPE)) {
-                schema.addExtension(X_JAVA_TYPE, type.get(JAVA_TYPE).textValue());
-            }
-            if (type.hasNonNull("javaEnumNames")) {
-                schema.addExtension("x-java-enum-names", getEnum(type, "javaEnumNames"));
-            }
+        if (type.hasNonNull(JAVA_TYPE)) {
+            schema.addExtension(X_JAVA_TYPE, type.get(JAVA_TYPE).textValue());
+        }
+        if (type.hasNonNull(JAVA_ENUM_NAMES)) {
+            schema.addExtension(X_JAVA_ENUM_NAMES, getEnum(type, JAVA_ENUM_NAMES));
         }
         schema.setEnum(getEnum(type));
         return schema;
@@ -344,7 +351,8 @@ class JsonSchemaToOpenApi {
             String javaType = type.get(JAVA_TYPE).textValue();
             switch (javaType) {
                 case "java.util.Date":
-                    Optional<String> format = Optional.ofNullable(type.hasNonNull("format") ? type.get("format").textValue() : null);
+                    Optional<String> format = Optional
+                        .ofNullable(type.hasNonNull("format") ? type.get("format").textValue() : null);
                     return format.orElseGet(() -> "date-time");
                 case "java.lang.Long":
                     return "number";
@@ -410,7 +418,8 @@ class JsonSchemaToOpenApi {
         }
     }
 
-    private Schema mapProperty(Schema parent, Components components, String propertyName, ObjectNode jsonSchema, URL baseUrl, boolean derefence) throws DerefenceException {
+    private Schema mapProperty(Schema parent, Components components, String propertyName, ObjectNode jsonSchema,
+        URL baseUrl, boolean derefence) throws DerefenceException {
         Schema schema;
         boolean hasJsonRef = jsonSchema.has(REF) && StringUtils.isNotEmpty(jsonSchema.get(REF).textValue());
 
@@ -431,7 +440,8 @@ class JsonSchemaToOpenApi {
                 schema = Utils.resolveSchemaByJavaType(dereferencedJsonSchema, components);
                 if (schema == null) {
                     log.debug("Adding property {} schema to catalog as: {}", propertyName, schemaName);
-                    schema = createNewSchema(parent, dereferencedJsonSchema, schemaName, components, Utils.getAbsoluteReferenceParent(absoluteReference));
+                    schema = createNewSchema(parent, dereferencedJsonSchema, schemaName, components,
+                        Utils.getAbsoluteReferenceParent(absoluteReference));
                     components.addSchemas(schemaName, schema);
                     dereferenceSchema(schema, components);
                 } else {
@@ -508,7 +518,8 @@ class JsonSchemaToOpenApi {
                 if (components.getSchemas().containsKey(schemaName)) {
                     referencedSchema = components.getSchemas().get(schemaName);
                 } else {
-                    referencedSchema = createNewSchema(schema, dereferenced, schemaName, components, absoluteParentReference);
+                    referencedSchema = createNewSchema(schema, dereferenced, schemaName, components,
+                        absoluteParentReference);
                     components.addSchemas(schemaName, referencedSchema);
                     if (hasReference(referencedSchema)) {
                         dereferenceSchema(referencedSchema, components);
@@ -555,7 +566,8 @@ class JsonSchemaToOpenApi {
 
         dereferenced = objectMapper.readTree($ref.toURL());
         if ($ref.getFragment() != null) {
-            List<String> fragments = Arrays.stream($ref.getFragment().split("/")).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            List<String> fragments = Arrays.stream($ref.getFragment().split("/")).filter(StringUtils::isNotEmpty)
+                .collect(Collectors.toList());
             for (String fragment : fragments) {
                 dereferenced = dereferenced.get(fragment);
             }
@@ -574,8 +586,9 @@ class JsonSchemaToOpenApi {
             } else {
                 $ref = parentSchema.get$ref();
             }
-            if ($ref != null && !$ref.equals(reference))
+            if ($ref != null && !$ref.equals(reference)) {
                 return $ref;
+            }
             parentSchema = (Schema) parentSchema.getExtensions().get(X_RAML_PARENT);
         }
         return null;
@@ -589,7 +602,8 @@ class JsonSchemaToOpenApi {
         if (schema instanceof ArraySchema && ((ArraySchema) schema).getItems().get$ref() != null) {
             return true;
         }
-        if (schema.getProperties() != null && schema.getProperties().values().stream().anyMatch(property -> hasReference((Schema) property))) {
+        if (schema.getProperties() != null && schema.getProperties().values().stream()
+            .anyMatch(property -> hasReference((Schema) property))) {
             return true;
         }
         if (schema.getExtensions().containsKey(X_RAML_EXTENDS)) {
@@ -619,7 +633,8 @@ class JsonSchemaToOpenApi {
 
                 referencedSchema = Utils.resolveSchemaByJavaType(dereferenced, components);
                 if (referencedSchema == null) {
-                    referencedSchema = createNewSchema(schema, dereferenced, schemaName, components, Utils.getAbsoluteReferenceParent(reference));
+                    referencedSchema = createNewSchema(schema, dereferenced, schemaName, components,
+                        Utils.getAbsoluteReferenceParent(reference));
                     components.addSchemas(schemaName, referencedSchema);
                     if (hasReference(referencedSchema)) {
                         dereferenceSchema(referencedSchema, components);

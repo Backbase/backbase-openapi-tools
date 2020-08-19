@@ -1,9 +1,9 @@
 package com.backbase.oss.boat.diff;
 
 import com.backbase.oss.boat.serializer.SerializerUtils;
-import com.qdesrame.openapi.diff.compare.OpenApiDiff;
-import com.qdesrame.openapi.diff.model.ChangedOpenApi;
-import com.qdesrame.openapi.diff.output.MarkdownRender;
+import com.github.elibracha.compare.OpenApiDiff;
+import com.github.elibracha.model.ChangedOpenApi;
+import com.github.elibracha.output.MarkdownRender;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -103,10 +103,10 @@ public class BatchOpenApiDiff {
                 .append(diff.getNewSpecOpenApi().getInfo().getVersion())
                 .append("\n");
 
-            if (diff.isDiff()) {
+            if (diff.isDifferent()) {
                 markDown.append("No Changes\n");
             } else {
-                if (diff.isDiffBackwardCompatible()) {
+                if (diff.isCompatible()) {
                     markDown.append("**Note:** API has incompatible changes!!\n");
                 }
                 String changes = BatchOpenApiDiff.markdownRender.render(diff);
