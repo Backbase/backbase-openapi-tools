@@ -1,8 +1,8 @@
 package com.backbase.oss.boat;
 
-import com.qdesrame.openapi.diff.OpenApiCompare;
-import com.qdesrame.openapi.diff.model.ChangedOpenApi;
-import com.qdesrame.openapi.diff.output.ConsoleRender;
+import com.github.elibracha.OpenApiCompare;
+import com.github.elibracha.model.ChangedOpenApi;
+import com.github.elibracha.output.ConsoleRender;
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,7 +34,7 @@ public class DiffMojo extends AbstractMojo {
         ChangedOpenApi changedOpenApi = OpenApiCompare.fromFiles(oldFile, newFile);
 
         ConsoleRender consoleRender = new ConsoleRender();
-        if (!changedOpenApi.isDiffBackwardCompatible()) {
+        if (changedOpenApi.isIncompatible()) {
             log.error("\n{}", consoleRender.render(changedOpenApi));
             if (breakOnBreakingChanges) {
                 throw new MojoExecutionException("newFile: " + newFile + " contains breaking changes!");

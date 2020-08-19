@@ -27,13 +27,13 @@ public class ExporterTest extends AbstractBoatEngineTests {
     @Test
     public void testHelloWorld() throws Exception {
         File inputFile = getFile("/raml-examples/helloworld/helloworld.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
     }
 
     @Test
-    public void normalizeNameTests(){
+    public void normalizeNameTests() {
         String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
         System.out.println(s);
         s = Utils.normalizeSchemaName("batchUpload-GET-Response");

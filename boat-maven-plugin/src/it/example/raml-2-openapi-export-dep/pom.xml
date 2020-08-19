@@ -26,6 +26,13 @@
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
                 <version>@pom.version@</version>
+                <configuration>
+                    <ramlFileFilter>
+                        <ramlFileFilters>
+                            <ramlFileFilter>**/*.raml</ramlFileFilter>
+                        </ramlFileFilters>
+                    </ramlFileFilter>
+                </configuration>
             </plugin>
         </plugins>
     </build>
