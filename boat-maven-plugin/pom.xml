@@ -18,7 +18,9 @@
 
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
-
+        <sonar.coverage.exclusions>
+            src/main/java/com/backbase/oss/boat/GenerateMojo.java
+        </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
