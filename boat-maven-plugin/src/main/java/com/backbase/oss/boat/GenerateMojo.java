@@ -802,7 +802,7 @@ public class GenerateMojo extends AbstractMojo {
      * @return openapi specification file hash
      * @throws IOException When cannot read the file
      */
-    @SuppressWarnings({"java:S2095", "java:S4790","java:S5361"})
+    @SuppressWarnings({"java:S2095", "java:S4790"})
     private String calculateInputSpecHash(File inputSpecFile) throws IOException {
 
         URL inputSpecRemoteUrl = inputSpecRemoteUrl();
