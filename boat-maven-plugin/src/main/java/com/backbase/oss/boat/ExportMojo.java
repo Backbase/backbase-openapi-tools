@@ -1,7 +1,6 @@
 package com.backbase.oss.boat;
 
 import java.io.File;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -64,8 +63,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
             String ramlName = StringUtils.substringBeforeLast(file.getName(), ".");
             try {
                 File outputDirectory = new File(output, ramlName);
-                String name = project.getArtifactId() + ":" + project.getVersion() + ":" + ramlName;
-                export(name, null, file, outputDirectory);
+                export(null, file, outputDirectory);
                 getLog().info("Exported RAML Spec: " + ramlName);
             } catch (Exception e) {
                 failed.put(ramlName, e.getMessage());
