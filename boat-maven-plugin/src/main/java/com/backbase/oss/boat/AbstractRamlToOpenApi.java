@@ -5,7 +5,6 @@ import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
 import com.backbase.oss.boat.transformers.Decomposer;
 import com.backbase.oss.boat.transformers.Deprecator;
 import com.backbase.oss.boat.transformers.LicenseAdder;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -16,16 +15,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.Expand;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -103,6 +104,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(property = "additionalPropertiesType", defaultValue = "object")
     protected String additionalPropertiesType;
 
+    @Parameter(property = "continueOnError", defaultValue = "true")
+    protected boolean continueOnError;
 
     /**
      * Target directory for generated code. Use location relative to the project.baseDir. Default value is
@@ -129,6 +132,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
     protected List<RemoteRepository> remoteRepositories;
 
+    @Parameter(defaultValue = "**/*-api.raml,**/api.raml")
+    protected String ramlFileFilters;
+
 
     protected boolean isRamlSpec(File file) {
         return file.getName().equals("api.raml")
@@ -137,9 +143,9 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             || file.getName().endsWith("client-api.raml");
     }
 
-    protected File export(String name, String version, File ramlFile, File outputDirectory)
+    protected File export(String version, File ramlFile, File outputDirectory)
         throws ExportException, IOException {
-        getLog().info("Exporting " + name + " to: " + outputDirectory);
+        getLog().info("Exporting " + ramlFile.getAbsolutePath() + " to: " + outputDirectory);
 
         OpenAPI openApi = convert(version, ramlFile);
 
@@ -149,7 +155,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             outputDirectory.mkdirs();
         }
         File file = new File(outputDirectory, "openapi.yaml");
-        getLog().info("Writing Open API Specification to: " + file.getAbsolutePath());
         Files.write(file.toPath(), yaml.getBytes());
 
         File indexFile = new File(outputDirectory, "index.html");
@@ -176,7 +181,8 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
             options.getTransformers().add(new Decomposer());
         }
         if (!addAdditionalProperties.isEmpty()) {
-            options.getTransformers().add(new AdditionalPropertiesAdder(addAdditionalProperties, additionalPropertiesType));
+            options.getTransformers()
+                .add(new AdditionalPropertiesAdder(addAdditionalProperties, additionalPropertiesType));
         }
 
         if (licenseName != null && licenseUrl != null) {
@@ -328,32 +334,62 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
     protected List<File> exportArtifact(String groupId, String artifactId, String version, File artifactFile,
         File outputDirectory) throws MojoExecutionException {
 
-        log.info("Converting RAML specs from Artifact {}:{}:{}", groupId, artifactId, version);
+        log.info("Converting RAML specs from Artifact {}:{}:{} from: {}", groupId, artifactId, version, artifactFile);
 
         File specUnzipDirectory = new File(project.getBuild().getDirectory() + "/raml/" + version, artifactId);
         unzipSpec(artifactFile, specUnzipDirectory);
-        File[] files = specUnzipDirectory.listFiles(this::isRamlSpec);
-        assert files != null;
+        File[] files = findAllRamlSpecs(specUnzipDirectory);
+        ArrayUtils.reverse(files);
         List<File> exported = new ArrayList<>();
         for (File file : files) {
+
+            // If specs are 2 level deep, append directory name
             String ramlName = StringUtils.substringBeforeLast(file.getName(), ".");
+            File fileParent = file.getParentFile();
+
             try {
-                File parent = new File(outputDirectory, artifactId);
-                File openApiOutputDirectory = new File(parent, ramlName);
+                File parent;
+                File openApiOutputDirectory;
+                if (!fileParent.equals(specUnzipDirectory)) {
+                    parent = new File(outputDirectory, artifactId + File.separator + fileParent.getName() + File.separator + ramlName);
+                    openApiOutputDirectory = parent;
+                } else {
+                    parent = new File(outputDirectory, artifactId + File.separator + ramlName);
+                    openApiOutputDirectory = new File(parent, ramlName);
+                }
+
                 if (includeVersionInOutputDirectory) {
                     openApiOutputDirectory = new File(openApiOutputDirectory, version);
                 }
-                String name = artifactId + ":" + version + ":" + ramlName;
-                File exportedTo = export(name, version, file, openApiOutputDirectory);
+
+                File exportedTo = export(version, file, openApiOutputDirectory);
                 exported.add(exportedTo);
-                getLog().info("Exported RAML Spec: " + artifactId + " to: " + file);
+
             } catch (Exception e) {
-                getLog().warn(
-                    "Failed to export RAML Spec: " + artifactId + " due to: [" + e.getClass() + "] " + e.getMessage());
-                failed.put(artifactId + ":" + ramlName, e.getMessage());
+
+                if (!continueOnError) {
+                    throw new MojoExecutionException("Failed to export RAML: " + file.getAbsolutePath(), e);
+                } else {
+                    getLog().error(
+                        "Failed to export RAML Spec: " + file + " due to: [" + e.getClass() + "] " + e.getMessage());
+                    failed.put(artifactId + ":" + ramlName, e.getMessage());
+                }
+
             }
         }
+        getLog().info("Exported RAML Spec: " + artifactId + " to: " + outputDirectory);
         return exported;
+    }
+
+    private File[] findAllRamlSpecs(File specUnzipDirectory) {
+        DirectoryScanner directoryScanner = new DirectoryScanner();
+        directoryScanner.setBasedir(specUnzipDirectory);
+        directoryScanner.setIncludes(ramlFileFilters.replace(" ", "").split(","));
+        directoryScanner.scan();
+
+        String[] includedFiles = directoryScanner.getIncludedFiles();
+        return Arrays.stream(includedFiles).map(pathname -> new File(specUnzipDirectory, pathname))
+            .collect(Collectors.toList()).toArray(new File[]{});
     }
 
     private void unzipSpec(File inputFile, File unzipDirectory) throws MojoExecutionException {
