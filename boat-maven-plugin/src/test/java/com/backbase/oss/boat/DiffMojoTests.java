@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
 @Slf4j
+@SuppressWarnings("java:S2699")
 public class DiffMojoTests {
 
     @SneakyThrows

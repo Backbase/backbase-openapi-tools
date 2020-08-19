@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"Duplicates","java:S3776"})
 public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
@@ -237,7 +237,6 @@ public class Utils {
             return false;
         }
     }
-
 
     public static void cleanUp(Schema schema, boolean removeJavaExtensions) {
         if (schema == null) {

@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.raml.v2.api.model.v10.datamodel.JSONTypeDeclaration;
 
-@SuppressWarnings({"unchecked", "WeakerAccess", "rawtypes"})
+@SuppressWarnings({"unchecked", "WeakerAccess", "rawtypes","java:S3776", "java:S3740"})
 @Slf4j
 class JsonSchemaToOpenApi {
 
@@ -123,6 +123,7 @@ class JsonSchemaToOpenApi {
 
     }
 
+
     public Schema createNewSchema(Schema parent, JsonNode type, String name, Components components, URL baseUrl)
         throws DerefenceException {
         log.debug("Creating Schema for: {} with path: {}", name, baseUrl);
@@ -190,7 +191,7 @@ class JsonSchemaToOpenApi {
                         }
                     }
                     ((ComposedSchema) schema)
-                        .setAllOf(Collections.singletonList(new Schema().$ref(extendedSchemaName)));
+                        .setAllOf(Collections.singletonList(new ObjectSchema().$ref(extendedSchemaName)));
                 } else {
                     schema = new ObjectSchema();
                 }

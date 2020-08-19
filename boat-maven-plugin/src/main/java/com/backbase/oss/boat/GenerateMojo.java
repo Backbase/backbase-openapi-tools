@@ -760,7 +760,7 @@ public class GenerateMojo extends AbstractMojo {
                 for (CliOption langCliOption : config.cliOptions()) {
                     getLog().info("\t" + langCliOption.getOpt());
                     getLog().info("\t    "
-                        + langCliOption.getOptionHelp().replaceAll("\n", "\n\t    "));
+                        + langCliOption.getOptionHelp().replace("\n", "\n\t    "));
                 }
                 return;
             }
