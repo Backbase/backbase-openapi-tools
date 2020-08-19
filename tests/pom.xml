@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.1.9</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>tests</artifactId>
@@ -19,11 +19,6 @@
     <name>Tests</name>
 
     <dependencies>
-        <dependency>
-            <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-diff</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-engine</artifactId>
