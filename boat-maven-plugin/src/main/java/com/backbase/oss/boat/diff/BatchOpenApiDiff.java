@@ -14,10 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,49 +33,67 @@ public class BatchOpenApiDiff {
     @SuppressWarnings("squid:S2095")
     public static void diff(Path outputDirectory, Map<File, OpenAPI> success, Map<String, String> failed,
         boolean insertIntoSpec, boolean writeChangeLogToSeparateFile) throws IOException {
-        Map<Path, OpenAPI> specs = new LinkedHashMap<>();
 
-        Files.walk(outputDirectory)
+        List<Pair<Path, OpenAPI>> sortedSpecs = Files.walk(outputDirectory)
             .filter(Files::isRegularFile)
-            .filter(path -> path.toString().endsWith("openapi.yaml"))
-            .map(path -> {
-                SwaggerParseResult right = parseOpenAPI(path);
-                return Pair.of(path, right);
-            })
-            .filter(pair -> pair.getRight().getMessages().isEmpty())
-            .map(pair -> Pair.of(pair.getKey(), pair.getRight().getOpenAPI()))
-            .sorted((pair1, pair2) -> compareVersions(pair1.getRight().getInfo().getVersion(),
-                pair2.getRight().getInfo().getVersion()))
-            .forEach(tuple -> specs.put(tuple.getKey(), tuple.getValue()));
+            .filter(BatchOpenApiDiff::isOpenApiSpec)
+            .map(BatchOpenApiDiff::parseFileToParseResult)
+            .filter(BatchOpenApiDiff::isValidOpenApiSpec)
+            .map(BatchOpenApiDiff::mapToOpenAPIPair)
+            .sorted(BatchOpenApiDiff::sortVersions)
+            .collect(Collectors.toList());
 
-        for (Map.Entry<Path, OpenAPI> entry : specs.entrySet()) {
-            Path openApiFilePath = entry.getKey();
-            OpenAPI openAPI = entry.getValue();
-            String version = openAPI.getInfo().getVersion();
-            log.debug("Including Changelog for: {} with version: {}", openAPI.getInfo().getTitle(), version);
+        for (int i = 1; i < sortedSpecs.size(); i++) {
+            Pair<Path,OpenAPI> oldVersionPair = sortedSpecs.get(i-1);
+            Pair<Path,OpenAPI> newVersionPair = sortedSpecs.get(i);
 
-            previousVersion(openAPI, openApiFilePath, specs).ifPresent(oldSpec -> {
-                log.debug("Comparing versions: {} - {} ", version, oldSpec.getInfo().getVersion());
-                ChangedOpenApi compare;
-                try {
-                    compare = OpenApiDiff.compare(oldSpec, openAPI);
-                    List<ChangedOpenApi> changeLog = getChangeLog(oldSpec);
-                    changeLog.add(compare);
-                    String changelogMarkdown = renderChangeLog(changeLog);
-                    if (insertIntoSpec) {
-                        writeChangelogInOpenAPI(openApiFilePath, changelogMarkdown);
-                    }
-                    if (writeChangeLogToSeparateFile) {
-                        Path changeLogFile = openApiFilePath.getParent().resolve("changelog.md");
-                        Files.write(changeLogFile, changelogMarkdown.getBytes(), StandardOpenOption.CREATE);
-                    }
-                    openAPI.addExtension(X_CHANGELOG, changeLog);
-                    success.put(openApiFilePath.toFile(), openAPI);
-                } catch (Exception e) {
-                    failed.put(openApiFilePath.toString(), e.getMessage());
+            OpenAPI oldOpenAPI = oldVersionPair.getValue();
+            OpenAPI newOpenAPI = newVersionPair.getValue();
+            Path newOpenAPIPath = newVersionPair.getKey();
+
+            try {
+                ChangedOpenApi  compare = OpenApiDiff.compare(oldOpenAPI, newOpenAPI);
+                List<ChangedOpenApi> changeLog = getChangeLog(oldOpenAPI);
+                changeLog.add(compare);
+                String changelogMarkdown = renderChangeLog(changeLog);
+                if (insertIntoSpec) {
+                    writeChangelogInOpenAPI(newOpenAPIPath, changelogMarkdown);
                 }
-            });
+                if (writeChangeLogToSeparateFile) {
+                    Path changeLogFile = newOpenAPIPath.getParent().resolve("changelog.md");
+                    Files.write(changeLogFile, changelogMarkdown.getBytes(), StandardOpenOption.CREATE);
+                }
+                newOpenAPI.addExtension(X_CHANGELOG, changeLog);
+                success.put(newOpenAPIPath.toFile(), newOpenAPI);
+
+            log.info("Including Changelog for: {} with version: {}", newOpenAPI.getInfo().getTitle(), newOpenAPI.getInfo().getVersion());
+
+            } catch (Exception e) {
+                failed.put(newOpenAPI.toString(), e.getMessage());
+            }
         }
+    }
+
+    private static int sortVersions(Pair<Path, OpenAPI> pair1, Pair<Path, OpenAPI> pair2) {
+        return compareVersions(pair1.getRight().getInfo().getVersion(),
+            pair2.getRight().getInfo().getVersion());
+    }
+
+    private static Pair<Path, OpenAPI> mapToOpenAPIPair(Pair<Path, SwaggerParseResult> pair) {
+        return Pair.of(pair.getKey(), pair.getRight().getOpenAPI());
+    }
+
+    private static Pair<Path, SwaggerParseResult> parseFileToParseResult(Path path) {
+        SwaggerParseResult right = parseOpenAPI(path);
+        return Pair.of(path, right);
+    }
+
+    private static boolean isOpenApiSpec(Path path) {
+        return path.toString().endsWith(".yaml");
+    }
+
+    private static boolean isValidOpenApiSpec(Pair<Path, SwaggerParseResult> pair) {
+        return pair.getRight().getMessages().isEmpty();
     }
 
     private static void writeChangelogInOpenAPI(Path openApiFilePath, String changelogMarkdown) throws IOException {
@@ -103,10 +119,10 @@ public class BatchOpenApiDiff {
                 .append(diff.getNewSpecOpenApi().getInfo().getVersion())
                 .append("\n");
 
-            if (diff.isDifferent()) {
+            if (!diff.isDifferent()) {
                 markDown.append("No Changes\n");
             } else {
-                if (diff.isCompatible()) {
+                if (diff.isIncompatible()) {
                     markDown.append("**Note:** API has incompatible changes!!\n");
                 }
                 String changes = BatchOpenApiDiff.markdownRender.render(diff);
@@ -116,6 +132,7 @@ public class BatchOpenApiDiff {
         return markDown.toString();
     }
 
+    @SuppressWarnings("unchecked")
     private static List<ChangedOpenApi> getChangeLog(OpenAPI oldSpec) {
         List<ChangedOpenApi> changeLog;
         if (oldSpec.getExtensions() != null && oldSpec.getExtensions().containsKey(X_CHANGELOG)) {
@@ -125,27 +142,6 @@ public class BatchOpenApiDiff {
 
         }
         return changeLog;
-    }
-
-    @SuppressWarnings({"java:S2629","java:S1075", "java:S2095"})
-    private static Optional<OpenAPI> previousVersion(OpenAPI openApi, Path openApiPath, Map<Path, OpenAPI> specs) throws IOException {
-        List<Path> lowerVersions = Files.list(openApiPath.getParent().getParent())
-            .filter(otherVersionPath -> {
-                String otherVersion = otherVersionPath.getFileName().toString();
-                int compared = compareVersions(otherVersion, openApi.getInfo().getVersion());
-                return compared < 0;
-            })
-            .sorted().collect(Collectors.toList());
-
-        if (lowerVersions.isEmpty()) {
-            log.debug("No previous versions found for: {}", openApi.getInfo().getTitle());
-            return Optional.empty();
-        } else {
-            log.debug("{} previous versions: {}", openApi.getInfo().getTitle(), lowerVersions.stream().map(path -> path.getFileName().toString()).collect(Collectors.joining(", ")));
-            File previousVersion = new File(lowerVersions.get(lowerVersions.size() - 1).toFile(), "/openapi.yaml");
-            OpenAPI oldSpec = specs.get(previousVersion.toPath());
-            return Optional.of(oldSpec);
-        }
     }
 
     private static SwaggerParseResult parseOpenAPI(Path file) {
