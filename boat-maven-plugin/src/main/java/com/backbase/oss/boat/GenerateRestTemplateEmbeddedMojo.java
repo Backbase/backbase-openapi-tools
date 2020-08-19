@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "generate-rest-template-embedded", threadSafe = true)
@@ -8,24 +9,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class GenerateRestTemplateEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
-    protected boolean isGenerateSupportingFiles() {
-        return true;
+    public void execute() throws MojoExecutionException {
+        getLog().info("Generating Client using Spring Rest Template");
+        execute("java", "resttemplate", true, false, false);
     }
-
-    @Override
-    protected String getLibrary() {
-        return "resttemplate";
-    }
-
-    @Override
-    protected boolean isEmbedded() {
-        return true;
-    }
-
-    @Override
-    protected Boolean isReactive() {
-        return false;
-    }
-
-
 }

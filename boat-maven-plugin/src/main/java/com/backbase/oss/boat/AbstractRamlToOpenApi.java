@@ -351,10 +351,10 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
                 File parent;
                 File openApiOutputDirectory;
                 if (!fileParent.equals(specUnzipDirectory)) {
-                    parent = new File(outputDirectory, artifactId + "/" + fileParent.getName() + "/" + ramlName);
+                    parent = new File(outputDirectory, artifactId + File.separator + fileParent.getName() + File.separator + ramlName);
                     openApiOutputDirectory = parent;
                 } else {
-                    parent = new File(outputDirectory, artifactId + "/" + ramlName);
+                    parent = new File(outputDirectory, artifactId + File.separator + ramlName);
                     openApiOutputDirectory = new File(parent, ramlName);
                 }
 
