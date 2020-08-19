@@ -17,12 +17,12 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
     @Override
     public void execute() throws MojoExecutionException {
 
-        List<org.apache.maven.artifact.Artifact> collect1 = project.getArtifacts().stream()
+        List<org.apache.maven.artifact.Artifact> artifacts = project.getArtifacts().stream()
             .filter(dependency -> dependency.getGroupId().startsWith(includeGroupIds))
             .filter(dependency -> dependency.getArtifactId().endsWith("-spec"))
             .collect(Collectors.toList());
 
-        for (Artifact artifact : collect1) {
+        for (Artifact artifact : artifacts) {
             export(artifact);
         }
 
