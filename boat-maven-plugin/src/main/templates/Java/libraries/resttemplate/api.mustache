@@ -101,7 +101,7 @@ public class {{classname}} {
     @Deprecated
     {{/isDeprecated}}
     public ResponseEntity<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}WithHttpInfo({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) throws RestClientException {
-        Object postBody = {{#bodyParam}}{{paramName}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}};
+        Object localVarPostBody = {{#bodyParam}}{{paramName}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}};
         {{#allParams}}{{#required}}
         // verify the required parameter '{{paramName}}' is set
         if ({{paramName}} == null) {
@@ -109,43 +109,43 @@ public class {{classname}} {
         }
         {{/required}}{{/allParams}}{{#hasPathParams}}
         // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();{{#pathParams}}
-        uriVariables.put("{{baseName}}", {{#collectionFormat}}apiClient.collectionPathParameterToString(ApiClient.CollectionFormat.valueOf("{{{collectionFormat}}}".toUpperCase()), {{{paramName}}}){{/collectionFormat}}{{^collectionFormat}}{{{paramName}}}{{/collectionFormat}});{{/pathParams}}{{/hasPathParams}}
-        String path = apiClient.expandPath("{{{path}}}", {{#hasPathParams}}uriVariables{{/hasPathParams}}{{^hasPathParams}}Collections.<String, Object>emptyMap(){{/hasPathParams}});
+        final Map<String, Object> localVarUriVariables = new HashMap<String, Object>();{{#pathParams}}
+        localVarUriVariables.put("{{baseName}}", {{#collectionFormat}}apiClient.collectionPathParameterToString(ApiClient.CollectionFormat.valueOf("{{{collectionFormat}}}".toUpperCase()), {{{paramName}}}){{/collectionFormat}}{{^collectionFormat}}{{{paramName}}}{{/collectionFormat}});{{/pathParams}}{{/hasPathParams}}
+        String localVarPath = apiClient.expandPath("{{{path}}}", {{#hasPathParams}}localVarUriVariables{{/hasPathParams}}{{^hasPathParams}}Collections.<String, Object>emptyMap(){{/hasPathParams}});
 
-        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-        final HttpHeaders headerParams = new HttpHeaders();
-        final MultiValueMap<String, String> cookieParams = new LinkedMultiValueMap<String, String>();
-        final MultiValueMap formParams = new LinkedMultiValueMap();{{#hasQueryParams}}
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap localVarFormParams = new LinkedMultiValueMap();{{#hasQueryParams}}
 
-        {{#queryParams}}queryParams.putAll(apiClient.parameterToMultiValueMap({{#collectionFormat}}ApiClient.CollectionFormat.valueOf("{{{collectionFormat}}}".toUpperCase(Locale.ROOT)){{/collectionFormat}}{{^collectionFormat}}null{{/collectionFormat}}, "{{baseName}}", {{paramName}}));{{#hasMore}}
+        {{#queryParams}}localVarQueryParams.putAll(apiClient.parameterToMultiValueMap({{#collectionFormat}}ApiClient.CollectionFormat.valueOf("{{{collectionFormat}}}".toUpperCase(Locale.ROOT)){{/collectionFormat}}{{^collectionFormat}}null{{/collectionFormat}}, "{{baseName}}", {{paramName}}));{{#hasMore}}
         {{/hasMore}}{{/queryParams}}{{/hasQueryParams}}{{#hasHeaderParams}}
 
         {{#headerParams}}if ({{paramName}} != null)
-        headerParams.add("{{baseName}}", apiClient.parameterToString({{paramName}}));{{#hasMore}}
+        localVarHeaderParams.add("{{baseName}}", apiClient.parameterToString({{paramName}}));{{#hasMore}}
         {{/hasMore}}{{/headerParams}}{{/hasHeaderParams}}{{#hasCookieParams}}
 
         {{#cookieParams}}if ({{paramName}} != null)
-        cookieParams.add("{{baseName}}", apiClient.parameterToString({{paramName}}));{{#hasMore}}
+        localVarCookieParams.add("{{baseName}}", apiClient.parameterToString({{paramName}}));{{#hasMore}}
         {{/hasMore}}{{/cookieParams}}{{/hasCookieParams}}{{#hasFormParams}}
 
         {{#formParams}}if ({{paramName}} != null)
-            formParams.{{^collectionFormat}}add{{/collectionFormat}}{{#collectionFormat}}put{{/collectionFormat}}("{{baseName}}", {{#isFile}}new FileSystemResource({{paramName}}){{/isFile}}{{^isFile}}{{paramName}}{{/isFile}});{{#hasMore}}
+          localVarFormParams.{{^collectionFormat}}add{{/collectionFormat}}{{#collectionFormat}}put{{/collectionFormat}}("{{baseName}}", {{#isFile}}new FileSystemResource({{paramName}}){{/isFile}}{{^isFile}}{{paramName}}{{/isFile}});{{#hasMore}}
         {{/hasMore}}{{/formParams}}{{/hasFormParams}}
 
-        final String[] accepts = { {{#hasProduces}}
+        final String[] localVarAccepts = { {{#hasProduces}}
             {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}}
         {{/hasProduces}}};
-        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = { {{#hasConsumes}}
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { {{#hasConsumes}}
             {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}}
         {{/hasConsumes}}};
-        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] authNames = new String[] { {{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}} };
+        String[] localVarAuthNames = new String[] { {{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}} };
 
-        {{#returnType}}ParameterizedTypeReference<{{{returnType}}}> returnType = new ParameterizedTypeReference<{{{returnType}}}>() {};{{/returnType}}{{^returnType}}ParameterizedTypeReference<Void> returnType = new ParameterizedTypeReference<Void>() {};{{/returnType}}
-        return apiClient.invokeAPI(path, HttpMethod.{{httpMethod}}, queryParams, postBody, headerParams, cookieParams, formParams, accept, contentType, authNames, returnType);
+        {{#returnType}}ParameterizedTypeReference<{{{returnType}}}> localVarReturnType = new ParameterizedTypeReference<{{{returnType}}}>() {};{{/returnType}}{{^returnType}}ParameterizedTypeReference<Void> localVarReturnType = new ParameterizedTypeReference<Void>() {};{{/returnType}}
+        return apiClient.invokeAPI(localVarPath, HttpMethod.{{httpMethod}}, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
     }
     {{/operation}}
 }

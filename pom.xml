@@ -5,7 +5,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.1.9</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
@@ -62,7 +62,6 @@
 
     <modules>
         <module>boat-engine</module>
-        <module>boat-diff</module>
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
         <!-- Code Coverage Project -->
