@@ -20,6 +20,18 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.0
+* Created new Code Generation Mojos with opinionated settings for
+** Java Client with Spring WebClient (Reactive)
+** Java Server Stubs for WebFlux (Reactive)
+** Java Client with Spring Rest Template (Non Reactive)
+** Java Server Stubs for Spring Rest Controller (Non Reactive)
+** Improved Java Client API's to better cope with reserved words
+* Export Dependencies will now traverse through the artifact to find all raml specs
+* Improved RAML 2 Open API conversion
+* Upgraded OpenAPI Diff library to more current version
+* Mojo's can now break the build by setting `continueOnError` to false
+
 ## 0.1.9
 * Improved how services are named after base url conversion was introduced.
 
