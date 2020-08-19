@@ -41,7 +41,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
     }
 
     @Test
-    public void testWallet() throws Exception {
+    public void testWalletPresentation() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -52,6 +52,30 @@ public class ExporterTest extends AbstractBoatEngineTests {
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/wallet/paymentcards"));
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/wallet/paymentcards/{cardId}"));
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
+    }
+
+    @Test
+    public void testWalletIntegration() throws Exception {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-integration-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(false)
+            .transformers(Collections.singletonList(new Decomposer())));
+        String export = SerializerUtils.toYamlString(openAPI);
+        SwaggerParseResult swaggerParseResult = validateExport(export);
+        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/integration-api/v1/items"));
+    }
+
+    @Test
+    public void testWalletService() throws Exception {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(false)
+            .transformers(Collections.singletonList(new Decomposer())));
+        String export = SerializerUtils.toYamlString(openAPI);
+        SwaggerParseResult swaggerParseResult = validateExport(export);
+        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/service-api/v1/wallet/admin/{userId}/paymentcards"));
     }
 
 
