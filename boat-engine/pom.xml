@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,12 +16,19 @@
 
     <properties>
         <jackson.version>2.11.0</jackson.version>
-        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
         <version.openapi-parser>1.6.16</version.openapi-parser>
     </properties>
 
 
     <dependencies>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/me.andrz.jackson/jackson-json-reference-core -->
         <dependency>
@@ -35,28 +43,14 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>*</artifactId>
-
                 </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-            <scope>provided</scope>
-            <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.12</version>
             <scope>provided</scope>
         </dependency>
 
@@ -103,15 +97,6 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
-
-        <dependency>
-            <groupId>com.qdesrame</groupId>
-            <artifactId>openapi-diff</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>
