@@ -62,7 +62,6 @@
 
     <modules>
         <module>boat-engine</module>
-<!--        <module>boat-diff</module>-->
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
         <!-- Code Coverage Project -->
