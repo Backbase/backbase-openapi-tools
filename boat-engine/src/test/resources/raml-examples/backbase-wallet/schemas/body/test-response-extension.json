@@ -20,6 +20,18 @@
         "HTTP_STATUS_NOT_FOUND",
         "HTTP_STATUS_INTERNAL_SERVER_ERROR"
       ]
+    },
+    "polymorphic": {
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city":           { "type": "string" },
+        "state":          { "type": "string" }
+      },
+      "anyOf": [
+        { "type": "string", "maxLength": 5 },
+        { "type": "number", "minimum": 0 }
+      ]
     }
   }
 }

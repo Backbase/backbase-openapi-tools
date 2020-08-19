@@ -14,7 +14,6 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashSet;
@@ -23,13 +22,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@SuppressWarnings({"Duplicates","java:S3776","java:S3740"})
+@SuppressWarnings({"Duplicates", "java:S3776", "java:S3740"})
 public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
@@ -152,28 +150,14 @@ public class Utils {
             name = proposedName;
         } else {
             if (isUrl(reference)) {
-                if (contentsAreEqual(reference, existingRef)) {
-
-                    if (existingRef != null) {
-                        existingName = referenceNames.get(existingRef);
-                    }
-                    if (existingName.equals(proposedName)) {
-                        name = parentSchemaName + proposedName;
-                    } else {
-                        name = proposedName;
-                    }
-
-
-                } else {
-                    URL parent = getAbsoluteReferenceParent(reference);
-                    String parentName = getProposedSchemaName(
-                        parent.toString().substring(0, parent.toString().length() - 1));
-                    String newName = parentName + proposedName;
-                    log.warn("Schema Name already exists for: {}! Using: {}", proposedName, newName);
-                    proposedName = newName;
-                    referenceNames.put(reference, proposedName);
-                    name = proposedName;
-                }
+                URL parent = getAbsoluteReferenceParent(reference);
+                String parentName = getProposedSchemaName(
+                    parent.toString().substring(0, parent.toString().length() - 1));
+                String newName = parentName + proposedName;
+                log.warn("Schema Name already exists for: {}! Using: {}", proposedName, newName);
+                proposedName = newName;
+                referenceNames.put(reference, proposedName);
+                name = proposedName;
             } else {
                 String newName = proposedName + "Duplicate";
                 log.warn("Schema Name already exists for{}! Using: {}", proposedName, newName);
@@ -182,13 +166,6 @@ public class Utils {
             }
         }
         return name;
-    }
-
-    private static boolean contentsAreEqual(String reference, String existingName) throws IOException {
-        File file1 = new File("file1.txt");
-        File file2 = new File("file2.txt");
-        boolean isTwoEqual = FileUtils.contentEquals(file1, file2);
-        return isTwoEqual;
     }
 
     protected static String getProposedSchemaName(String absoluteReference) {
