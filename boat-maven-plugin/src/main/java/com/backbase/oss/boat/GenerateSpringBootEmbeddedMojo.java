@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "generate-spring-boot-embedded", threadSafe = true)
@@ -8,24 +9,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class GenerateSpringBootEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
-    protected boolean isGenerateSupportingFiles() {
-        return false;
+    public void execute() throws MojoExecutionException {
+        getLog().info("Generating Server Stubs using Spring Boot");
+        execute("spring", "spring-boot", true, false, false);
     }
-
-    @Override
-    protected String getLibrary() {
-        return "spring-boot";
-    }
-
-    @Override
-    protected boolean isEmbedded() {
-        return true;
-    }
-
-    @Override
-    protected Boolean isReactive() {
-        return true;
-    }
-
 
 }
