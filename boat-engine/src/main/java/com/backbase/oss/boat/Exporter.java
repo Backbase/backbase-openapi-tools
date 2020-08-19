@@ -53,6 +53,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.raml.v2.api.RamlModelBuilder;
@@ -80,9 +81,9 @@ public class Exporter {
     private static final Pattern placeholderPattern = Pattern.compile("(\\{[^}]*\\})");
     public static final String X_EXAMPLES = "x-examples";
     public static final String NO_DESCRIPTION_AVAILABLE = "No description available";
-    private static final String NEW_LINE = "\n";
+    public static final String NEW_LINE = "\n";
     public static final String EXAMPLE = "example";
-    private static ObjectMapper mapper = Utils.createObjectMapper();
+    private static final ObjectMapper mapper = Utils.createObjectMapper();
 
     private final ExporterOptions exporterOptions;
 
@@ -102,9 +103,10 @@ public class Exporter {
      */
     public static OpenAPI export(File inputFile, boolean addJavaTypeExtensions, List<Transformer> transformers)
         throws ExportException {
-
-        return export(inputFile,
-            new ExporterOptions().addJavaTypeExtensions(addJavaTypeExtensions).transformers(transformers));
+        ExporterOptions exporterOptions = new ExporterOptions();
+        exporterOptions.setAddJavaTypeExtensions(addJavaTypeExtensions);
+        exporterOptions.setTransformers(transformers);
+        return export(inputFile, exporterOptions);
     }
 
     /**
@@ -116,20 +118,22 @@ public class Exporter {
      * @throws ExportException things going south.
      */
     public static OpenAPI export(File inputFile, ExporterOptions options) throws ExportException {
-
         // Guess Service Name
         AtomicReference<String> serviceName = new AtomicReference<>("serviceName");
 
-        Arrays.stream(inputFile.getPath().split("/"))
+        String[] split = inputFile.getPath().split("/");
+        ArrayUtils.reverse(split);
+        Arrays.stream(split)
             .filter(part -> part.endsWith("-spec"))
             .findFirst()
             .ifPresent(s -> serviceName.set(s.replace("-spec", "-service")));
 
+        log.info("Export: {} with options: {}", inputFile, options);
         return new Exporter(options).export(serviceName.get(), inputFile);
     }
 
     @SuppressWarnings("java:S3776")
-    public OpenAPI export(String serviceName, File inputFile) throws ExportException {
+    private OpenAPI export(String serviceName, File inputFile) throws ExportException {
 
         File parentFile = inputFile.getParentFile();
         URL baseUrl;
@@ -164,8 +168,8 @@ public class Exporter {
         JsonSchemaToOpenApi jsonSchemaToOpenApi = new JsonSchemaToOpenApi(
             baseUrl,
             components,
-            ramlTypeReferences,
-            exporterOptions.isAddJavaTypeExtensions());
+            ramlTypeReferences
+        );
 
         assert ramlApi != null;
         Map<String, TypeDeclaration> types = collectTypesFromRamlSpec(ramlApi);
@@ -203,7 +207,7 @@ public class Exporter {
                 throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
             }
         }
-        components.getSchemas().values().forEach(Utils::cleanUp);
+        components.getSchemas().values().forEach(schema1 -> Utils.cleanUp(schema1, !exporterOptions.isAddJavaTypeExtensions()));
 
         Info info = setupInfo(ramlApi);
         List<Tag> tags = setupTags(ramlApi);
@@ -243,7 +247,7 @@ public class Exporter {
                 throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
             }
         }
-        components.getSchemas().values().forEach(Utils::cleanUp);
+        components.getSchemas().values().forEach(schema -> Utils.cleanUp(schema, !exporterOptions.isAddJavaTypeExtensions()));
 
         exporterOptions.getTransformers().forEach(transformer -> transformer.transform(openAPI, new HashMap()));
 
@@ -252,7 +256,7 @@ public class Exporter {
 
     private String buildBaseUri(Api ramlApi) {
         if (ramlApi.baseUri() == null) {
-            return  "/";
+            return "/";
         }
         String ramlBaseUrl = ramlApi.baseUri().value();
         if (!ramlBaseUrl.startsWith("/")) {
@@ -704,7 +708,7 @@ public class Exporter {
                         "Cannot dereference inline schema: : " + jsonType.schemaContent() + " for response: "
                             + resourcePath);
                 }
-                Utils.cleanUp(annotationSchema);
+                Utils.cleanUp(annotationSchema, !exporterOptions.isAddJavaTypeExtensions());
             } else {
                 String modelName = Utils.getProposedSchemaName(jsonType.type());
                 annotationSchema = components.getSchemas().get(modelName);
@@ -839,7 +843,7 @@ public class Exporter {
                     jsonSchemaToOpenApi.dereferenceSchema(bodySchema, components);
 
                     mediaType.setSchema(bodySchema);
-                    Utils.cleanUp(bodySchema);
+                    Utils.cleanUp(bodySchema, !exporterOptions.isAddJavaTypeExtensions());
                 }
                 mediaType.setSchema(new Schema().$ref(name));
             } else {
