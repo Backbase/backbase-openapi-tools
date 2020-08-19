@@ -16,6 +16,9 @@
 
     <properties>
         <jackson.version>2.11.0</jackson.version>
+        <sonar.coverage.exclusions>
+            src/main/java/com/backbase/oss/boat/ExporterOptions.java
+        </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <version.openapi-parser>1.6.16</version.openapi-parser>
