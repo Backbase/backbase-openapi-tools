@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@SuppressWarnings({"Duplicates","java:S3776"})
+@SuppressWarnings({"Duplicates","java:S3776","java:S3740"})
 public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);

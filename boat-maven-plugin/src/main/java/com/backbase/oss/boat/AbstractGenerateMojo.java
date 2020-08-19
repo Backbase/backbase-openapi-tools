@@ -12,7 +12,7 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("library", library);
         options.put("java8", "true");
         options.put("dateLibrary", "java8");
-        options.put("reactive", Boolean.valueOf(reactive).toString());
+        options.put("reactive", Boolean.toString(reactive));
         options.put("performBeanValidation", "true");
         options.put("skipDefaultInterface", "true");
         options.put("interfaceOnly", "true");

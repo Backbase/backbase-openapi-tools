@@ -10,6 +10,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -56,6 +57,9 @@ public class ExportDependencyMojoTests {
         mojo.output = new File("target/export-dep");
         mojo.continueOnError = false;
         mojo.execute();
+
+        Assert.assertTrue(new File("target/export-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
+
     }
 
     private File getFile(String fileName) {
