@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "generate-webclient-embedded", threadSafe = true)
@@ -8,24 +9,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class GenerateWebClientEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
-    protected boolean isGenerateSupportingFiles() {
-        return true;
+    public void execute() throws MojoExecutionException {
+        getLog().info("Generating Server Stubs using Web Client Boot");
+        execute("java", "webclient", true, true, false);
     }
-
-    @Override
-    protected String getLibrary() {
-        return "webclient";
-    }
-
-    @Override
-    protected boolean isEmbedded() {
-        return true;
-    }
-
-    @Override
-    protected Boolean isReactive() {
-        return false;
-    }
-
 
 }

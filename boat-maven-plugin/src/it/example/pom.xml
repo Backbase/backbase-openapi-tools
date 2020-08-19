@@ -17,6 +17,9 @@
         <module>raml-spec-bom-version-2</module>
         <module>raml-2-openapi-export-dep</module>
         <module>raml-2-openapi-export-bom</module>
+        <module>raml-2-openapi-generate-rest-template-embedded</module>
+        <module>raml-2-openapi-generate-spring-boot-embedded</module>
+        <module>raml-2-openapi-generate-webclient-embedded</module>
     </modules>
 
 
