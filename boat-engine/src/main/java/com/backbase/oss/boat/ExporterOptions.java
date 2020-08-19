@@ -3,21 +3,23 @@ package com.backbase.oss.boat;
 import com.backbase.oss.boat.transformers.Transformer;
 import java.util.LinkedList;
 import java.util.List;
+import lombok.Data;
 
+@Data
 public class ExporterOptions {
 
-    private boolean addJavaTypeExtensions;
-
-    private  boolean convertExamplesToYaml = true;
-
+    private boolean addJavaTypeExtensions = false;
+    private boolean convertExamplesToYaml = true;
     private List<Transformer> transformers = new LinkedList<>();
 
-    public boolean isAddJavaTypeExtensions() {
-        return addJavaTypeExtensions;
+    public ExporterOptions convertExamplesToYaml(boolean convertExamplesToYaml) {
+        this.convertExamplesToYaml = convertExamplesToYaml;
+        return this;
     }
 
-    public void setAddJavaTypeExtensions(boolean addJavaTypeExtensions) {
-        this.addJavaTypeExtensions = addJavaTypeExtensions;
+    public ExporterOptions transformers(List<Transformer> transformers) {
+        this.transformers = transformers;
+        return this;
     }
 
     public ExporterOptions addJavaTypeExtensions(boolean addJavaTypeExtensions) {
@@ -25,29 +27,4 @@ public class ExporterOptions {
         return this;
     }
 
-    public boolean isConvertExamplesToYaml() {
-        return convertExamplesToYaml;
-    }
-
-    public void setConvertExamplesToYaml(boolean convertExamplesToYaml) {
-        this.convertExamplesToYaml = convertExamplesToYaml;
-    }
-
-    public ExporterOptions convertExamplesToYaml(boolean convertExamplesToYaml) {
-        this.convertExamplesToYaml = convertExamplesToYaml;
-        return this;
-    }
-
-    public List<Transformer> getTransformers() {
-        return transformers;
-    }
-
-    public void setTransformers(List<Transformer> transformers) {
-        this.transformers = transformers;
-    }
-
-    public ExporterOptions transformers(List<Transformer> transformers) {
-        this.transformers = transformers;
-        return this;
-    }
 }

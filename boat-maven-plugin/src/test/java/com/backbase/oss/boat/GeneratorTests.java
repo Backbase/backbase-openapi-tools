@@ -13,7 +13,7 @@ public class GeneratorTests {
 
     @Test
     public void testHTML2() throws MojoExecutionException {
-        CodeGenMojo mojo = new CodeGenMojo();
+        GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
         File input = new File(inputFile);
