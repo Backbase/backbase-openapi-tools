@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.1.9</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>boat-maven-plugin</artifactId>
@@ -18,7 +18,9 @@
 
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
-
+        <sonar.coverage.exclusions>
+            src/main/java/com/backbase/oss/boat/GenerateMojo.java
+        </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -33,10 +35,17 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.github.elibracha/openapi-diff -->
         <dependency>
-            <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-diff</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.github.elibracha</groupId>
+            <artifactId>openapi-diff</artifactId>
+            <version>2.3.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -70,6 +79,12 @@
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator</artifactId>
             <version>${openapi-generator.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -91,6 +106,13 @@
             <version>${maven.api.version}</version>
             <scope>provided</scope>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <version>1.2.3</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
