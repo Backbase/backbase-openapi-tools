@@ -4,7 +4,6 @@ import com.backbase.oss.boat.diff.model.Changed;
 import com.backbase.oss.boat.diff.model.ChangedApiResponse;
 import com.backbase.oss.boat.diff.model.ChangedContent;
 import com.backbase.oss.boat.diff.model.ChangedMediaType;
-import com.backbase.oss.boat.diff.model.ChangedMetadata;
 import com.backbase.oss.boat.diff.model.ChangedOpenApi;
 import com.backbase.oss.boat.diff.model.ChangedOperation;
 import com.backbase.oss.boat.diff.model.ChangedParameter;
@@ -23,22 +22,21 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings({"java:S3740","java:S117","java:S100"})
 public class ConsoleRender implements Render {
+
     private static final int LINE_LENGTH = 74;
+    public static final String CHANGED = "Changed ";
     protected static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
     protected ChangedOpenApi diff;
 
-    private StringBuilder output;
-
     @Override
     public String render(ChangedOpenApi diff) {
+        StringBuilder output =  new StringBuilder();
         this.diff = diff;
-        output = new StringBuilder();
         if (diff.isUnchanged()) {
             output.append("No differences. Specifications are equivalents");
         } else {
@@ -173,7 +171,7 @@ public class ConsoleRender implements Render {
             sb.append(itemResponse("Deleted ", propName));
         }
         for (String propName : changedResponses.keySet()) {
-            sb.append(itemChangedResponse("Changed ", propName, changedResponses.get(propName)));
+            sb.append(itemChangedResponse(CHANGED, propName, changedResponses.get(propName)));
         }
         return sb.toString();
     }
@@ -215,7 +213,7 @@ public class ConsoleRender implements Render {
         }
         for (String propName : changedContent.getChanged().keySet()) {
             sb.append(
-                    itemContent("Changed ", propName, changedContent.getChanged().get(propName), isRequest));
+                    itemContent(CHANGED, propName, changedContent.getChanged().get(propName), isRequest));
         }
         return sb.toString();
     }
@@ -338,7 +336,7 @@ public class ConsoleRender implements Render {
         if (changeParam.isDeprecated()) {
             return itemParam("Deprecated ", changeParam.getNewParameter());
         } else {
-            return itemParam("Changed ", changeParam.getNewParameter());
+            return itemParam(CHANGED, changeParam.getNewParameter());
         }
     }
 

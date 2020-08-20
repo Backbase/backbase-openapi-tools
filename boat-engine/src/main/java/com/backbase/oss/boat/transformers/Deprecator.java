@@ -1,6 +1,7 @@
 package com.backbase.oss.boat.transformers;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -19,7 +20,7 @@ public class Deprecator implements Transformer {
 
         openAPI.getPaths().forEach((s, pathItem) -> {
 
-            if (pathItem.getGet() != null && pathItem.getGet().getDeprecated() != null && pathItem.getGet().getDeprecated().booleanValue()) {
+            if (isGetDeprecated(pathItem)) {
                 pathItem.setGet(null);
             }
             if (pathItem.getDelete() != null && pathItem.getDelete().getDeprecated() != null && pathItem.getDelete().getDeprecated().booleanValue()) {
@@ -61,6 +62,11 @@ public class Deprecator implements Transformer {
         });
 
         openAPI.getComponents().getSchemas().values().stream().forEach(Deprecator::removeDeprecatedProperties);
+    }
+
+    private boolean isGetDeprecated(PathItem pathItem) {
+        return pathItem.getGet() != null && pathItem.getGet().getDeprecated() != null && pathItem.getGet()
+            .getDeprecated();
     }
 
     private static void removeDeprecatedContent(Content content) {
