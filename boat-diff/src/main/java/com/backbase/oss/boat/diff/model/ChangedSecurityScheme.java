@@ -40,6 +40,7 @@ public class ChangedSecurityScheme implements ComposedChanged {
   }
 
   @Override
+  @SuppressWarnings("java:S2589")
   public DiffResult isCoreChanged() {
     if (!changedType
         && !changedIn

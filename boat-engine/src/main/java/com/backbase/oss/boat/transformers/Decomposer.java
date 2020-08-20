@@ -1,11 +1,9 @@
 package com.backbase.oss.boat.transformers;
 
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
+@SuppressWarnings("java:S3740")
 public class Decomposer implements Transformer {
 
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
@@ -22,11 +21,7 @@ public class Decomposer implements Transformer {
             .filter(schema -> schema instanceof ComposedSchema)
             .collect(Collectors.toList());
 
-        composedSchemas.forEach(composedSchema -> {
-
-            mergeComposedSchema(openAPI, composedSchema);
-
-        });
+        composedSchemas.forEach(composedSchema -> mergeComposedSchema(openAPI, composedSchema));
 
         for (Schema composedSchema : composedSchemas) {
             ((ComposedSchema) composedSchema).setAllOf(null);
@@ -43,8 +38,8 @@ public class Decomposer implements Transformer {
                 }
                 return schema;
             })
-            .peek(schema -> log.debug("Merging properties from referenced Schema: {}", schema.getName()))
             .forEach(schema -> {
+                log.debug("Merging properties from referenced Schema: {}", schema.getName());
                 if (schema instanceof ComposedSchema)
                     mergeComposedSchema(openAPI, schema);
 
@@ -68,9 +63,5 @@ public class Decomposer implements Transformer {
         composedSchema.getProperties().putAll(schema.getProperties());
     }
 
-
-    private static Schema getSchemaByRef(String $ref, Components components) {
-        return components.getSchemas().get(StringUtils.substringAfterLast($ref, "/"));
-    }
 
 }

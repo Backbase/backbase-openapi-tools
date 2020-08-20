@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@SuppressWarnings({"rawtypes", "java:S100", "java:S117", "java:S3740"})
 public class HtmlRender implements Render {
 
     public static final String BOOSTRAP_CSS = "https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css";
@@ -57,16 +58,18 @@ public class HtmlRender implements Render {
     public static final String BOOTSTRAP_CSS_THEME_SHA = "sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ";
     public static final String BOOTSTRAP_JS_SHA = "sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd";
     public static final String BOOSTRAP_JS = "https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js";
-    private String title;
+    public static final String CROSSORIGIN = "crossorigin";
+    public static final String ANONYMOUS = "anonymous";
+    public static final String INTEGRITY = "integrity";
+    public static final String STYLESHEET = "stylesheet";
+    public static final String COMMENT = "comment";
+    public static final String MISSING = "missing";
+    private final String title;
     protected static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
     protected ChangedOpenApi diff;
 
     public HtmlRender() {
-        this("Api Change Log", "http://deepoove.com/swagger-diff/stylesheets/demo.css");
-    }
-
-    public HtmlRender(String title, String linkCss) {
-        this.title = title;
+        this("Api Change Log");
     }
 
     public HtmlRender(String title) {
@@ -102,15 +105,15 @@ public class HtmlRender implements Render {
                         .with(
                             meta().withCharset("utf-8"),
                             title(title),
-                            link().withRel("stylesheet").withHref(BOOSTRAP_CSS)
-                                .attr("crossorigin", "anonymous")
-                                .attr("integrity", BOOTSTRAP_CSS_SHA),
-                            link().withRel("stylesheet").withHref(BOOTSTRAP_THEME_CSS)
-                                .attr("crossorigin", "anonymous")
-                                .attr("integrity", BOOTSTRAP_CSS_THEME_SHA),
+                            link().withRel(STYLESHEET).withHref(BOOSTRAP_CSS)
+                                .attr(CROSSORIGIN, ANONYMOUS)
+                                .attr(INTEGRITY, BOOTSTRAP_CSS_SHA),
+                            link().withRel(STYLESHEET).withHref(BOOTSTRAP_THEME_CSS)
+                                .attr(CROSSORIGIN, ANONYMOUS)
+                                .attr(INTEGRITY, BOOTSTRAP_CSS_THEME_SHA),
                             script().withSrc(BOOSTRAP_JS)
-                                .attr("integrity", BOOTSTRAP_JS_SHA)
-                                .attr("crossorigin", "anonymous")
+                                .attr(INTEGRITY, BOOTSTRAP_JS_SHA)
+                                .attr(CROSSORIGIN, ANONYMOUS)
                         ),
 
                     body()
@@ -200,7 +203,6 @@ public class HtmlRender implements Render {
                 ul_detail.with(
                     li().with(h3("Request"))
                         .with(ul_request(changedOperation.getRequestBody().getContent())));
-            } else {
             }
             if (changedOperation.resultApiResponses().isDifferent()) {
                 ul_detail.with(
@@ -241,36 +243,33 @@ public class HtmlRender implements Render {
         Map<String, ApiResponse> delResponses = changedApiResponse.getMissing();
         Map<String, ChangedResponse> changedResponses = changedApiResponse.getChanged();
         ContainerTag ul = ul().withClass("change response");
-        for (String propName : addResponses.keySet()) {
-            ul.with(li_addResponse(propName, addResponses.get(propName)));
-        }
-        for (String propName : delResponses.keySet()) {
-            ul.with(li_missingResponse(propName, delResponses.get(propName)));
-        }
-        for (String propName : changedResponses.keySet()) {
-            ul.with(li_changedResponse(propName, changedResponses.get(propName)));
-        }
+        addResponses.keySet().stream().map(propName -> li_addResponse(propName, addResponses.get(propName)))
+            .forEach(ul::with);
+        delResponses.keySet().stream().map(propName -> li_missingResponse(propName, delResponses.get(propName)))
+            .forEach(ul::with);
+        changedResponses.keySet().stream().map(propName -> li_changedResponse(propName, changedResponses.get(propName)))
+            .forEach(ul::with);
         return ul;
     }
 
     private ContainerTag li_addSecurity(ChangedSecurityRequirement requirement) {
         return li(div(String.format("changed security : New -> [%s]", requirement.getNewSecurityRequirement()))
-            .withClass("comment"))
-            .with(div(("changed security : Old -> " + requirement.getOldSecurityRequirement())).withClass("missing"));
+            .withClass(COMMENT))
+            .with(div(("changed security : Old -> " + requirement.getOldSecurityRequirement())).withClass(MISSING));
     }
 
     private ContainerTag li_addResponse(String name, ApiResponse response) {
         return li().withText(String.format("New response : [%s]", name))
             .with(
                 span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
-                    .withClass("comment"));
+                    .withClass(COMMENT));
     }
 
     private ContainerTag li_missingResponse(String name, ApiResponse response) {
         return li().withText(String.format("Deleted response : [%s]", name))
             .with(
                 span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
-                    .withClass("comment"));
+                    .withClass(COMMENT));
     }
 
     private ContainerTag li_changedResponse(String name, ChangedResponse response) {
@@ -280,7 +279,7 @@ public class HtmlRender implements Render {
                     || null == response.getNewApiResponse().getDescription())
                     ? ""
                     : ("//" + response.getNewApiResponse().getDescription()))
-                    .withClass("comment"))
+                    .withClass(COMMENT))
             .with(ul_request(response.getContent()));
     }
 
@@ -300,10 +299,12 @@ public class HtmlRender implements Render {
         return ul;
     }
 
+    @SuppressWarnings("java:S1172")
     private ContainerTag li_addRequest(String name, MediaType request) {
         return li().withText(String.format("New body: '%s'", name));
     }
 
+    @SuppressWarnings("java:S1172")
     private ContainerTag li_missingRequest(String name, MediaType request) {
         return li().withText(String.format("Deleted body: '%s'", name));
     }
@@ -349,6 +350,7 @@ public class HtmlRender implements Render {
         incompatibilities(output, propName + "[n]", schema);
     }
 
+    @SuppressWarnings("java:S1172")
     private void properties(
         ContainerTag output,
         String propPrefix,
@@ -365,7 +367,7 @@ public class HtmlRender implements Render {
     }
 
     protected void property(ContainerTag output, String name, String title, String type) {
-        output.with(p(String.format("%s: %s (%s)", title, name, type)).withClass("missing"));
+        output.with(p(String.format("%s: %s (%s)", title, name, type)).withClass(MISSING));
     }
 
     protected Schema resolve(Schema schema) {
@@ -404,21 +406,21 @@ public class HtmlRender implements Render {
         return li().withText("Add " + param.getName() + " in " + param.getIn())
             .with(
                 span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
-                    .withClass("comment"));
+                    .withClass(COMMENT));
     }
 
     private ContainerTag li_missingParam(Parameter param) {
-        return li().withClass("missing")
+        return li().withClass(MISSING)
             .with(span("Delete"))
             .with(del(param.getName()))
             .with(span("in ").withText(param.getIn()))
             .with(
                 span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
-                    .withClass("comment"));
+                    .withClass(COMMENT));
     }
 
     private ContainerTag li_deprecatedParam(ChangedParameter param) {
-        return li().withClass("missing")
+        return li().withClass(MISSING)
             .with(span("Deprecated"))
             .with(del(param.getName()))
             .with(span("in ").withText(param.getIn()))
@@ -426,7 +428,7 @@ public class HtmlRender implements Render {
                 span(null == param.getNewParameter().getDescription()
                     ? ""
                     : ("//" + param.getNewParameter().getDescription()))
-                    .withClass("comment"));
+                    .withClass(COMMENT));
     }
 
     private ContainerTag li_changedParam(ChangedParameter changeParam) {
@@ -439,13 +441,13 @@ public class HtmlRender implements Render {
         Parameter leftParam = changeParam.getNewParameter();
         ContainerTag li = li().withText(changeParam.getName() + " in " + changeParam.getIn());
         if (changeRequired) {
-            li.withText(" change into " + (rightParam.getRequired() ? "required" : "not required"));
+            li.withText(" change into " + (rightParam.getRequired().booleanValue() ? "required" : "not required"));
         }
         if (changeDescription) {
             li.withText(" Notes ")
-                .with(del(leftParam.getDescription()).withClass("comment"))
+                .with(del(leftParam.getDescription()).withClass(COMMENT))
                 .withText(" change into ")
-                .with(span(rightParam.getDescription()).withClass("comment"));
+                .with(span(rightParam.getDescription()).withClass(COMMENT));
         }
         return li;
     }

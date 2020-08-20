@@ -24,10 +24,10 @@ public class ChangedOpenApiRender {
         this.isBreaking = isBreaking;
     }
 
-    public ChangedOpenApiRender(Endpoint endpoint, String _whatChanged) {
+    public ChangedOpenApiRender(Endpoint endpoint, String whatChanged) {
         this.name = endpoint.getPathUrl();
         this.httpMehhod = endpoint.getMethod().toString();
-        this.whatChanged = _whatChanged;
+        this.whatChanged = whatChanged;
         this.isBreaking = "Breaking";
     }
 

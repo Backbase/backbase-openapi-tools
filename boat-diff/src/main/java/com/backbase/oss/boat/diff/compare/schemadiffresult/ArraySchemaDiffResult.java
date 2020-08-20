@@ -6,7 +6,6 @@ import com.backbase.oss.boat.diff.model.DiffContext;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
