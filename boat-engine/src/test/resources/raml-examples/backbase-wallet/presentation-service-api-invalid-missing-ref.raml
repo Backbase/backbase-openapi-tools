@@ -1,0 +1,122 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md
+#===============================================================
+title: Wallet Test Service API
+uses: 
+  traits: lib/traits/traits.raml
+  bb: lib/annotations/annotations.raml
+  common: bbt-common.raml
+version: v1
+baseUri: "service-api/{version}"
+mediaType:  application/json
+protocols: [ HTTP, HTTPS ]
+#===============================================================
+# API resource definitions
+#===============================================================
+securedBy: [ bb.bbAccessControl ]
+(bb.x-bb-api-type): [system]
+/wallet:
+  displayName: WalletService
+  /admin/{userId}:
+    uriParameters:
+      userId:
+        type: string
+    /paymentcards:
+      displayName: Payment Cards
+      get:
+        is: [traits.BadRequestError, traits.NotAcceptableError, traits.orderable: {fieldsList: nameOnCard}, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
+        description: "Returns available payment card details for user, optionally filtered by nameOnCard"
+        queryParameters:
+          nameOnCard:
+            description: "Filter by the cardholder's name (case-insensitive), can be the first one or more characters of one of the words/names"
+            required: false
+            type: string
+            example: "Smi"
+          dateTimeOnly:
+            description: Creation date in datetime-only format
+            required: false
+            type: datetime-only
+            example: 2017-10-04T14:54:36
+          dateTime:
+            description: Creation date in Zoned RFC3339 Date-time format
+            required: false
+            type: datetime
+            format: rfc3339
+            example: 2017-10-04T14:54:36Z
+          dateTime2616:
+            description: Zoned RFC2616 Date-time param example
+            required: false
+            type: datetime
+            format: rfc2616
+            example: Wed, 4 Jul 2001 12:08:56 PDT
+          date:
+            description: Date-only param example
+            required: false
+            type: date-only
+            example: 2017-10-04
+          time:
+            description: time-only param example
+            required: false
+            type: time-only
+            example: 14:54:36
+        responses:
+          200:
+            body:
+              application/json:
+                type: common.PaymentCards
+                example: !include examples/body/paymentcards-get.json
+      post:
+        is: [traits.BadRequestError, traits.InternalServerError, traits.idempotent, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
+        description: Adds a payment card to the user's wallet
+        body:
+          application/json:
+            type: common.PaymentCard
+            example: !include examples/body/paymentcard-item.json
+        responses:
+          201:
+            description: request to create payment card accepted
+            body:
+              application/json:
+                schema: !include schemas/body/paymentcard-id.json
+                example: !include examples/body/paymentcard-created.json
+      /{cardId}:
+        displayName: Payment Card
+        uriParameters:
+              cardId:
+                type: string
+        get:
+          is: [traits.BadRequestError, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
+          description: Returns details of a specific payment card
+          responses:
+            200:
+              body:
+                application/json:
+                  type: common.PaymentCard
+                  example: !include examples/body/paymentcard-item.json
+        delete:
+          is: [traits.BadRequestError, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
+          description: Deletes a payment card with a given id
+          responses:
+            204:
+              description: Payment card is succesfully deleted
+/testQuery:
+  /required-boolean-query-param:
+    description: arbitrary tests
+    displayName: required boolean query param
+    get:
+      is: [traits.BadRequestError, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
+      queryParameters:
+        bool:
+          description: Required boolean parameter with no default value
+          required: true
+          type: boolean
+          example: false
+      responses:
+        200:
+          body:
+            application/json:
+              schema: !include schemas/body/test-response-invalid-ref.json
