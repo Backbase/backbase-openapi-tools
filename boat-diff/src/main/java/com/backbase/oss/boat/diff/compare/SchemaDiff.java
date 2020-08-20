@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
+@SuppressWarnings({"rawtypes","java:S3740"})
 public class SchemaDiff extends ReferenceDiffCache<Schema, ChangedSchema> {
 
     private static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
@@ -36,9 +38,9 @@ public class SchemaDiff extends ReferenceDiffCache<Schema, ChangedSchema> {
         schemaDiffResultClassMap.put(ComposedSchema.class, ComposedSchemaDiffResult.class);
     }
 
-    private Components leftComponents;
-    private Components rightComponents;
-    private OpenApiDiff openApiDiff;
+    private final Components leftComponents;
+    private final Components rightComponents;
+    private final OpenApiDiff openApiDiff;
 
     public SchemaDiff(OpenApiDiff openApiDiff) {
         this.openApiDiff = openApiDiff;
@@ -93,6 +95,7 @@ public class SchemaDiff extends ReferenceDiffCache<Schema, ChangedSchema> {
         return schema;
     }
 
+    @SuppressWarnings("java:S3776")
     protected static Schema addSchema(Schema<?> schema, Schema<?> fromSchema) {
         if (fromSchema.getProperties() != null) {
             if (schema.getProperties() == null) {
@@ -275,7 +278,7 @@ public class SchemaDiff extends ReferenceDiffCache<Schema, ChangedSchema> {
     }
 
     public Optional<ChangedSchema> diff(
-            HashSet<String> refSet, Schema left, Schema right, DiffContext context) {
+        Set<String> refSet, Schema left, Schema right, DiffContext context) {
         if (left == null && right == null) {
             return Optional.empty();
         }
@@ -295,7 +298,7 @@ public class SchemaDiff extends ReferenceDiffCache<Schema, ChangedSchema> {
 
     @Override
     protected Optional<ChangedSchema> computeDiff(
-            HashSet<String> refSet, Schema left, Schema right, DiffContext context) {
+            Set<String> refSet, Schema left, Schema right, DiffContext context) {
         left = refPointer.resolveRef(this.leftComponents, left, getSchemaRef(left));
         right = refPointer.resolveRef(this.rightComponents, right, getSchemaRef(right));
 

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 18/12/17.
@@ -19,7 +20,7 @@ public class ArraySchemaDiffResult extends SchemaDiffResult {
 
     @Override
     public <T extends Schema<X>, X> Optional<ChangedSchema> diff(
-            HashSet<String> refSet,
+            Set<String> refSet,
             Components leftComponents,
             Components rightComponents,
             T left,

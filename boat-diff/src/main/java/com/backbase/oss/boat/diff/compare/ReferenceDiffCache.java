@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 07/01/18.
  */
 public abstract class ReferenceDiffCache<C, D> {
-    private Map<CacheKey, D> refDiffMap;
+    private final Map<CacheKey, D> refDiffMap;
 
     public ReferenceDiffCache() {
         this.refDiffMap = new HashMap<>();
@@ -25,7 +26,7 @@ public abstract class ReferenceDiffCache<C, D> {
     }
 
     public Optional<D> cachedDiff(
-            HashSet<String> refSet,
+            Set<String> refSet,
             C left,
             C right,
             String leftRef,
@@ -59,5 +60,5 @@ public abstract class ReferenceDiffCache<C, D> {
     }
 
     protected abstract Optional<D> computeDiff(
-            HashSet<String> refSet, C left, C right, DiffContext context);
+            Set<String> refSet, C left, C right, DiffContext context);
 }

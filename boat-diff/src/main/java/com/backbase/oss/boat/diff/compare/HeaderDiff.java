@@ -10,6 +10,7 @@ import io.swagger.v3.oas.models.headers.Header;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 28/12/17.
@@ -38,7 +39,7 @@ public class HeaderDiff extends ReferenceDiffCache<Header, ChangedHeader> {
 
     @Override
     protected Optional<ChangedHeader> computeDiff(
-            HashSet<String> refSet, Header left, Header right, DiffContext context) {
+            Set<String> refSet, Header left, Header right, DiffContext context) {
         left = refPointer.resolveRef(leftComponents, left, left.get$ref());
         right = refPointer.resolveRef(rightComponents, right, right.get$ref());
 

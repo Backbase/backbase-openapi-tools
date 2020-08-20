@@ -15,12 +15,14 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Created by adarsh.sharma on 20/12/17.
  */
+@SuppressWarnings("java:S3740")
 public class ComposedSchemaDiffResult extends SchemaDiffResult {
     private static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
 
@@ -30,7 +32,7 @@ public class ComposedSchemaDiffResult extends SchemaDiffResult {
 
     @Override
     public <T extends Schema<X>, X> Optional<ChangedSchema> diff(
-            HashSet<String> refSet,
+            Set<String> refSet,
             Components leftComponents,
             Components rightComponents,
             T left,
