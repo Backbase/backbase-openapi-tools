@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
     </parent>
 
     <artifactId>boat-maven-plugin</artifactId>
@@ -35,18 +35,13 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.elibracha/openapi-diff -->
         <dependency>
-            <groupId>com.github.elibracha</groupId>
-            <artifactId>openapi-diff</artifactId>
-            <version>2.3.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-diff</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -106,13 +101,6 @@
             <version>${maven.api.version}</version>
             <scope>provided</scope>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <version>1.2.3</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
@@ -213,6 +201,7 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
+                    <skipInvocation>${skipTests}</skipInvocation>
                     <debug>false</debug>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <pomIncludes>
