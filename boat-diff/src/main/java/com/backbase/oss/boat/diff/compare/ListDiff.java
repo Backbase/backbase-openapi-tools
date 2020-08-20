@@ -2,8 +2,9 @@ package com.backbase.oss.boat.diff.compare;
 
 import com.backbase.oss.boat.diff.model.ChangedList;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
-@Getter
+@UtilityClass
 public class ListDiff {
 
     public static <K extends ChangedList<X>, X> K diff(K instance) {

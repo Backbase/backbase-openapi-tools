@@ -6,11 +6,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.backbase.oss.boat.diff.model.ChangedOpenApi;
 import com.backbase.oss.boat.diff.model.ChangedOperation;
 import com.backbase.oss.boat.diff.model.Endpoint;
+import com.backbase.oss.boat.diff.output.ConsoleRender;
 import com.backbase.oss.boat.diff.output.HtmlRender;
+import com.backbase.oss.boat.diff.output.JsonRender;
 import com.backbase.oss.boat.diff.output.MarkdownRender;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class OpenApiDiffTest {
@@ -95,6 +98,36 @@ public class OpenApiDiffTest {
         String render = new MarkdownRender().render(diff);
         try {
             FileWriter fw = new FileWriter("target/testDiff.md");
+            fw.write(render);
+            fw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SneakyThrows
+    @Test
+    public void testDiffAndJson() {
+        ChangedOpenApi diff = OpenApiCompare.fromLocations(OPENAPI_DOC1, OPENAPI_DOC2);
+        String render = new JsonRender().render(diff);
+        try {
+            FileWriter fw = new FileWriter("target/test.json");
+            fw.write(render);
+            fw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SneakyThrows
+    @Test
+    public void testDiffAndConsole() {
+        ChangedOpenApi diff = OpenApiCompare.fromLocations(OPENAPI_DOC1, OPENAPI_DOC2);
+        String render = new ConsoleRender().render(diff);
+        try {
+            FileWriter fw = new FileWriter("target/console.txt");
             fw.write(render);
             fw.close();
 
