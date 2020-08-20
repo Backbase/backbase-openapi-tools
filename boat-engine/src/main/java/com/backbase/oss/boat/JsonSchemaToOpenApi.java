@@ -56,6 +56,12 @@ class JsonSchemaToOpenApi {
     public static final String PROPERTIES = "properties";
     public static final String JAVA_ENUM_NAMES = "javaEnumNames";
     public static final String X_JAVA_ENUM_NAMES = "x-java-enum-names";
+    public static final String STRING = "string";
+    public static final String FORMAT = "format";
+    public static final String TYPE = "type";
+    public static final String NUMBER = "number";
+    public static final String DATE_TIME = "date-time";
+    public static final String REQUIRED = "required";
 
     private final URL baseUrl;
     private final Components components;
@@ -130,7 +136,7 @@ class JsonSchemaToOpenApi {
         throws DerefenceException {
         log.debug("Creating Schema for: {} with path: {}", name, baseUrl);
         if (name.contains(" ")) {
-            throw new RuntimeException("name cannot contain spaces");
+            throw new IllegalStateException("name cannot contain spaces");
         }
 
         Schema schema = Utils.resolveSchemaByJavaType(type, components);
@@ -140,7 +146,7 @@ class JsonSchemaToOpenApi {
 
         String jsonSchemaType = determineJsonSchemaType(type);
         switch (jsonSchemaType) {
-            case "date-time":
+            case DATE_TIME:
             case "datetime-only":
             case "datetime":
                 schema = new DateTimeSchema();
@@ -198,14 +204,14 @@ class JsonSchemaToOpenApi {
                     schema = new ObjectSchema();
                 }
                 break;
-            case "string":
+            case STRING:
             case "time-only":
                 schema = new StringSchema();
                 break;
             case "email":
                 schema = new EmailSchema();
                 break;
-            case "number":
+            case NUMBER:
                 schema = new NumberSchema();
                 break;
             case "integer":
@@ -217,10 +223,8 @@ class JsonSchemaToOpenApi {
             case "array":
                 schema = new ArraySchema();
                 JsonNode itemJsonSchema = type.get("items");
-
-//                if (itemJsonSchema == null) {
                 if (hasReference(itemJsonSchema)) {
-                    String itemReference = itemJsonSchema.get("$ref").textValue();
+                    String itemReference = itemJsonSchema.get("ref").textValue();
                     String absoluteReference;
                     if (StringUtils.isNotEmpty(itemReference) && !Utils.isUrl(itemReference) && !Utils
                         .isFragment(itemReference)) {
@@ -232,7 +236,7 @@ class JsonSchemaToOpenApi {
                         absoluteReference = itemReference;
                     }
                     if (!absoluteReference.equals(itemReference)) {
-                        itemJsonSchema = ((ObjectNode) itemJsonSchema).set("$ref", new TextNode(absoluteReference));
+                        itemJsonSchema = ((ObjectNode) itemJsonSchema).set("ref", new TextNode(absoluteReference));
                     }
                     Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema,
                         baseUrl, false);
@@ -242,15 +246,11 @@ class JsonSchemaToOpenApi {
                         baseUrl, false);
                     ((ArraySchema) schema).setItems(itemSchema);
                 }
-//                }
-//                else {
-//                    ((ArraySchema) schema).setItems(new StringSchema());
-//                }
                 break;
 
             case "anyOf":
                 schema = new ComposedSchema();
-                ArrayNode anyOfJsonSchmema = (ArrayNode) type.get("type");
+                ArrayNode anyOfJsonSchmema = (ArrayNode) type.get(TYPE);
                 Iterable<JsonNode> iterable = anyOfJsonSchmema::elements;
                 Stream<JsonNode> stream = StreamSupport.stream(iterable.spliterator(), false);
                 List<Schema> anyOfSchemas = stream.map(jsonNode -> new Schema().type(jsonNode.textValue()))
@@ -259,7 +259,6 @@ class JsonSchemaToOpenApi {
                 break;
             default:
                 schema = new StringSchema();
-//                throw new UnsupportedOperationException("Unsupported type: " + type);
         }
 
         schema.addExtension(X_RAML_BASE, baseUrl);
@@ -285,16 +284,16 @@ class JsonSchemaToOpenApi {
             schema.getProperties().putAll(properties);
         }
 
-        schema.setRequired(getRequired(type));
+        getRequired(type).ifPresent(schema::setRequired);
 
-        String $ref = getString(type, REF);
+        String ref = getString(type, REF);
 
-        if (StringUtils.isNotEmpty($ref) && !Utils.isUrl($ref) && !Utils.isFragment($ref)) {
-            $ref = Utils.getAbsoluteReference(baseUrl, $ref).toString();
-        } else if (StringUtils.isNotEmpty($ref) && Utils.isFragment($ref) && Utils.isDirectory(baseUrl, $ref)) {
-            $ref = getReferenceFromParent($ref, parent);
+        if (StringUtils.isNotEmpty(ref) && !Utils.isUrl(ref) && !Utils.isFragment(ref)) {
+            ref = Utils.getAbsoluteReference(baseUrl, ref).toString();
+        } else if (StringUtils.isNotEmpty(ref) && Utils.isFragment(ref) && Utils.isDirectory(baseUrl, ref)) {
+            ref = getReferenceFromParent(ref, parent);
         }
-        schema.set$ref($ref);
+        schema.set$ref(ref);
         if (type.hasNonNull(JAVA_TYPE)) {
             schema.addExtension(X_JAVA_TYPE, type.get(JAVA_TYPE).textValue());
         }
@@ -312,7 +311,7 @@ class JsonSchemaToOpenApi {
         } else if (Utils.isFragment($ref) && Utils.isDirectory(baseUrl, $ref)) {
             String referenceFromParent = getReferenceFromParent($ref, parent);
             if (referenceFromParent == null) {
-                throw new RuntimeException("Whha??");
+                throw new IllegalStateException("Whha??");
             }
             return new URL(referenceFromParent);
         } else if (Utils.isFragment($ref) && Utils.hasFragment(baseUrl.toString())) {
@@ -329,23 +328,22 @@ class JsonSchemaToOpenApi {
 
     private String determineJsonSchemaType(JsonNode type) {
         assert type != null;
-        JsonNode jsonType = type.get("type");
-        if (jsonType != null && jsonType.isTextual() && !type.has("format")) {
+        JsonNode jsonType = type.get(TYPE);
+        if (jsonType != null && jsonType.isTextual() && !type.has(FORMAT)) {
             return determineTypeFromJavaType(type, jsonType.asText());
-        } else if (jsonType != null && type.has("format")) {
-            return type.get("format").textValue();
+        } else if (jsonType != null && type.has(FORMAT)) {
+            return type.get(FORMAT).textValue();
         } else if (jsonType != null && jsonType.isArray()) {
             return "anyOf";
         } else if (type.hasNonNull("enum")) {
-            return "string";
+            return STRING;
         } else if (type.hasNonNull(JAVA_TYPE) || type.hasNonNull(REF)) {
             return "object";
         } else if (type instanceof ObjectNode && ((ObjectNode) type).size() == 0) {
-            return "string";
+            return STRING;
         } else {
             log.error("Cannot determine json type from: {}. Guessing string", type);
-            return "string";
-//            throw new RuntimeException("Cannot determine type from: " + type);
+            return STRING;
         }
     }
 
@@ -355,10 +353,10 @@ class JsonSchemaToOpenApi {
             switch (javaType) {
                 case "java.util.Date":
                     Optional<String> format = Optional
-                        .ofNullable(type.hasNonNull("format") ? type.get("format").textValue() : null);
-                    return format.orElseGet(() -> "date-time");
+                        .ofNullable(type.hasNonNull(FORMAT) ? type.get(FORMAT).textValue() : null);
+                    return format.orElseGet(() -> DATE_TIME);
                 case "java.lang.Long":
-                    return "number";
+                    return NUMBER;
                 default:
                     return fallback;
             }
@@ -391,11 +389,11 @@ class JsonSchemaToOpenApi {
             });
             return result;
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
-    @SuppressWarnings("Duplicates")
+    @SuppressWarnings({"Duplicates","java:S112"})
     private Map<String, Schema> getProperties(Schema parent, JsonNode type, Components components, URL
         baseUrl) {
         Map<String, Schema> properties = new LinkedHashMap<>();
@@ -452,34 +450,33 @@ class JsonSchemaToOpenApi {
                 }
             }
             log.debug("Property referenced schema: {}", schema.getName());
-//            schema = new Schema().$ref(referencedSchema.getName());
         } else {
             schema = createNewSchema(parent, jsonSchema, propertyName, components, baseUrl);
         }
         return schema;
     }
 
-    private List<String> getRequired(JsonNode type) {
+    private Optional<List<String>> getRequired(JsonNode type) {
         if (!type.hasNonNull(PROPERTIES)) {
-            return null;
+            return Optional.empty();
         }
         List<String> required = new ArrayList<>();
         type.get(PROPERTIES).fields().forEachRemaining(field -> {
             JsonNode property = field.getValue();
-            if (property.hasNonNull("required") && property.get("required").asBoolean()) {
+            if (property.hasNonNull(REQUIRED) && property.get(REQUIRED).asBoolean()) {
                 required.add(field.getKey());
             }
         });
 
-        if (type.has("required")) {
-            JsonNode requiredNode = type.get("required");
+        if (type.has(REQUIRED)) {
+            JsonNode requiredNode = type.get(REQUIRED);
             if (requiredNode.isArray()) {
                 requiredNode.elements().forEachRemaining(jsonNode -> required.add(jsonNode.asText()));
             } else {
                 log.warn("wut?");
             }
         }
-        return required.isEmpty() ? null : required;
+        return required.isEmpty() ? Optional.empty() : Optional.of(required);
     }
 
     private String getString(JsonNode result, String key) {
@@ -504,17 +501,17 @@ class JsonSchemaToOpenApi {
     }
 
     void dereferenceSchema(final Schema schema, Components components) throws DerefenceException {
-        String $ref = schema.get$ref();
+        String ref = schema.get$ref();
 
-        if ($ref != null && Utils.isAbsolute($ref)) {
-            URL absoluteParentReference = Utils.getAbsoluteReferenceParent($ref);
-            log.debug("$ref: {}", $ref);
+        if (ref != null && Utils.isAbsolute(ref)) {
+            URL absoluteParentReference = Utils.getAbsoluteReferenceParent(ref);
+            log.debug("ref: {}", ref);
 
-            JsonNode dereferenced = getJsonNode($ref);
+            JsonNode dereferenced = getJsonNode(ref);
             String schemaName = Utils.getSchemaNameFromJavaClass(dereferenced)
-                .orElse(Utils.getSchemaNameFromReference($ref, schema.getName(), referenceNames));
+                .orElse(Utils.getSchemaNameFromReference(ref, schema.getName(), referenceNames));
 
-            log.debug("Dereference schema: {} with $ref: {}", schemaName, $ref);
+            log.debug("Dereference schema: {} with ref: {}", schemaName, ref);
 
             Schema referencedSchema = Utils.resolveSchemaByJavaType(dereferenced, components);
             if (referencedSchema == null) {
@@ -553,29 +550,29 @@ class JsonSchemaToOpenApi {
 
     @SneakyThrows
     private JsonNode getJsonNode(String reference) {
-        URI $ref = new URI(reference);
-        return getJsonNode($ref);
+        URI ref = new URI(reference);
+        return getJsonNode(ref);
     }
 
     @SneakyThrows
-    private JsonNode getJsonNode(URI $ref) {
+    private JsonNode getJsonNode(URI ref) {
 
-        if (jsonSchemas.containsKey($ref.toString())) {
-            log.debug("Returning cached $ref: {}", $ref);
-            return jsonSchemas.get($ref.toString());
+        if (jsonSchemas.containsKey(ref.toString())) {
+            log.debug("Returning cached ref: {}", ref);
+            return jsonSchemas.get(ref.toString());
         }
         JsonNode dereferenced;
-        log.debug("getJsonNode for: {}", $ref);
+        log.debug("getJsonNode for: {}", ref);
 
-        dereferenced = objectMapper.readTree($ref.toURL());
-        if ($ref.getFragment() != null) {
-            List<String> fragments = Arrays.stream($ref.getFragment().split("/")).filter(StringUtils::isNotEmpty)
+        dereferenced = objectMapper.readTree(ref.toURL());
+        if (ref.getFragment() != null) {
+            List<String> fragments = Arrays.stream(ref.getFragment().split("/")).filter(StringUtils::isNotEmpty)
                 .collect(Collectors.toList());
             for (String fragment : fragments) {
                 dereferenced = dereferenced.get(fragment);
             }
         }
-        jsonSchemas.put($ref.toString(), dereferenced);
+        jsonSchemas.put(ref.toString(), dereferenced);
         return dereferenced;
     }
 
@@ -583,14 +580,14 @@ class JsonSchemaToOpenApi {
     private String getReferenceFromParent(String reference, Schema schema) {
         Schema parentSchema = (Schema) schema.getExtensions().get(X_RAML_PARENT);
         while (parentSchema != null && parentSchema.getExtensions() != null) {
-            String $ref;
+            String ref;
             if (parentSchema instanceof ArraySchema) {
-                $ref = ((ArraySchema) parentSchema).getItems().get$ref();
+                ref = ((ArraySchema) parentSchema).getItems().get$ref();
             } else {
-                $ref = parentSchema.get$ref();
+                ref = parentSchema.get$ref();
             }
-            if ($ref != null && !$ref.equals(reference)) {
-                return $ref;
+            if (ref != null && !ref.equals(reference)) {
+                return ref;
             }
             parentSchema = (Schema) parentSchema.getExtensions().get(X_RAML_PARENT);
         }
@@ -609,10 +606,7 @@ class JsonSchemaToOpenApi {
             .anyMatch(property -> hasReference((Schema) property))) {
             return true;
         }
-        if (schema.getExtensions().containsKey(X_RAML_EXTENDS)) {
-            return true;
-        }
-        return false;
+        return schema.getExtensions().containsKey(X_RAML_EXTENDS);
 
     }
 

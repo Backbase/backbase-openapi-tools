@@ -23,6 +23,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties({"context","oldSchema","newSchema","type"})
+@SuppressWarnings("java:S3740")
 public class ChangedSchema implements ComposedChanged {
   protected DiffContext context;
   protected Schema oldSchema;
@@ -77,9 +78,9 @@ public class ChangedSchema implements ComposedChanged {
     if (!changedType
         && (oldSchema == null && newSchema == null || oldSchema != null && newSchema != null)
         && !changeFormat
-        && increasedProperties.size() == 0
-        && missingProperties.size() == 0
-        && changedProperties.values().size() == 0
+        && increasedProperties.isEmpty()
+        && missingProperties.isEmpty()
+        && changedProperties.values().isEmpty()
         && !changeDeprecated
         && !discriminatorPropertyChanged) {
       return DiffResult.NO_CHANGES;
