@@ -52,7 +52,6 @@ class JsonSchemaToOpenApi {
 
     public static final String X_JAVA_TYPE = "x-java-type";
     public static final String JAVA_TYPE = "javaType";
-    public static final String REF = "$ref";
     public static final String PROPERTIES = "properties";
     public static final String JAVA_ENUM_NAMES = "javaEnumNames";
     public static final String X_JAVA_ENUM_NAMES = "x-java-enum-names";
@@ -62,6 +61,11 @@ class JsonSchemaToOpenApi {
     public static final String NUMBER = "number";
     public static final String DATE_TIME = "date-time";
     public static final String REQUIRED = "required";
+    public static final String DATETIME_ONLY = "datetime-only";
+    public static final String DATETIME = "datetime";
+    public static final String DATE = "date";
+    public static final String DATE_ONLY = "date-only";
+    public static final String DOLLAR_REF = "$ref";
 
     private final URL baseUrl;
     private final Components components;
@@ -147,12 +151,12 @@ class JsonSchemaToOpenApi {
         String jsonSchemaType = determineJsonSchemaType(type);
         switch (jsonSchemaType) {
             case DATE_TIME:
-            case "datetime-only":
-            case "datetime":
+            case DATETIME_ONLY:
+            case DATETIME:
                 schema = new DateTimeSchema();
                 break;
-            case "date":
-            case "date-only":
+            case DATE:
+            case DATE_ONLY:
                 schema = new DateSchema();
                 break;
             case "object":
@@ -161,7 +165,7 @@ class JsonSchemaToOpenApi {
                     JsonNode extendsNode = type.get(EXTENDS);
                     String extendedSchemaName;
                     if (hasReference(extendsNode)) {
-                        String extendsReference = extendsNode.get(REF).asText();
+                        String extendsReference = extendsNode.get(DOLLAR_REF).asText();
                         log.debug("Creating Composed Schema for {} with reference: {}", name, extendsReference);
 
                         URL absoluteReference = resolveAbsoluteReference(parent, extendsReference, baseUrl);
@@ -182,8 +186,6 @@ class JsonSchemaToOpenApi {
                                 absoluteReferenceParent);
                             extendedSchema = createNewSchema(parent, dereferencedExtendedNode, extendedSchemaName,
                                 components, absoluteReferenceParent);
-
-//                            dereferenceSchema(extendedSchema, components);
                             components.addSchemas(extendedSchemaName, extendedSchema);
                             schema.addExtension(X_RAML_EXTENDS, extendedSchema);
                         } else {
@@ -224,7 +226,7 @@ class JsonSchemaToOpenApi {
                 schema = new ArraySchema();
                 JsonNode itemJsonSchema = type.get("items");
                 if (hasReference(itemJsonSchema)) {
-                    String itemReference = itemJsonSchema.get("ref").textValue();
+                    String itemReference = itemJsonSchema.get(DOLLAR_REF).textValue();
                     String absoluteReference;
                     if (StringUtils.isNotEmpty(itemReference) && !Utils.isUrl(itemReference) && !Utils
                         .isFragment(itemReference)) {
@@ -236,7 +238,7 @@ class JsonSchemaToOpenApi {
                         absoluteReference = itemReference;
                     }
                     if (!absoluteReference.equals(itemReference)) {
-                        itemJsonSchema = ((ObjectNode) itemJsonSchema).set("ref", new TextNode(absoluteReference));
+                        itemJsonSchema = ((ObjectNode) itemJsonSchema).set(DOLLAR_REF, new TextNode(absoluteReference));
                     }
                     Schema itemSchema = mapProperty(parent, components, name + "Item", (ObjectNode) itemJsonSchema,
                         baseUrl, false);
@@ -286,7 +288,7 @@ class JsonSchemaToOpenApi {
 
         getRequired(type).ifPresent(schema::setRequired);
 
-        String ref = getString(type, REF);
+        String ref = getString(type, DOLLAR_REF);
 
         if (StringUtils.isNotEmpty(ref) && !Utils.isUrl(ref) && !Utils.isFragment(ref)) {
             ref = Utils.getAbsoluteReference(baseUrl, ref).toString();
@@ -305,25 +307,25 @@ class JsonSchemaToOpenApi {
     }
 
     @SneakyThrows
-    private URL resolveAbsoluteReference(Schema parent, String $ref, URL baseUrl) {
-        if (StringUtils.isNotEmpty($ref) && !Utils.isUrl($ref) && !Utils.isFragment($ref)) {
-            return Utils.getAbsoluteReference(baseUrl, $ref);
-        } else if (Utils.isFragment($ref) && Utils.isDirectory(baseUrl, $ref)) {
-            String referenceFromParent = getReferenceFromParent($ref, parent);
+    private URL resolveAbsoluteReference(Schema parent, String ref, URL baseUrl) {
+        if (StringUtils.isNotEmpty(ref) && !Utils.isUrl(ref) && !Utils.isFragment(ref)) {
+            return Utils.getAbsoluteReference(baseUrl, ref);
+        } else if (Utils.isFragment(ref) && Utils.isDirectory(baseUrl, ref)) {
+            String referenceFromParent = getReferenceFromParent(ref, parent);
             if (referenceFromParent == null) {
                 throw new IllegalStateException("Whha??");
             }
             return new URL(referenceFromParent);
-        } else if (Utils.isFragment($ref) && Utils.hasFragment(baseUrl.toString())) {
+        } else if (Utils.isFragment(ref) && Utils.hasFragment(baseUrl.toString())) {
             String base = StringUtils.substringBefore(baseUrl.toString(), "#");
-            return new URL(base + $ref);
+            return new URL(base + ref);
         } else {
-            return new URL($ref);
+            return new URL(ref);
         }
     }
 
     private boolean hasReference(JsonNode itemJsonSchema) {
-        return itemJsonSchema.hasNonNull("$ref");
+        return itemJsonSchema.hasNonNull(DOLLAR_REF);
     }
 
     private String determineJsonSchemaType(JsonNode type) {
@@ -337,7 +339,7 @@ class JsonSchemaToOpenApi {
             return "anyOf";
         } else if (type.hasNonNull("enum")) {
             return STRING;
-        } else if (type.hasNonNull(JAVA_TYPE) || type.hasNonNull(REF)) {
+        } else if (type.hasNonNull(JAVA_TYPE) || type.hasNonNull(DOLLAR_REF)) {
             return "object";
         } else if (type instanceof ObjectNode && ((ObjectNode) type).size() == 0) {
             return STRING;
@@ -422,15 +424,15 @@ class JsonSchemaToOpenApi {
     private Schema mapProperty(Schema parent, Components components, String propertyName, ObjectNode jsonSchema,
         URL baseUrl, boolean derefence) throws DerefenceException {
         Schema schema;
-        boolean hasJsonRef = jsonSchema.has(REF) && StringUtils.isNotEmpty(jsonSchema.get(REF).textValue());
+        boolean hasJsonRef = jsonSchema.has(DOLLAR_REF) && StringUtils.isNotEmpty(jsonSchema.get(DOLLAR_REF).textValue());
 
         if (hasJsonRef && !derefence) {
-            String reference = jsonSchema.get(REF).textValue();
+            String reference = jsonSchema.get(DOLLAR_REF).textValue();
             URL absoluteReference = Utils.getAbsoluteReference(baseUrl, reference);
-            jsonSchema.set(REF, new TextNode(absoluteReference.toString()));
+            jsonSchema.set(DOLLAR_REF, new TextNode(absoluteReference.toString()));
             schema = createNewSchema(parent, jsonSchema, propertyName, components, baseUrl);
         } else if (hasJsonRef) {
-            String absoluteReference = jsonSchema.get(REF).textValue();
+            String absoluteReference = jsonSchema.get(DOLLAR_REF).textValue();
             log.debug("Dereference jsonSchema: {}", absoluteReference);
             JsonNode dereferencedJsonSchema = getJsonNode(absoluteReference);
             String schemaName = Utils.getSchemaNameFromJavaClass(dereferencedJsonSchema)
