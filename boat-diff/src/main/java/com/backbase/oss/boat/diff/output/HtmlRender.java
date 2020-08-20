@@ -16,6 +16,7 @@ import static j2html.TagCreator.link;
 import static j2html.TagCreator.meta;
 import static j2html.TagCreator.ol;
 import static j2html.TagCreator.p;
+import static j2html.TagCreator.script;
 import static j2html.TagCreator.span;
 import static j2html.TagCreator.title;
 import static j2html.TagCreator.ul;
@@ -50,8 +51,13 @@ import java.util.Optional;
 
 public class HtmlRender implements Render {
 
+    public static final String BOOSTRAP_CSS = "https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css";
+    public static final String BOOTSTRAP_THEME_CSS = "https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css";
+    public static final String BOOTSTRAP_CSS_SHA = "sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu";
+    public static final String BOOTSTRAP_CSS_THEME_SHA = "sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ";
+    public static final String BOOTSTRAP_JS_SHA = "sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd";
+    public static final String BOOSTRAP_JS = "https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js";
     private String title;
-    private String linkCss;
     protected static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
     protected ChangedOpenApi diff;
 
@@ -61,12 +67,11 @@ public class HtmlRender implements Render {
 
     public HtmlRender(String title, String linkCss) {
         this.title = title;
-        this.linkCss = linkCss;
     }
 
-    public HtmlRender(String title, boolean useLocalCss) {
+    public HtmlRender(String title) {
         this.title = title;
-        this.linkCss = useLocalCss ? getClass().getClassLoader().getResource("demo.css").getPath() : linkCss;
+
     }
 
     public String render(ChangedOpenApi diff) {
@@ -88,37 +93,49 @@ public class HtmlRender implements Render {
     }
 
     public String renderHtml(
-            ContainerTag ol_new, ContainerTag ol_miss, ContainerTag ol_deprec, ContainerTag ol_changed) {
+        ContainerTag ol_new, ContainerTag ol_miss, ContainerTag ol_deprec, ContainerTag ol_changed) {
         ContainerTag html =
-                html()
-                        .attr("lang", "en")
+            html()
+                .attr("lang", "en")
+                .with(
+                    head()
                         .with(
-                                head()
-                                        .with(
-                                                meta().withCharset("utf-8"),
-                                                title(title),
-                                                link().withRel("stylesheet").withHref(linkCss)),
-                                body()
-                                        .with(
-                                                header().with(h1(title)),
-                                                div()
-                                                        .withClass("article")
-                                                        .with(
-                                                                div().with(h2("What's New"), hr(), ol_new),
-                                                                div().with(h2("What's Deleted"), hr(), ol_miss),
-                                                                div().with(h2("What's Deprecated"), hr(), ol_deprec),
-                                                                div().with(h2("What's Changed"), hr(), ol_changed))));
+                            meta().withCharset("utf-8"),
+                            title(title),
+                            link().withRel("stylesheet").withHref(BOOSTRAP_CSS)
+                                .attr("crossorigin", "anonymous")
+                                .attr("integrity", BOOTSTRAP_CSS_SHA),
+                            link().withRel("stylesheet").withHref(BOOTSTRAP_THEME_CSS)
+                                .attr("crossorigin", "anonymous")
+                                .attr("integrity", BOOTSTRAP_CSS_THEME_SHA),
+                            script().withSrc(BOOSTRAP_JS)
+                                .attr("integrity", BOOTSTRAP_JS_SHA)
+                                .attr("crossorigin", "anonymous")
+                        ),
+
+                    body()
+                        .with(
+                            header().with(h1(title)),
+                            div()
+                                .withClass("article")
+                                .with(
+                                    div().with(h2("What's New"), hr(), ol_new),
+                                    div().with(h2("What's Deleted"), hr(), ol_miss),
+                                    div().with(h2("What's Deprecated"), hr(), ol_deprec),
+                                    div().with(h2("What's Changed"), hr(), ol_changed))));
 
         return document().render() + html.render();
     }
 
     private ContainerTag ol_newEndpoint(List<Endpoint> endpoints) {
-        if (null == endpoints) return ol();
+        if (null == endpoints) {
+            return ol();
+        }
         ContainerTag ol = ol();
         for (Endpoint endpoint : endpoints) {
             ol.with(
-                    li_newEndpoint(
-                            endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
+                li_newEndpoint(
+                    endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
         }
         return ol;
     }
@@ -128,12 +145,14 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag ol_missingEndpoint(List<Endpoint> endpoints) {
-        if (null == endpoints) return ol();
+        if (null == endpoints) {
+            return ol();
+        }
         ContainerTag ol = ol();
         for (Endpoint endpoint : endpoints) {
             ol.with(
-                    li_missingEndpoint(
-                            endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
+                li_missingEndpoint(
+                    endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
         }
         return ol;
     }
@@ -143,12 +162,14 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag ol_deprecatedEndpoint(List<Endpoint> endpoints) {
-        if (null == endpoints) return ol();
+        if (null == endpoints) {
+            return ol();
+        }
         ContainerTag ol = ol();
         for (Endpoint endpoint : endpoints) {
             ol.with(
-                    li_deprecatedEndpoint(
-                            endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
+                li_deprecatedEndpoint(
+                    endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
         }
         return ol;
     }
@@ -158,42 +179,45 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag ol_changed(List<ChangedOperation> changedOperations) {
-        if (null == changedOperations) return ol();
+        if (null == changedOperations) {
+            return ol();
+        }
         ContainerTag ol = ol();
         for (ChangedOperation changedOperation : changedOperations) {
             String pathUrl = changedOperation.getPathUrl();
             String method = changedOperation.getHttpMethod().toString();
             String desc =
-                    Optional.ofNullable(changedOperation.getSummary())
-                            .map(ChangedMetadata::getRight)
-                            .orElse("");
+                Optional.ofNullable(changedOperation.getSummary())
+                    .map(ChangedMetadata::getRight)
+                    .orElse("");
 
             ContainerTag ul_detail = ul().withClass("detail");
             if (Changed.result(changedOperation.getParameters()).isDifferent()) {
                 ul_detail.with(
-                        li().with(h3("Parameters")).with(ul_param(changedOperation.getParameters())));
+                    li().with(h3("Parameters")).with(ul_param(changedOperation.getParameters())));
             }
             if (changedOperation.resultRequestBody().isDifferent()) {
                 ul_detail.with(
-                        li().with(h3("Request"))
-                                .with(ul_request(changedOperation.getRequestBody().getContent())));
+                    li().with(h3("Request"))
+                        .with(ul_request(changedOperation.getRequestBody().getContent())));
             } else {
             }
             if (changedOperation.resultApiResponses().isDifferent()) {
                 ul_detail.with(
-                        li().with(h3("Response")).with(ul_response(changedOperation.getApiResponses())));
+                    li().with(h3("Response")).with(ul_response(changedOperation.getApiResponses())));
             }
 
-            if (changedOperation.getSecurityRequirements() != null && changedOperation.getSecurityRequirements().isDifferent()) {
+            if (changedOperation.getSecurityRequirements() != null && changedOperation.getSecurityRequirements()
+                .isDifferent()) {
                 ul_detail.with(
-                        li().with(h3("Security")).with(ul_security(changedOperation.getSecurityRequirements())));
+                    li().with(h3("Security")).with(ul_security(changedOperation.getSecurityRequirements())));
             }
 
             ol.with(
-                    li().with(span(method).withClass(method))
-                            .withText(pathUrl + " ")
-                            .with(span(desc))
-                            .with(ul_detail));
+                li().with(span(method).withClass(method))
+                    .withText(pathUrl + " ")
+                    .with(span(desc))
+                    .with(ul_detail));
         }
         return ol;
     }
@@ -205,7 +229,7 @@ public class HtmlRender implements Render {
 
         if (changedSecurity != null) {
             changedSecurity.forEach(
-                    e -> ul.with(li_addSecurity(e))
+                e -> ul.with(li_addSecurity(e))
             );
         }
         return ul;
@@ -230,33 +254,34 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag li_addSecurity(ChangedSecurityRequirement requirement) {
-        return li(div(String.format("changed security : New -> [%s]", requirement.getNewSecurityRequirement())).withClass("comment"))
-                .with(div(("changed security : Old -> " + requirement.getOldSecurityRequirement())).withClass("missing"));
+        return li(div(String.format("changed security : New -> [%s]", requirement.getNewSecurityRequirement()))
+            .withClass("comment"))
+            .with(div(("changed security : Old -> " + requirement.getOldSecurityRequirement())).withClass("missing"));
     }
 
     private ContainerTag li_addResponse(String name, ApiResponse response) {
         return li().withText(String.format("New response : [%s]", name))
-                .with(
-                        span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
-                                .withClass("comment"));
+            .with(
+                span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
+                    .withClass("comment"));
     }
 
     private ContainerTag li_missingResponse(String name, ApiResponse response) {
         return li().withText(String.format("Deleted response : [%s]", name))
-                .with(
-                        span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
-                                .withClass("comment"));
+            .with(
+                span(null == response.getDescription() ? "" : ("//" + response.getDescription()))
+                    .withClass("comment"));
     }
 
     private ContainerTag li_changedResponse(String name, ChangedResponse response) {
         return li().withText(String.format("Changed response : [%s]", name))
-                .with(
-                        span((null == response.getNewApiResponse()
-                                || null == response.getNewApiResponse().getDescription())
-                                ? ""
-                                : ("//" + response.getNewApiResponse().getDescription()))
-                                .withClass("comment"))
-                .with(ul_request(response.getContent()));
+            .with(
+                span((null == response.getNewApiResponse()
+                    || null == response.getNewApiResponse().getDescription())
+                    ? ""
+                    : ("//" + response.getNewApiResponse().getDescription()))
+                    .withClass("comment"))
+            .with(ul_request(response.getContent()));
     }
 
     private ContainerTag ul_request(ChangedContent changedContent) {
@@ -285,8 +310,8 @@ public class HtmlRender implements Render {
 
     private ContainerTag li_changedRequest(String name, ChangedMediaType request) {
         ContainerTag li =
-                li().with(div_changedSchema(request.getSchema()))
-                        .withText(String.format("Changed body: '%s'", name));
+            li().with(div_changedSchema(request.getSchema()))
+                .withText(String.format("Changed body: '%s'", name));
         if (request.isIncompatible()) {
             incompatibilities(li, request.getSchema());
         }
@@ -304,7 +329,7 @@ public class HtmlRender implements Render {
     }
 
     private void incompatibilities(
-            final ContainerTag output, String propName, final ChangedSchema schema) {
+        final ContainerTag output, String propName, final ChangedSchema schema) {
         if (schema.getItems() != null) {
             items(output, propName, schema.getItems());
         }
@@ -314,10 +339,10 @@ public class HtmlRender implements Render {
         }
         String prefix = propName.isEmpty() ? "" : propName + ".";
         properties(
-                output, prefix, "Missing property", schema.getMissingProperties(), schema.getContext());
+            output, prefix, "Missing property", schema.getMissingProperties(), schema.getContext());
         schema
-                .getChangedProperties()
-                .forEach((name, property) -> incompatibilities(output, prefix + name, property));
+            .getChangedProperties()
+            .forEach((name, property) -> incompatibilities(output, prefix + name, property));
     }
 
     private void items(ContainerTag output, String propName, ChangedSchema schema) {
@@ -325,11 +350,11 @@ public class HtmlRender implements Render {
     }
 
     private void properties(
-            ContainerTag output,
-            String propPrefix,
-            String title,
-            Map<String, Schema> properties,
-            DiffContext context) {
+        ContainerTag output,
+        String propPrefix,
+        String title,
+        Map<String, Schema> properties,
+        DiffContext context) {
         if (properties != null) {
             properties.forEach((key, value) -> property(output, propPrefix + key, title, resolve(value)));
         }
@@ -345,7 +370,7 @@ public class HtmlRender implements Render {
 
     protected Schema resolve(Schema schema) {
         return refPointer.resolveRef(
-                diff.getNewSpecOpenApi().getComponents(), schema, schema.get$ref());
+            diff.getNewSpecOpenApi().getComponents(), schema, schema.get$ref());
     }
 
     protected String type(Schema schema) {
@@ -377,31 +402,31 @@ public class HtmlRender implements Render {
 
     private ContainerTag li_addParam(Parameter param) {
         return li().withText("Add " + param.getName() + " in " + param.getIn())
-                .with(
-                        span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
-                                .withClass("comment"));
+            .with(
+                span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
+                    .withClass("comment"));
     }
 
     private ContainerTag li_missingParam(Parameter param) {
         return li().withClass("missing")
-                .with(span("Delete"))
-                .with(del(param.getName()))
-                .with(span("in ").withText(param.getIn()))
-                .with(
-                        span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
-                                .withClass("comment"));
+            .with(span("Delete"))
+            .with(del(param.getName()))
+            .with(span("in ").withText(param.getIn()))
+            .with(
+                span(null == param.getDescription() ? "" : ("//" + param.getDescription()))
+                    .withClass("comment"));
     }
 
     private ContainerTag li_deprecatedParam(ChangedParameter param) {
         return li().withClass("missing")
-                .with(span("Deprecated"))
-                .with(del(param.getName()))
-                .with(span("in ").withText(param.getIn()))
-                .with(
-                        span(null == param.getNewParameter().getDescription()
-                                ? ""
-                                : ("//" + param.getNewParameter().getDescription()))
-                                .withClass("comment"));
+            .with(span("Deprecated"))
+            .with(del(param.getName()))
+            .with(span("in ").withText(param.getIn()))
+            .with(
+                span(null == param.getNewParameter().getDescription()
+                    ? ""
+                    : ("//" + param.getNewParameter().getDescription()))
+                    .withClass("comment"));
     }
 
     private ContainerTag li_changedParam(ChangedParameter changeParam) {
@@ -418,9 +443,9 @@ public class HtmlRender implements Render {
         }
         if (changeDescription) {
             li.withText(" Notes ")
-                    .with(del(leftParam.getDescription()).withClass("comment"))
-                    .withText(" change into ")
-                    .with(span(rightParam.getDescription()).withClass("comment"));
+                .with(del(leftParam.getDescription()).withClass("comment"))
+                .withText(" change into ")
+                .with(span(rightParam.getDescription()).withClass("comment"));
         }
         return li;
     }
