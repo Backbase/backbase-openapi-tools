@@ -98,31 +98,31 @@ public class OpenApiDiff {
         preProcess(oldSpecOpenApi);
         preProcess(newSpecOpenApi);
         Optional<ChangedPaths> paths =
-                this.pathsDiff.diff(
-                        valOrEmpty(oldSpecOpenApi.getPaths()), valOrEmpty(newSpecOpenApi.getPaths()));
+            this.pathsDiff.diff(
+                valOrEmpty(oldSpecOpenApi.getPaths()), valOrEmpty(newSpecOpenApi.getPaths()));
         this.newEndpoints = new ArrayList<>();
         this.missingEndpoints = new ArrayList<>();
         this.changedOperations = new ArrayList<>();
         paths.ifPresent(
-                changedPaths -> {
-                    this.newEndpoints = EndpointUtils.convert2EndpointList(changedPaths.getIncreased());
-                    this.missingEndpoints = EndpointUtils.convert2EndpointList(changedPaths.getMissing());
-                    changedPaths
-                            .getChanged()
-                            .keySet()
-                            .forEach(
-                                    path -> {
-                                        ChangedPath changedPath = changedPaths.getChanged().get(path);
-                                        this.newEndpoints.addAll(
-                                                EndpointUtils.convert2Endpoints(path, changedPath.getIncreased()));
-                                        this.missingEndpoints.addAll(
-                                                EndpointUtils.convert2Endpoints(path, changedPath.getMissing()));
-                                        changedOperations.addAll(changedPath.getChanged());
-                                    });
-                });
+            changedPaths -> {
+                this.newEndpoints = EndpointUtils.convert2EndpointList(changedPaths.getIncreased());
+                this.missingEndpoints = EndpointUtils.convert2EndpointList(changedPaths.getMissing());
+                changedPaths
+                    .getChanged()
+                    .keySet()
+                    .forEach(
+                        path -> {
+                            ChangedPath changedPath = changedPaths.getChanged().get(path);
+                            this.newEndpoints.addAll(
+                                EndpointUtils.convert2Endpoints(path, changedPath.getIncreased()));
+                            this.missingEndpoints.addAll(
+                                EndpointUtils.convert2Endpoints(path, changedPath.getMissing()));
+                            changedOperations.addAll(changedPath.getChanged());
+                        });
+            });
         getExtensionsDiff()
-                .diff(oldSpecOpenApi.getExtensions(), newSpecOpenApi.getExtensions())
-                .ifPresent(this::setChangedExtension);
+            .diff(oldSpecOpenApi.getExtensions(), newSpecOpenApi.getExtensions())
+            .ifPresent(this::setChangedExtension);
         return getChangedOpenApi();
     }
 
@@ -135,28 +135,28 @@ public class OpenApiDiff {
 
         if (securityRequirements != null) {
             List<SecurityRequirement> distinctSecurityRequirements =
-                    securityRequirements.stream().distinct().collect(Collectors.toList());
+                securityRequirements.stream().distinct().collect(Collectors.toList());
             Map<String, PathItem> paths = openApi.getPaths();
             if (paths != null) {
                 paths
-                        .values()
-                        .forEach(
-                                pathItem ->
-                                        pathItem.readOperationsMap().values().stream()
-                                                .filter(operation -> operation.getSecurity() != null)
-                                                .forEach(
-                                                        operation ->
-                                                                operation.setSecurity(
-                                                                        operation.getSecurity().stream()
-                                                                                .distinct()
-                                                                                .collect(Collectors.toList()))));
+                    .values()
+                    .forEach(
+                        pathItem ->
+                            pathItem.readOperationsMap().values().stream()
+                                .filter(operation -> operation.getSecurity() != null)
+                                .forEach(
+                                    operation ->
+                                        operation.setSecurity(
+                                            operation.getSecurity().stream()
+                                                .distinct()
+                                                .collect(Collectors.toList()))));
                 paths
-                        .values()
-                        .forEach(
-                                pathItem ->
-                                        pathItem.readOperationsMap().values().stream()
-                                                .filter(operation -> operation.getSecurity() == null)
-                                                .forEach(operation -> operation.setSecurity(distinctSecurityRequirements)));
+                    .values()
+                    .forEach(
+                        pathItem ->
+                            pathItem.readOperationsMap().values().stream()
+                                .filter(operation -> operation.getSecurity() == null)
+                                .forEach(operation -> operation.setSecurity(distinctSecurityRequirements)));
             }
             openApi.setSecurity(null);
         }
@@ -164,11 +164,11 @@ public class OpenApiDiff {
 
     private ChangedOpenApi getChangedOpenApi() {
         return new ChangedOpenApi()
-                .setMissingEndpoints(missingEndpoints)
-                .setNewEndpoints(newEndpoints)
-                .setNewSpecOpenApi(newSpecOpenApi)
-                .setOldSpecOpenApi(oldSpecOpenApi)
-                .setChangedOperations(changedOperations)
-                .setChangedExtensions(changedExtensions);
+            .setMissingEndpoints(missingEndpoints)
+            .setNewEndpoints(newEndpoints)
+            .setNewSpecOpenApi(newSpecOpenApi)
+            .setOldSpecOpenApi(oldSpecOpenApi)
+            .setChangedOperations(changedOperations)
+            .setChangedExtensions(changedExtensions);
     }
 }
