@@ -115,6 +115,8 @@ class JsonSchemaToOpenApi {
             throw new ExportException("Cannot read json schema from type: " + typeDeclaration.name(), e);
         } catch (DerefenceException e) {
             throw new ExportException("Cannot dereference json schema from type: " + typeDeclaration.name(), e);
+        } catch (RuntimeException e) {
+            throw new ExportException("Runtime exception:", e);
         }
 
         schema.setExample(ExampleUtils.getExampleObject(typeDeclaration.example(), true));
