@@ -11,7 +11,6 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.Assert;
@@ -54,6 +53,24 @@ public class ExporterTest extends AbstractBoatEngineTests {
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
     }
 
+    @Test(expected = ExportException.class)
+    public void testWalletPresentationMissingRef() throws ExportException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(false)
+            .transformers(Collections.singletonList(new Decomposer())));
+    }
+
+    @Test(expected = ExportException.class)
+    public void testWalletPresentationInvalidRef() throws Exception {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(false)
+            .transformers(Collections.singletonList(new Decomposer())));
+    }
+
     @Test
     public void testWalletIntegration() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-integration-api.raml");
@@ -75,7 +92,8 @@ public class ExporterTest extends AbstractBoatEngineTests {
             .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
         SwaggerParseResult swaggerParseResult = validateExport(export);
-        assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/service-api/v1/wallet/admin/{userId}/paymentcards"));
+        assertNotNull(
+            swaggerParseResult.getOpenAPI().getPaths().get("/service-api/v1/wallet/admin/{userId}/paymentcards"));
     }
 
 
@@ -98,7 +116,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
     }
 
 
-    protected SwaggerParseResult validateExport(String export) throws IOException {
+    protected SwaggerParseResult validateExport(String export) throws IOException, ExportException {
         if (export == null) {
             throw new ExportException("Invalid Export");
         }
