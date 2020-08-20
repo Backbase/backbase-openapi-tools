@@ -25,6 +25,10 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         this.generateModelTests = !isEmbedded;
         this.skipOverwrite = true;
         this.configOptions = options;
+
+        if(isEmbedded) {
+            this.supportingFilesToGenerate = "ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java";
+        }
         super.execute();
     }
 }
