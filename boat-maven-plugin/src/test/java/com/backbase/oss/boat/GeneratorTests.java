@@ -36,4 +36,28 @@ public class GeneratorTests {
         mojo.execute();
 
     }
+
+    @Test
+    public void testWebClient() throws MojoExecutionException {
+        GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
+
+        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
+        File input = new File(inputFile);
+        File output = new File("target/webclient");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.execute();
+
+    }
 }
