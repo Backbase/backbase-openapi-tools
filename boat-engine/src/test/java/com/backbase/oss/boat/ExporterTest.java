@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.backbase.oss.boat.serializer.SerializerUtils;
@@ -34,9 +35,9 @@ public class ExporterTest extends AbstractBoatEngineTests {
     @Test
     public void normalizeNameTests() {
         String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
-        System.out.println(s);
+        assertEquals("BatchuploadGetResponse", s);
         s = Utils.normalizeSchemaName("batchUpload-GET-Response");
-        System.out.println(s);
+        assertEquals("BatchuploadGetResponse", s);
     }
 
     @Test

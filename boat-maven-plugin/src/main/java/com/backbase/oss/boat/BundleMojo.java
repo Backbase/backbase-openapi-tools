@@ -4,7 +4,6 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
-import com.backbase.oss.boat.transformers.Decomposer;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +20,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 @Mojo(name = "bundle", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
-/**
- * Bundles all references in the OpenAPI specification into one file.
+/*
+  Bundles all references in the OpenAPI specification into one file.
  */
 public class BundleMojo extends AbstractMojo {
 

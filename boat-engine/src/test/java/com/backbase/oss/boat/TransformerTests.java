@@ -6,7 +6,12 @@ import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.CaseFormatTransformer;
+import com.backbase.oss.boat.transformers.Deprecator;
 import com.backbase.oss.boat.transformers.Normaliser;
+import com.backbase.oss.boat.transformers.OpenAPIExtractor;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +35,44 @@ public class TransformerTests extends AbstractBoatEngineTests {
         Assert.assertTrue(new File("target/openapi.yaml").exists());
 
     }
+
+    @Test
+    public void testDeprecator() throws OpenAPILoaderException, IOException {
+
+        OpenAPI openAPI = OpenAPILoader.load(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"), false);
+
+        // Set first found operation to deprecated
+        openAPI.getPaths().values().stream().findFirst()
+            .flatMap(pathItem -> pathItem.readOperations().stream().findFirst())
+            .ifPresent(operation -> operation.setDeprecated(true));
+
+        new Deprecator().transform(openAPI, null);
+        String output = SerializerUtils.toYamlString(openAPI);
+        writeOutput(output, "/openapi.yaml");
+
+        Assert.assertTrue(new File("target/openapi.yaml").exists());
+
+    }
+
+    @Test
+    public void testDirectoryExploder() throws OpenAPILoaderException, IOException {
+
+        OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-service-api/openapi.yaml"), false);
+
+        File output = new File("target/explode/examples/");
+
+        if(output.exists()) {
+            output.delete();
+        }
+        output.mkdirs();
+
+
+        OpenAPIExtractor extractor = new OpenAPIExtractor(openAPI);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+        new DirectoryExploder(extractor, writer).serializeIntoDirectory("target/explode");
+    }
+
 
     @Test
     public void testPropertiesAdder() throws OpenAPILoaderException, IOException {
