@@ -89,6 +89,8 @@ public class SecurityDiffTest {
         assertThat(securityRequirement3)
                 .hasSize(1)
                 .hasEntrySatisfying("petstore_auth", values -> assertThat(values).hasSize(2));
+
+        TestUtils.renderEverything(changedOpenApi);
     }
 
     @Test
