@@ -10,13 +10,11 @@ public class ChangedWriteOnly implements Changed {
   private final DiffContext context;
   private final boolean oldValue;
   private final boolean newValue;
-  //    private final boolean required;
 
   public ChangedWriteOnly(Boolean oldValue, Boolean newValue, DiffContext context) {
     this.context = context;
     this.oldValue = Optional.ofNullable(oldValue).orElse(false);
     this.newValue = Optional.ofNullable(newValue).orElse(false);
-    //        this.required = required;
   }
 
   @Override
@@ -31,7 +29,7 @@ public class ChangedWriteOnly implements Changed {
       if (Boolean.TRUE.equals(newValue)) {
         return DiffResult.INCOMPATIBLE;
       } else {
-        return context.isRequired() ? DiffResult.INCOMPATIBLE : DiffResult.COMPATIBLE;
+        return context.isRequired().booleanValue() ? DiffResult.INCOMPATIBLE : DiffResult.COMPATIBLE;
       }
     }
     return DiffResult.UNKNOWN;

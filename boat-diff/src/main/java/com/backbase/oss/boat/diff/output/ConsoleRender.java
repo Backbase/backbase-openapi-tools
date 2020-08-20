@@ -13,7 +13,6 @@ import com.backbase.oss.boat.diff.model.ChangedResponse;
 import com.backbase.oss.boat.diff.model.ChangedSchema;
 import com.backbase.oss.boat.diff.model.ChangedSecurityRequirement;
 import com.backbase.oss.boat.diff.model.ChangedSecurityRequirements;
-import com.backbase.oss.boat.diff.model.DiffContext;
 import com.backbase.oss.boat.diff.model.DiffResult;
 import com.backbase.oss.boat.diff.model.Endpoint;
 import com.backbase.oss.boat.diff.utils.RefPointer;
@@ -28,6 +27,7 @@ import java.util.Optional;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 
+@SuppressWarnings({"java:S3740","java:S117","java:S100"})
 public class ConsoleRender implements Render {
     private static final int LINE_LENGTH = 74;
     protected static RefPointer<Schema> refPointer = new RefPointer<>(RefType.SCHEMAS);
@@ -75,16 +75,12 @@ public class ConsoleRender implements Render {
     }
 
     private String ol_changed(List<ChangedOperation> operations) {
-        if (null == operations || operations.size() == 0) return "";
+        if (null == operations || operations.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         sb.append(title("What's Changed"));
         for (ChangedOperation operation : operations) {
             String pathUrl = operation.getPathUrl();
             String method = operation.getHttpMethod().toString();
-            String desc =
-                    Optional.ofNullable(operation.getSummary()).map(ChangedMetadata::getRight).orElse("");
-
-
             StringBuilder ul_detail = new StringBuilder();
 
             if (Changed.result(operation.getParameters()).isDifferent()) {
@@ -127,7 +123,7 @@ public class ConsoleRender implements Render {
                         .append(ul_security(operation.getSecurityRequirements()));
             }
 
-            sb.append(itemEndpoint(method, pathUrl, desc)).append(ul_detail);
+            sb.append(itemEndpoint(method, pathUrl)).append(ul_detail);
         }
         return sb.toString();
     }
@@ -263,7 +259,7 @@ public class ConsoleRender implements Render {
         }
         String prefix = propName.isEmpty() ? "" : propName + ".";
         sb.append(
-                properties(prefix, "Missing property", schema.getMissingProperties(), schema.getContext()));
+                properties(prefix, "Missing property", schema.getMissingProperties()));
         schema
                 .getChangedProperties()
                 .forEach((name, property) -> sb.append(incompatibilities(prefix + name, property)));
@@ -277,7 +273,7 @@ public class ConsoleRender implements Render {
     }
 
     private String properties(
-            String propPrefix, String title, Map<String, Schema> properties, DiffContext context) {
+        String propPrefix, String title, Map<String, Schema> properties) {
         StringBuilder sb = new StringBuilder();
         if (properties != null) {
             properties.forEach(
@@ -291,7 +287,7 @@ public class ConsoleRender implements Render {
     }
 
     protected String property(String name, String title, String type) {
-        return String.format("%s%s: %s (%s)\n", StringUtils.repeat(' ', 10), title, name, type);
+        return String.format("%s%s: %s (%s)%n", StringUtils.repeat(' ', 10), title, name, type);
     }
 
     protected Schema resolve(Schema schema) {
@@ -335,8 +331,6 @@ public class ConsoleRender implements Render {
                 .append(" in ")
                 .append(param.getIn())
                 .append(System.lineSeparator());
-        //                .append(null == param.getDescription() ? ""
-        //                        : (" //" + param.getDescription()));
         return sb.toString();
     }
 
@@ -349,18 +343,18 @@ public class ConsoleRender implements Render {
     }
 
     private String listEndpoints(List<Endpoint> endpoints, String title) {
-        if (null == endpoints || endpoints.size() == 0) return "";
+        if (null == endpoints || endpoints.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         sb.append(title(title));
         for (Endpoint endpoint : endpoints) {
             sb.append(
                     itemEndpoint(
-                            endpoint.getMethod().toString(), endpoint.getPathUrl(), endpoint.getSummary()));
+                            endpoint.getMethod().toString(), endpoint.getPathUrl()));
         }
         return sb.append(System.lineSeparator()).toString();
     }
 
-    private String itemEndpoint(String method, String path, String desc) {
+    private String itemEndpoint(String method, String path) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("- %s %s%n", StringUtils.rightPad(method, 6), path));
         return sb.toString();

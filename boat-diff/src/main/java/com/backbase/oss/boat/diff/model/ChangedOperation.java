@@ -56,7 +56,6 @@ public class ChangedOperation implements ComposedChanged {
 
   @Override
   public DiffResult isCoreChanged() {
-    // TODO BETTER HANDLING FOR DEPRECIATION
     if (deprecated) {
       return DiffResult.COMPATIBLE;
     }

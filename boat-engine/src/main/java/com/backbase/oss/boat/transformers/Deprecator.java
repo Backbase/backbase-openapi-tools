@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SuppressWarnings("java:S3740")
 public class Deprecator implements Transformer {
 
     @Override
@@ -18,19 +19,19 @@ public class Deprecator implements Transformer {
 
         openAPI.getPaths().forEach((s, pathItem) -> {
 
-            if (pathItem.getGet() != null && pathItem.getGet().getDeprecated() != null && pathItem.getGet().getDeprecated()) {
+            if (pathItem.getGet() != null && pathItem.getGet().getDeprecated() != null && pathItem.getGet().getDeprecated().booleanValue()) {
                 pathItem.setGet(null);
             }
-            if (pathItem.getDelete() != null && pathItem.getDelete().getDeprecated() != null && pathItem.getDelete().getDeprecated()) {
+            if (pathItem.getDelete() != null && pathItem.getDelete().getDeprecated() != null && pathItem.getDelete().getDeprecated().booleanValue()) {
                 pathItem.setDelete(null);
             }
-            if (pathItem.getPost() != null && pathItem.getPost().getDeprecated() != null && pathItem.getPost().getDeprecated()) {
+            if (pathItem.getPost() != null && pathItem.getPost().getDeprecated() != null && pathItem.getPost().getDeprecated().booleanValue()) {
                 pathItem.setPost(null);
             }
-            if (pathItem.getPut() != null && pathItem.getPut().getDeprecated() != null && pathItem.getPut().getDeprecated()) {
+            if (pathItem.getPut() != null && pathItem.getPut().getDeprecated() != null && pathItem.getPut().getDeprecated().booleanValue()) {
                 pathItem.setPut(null);
             }
-            if (pathItem.getPatch() != null && pathItem.getPatch().getDeprecated() != null && pathItem.getPatch().getDeprecated()) {
+            if (pathItem.getPatch() != null && pathItem.getPatch().getDeprecated() != null && pathItem.getPatch().getDeprecated().booleanValue()) {
                 pathItem.setPatch(null);
             }
 
@@ -60,9 +61,6 @@ public class Deprecator implements Transformer {
         });
 
         openAPI.getComponents().getSchemas().values().stream().forEach(Deprecator::removeDeprecatedProperties);
-
-//        openAPI.getComponents().addSecuritySchemes("oauth2", securityScheme);
-
     }
 
     private static void removeDeprecatedContent(Content content) {

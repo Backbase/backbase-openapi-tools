@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SuppressWarnings("java:S3740")
 public class CaseFormatTransformer implements Transformer {
 
     @Override

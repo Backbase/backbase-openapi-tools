@@ -36,7 +36,7 @@ public class OpenApiDiffTest {
         List<Endpoint> missingEndpoints = changedOpenApi.getMissingEndpoints();
         List<ChangedOperation> changedEndPoints = changedOpenApi.getChangedOperations();
         String html =
-                new HtmlRender("Changelog", "http://deepoove.com/swagger-diff/stylesheets/demo.css")
+                new HtmlRender("Changelog")
                         .render(changedOpenApi);
 
         try {
@@ -59,7 +59,7 @@ public class OpenApiDiffTest {
         List<Endpoint> missingEndpoints = changedOpenApi.getMissingEndpoints();
         List<ChangedOperation> changedEndPoints = changedOpenApi.getChangedOperations();
         String html =
-                new HtmlRender("Changelog", "http://deepoove.com/swagger-diff/stylesheets/demo.css")
+                new HtmlRender("Changelog")
                         .render(changedOpenApi);
 
         try {
