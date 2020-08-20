@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 
 /** Created by adarsh.sharma on 26/12/17. */
+@UtilityClass
 public class EndpointUtils {
+
   public static Collection<? extends Endpoint> convert2Endpoints(
       String pathUrl, Map<PathItem.HttpMethod, Operation> map) {
-    List<Endpoint> endpoints = new ArrayList<Endpoint>();
+    List<Endpoint> endpoints = new ArrayList<>();
     if (null == map) return endpoints;
     for (Map.Entry<PathItem.HttpMethod, Operation> entry : map.entrySet()) {
       PathItem.HttpMethod httpMethod = entry.getKey();

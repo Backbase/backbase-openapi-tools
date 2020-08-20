@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @JsonIgnoreProperties({"oldMapping", "newMapping","context"})
+@SuppressWarnings("java:S3740")
 public class ChangedOneOfSchema implements ComposedChanged {
   private final Map<String, String> oldMapping;
   private final Map<String, String> newMapping;
