@@ -1,9 +1,9 @@
 package com.backbase.oss.boat.diff;
 
+import com.backbase.oss.boat.diff.compare.OpenApiDiff;
+import com.backbase.oss.boat.diff.model.ChangedOpenApi;
+import com.backbase.oss.boat.diff.output.MarkdownRender;
 import com.backbase.oss.boat.serializer.SerializerUtils;
-import com.github.elibracha.compare.OpenApiDiff;
-import com.github.elibracha.model.ChangedOpenApi;
-import com.github.elibracha.output.MarkdownRender;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -52,7 +52,7 @@ public class BatchOpenApiDiff {
             Path newOpenAPIPath = newVersionPair.getKey();
 
             try {
-                ChangedOpenApi  compare = OpenApiDiff.compare(oldOpenAPI, newOpenAPI);
+                ChangedOpenApi compare = OpenApiDiff.compare(oldOpenAPI, newOpenAPI);
                 List<ChangedOpenApi> changeLog = getChangeLog(oldOpenAPI);
                 changeLog.add(compare);
                 String changelogMarkdown = renderChangeLog(changeLog);
