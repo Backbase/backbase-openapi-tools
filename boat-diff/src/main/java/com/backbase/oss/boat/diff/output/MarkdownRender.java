@@ -339,13 +339,13 @@ public class MarkdownRender implements Render {
 
     protected String schema(int deepness, ComposedSchema schema, DiffContext context) {
         StringBuilder sb = new StringBuilder();
-        if (schema.getAllOf() != null && schema.getAllOf() != null) {
+        if (schema.getAllOf() != null) {
             LOGGER.debug("All of schema");
             schema.getAllOf().stream()
                     .map(this::resolve)
                     .forEach(composedChild -> sb.append(schema(deepness, composedChild, context)));
         }
-        if (schema.getOneOf() != null && schema.getOneOf() != null) {
+        if (schema.getOneOf() != null) {
             LOGGER.debug("One of schema");
             sb.append(format("%sOne of:\n\n", indent(deepness)));
             schema.getOneOf().stream()

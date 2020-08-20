@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 28/12/17.
@@ -30,14 +31,14 @@ public class RequestBodyDiff extends ReferenceDiffCache<RequestBody, ChangedRequ
 
     public Optional<ChangedRequestBody> diff(
             RequestBody left, RequestBody right, DiffContext context) {
-        String leftRef = left != null ? left.get$ref() : null,
-                rightRef = right != null ? right.get$ref() : null;
+        String leftRef = left != null ? left.get$ref() : null;
+        String rightRef = right != null ? right.get$ref() : null;
         return cachedDiff(new HashSet<>(), left, right, leftRef, rightRef, context);
     }
 
     @Override
     protected Optional<ChangedRequestBody> computeDiff(
-            HashSet<String> refSet, RequestBody left, RequestBody right, DiffContext context) {
+        Set<String> refSet, RequestBody left, RequestBody right, DiffContext context) {
         Content oldRequestContent = new Content();
         Content newRequestContent = new Content();
         RequestBody oldRequestBody = null;

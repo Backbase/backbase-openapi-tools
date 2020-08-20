@@ -48,8 +48,8 @@ public class OpenApiDiff {
     private ExtensionsDiff extensionsDiff;
     private MetadataDiff metadataDiff;
 
-    private OpenAPI oldSpecOpenApi;
-    private OpenAPI newSpecOpenApi;
+    private final OpenAPI oldSpecOpenApi;
+    private final OpenAPI newSpecOpenApi;
     private List<Endpoint> newEndpoints;
     private List<Endpoint> missingEndpoints;
     private List<ChangedOperation> changedOperations;
@@ -63,7 +63,7 @@ public class OpenApiDiff {
         this.oldSpecOpenApi = oldSpecOpenApi;
         this.newSpecOpenApi = newSpecOpenApi;
         if (null == oldSpecOpenApi || null == newSpecOpenApi) {
-            throw new RuntimeException("one of the old or new object is null");
+            throw new IllegalArgumentException("one of the old or new object is null");
         }
         initializeFields();
     }

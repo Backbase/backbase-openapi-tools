@@ -17,9 +17,9 @@ import java.util.Optional;
  * Created by adarsh.sharma on 07/01/18.
  */
 public class SecurityRequirementDiff {
-    private OpenApiDiff openApiDiff;
-    private Components leftComponents;
-    private Components rightComponents;
+    private final OpenApiDiff openApiDiff;
+    private final Components leftComponents;
+    private final Components rightComponents;
 
     public SecurityRequirementDiff(OpenApiDiff openApiDiff) {
         this.openApiDiff = openApiDiff;
@@ -33,7 +33,7 @@ public class SecurityRequirementDiff {
                         : null;
     }
 
-    public static SecurityRequirement getCopy(LinkedHashMap<String, List<String>> right) {
+    public static SecurityRequirement getCopy(Map<String, List<String>> right) {
         SecurityRequirement newSecurityRequirement = new SecurityRequirement();
         right.entrySet().stream()
                 .forEach(e -> newSecurityRequirement.put(e.getKey(), new ArrayList<>(e.getValue())));
@@ -81,7 +81,7 @@ public class SecurityRequirementDiff {
             if (rightSec.isEmpty()) {
                 changedSecurityRequirement.addMissing(leftSchemeRef, left.get(leftSchemeRef));
             } else {
-                String rightSchemeRef = rightSec.keySet().stream().findFirst().get();
+                String rightSchemeRef = rightSec.keySet().stream().findFirst().orElseThrow(NullPointerException::new);
                 right.remove(rightSchemeRef);
                 Optional<ChangedSecurityScheme> diff =
                         openApiDiff
