@@ -8,7 +8,9 @@ import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.io.File;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class OpenApiCompare {
 
     private static OpenAPIV3Parser openApiParser = new OpenAPIV3Parser();
@@ -51,7 +53,7 @@ public class OpenApiCompare {
 
     private static OpenAPI notNull(OpenAPI spec, String type) {
         if (spec == null) {
-            throw new RuntimeException(String.format("Malformed file: cant read %s file", type));
+            throw new IllegalArgumentException(String.format("Malformed file: cant read %s file", type));
         }
         return spec;
     }

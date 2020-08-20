@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 28/12/17.
@@ -37,7 +38,7 @@ public class ResponseDiff extends ReferenceDiffCache<ApiResponse, ChangedRespons
 
     @Override
     protected Optional<ChangedResponse> computeDiff(
-            HashSet<String> refSet, ApiResponse left, ApiResponse right, DiffContext context) {
+        Set<String> refSet, ApiResponse left, ApiResponse right, DiffContext context) {
         left = refPointer.resolveRef(leftComponents, left, left.get$ref());
         right = refPointer.resolveRef(rightComponents, right, right.get$ref());
 

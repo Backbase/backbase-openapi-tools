@@ -10,6 +10,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class ParameterDiff extends ReferenceDiffCache<Parameter, ChangedParameter> {
 
@@ -36,7 +37,7 @@ public class ParameterDiff extends ReferenceDiffCache<Parameter, ChangedParamete
 
     @Override
     protected Optional<ChangedParameter> computeDiff(
-            HashSet<String> refSet, Parameter left, Parameter right, DiffContext context) {
+        Set<String> refSet, Parameter left, Parameter right, DiffContext context) {
         left = refPointer.resolveRef(this.leftComponents, left, left.get$ref());
         right = refPointer.resolveRef(this.rightComponents, right, right.get$ref());
 

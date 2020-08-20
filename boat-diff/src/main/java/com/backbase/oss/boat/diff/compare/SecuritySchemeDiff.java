@@ -10,14 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by adarsh.sharma on 11/01/18.
  */
 public class SecuritySchemeDiff extends ReferenceDiffCache<SecurityScheme, ChangedSecurityScheme> {
-    private OpenApiDiff openApiDiff;
-    private Components leftComponents;
-    private Components rightComponents;
+    private final OpenApiDiff openApiDiff;
+    private final Components leftComponents;
+    private final Components rightComponents;
 
     public SecuritySchemeDiff(OpenApiDiff openApiDiff) {
         this.openApiDiff = openApiDiff;
@@ -63,7 +64,7 @@ public class SecuritySchemeDiff extends ReferenceDiffCache<SecurityScheme, Chang
 
     @Override
     protected Optional<ChangedSecurityScheme> computeDiff(
-            HashSet<String> refSet,
+            Set<String> refSet,
             SecurityScheme leftSecurityScheme,
             SecurityScheme rightSecurityScheme,
             DiffContext context) {

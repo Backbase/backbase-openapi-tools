@@ -3,7 +3,7 @@ package com.backbase.oss.boat.diff.compare;
 import com.backbase.oss.boat.diff.model.Change;
 import com.backbase.oss.boat.diff.model.Changed;
 import com.backbase.oss.boat.diff.model.DiffContext;
-
+@SuppressWarnings({"java:S3740", "rawtypes"})
 public interface ExtensionDiff {
 
     ExtensionDiff setOpenApiDiff(OpenApiDiff openApiDiff);

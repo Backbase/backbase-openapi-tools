@@ -17,13 +17,13 @@ public class ExtensionsDiff {
     private final OpenApiDiff openApiDiff;
 
     private ServiceLoader<ExtensionDiff> extensionsLoader = ServiceLoader.load(ExtensionDiff.class);
-    private List<ExtensionDiff> extensionsDiff = new ArrayList<>();
+    private List<ExtensionDiff> extensionDiffList = new ArrayList<>();
 
     public ExtensionsDiff(OpenApiDiff openApiDiff) {
         this.openApiDiff = openApiDiff;
         this.extensionsLoader.reload();
         for (ExtensionDiff anExtensionsLoader : this.extensionsLoader) {
-            extensionsDiff.add(anExtensionsLoader);
+            extensionDiffList.add(anExtensionsLoader);
         }
     }
 
@@ -43,7 +43,7 @@ public class ExtensionsDiff {
     }
 
     public Optional<ExtensionDiff> getExtensionDiff(String name) {
-        return extensionsDiff.stream().filter(diff -> ("x-" + diff.getName()).equals(name)).findFirst();
+        return extensionDiffList.stream().filter(diff -> ("x-" + diff.getName()).equals(name)).findFirst();
     }
 
     public <T> Optional<T> executeExtension(String name, Function<ExtensionDiff, T> predicate) {
@@ -81,7 +81,7 @@ public class ExtensionsDiff {
                                 .ifPresent(changed -> changedExtensions.getIncreased().put(key, changed)));
         return ChangedUtils.isChanged(changedExtensions);
     }
-
+    @SuppressWarnings({"java:S3740", "rawtypes"})
     private Optional<Changed> executeExtensionDiff(String name, Change change, DiffContext context) {
         return executeExtension(name, diff -> diff.setOpenApiDiff(openApiDiff).diff(change, context));
     }

@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.Getter;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"java:S3740", "rawtypes"})
 @Getter
 public class SchemaDiffResult {
     protected ChangedSchema changedSchema;
@@ -41,7 +42,7 @@ public class SchemaDiffResult {
     }
 
     public <V extends Schema<X>, X> Optional<ChangedSchema> diff(
-            HashSet<String> refSet,
+            Set<String> refSet,
             Components leftComponents,
             Components rightComponents,
             V left,
@@ -79,8 +80,8 @@ public class SchemaDiffResult {
                 .diff(left.getDescription(), right.getDescription(), context)
                 .ifPresent(changedSchema::setDescription);
 
-        Map<String, Schema> leftProperties = null == left ? null : left.getProperties();
-        Map<String, Schema> rightProperties = null == right ? null : right.getProperties();
+        Map<String, Schema> leftProperties = left.getProperties();
+        Map<String, Schema> rightProperties = right.getProperties();
         MapKeyDiff<String, Schema> propertyDiff = MapKeyDiff.diff(leftProperties, rightProperties);
 
         for (String key : propertyDiff.getSharedKey()) {
@@ -146,10 +147,10 @@ public class SchemaDiffResult {
     }
 
     private void compareAdditionalProperties(
-            HashSet<String> refSet, Schema leftSchema, Schema rightSchema, DiffContext context) {
+            Set<String> refSet, Schema leftSchema, Schema rightSchema, DiffContext context) {
         Object left = leftSchema.getAdditionalProperties();
         Object right = rightSchema.getAdditionalProperties();
-        if ((left != null && left instanceof Schema) || (right != null && right instanceof Schema)) {
+        if ((left instanceof Schema) || (right instanceof Schema)) {
             Schema leftAdditionalSchema = (Schema) left;
             Schema rightAdditionalSchema = (Schema) right;
             ChangedSchema apChangedSchema =
