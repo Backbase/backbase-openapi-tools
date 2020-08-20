@@ -10,6 +10,7 @@ import com.backbase.oss.boat.diff.output.ConsoleRender;
 import com.backbase.oss.boat.diff.output.HtmlRender;
 import com.backbase.oss.boat.diff.output.JsonRender;
 import com.backbase.oss.boat.diff.output.MarkdownRender;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -78,8 +79,7 @@ public class OpenApiDiffTest {
     public void testDiff() {
         ChangedOpenApi changedOpenApi = OpenApiCompare.fromLocations(OPENAPI_DOC1, OPENAPI_DOC2);
         List<ChangedOperation> changedEndPoints = changedOpenApi.getChangedOperations();
-        String html =
-                new HtmlRender("Changelog", true)
+        String html = new HtmlRender("Changelog")
                         .render(changedOpenApi);
         try {
             FileWriter fw = new FileWriter("target/testDiff.html");
@@ -104,6 +104,7 @@ public class OpenApiDiffTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assertThat(new File("target/testDiff.md")).exists();
     }
 
     @SneakyThrows
@@ -119,6 +120,7 @@ public class OpenApiDiffTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assertThat(new File("target/test.json")).exists();
     }
 
     @SneakyThrows
@@ -134,5 +136,6 @@ public class OpenApiDiffTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assertThat(new File("target/console.txt")).exists();
     }
 }
