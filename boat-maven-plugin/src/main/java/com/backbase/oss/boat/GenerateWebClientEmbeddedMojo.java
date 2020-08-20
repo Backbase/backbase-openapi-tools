@@ -11,7 +11,7 @@ public class GenerateWebClientEmbeddedMojo extends AbstractGenerateMojo {
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("Generating Server Stubs using Web Client Boot");
-        execute("java", "webclient", true, true, false);
+        execute("java", "webclient", true, true, true);
     }
 
 }
