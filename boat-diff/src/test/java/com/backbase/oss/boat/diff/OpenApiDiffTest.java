@@ -4,12 +4,14 @@ import static com.backbase.oss.boat.diff.TestUtils.assertOpenApiAreEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.backbase.oss.boat.diff.model.ChangedOpenApi;
+import com.backbase.oss.boat.diff.model.ChangedOpenApiRenderList;
 import com.backbase.oss.boat.diff.model.ChangedOperation;
 import com.backbase.oss.boat.diff.model.Endpoint;
 import com.backbase.oss.boat.diff.output.ConsoleRender;
 import com.backbase.oss.boat.diff.output.HtmlRender;
 import com.backbase.oss.boat.diff.output.JsonRender;
 import com.backbase.oss.boat.diff.output.MarkdownRender;
+import com.backbase.oss.boat.diff.output.SumJsonRender;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -137,5 +139,25 @@ public class OpenApiDiffTest {
             e.printStackTrace();
         }
         assertThat(new File("target/console.txt")).exists();
+    }
+
+    @SneakyThrows
+    @Test
+    public void testSumJsonRender() {
+        ChangedOpenApi diff = OpenApiCompare.fromLocations(OPENAPI_DOC1, OPENAPI_DOC2);
+
+        SumJsonRender sumJsonRender = new SumJsonRender();
+        ChangedOpenApiRenderList list = new ChangedOpenApiRenderList(diff);
+
+        String render = sumJsonRender.render(list);
+        try {
+            FileWriter fw = new FileWriter("target/sumJson.json");
+            fw.write(render);
+            fw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertThat(new File("target/sumJson.json")).exists();
     }
 }
