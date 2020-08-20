@@ -1,11 +1,11 @@
 package com.backbase.oss.boat;
 
-import com.github.elibracha.OpenApiCompare;
-import com.github.elibracha.model.ChangedOpenApi;
-import com.github.elibracha.output.ConsoleRender;
-import com.github.elibracha.output.HtmlRender;
-import com.github.elibracha.output.MarkdownRender;
-import com.github.elibracha.output.Render;
+import com.backbase.oss.boat.diff.OpenApiCompare;
+import com.backbase.oss.boat.diff.model.ChangedOpenApi;
+import com.backbase.oss.boat.diff.output.ConsoleRender;
+import com.backbase.oss.boat.diff.output.HtmlRender;
+import com.backbase.oss.boat.diff.output.MarkdownRender;
+import com.backbase.oss.boat.diff.output.Render;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
