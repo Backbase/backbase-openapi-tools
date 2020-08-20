@@ -74,8 +74,8 @@ public class DirectoryExploder {
                 }
                 Files.write(exampleFile, serializedValue.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
                 namedExample.getExample().setValue(null);
-                String $ref = EXAMPLES_DIR + File.separator + filename;
-                namedExample.getExample().set$ref($ref);
+                String ref = EXAMPLES_DIR + File.separator + filename;
+                namedExample.getExample().set$ref(ref);
             } catch (JsonProcessingException e) {
                 log.error("Could not serialize to JSON", e);
             } catch (IOException e) {

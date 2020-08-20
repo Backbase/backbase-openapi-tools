@@ -7,8 +7,8 @@ import java.util.HashMap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.util.Assert;
 
 @Slf4j
 @SuppressWarnings("java:S2699")
@@ -24,7 +24,7 @@ public class BatchDiffMojoTests {
         HashMap<File, OpenAPI> success = new HashMap<>();
 
         BatchOpenApiDiff.diff(tempSpecDirectory.toPath(), success, new HashMap<>(), true, true);
-        Assert.notEmpty(success, "All should be successful");
+        Assert.assertFalse("All should be successful",success.isEmpty());
     }
 
 
