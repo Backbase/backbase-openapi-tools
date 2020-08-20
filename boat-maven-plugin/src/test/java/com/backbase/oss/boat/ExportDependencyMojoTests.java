@@ -18,6 +18,51 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 public class ExportDependencyMojoTests {
 
     @Test
+    public void testAggremateInputFile() throws MojoExecutionException, ExportException {
+
+        ExportDependenciesMojo mojo = new ExportDependenciesMojo();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        String groupId = "test.groupId";
+        String artifactId = "artifact-spec";
+        String version = "2.19.0";
+        String scope = "provided";
+        String type = "jar";
+
+        Dependency specDependency = new Dependency();
+        specDependency.setGroupId(groupId);
+        specDependency.setArtifactId(artifactId);
+        specDependency.setVersion(version);
+
+        DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler();
+        DefaultArtifact specArtifact = new DefaultArtifact(groupId, artifactId, version, scope, type, null,
+            artifactHandler);
+        specArtifact.setFile(getFile("/raml-examples/aggregated-spec.zip"));
+
+        Build build = new Build();
+        build.setDirectory("target");
+
+
+        MavenProject project = new MavenProject();
+        project.setArtifacts(Collections.singleton(specArtifact));
+        project.setDependencies(Collections.singletonList(specDependency));
+
+        project.setBuild(build);
+
+        mojo.project = project;
+        mojo.includeGroupIds = "test.";
+        mojo.ramlFileFilters = "**/*-api.raml,**/api.raml";
+        mojo.output = new File("target/export-aggregated-dep");
+        mojo.continueOnError = false;
+        mojo.execute();
+
+        Assert.assertTrue(new File("target/export-aggregated-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
+
+    }
+
+    @Test
     public void testInputFile() throws MojoExecutionException, ExportException {
 
         ExportDependenciesMojo mojo = new ExportDependenciesMojo();
@@ -39,7 +84,7 @@ public class ExportDependencyMojoTests {
         DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler();
         DefaultArtifact specArtifact = new DefaultArtifact(groupId, artifactId, version, scope, type, null,
             artifactHandler);
-        specArtifact.setFile(getFile("/raml-examples/aggregated-spec.jar"));
+        specArtifact.setFile(getFile("/raml-examples/backbase-wallet.zip"));
 
         Build build = new Build();
         build.setDirectory("target");
