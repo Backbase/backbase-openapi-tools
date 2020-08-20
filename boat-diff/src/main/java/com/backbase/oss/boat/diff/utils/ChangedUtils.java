@@ -2,7 +2,9 @@ package com.backbase.oss.boat.diff.utils;
 
 import com.backbase.oss.boat.diff.model.Changed;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ChangedUtils {
 
   public static boolean isUnchanged(Changed changed) {

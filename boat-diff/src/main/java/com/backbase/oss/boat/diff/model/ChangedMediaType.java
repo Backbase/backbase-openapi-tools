@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @JsonIgnoreProperties({"oldSchema", "newSchema","context"})
+@SuppressWarnings("java:S3740")
 public class ChangedMediaType implements ComposedChanged {
   private final Schema oldSchema;
   private final Schema newSchema;
