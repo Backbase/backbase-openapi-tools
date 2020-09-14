@@ -302,7 +302,7 @@ class JsonSchemaToOpenApi {
         if (type.hasNonNull(JAVA_ENUM_NAMES)) {
             schema.addExtension(X_JAVA_ENUM_NAMES, getEnum(type, JAVA_ENUM_NAMES));
         }
-        schema.setEnum(getEnum(type));
+        getEnum(type).ifPresent(schema::setEnum);
         return schema;
     }
 
@@ -367,12 +367,12 @@ class JsonSchemaToOpenApi {
         }
     }
 
-    private List getEnum(JsonNode type) {
+    private Optional<List> getEnum(JsonNode type) {
         String propertyName = "enum";
         return getEnum(type, propertyName);
     }
 
-    private List getEnum(JsonNode type, String propertyName) {
+    private Optional<List> getEnum(JsonNode type, String propertyName) {
         if (type.hasNonNull(propertyName)) {
             JsonNode enumList = type.get(propertyName);
             ArrayList result = new ArrayList();
@@ -389,9 +389,9 @@ class JsonSchemaToOpenApi {
                     throw new UnsupportedOperationException("Haven't come across type enum type: " + type);
                 }
             });
-            return result;
+            return Optional.of(result);
         } else {
-            return Collections.emptyList();
+            return Optional.empty();
         }
     }
 

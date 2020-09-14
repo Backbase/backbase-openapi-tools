@@ -16,6 +16,10 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("performBeanValidation", "true");
         options.put("skipDefaultInterface", "true");
         options.put("interfaceOnly", "true");
+        options.put("useTags", "true");
+        options.put("useBeanValidation", "true");
+        options.put("useClassLevelBeanValidation", "false");
+        options.put("useOptional", "false");
 
         this.generatorName = generatorName;
         this.generateSupportingFiles = generateSupportingFiles;
