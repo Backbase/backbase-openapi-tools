@@ -11,6 +11,6 @@ public class GenerateRestTemplateEmbeddedMojo extends AbstractGenerateMojo {
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("Generating Client using Spring Rest Template");
-        execute("java", "resttemplate", true, false, false);
+        execute("java", "resttemplate", true, false, true);
     }
 }
