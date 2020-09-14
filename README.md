@@ -20,6 +20,11 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.2
+* Fixed enum conversion. Empty enums are now set to null again when converting from raml to OpenAPI
+* Added more robust code gen mojos
+
+
 ## 0.2.1
 * Improved Open API Diff
 * Sonar Fixes 
