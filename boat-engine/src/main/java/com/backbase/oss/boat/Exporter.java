@@ -556,7 +556,8 @@ public class Exporter {
             String operationId = getOperationId(resource, ramlMethod, operations, requestBody);
             String description = getDescription(ramlMethod.description());
             String summary;
-            if(ramlMethod.displayName() == null) {
+            List<String> unwantedSummaries = new ArrayList<>(Arrays.asList("put","get", "post"));
+            if(ramlMethod.displayName() == null || unwantedSummaries.contains(ramlMethod.displayName().value())) {
                 summary = getSummary(ramlMethod.description());
             }else {
                 summary = ramlMethod.displayName().value();
