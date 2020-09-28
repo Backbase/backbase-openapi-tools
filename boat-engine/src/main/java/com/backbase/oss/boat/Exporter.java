@@ -555,7 +555,14 @@ public class Exporter {
             String tag = Arrays.stream(resourcePath.substring(1).split("/")).findFirst().orElse("tag");
             String operationId = getOperationId(resource, ramlMethod, operations, requestBody);
             String description = getDescription(ramlMethod.description());
-            String summary = getSummary(ramlMethod.description());
+            String summary;
+            List<String> unwantedSummaries = new ArrayList<>(Arrays.asList("put","get", "post"));
+            if(ramlMethod.displayName() == null || unwantedSummaries.contains(ramlMethod.displayName().value())) {
+                summary = getSummary(ramlMethod.description());
+            }else {
+                summary = ramlMethod.displayName().value();
+            }
+
 
             Operation operation = new Operation();
 
