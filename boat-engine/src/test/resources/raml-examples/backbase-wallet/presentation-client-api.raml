@@ -101,6 +101,7 @@ securedBy: [ bb.bbAccessControl ]
           privilege: READ_PAYMENT_CARD
         is: [traits.BadRequestError, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
         description: Returns details of a specific payment card
+        displayName: Get payment card
         responses:
           200:
             body:
