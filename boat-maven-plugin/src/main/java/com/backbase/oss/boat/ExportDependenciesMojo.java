@@ -35,8 +35,4 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
         exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
     }
 
-    private void export(org.eclipse.aether.artifact.Artifact artifact) throws MojoExecutionException {
-        File outputDirectory = new File(this.output, artifact.getGroupId().replace('.', '/'));
-        exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
-    }
 }
