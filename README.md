@@ -20,6 +20,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.4
+* Also include integration-spec and artifacts ending on specs as default for conversion using `export-dep`
+
+## 0.2.3
+* Use RAML Display Name as Summary on Http Operations when converting to OAS3
+
 ## 0.2.2
 * Fixed enum conversion. Empty enums are now set to null again when converting from raml to OpenAPI
 * Added more robust code gen mojos
