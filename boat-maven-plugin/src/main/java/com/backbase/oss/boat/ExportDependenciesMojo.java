@@ -19,7 +19,7 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
 
         List<org.apache.maven.artifact.Artifact> artifacts = project.getArtifacts().stream()
             .filter(dependency -> dependency.getGroupId().startsWith(includeGroupIds))
-            .filter(dependency -> dependency.getArtifactId().endsWith("-spec"))
+            .filter(dependency -> dependency.getArtifactId().endsWith("-spec") || dependency.getArtifactId().endsWith("-specs"))
             .collect(Collectors.toList());
 
         for (Artifact artifact : artifacts) {
