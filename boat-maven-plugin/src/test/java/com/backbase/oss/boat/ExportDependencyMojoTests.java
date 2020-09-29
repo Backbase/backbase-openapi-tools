@@ -18,7 +18,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 public class ExportDependencyMojoTests {
 
     @Test
-    public void testAggremateInputFile() throws MojoExecutionException, ExportException {
+    public void testAggregatedInputFile() throws MojoExecutionException, ExportException {
 
         ExportDependenciesMojo mojo = new ExportDependenciesMojo();
 
@@ -64,17 +64,32 @@ public class ExportDependencyMojoTests {
 
     @Test
     public void testInputFile() throws MojoExecutionException, ExportException {
-
-        ExportDependenciesMojo mojo = new ExportDependenciesMojo();
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
         String groupId = "test.groupId";
         String artifactId = "artifact-spec";
         String version = "2.19.0";
         String scope = "provided";
         String type = "jar";
+
+        testExportDep(groupId, artifactId, version, scope, type);
+    }
+
+    @Test
+    public void testInputFile2() throws MojoExecutionException, ExportException {
+        String groupId = "test.groupId";
+        String artifactId = "artifact-specs";
+        String version = "2.19.0";
+        String scope = "provided";
+        String type = "jar";
+
+        testExportDep(groupId, artifactId, version, scope, type);
+    }
+
+    private void testExportDep(String groupId, String artifactId, String version, String scope, String type)
+        throws MojoExecutionException {
+        ExportDependenciesMojo mojo = new ExportDependenciesMojo();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
 
         Dependency specDependency = new Dependency();
         specDependency.setGroupId(groupId);
@@ -88,7 +103,6 @@ public class ExportDependencyMojoTests {
 
         Build build = new Build();
         build.setDirectory("target");
-
 
         MavenProject project = new MavenProject();
         project.setArtifacts(Collections.singleton(specArtifact));
@@ -104,11 +118,11 @@ public class ExportDependencyMojoTests {
         mojo.execute();
 
         Assert.assertTrue(new File("target/export-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
-
     }
 
     private File getFile(String fileName) {
         return new File(getClass().getResource(fileName).getFile());
     }
+
 
 }
