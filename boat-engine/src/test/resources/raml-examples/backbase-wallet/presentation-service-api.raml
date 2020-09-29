@@ -100,6 +100,11 @@ securedBy: [ bb.bbAccessControl ]
         delete:
           is: [traits.BadRequestError, traits.InternalServerError, traits.ForbiddenError, traits.UnsupportedMediaTypeError, traits.NotFoundError, traits.UnauthorizedError]
           description: Deletes a payment card with a given id
+          (bb.x-bb-api-deprecation):
+            deprecatedFromVersion: v2
+            removedFromVersion: v3
+            reason: Endpoints is going to be covered to post.
+            description: Here we can put an elaborate description for deprecated items
           responses:
             204:
               description: Payment card is succesfully deleted
