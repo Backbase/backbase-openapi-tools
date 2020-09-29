@@ -19,7 +19,7 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
 
         List<org.apache.maven.artifact.Artifact> artifacts = project.getArtifacts().stream()
             .filter(dependency -> dependency.getGroupId().startsWith(includeGroupIds))
-            .filter(dependency -> dependency.getArtifactId().endsWith("-spec"))
+            .filter(dependency -> dependency.getArtifactId().endsWith("-spec") || dependency.getArtifactId().endsWith("-specs"))
             .collect(Collectors.toList());
 
         for (Artifact artifact : artifacts) {
@@ -35,8 +35,4 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
         exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
     }
 
-    private void export(org.eclipse.aether.artifact.Artifact artifact) throws MojoExecutionException {
-        File outputDirectory = new File(this.output, artifact.getGroupId().replace('.', '/'));
-        exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
-    }
 }
