@@ -233,11 +233,13 @@ public class Exporter {
         }
 
         OpenAPI openAPI = new OpenAPI();
+        openAPI.setOpenapi("3.0.3");
         openAPI.setInfo(info);
         openAPI.setTags(tags);
         openAPI.setServers(servers);
         openAPI.setComponents(components);
         openAPI.setPaths(paths);
+
 
         // Start dereference Process
         schemas = new ArrayList<>(components.getSchemas().values());
@@ -607,16 +609,16 @@ public class Exporter {
     @SuppressWarnings("java:S3776")
     private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations,
         RequestBody requestBody) {
-        AnnotableStringType annotableStringType = ramlMethod.displayName();
-        String httpMethod;
-        if (annotableStringType == null) {
-            httpMethod = ramlMethod.method();
-        } else {
-            httpMethod = annotableStringType.value();
-        }
-        String resourceName = resource.displayName().value();
 
-        String operationId = httpMethod;
+        AnnotableStringType ramlMethodDisplayName = ramlMethod.displayName();
+        String httpMethod = ramlMethod.method();;
+        String resourceName =  resource.displayName().value();
+        // Some RAML display names consist "/"
+        if(resourceName.contains("/")) {
+            resourceName = Arrays.stream(resourceName.split("/")).map(StringUtils::capitalize).collect(Collectors.joining());
+        }
+
+        String operationId = httpMethod + resourceName;
 
         // If operationId is equal the http method name,
         // take the display name  or resource path name of the raml resource
@@ -631,22 +633,15 @@ public class Exporter {
         }
 
         // prepend http name ot to the operationId and ensure the rest has a capital
-        operationId = ramlMethod.method() + StringUtils.capitalize(operationId);
+        operationId = Utils.normalizeDisplayName(operationId);
 
         // path has path parameter, add By<PathParam> if not already there and hope for the best.
-        Set<String> placeHolders = Utils.getPlaceholders(resource.resourcePath());
-        if (!placeHolders.isEmpty()) {
-            String suffix =
-                "By" + placeHolders.stream().map(StringUtils::capitalize).collect(Collectors.joining("And"));
-            if (!operationId.toLowerCase().endsWith(suffix.toLowerCase())) {
-                operationId += suffix;
-            }
-        }
         // Ensure format is lower camel case.
         operationId = CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_CAMEL).convert(operationId);
 
         String finalOperationId = operationId;
         if (operationIdExists(operations, finalOperationId) && requestBody != null) {
+            log.warn("Operation {} already exists!", operationId);
             Optional<MediaType> first = requestBody.getContent().values().stream().findFirst();
             if (first.isPresent()) {
                 String ref = first.get().getSchema().get$ref();
@@ -673,7 +668,7 @@ public class Exporter {
     }
 
     private boolean operationIdExists(List<Operation> operations, String finalOperationId) {
-        return operations.stream().anyMatch(operation -> operation.getOperationId().equals(finalOperationId));
+        return operations.stream().anyMatch(operation -> operation.getOperationId().equalsIgnoreCase(finalOperationId));
     }
 
     private void processMethodAnnotations(String resourcePath, Components components, Method ramlMethod,

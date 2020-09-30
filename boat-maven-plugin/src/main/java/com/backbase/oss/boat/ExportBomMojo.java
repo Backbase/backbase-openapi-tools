@@ -268,7 +268,12 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
         }
         if (model.getProfiles() != null) {
             for (Profile profile : model.getProfiles()) {
-                for (Dependency dependency : profile.getDependencies()) {
+                log.info("Exporting spec from profile: {}", profile.getId());
+                List<Dependency> profileDependencies = profile.getDependencies().stream()
+                    .map(dependency -> setVersion(properties, dependency))
+                    .collect(Collectors.toList());
+
+                for (Dependency dependency : profileDependencies) {
                     setManagedVersionDependency(dependencyManagementDependencies, dependency);
                 }
             }
@@ -277,13 +282,15 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     }
 
     private Dependency setVersion(Properties properties, Dependency dependency) {
-        dependency.setVersion(replacePlaceholders(properties, dependency.getVersion()));
+        if (dependency.getVersion() != null && dependency.getVersion().contains("$")) {
+            dependency.setVersion(replacePlaceholders(properties, dependency.getVersion()));
+        }
         return dependency;
     }
 
     private void setManagedVersionDependency
         (List<org.apache.maven.model.Dependency> dependencyManagementDependencies,
-            org.apache.maven.model.Dependency profileDependency) {
+         org.apache.maven.model.Dependency profileDependency) {
         Optional<org.apache.maven.model.Dependency> managedDependency = resolveDependencyVersion(
             dependencyManagementDependencies, profileDependency);
         managedDependency.ifPresent(dependency -> profileDependency.setVersion(dependency.getVersion()));
@@ -315,7 +322,9 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             }
         }
         matcher.appendTail(buffer);
-        return buffer.toString();
+        String s = buffer.toString();
+        log.debug("Replaced placeholder: {} with: {}", template, s);
+        return s;
 
     }
 
