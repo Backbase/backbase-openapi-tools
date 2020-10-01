@@ -1,7 +1,5 @@
 package com.backbase.oss.boat;
 
-import static com.backbase.oss.boat.ExampleUtils.getExampleObject;
-
 import com.backbase.oss.boat.loader.CachingResourceLoader;
 import com.backbase.oss.boat.loader.RamlResourceLoader;
 import com.backbase.oss.boat.transformers.Transformer;
@@ -73,6 +71,8 @@ import org.raml.v2.api.model.v10.system.types.AnnotableStringType;
 import org.raml.v2.api.model.v10.system.types.MarkdownString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.backbase.oss.boat.ExampleUtils.getExampleObject;
 
 @SuppressWarnings("rawtypes")
 public class Exporter {
@@ -240,7 +240,6 @@ public class Exporter {
         openAPI.setComponents(components);
         openAPI.setPaths(paths);
 
-
         // Start dereference Process
         schemas = new ArrayList<>(components.getSchemas().values());
         for (Schema schema : schemas) {
@@ -350,7 +349,7 @@ public class Exporter {
     }
 
     private void parseRamlTypeReferences(URL baseUrl, Map<String, String> ramlTypeReferences,
-        JsonNode jsonNode) {
+                                         JsonNode jsonNode) {
         if (jsonNode.hasNonNull("types")) {
             ObjectNode types = (ObjectNode) jsonNode.get("types");
             types.fields().forEachRemaining(nodeEntry -> parseRamlRefEntry(baseUrl, ramlTypeReferences, nodeEntry));
@@ -382,7 +381,7 @@ public class Exporter {
     }
 
     private void parseRamlRefEntry(URL baseUrl, Map<String, String> ramlTypeReferences,
-        Map.Entry<String, JsonNode> nodeEntry) {
+                                   Map.Entry<String, JsonNode> nodeEntry) {
         String key = nodeEntry.getKey();
         JsonNode typeReference = nodeEntry.getValue();
         if (typeReference.has("type") && typeReference instanceof ObjectNode) {
@@ -428,7 +427,7 @@ public class Exporter {
     }
 
     private void convertResources(String rootPath, List<Resource> resources, Paths paths, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
+                                  JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
         for (Resource resource : resources) {
             if (log.isDebugEnabled()) {
@@ -449,7 +448,7 @@ public class Exporter {
     }
 
     private PathItem convertResource(Resource resource, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
+                                     JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
         throws ExportException, DerefenceException {
         PathItem pathItem = new PathItem();
         pathItem.summary(getDisplayName(resource.displayName()));
@@ -460,7 +459,7 @@ public class Exporter {
     }
 
     private void mapUriParameters(Resource resource, PathItem pathItem,
-        Components components) {
+                                  Components components) {
         Resource current = resource;
         Resource parent = current.parentResource();
 
@@ -543,7 +542,7 @@ public class Exporter {
     }
 
     private void mapMethods(Resource resource, PathItem pathItem, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
+                            JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
         for (Method ramlMethod : resource.methods()) {
             PathItem.HttpMethod httpMethod = getHttpMethod(ramlMethod);
@@ -608,14 +607,16 @@ public class Exporter {
 
     @SuppressWarnings("java:S3776")
     private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations,
-        RequestBody requestBody) {
+                                  RequestBody requestBody) {
 
-        AnnotableStringType ramlMethodDisplayName = ramlMethod.displayName();
-        String httpMethod = ramlMethod.method();;
-        String resourceName =  resource.displayName().value();
+        String ramlMethodDisplayName = ramlMethod.displayName().value();
+        String httpMethod = ramlMethod.method();
+        String resourceName = resource.displayName().value();
+
         // Some RAML display names consist "/"
-        if(resourceName.contains("/")) {
-            resourceName = Arrays.stream(resourceName.split("/")).map(StringUtils::capitalize).collect(Collectors.joining());
+        if (resourceName.contains("/")) {
+            resourceName = Arrays.stream(resourceName.split("/")).map(StringUtils::capitalize)
+                .collect(Collectors.joining());
         }
 
         String operationId = httpMethod + resourceName;
@@ -641,18 +642,17 @@ public class Exporter {
 
         String finalOperationId = operationId;
         if (operationIdExists(operations, finalOperationId) && requestBody != null) {
-            log.warn("Operation {} already exists!", operationId);
-            Optional<MediaType> first = requestBody.getContent().values().stream().findFirst();
-            if (first.isPresent()) {
-                String ref = first.get().getSchema().get$ref();
-                String suffix = first.get().getSchema().getName();
-                if (suffix == null && ref != null) {
-                    suffix = StringUtils.substringAfterLast(ref, "/");
+
+            Set<String> placeHolders = Utils.getPlaceholders(resource.resourcePath());
+            if (!placeHolders.isEmpty()) {
+                String suffix =
+                    "By" + placeHolders.stream().map(StringUtils::capitalize).collect(Collectors.joining("And"));
+                if (!operationId.toLowerCase().endsWith(suffix.toLowerCase())) {
+                    operationId += suffix;
                 }
-                operationId += "With" + suffix;
-            } else {
-                operationId += "Duplicate";
             }
+
+            log.warn("Operation {} for path: {}  already exists! using: {}", finalOperationId, resource.resourcePath(), operationId);
         }
 
         if (operationIdExists(operations, finalOperationId)) {
@@ -672,7 +672,7 @@ public class Exporter {
     }
 
     private void processMethodAnnotations(String resourcePath, Components components, Method ramlMethod,
-        PathItem.HttpMethod httpMethod, Operation operation, JsonSchemaToOpenApi jsonSchemaToOpenApi)
+                                          PathItem.HttpMethod httpMethod, Operation operation, JsonSchemaToOpenApi jsonSchemaToOpenApi)
         throws ExportException {
         for (AnnotationRef annotationRef : ramlMethod.annotations()) {
             TypeDeclaration annotation = annotationRef.annotation();
@@ -697,7 +697,7 @@ public class Exporter {
     }
 
     private Schema getAnnotationSchema(String resourcePath, Components components, TypeDeclaration annotation,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException {
+                                       JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException {
         Schema annotationSchema;
         if (annotation instanceof JSONTypeDeclaration) {
             JSONTypeDeclaration jsonType = (JSONTypeDeclaration) annotation;
@@ -727,7 +727,7 @@ public class Exporter {
     }
 
     private RequestBody convertRequestBody(Resource resource, Method ramlMethod, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws DerefenceException, ExportException {
+                                           JsonSchemaToOpenApi jsonSchemaToOpenApi) throws DerefenceException, ExportException {
         if (ramlMethod.body() == null || ramlMethod.body().isEmpty()) {
             return null;
         }
@@ -761,7 +761,7 @@ public class Exporter {
     }
 
     private void convertTypeToParameter(TypeDeclaration typeDeclaration, Parameter parameter,
-        Components components) {
+                                        Components components) {
         if (log.isDebugEnabled()) {
             log.debug("Converting Parameter from: {} with type: {} into: {}", typeDeclaration.name(),
                 typeDeclaration.type(), parameter.getClass().getName());
@@ -795,7 +795,7 @@ public class Exporter {
     }
 
     private ApiResponses mapResponses(Resource resource, Method ramlMethod, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
+                                      JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
         ApiResponses apiResponses = new ApiResponses();
         for (Response ramlResponse : ramlMethod.responses()) {
             Content apiResponseContent = new Content();
@@ -829,7 +829,7 @@ public class Exporter {
 
     @SuppressWarnings("java:S3776")
     private MediaType convertBody(TypeDeclaration body, String name, Components components,
-        JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
+                                  JsonSchemaToOpenApi jsonSchemaToOpenApi) throws ExportException, DerefenceException {
         Schema bodySchema = null;
         MediaType mediaType = null;
 
