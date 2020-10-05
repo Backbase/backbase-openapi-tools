@@ -20,6 +20,13 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.4 - Breaking Change!
+* **Changed how operationIds are generated**. The previous implementation ended up generating very long and confusing names. 
+    The improved generator greatly improves the names of operationId when converting from RAML to OAS3
+* Default version of OpenAPI is now **3.0.3**
+* Generated STUBS and Clients must be refactored to use the new names! It should not affect the names of Schemas converted from RAML. 
+
+
 ## 0.2.3
 * Use RAML Display Name as Summary on Http Operations when converting to OAS3
 * Also include integration-spec and artifacts ending on specs as default for conversion using `export-dep`
