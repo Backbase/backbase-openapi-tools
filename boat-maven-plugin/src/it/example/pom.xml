@@ -15,6 +15,7 @@
         <module>raml-spec-version-2</module>
         <module>raml-spec-bom</module>
         <module>raml-spec-bom-version-2</module>
+        <module>raml-spec-bom-version-3-profiles</module>
         <module>raml-2-openapi-export-dep</module>
         <module>raml-2-openapi-export-bom</module>
         <module>raml-2-openapi-generate-rest-template-embedded</module>
