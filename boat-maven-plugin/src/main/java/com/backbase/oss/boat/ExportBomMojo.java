@@ -255,13 +255,15 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
         List<org.apache.maven.model.Dependency> dependencyManagementDependencies = new ArrayList<>();
         if (model.getDependencyManagement() != null) {
             dependencyManagementDependencies = model.getDependencyManagement().getDependencies().stream()
-                .map(dependency -> setVersion(properties, dependency))
+                .map(dependency -> resolvePropertyPlaceholderVersion(properties, dependency))
                 .collect(Collectors.toList());
         }
         if (model.getDependencies() != null) {
             for (Dependency dependency : model.getDependencies()) {
                 if (dependency.getVersion() == null) {
                     setManagedVersionDependency(dependencyManagementDependencies, dependency);
+                } else {
+                    resolvePropertyPlaceholderVersion(properties, dependency);
                 }
             }
 
@@ -270,7 +272,7 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             for (Profile profile : model.getProfiles()) {
                 log.info("Exporting spec from profile: {}", profile.getId());
                 List<Dependency> profileDependencies = profile.getDependencies().stream()
-                    .map(dependency -> setVersion(properties, dependency))
+                    .map(dependency -> resolvePropertyPlaceholderVersion(properties, dependency))
                     .collect(Collectors.toList());
 
                 for (Dependency dependency : profileDependencies) {
@@ -281,7 +283,7 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
         return model;
     }
 
-    private Dependency setVersion(Properties properties, Dependency dependency) {
+    private Dependency resolvePropertyPlaceholderVersion(Properties properties, Dependency dependency) {
         if (dependency.getVersion() != null && dependency.getVersion().contains("$")) {
             dependency.setVersion(replacePlaceholders(properties, dependency.getVersion()));
         }
@@ -291,6 +293,9 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     private void setManagedVersionDependency
         (List<org.apache.maven.model.Dependency> dependencyManagementDependencies,
          org.apache.maven.model.Dependency profileDependency) {
+        if(profileDependency.getVersion()!=null) {
+            return;
+        }
         Optional<org.apache.maven.model.Dependency> managedDependency = resolveDependencyVersion(
             dependencyManagementDependencies, profileDependency);
         managedDependency.ifPresent(dependency -> profileDependency.setVersion(dependency.getVersion()));
