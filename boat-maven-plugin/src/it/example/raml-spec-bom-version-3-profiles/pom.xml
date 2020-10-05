@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.backbase.oss.boat</groupId>
+    <artifactId>raml-spec-bom</artifactId>
+    <version>1.2.0-SNAPSHOT</version>
+
+    <properties>
+        <raml-spec.version>1.1.0-SNAPSHOT</raml-spec.version>
+    </properties>
+
+    <packaging>pom</packaging>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.backbase.oss.boat</groupId>
+                <artifactId>raml-spec</artifactId>
+                <version>${raml-spec.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>profileWithSpecs</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.backbase.oss.boat</groupId>
+                    <artifactId>raml-spec</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+</project>
+
