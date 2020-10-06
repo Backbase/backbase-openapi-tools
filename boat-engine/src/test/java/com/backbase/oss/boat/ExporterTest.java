@@ -26,7 +26,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
 
     @Test
     public void testHelloWorld() throws Exception {
-        File inputFile = new File("/Users/bartv/IdeaProjects/stash/stream/stream-services-2.0/stream-dbs-clients/target/raml/1.0.8/audit-spec/integration-api.raml");
+        File inputFile = getFile("/raml-examples/helloworld/helloworld.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
