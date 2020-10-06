@@ -4,7 +4,9 @@
             <pattern>%highlight([%level]) [%logger{10}] %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="COLOR"/>
     </root>
+    <logger name="org.raml" level="INFO"/>
+    <logger name="com.backbase.oss.boat.loader.RamlResourceLoader" level="INFO"/>
 </configuration>
