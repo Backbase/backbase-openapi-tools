@@ -689,11 +689,12 @@ public class Exporter {
             }
 
             for (TypeInstanceProperty property : typeInstance.properties()) {
+                String extensionName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, annotationSchema.getName());
+                String propertyName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, property.name());
                 if (property.isArray().booleanValue()) {
-                    operation.addExtension("-" + annotationSchema.getName() + "-" + property.name(), property.values());
+                    operation.addExtension("-" + extensionName + "-" + propertyName, property.values());
                 } else {
-                    operation.addExtension("x-" + annotationSchema.getName() + "-" + property.name(),
-                        property.value().value());
+                    operation.addExtension("x-" + extensionName + "-" + propertyName, property.value().value());
                 }
             }
         }

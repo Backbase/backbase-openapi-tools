@@ -45,7 +45,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(false)
+            .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
         SwaggerParseResult swaggerParseResult = validateExport(export);
@@ -59,7 +59,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(false)
+            .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer())));
     }
 
@@ -68,7 +68,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(false)
+            .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer())));
     }
 
@@ -77,7 +77,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-integration-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(false)
+            .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
         SwaggerParseResult swaggerParseResult = validateExport(export);
@@ -89,7 +89,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(false)
+            .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer())));
         String export = SerializerUtils.toYamlString(openAPI);
         SwaggerParseResult swaggerParseResult = validateExport(export);
