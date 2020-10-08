@@ -448,13 +448,15 @@ public class Exporter {
     }
 
     private PathItem convertResource(Resource resource, Components components,
-                                     JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operationss)
+                                     JsonSchemaToOpenApi jsonSchemaToOpenApi, List<Operation> operations)
         throws ExportException, DerefenceException {
+
         PathItem pathItem = new PathItem();
         pathItem.summary(getDisplayName(resource.displayName()));
         pathItem.description(getDescription(resource));
+        log.info("Mapping RAML resource: {}", pathItem.getSummary());
         mapUriParameters(resource, pathItem, components);
-        mapMethods(resource, pathItem, components, jsonSchemaToOpenApi, operationss);
+        mapMethods(resource, pathItem, components, jsonSchemaToOpenApi, operations);
         return pathItem;
     }
 
@@ -548,6 +550,8 @@ public class Exporter {
             PathItem.HttpMethod httpMethod = getHttpMethod(ramlMethod);
             ApiResponses apiResponses = mapResponses(resource, ramlMethod, components, jsonSchemaToOpenApi);
 
+            log.debug("Mapping method: {}", httpMethod);
+
             ArrayList<Parameter> parameters = new ArrayList<>();
             addHeaders(ramlMethod, parameters, components);
             addQueryParameters(ramlMethod, parameters, components);
@@ -609,7 +613,6 @@ public class Exporter {
     private String getOperationId(Resource resource, Method ramlMethod, List<Operation> operations,
                                   RequestBody requestBody) {
 
-        String ramlMethodDisplayName = ramlMethod.displayName().value();
         String httpMethod = ramlMethod.method();
         String resourceName = resource.displayName().value();
 
@@ -734,7 +737,7 @@ public class Exporter {
 
         Content content = new Content();
         for (TypeDeclaration body : ramlMethod.body()) {
-            String name = getName(resource, ramlMethod) + "Response";
+            String name = getName(resource, ramlMethod) + "Request";
             MediaType mediaType = convertBody(body, name, components, jsonSchemaToOpenApi);
             content.addMediaType(body.name(), mediaType);
         }
