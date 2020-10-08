@@ -5,11 +5,11 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.2.5</version>
+    <version>0.2.6</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
-    <name>Backbase OpenApi Tools</name>
+    <name>Backbase OpenApi Tools ${project.version}</name>
 
     <url>https://github.com/Backbase/backbase-openapi-tools</url>
 
