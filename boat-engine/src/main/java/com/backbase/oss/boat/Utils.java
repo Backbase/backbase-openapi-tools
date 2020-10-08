@@ -40,7 +40,7 @@ public class Utils {
     @SneakyThrows
     static URL getAbsoluteReference(URL base, String ref) {
         URI uri = base.toURI().resolve(ref);
-        log.debug("Resolved: {} from {} and {}", uri, base, ref);
+        log.trace("Resolved: {} from {} and {}", uri, base, ref);
         File file = new File(uri.toURL().getFile());
         if (!file.exists()) {
             throw new DerefenceException("File does not exist: " + file.getAbsolutePath());
@@ -57,7 +57,7 @@ public class Utils {
         File file = new File(uri.toURL().getFile());
 
         boolean directory = file.isDirectory();
-        log.debug("isDirectory: {} $ref: {} = {}", base, ref, directory);
+        log.trace("isDirectory: {} $ref: {} = {}", base, ref, directory);
 
         return directory;
     }
@@ -151,16 +151,16 @@ public class Utils {
         } else {
             if (isUrl(reference)) {
                 URL parent = getAbsoluteReferenceParent(reference);
-                String parentName = getProposedSchemaName(
-                    parent.toString().substring(0, parent.toString().length() - 1));
+                String parentReference = StringUtils.stripEnd(parent.toString(), "/");
+                String parentName = getProposedSchemaName(parentReference);
                 String newName = parentName + proposedName;
-                log.warn("Schema Name already exists for: {}! Using: {}", proposedName, newName);
+                log.warn("Schema Name already exists for: {} Using: {}", proposedName, newName);
                 proposedName = newName;
                 referenceNames.put(reference, proposedName);
                 name = proposedName;
             } else {
                 String newName = proposedName + "Duplicate";
-                log.warn("Schema Name already exists for{}! Using: {}", proposedName, newName);
+                log.warn("Schema Name already exists for{} Using: {}", proposedName, newName);
                 referenceNames.put(reference, newName);
                 name = newName;
             }
