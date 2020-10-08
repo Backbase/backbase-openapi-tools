@@ -20,6 +20,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.5 
+* Fixed a bug how duplicate names are generated if RAML source has duplicate names for references. The parent resource name is now prepended to the schema name without removing the last character of the parent resource name
+* Fixed a bug when in RAML resources were inline references instead of global type references for Request Bodies causing Response Schemas being referenced as Request Bodies
+
 ## 0.2.4 - Breaking Change!
 * **Changed how operationIds are generated**. The previous implementation ended up generating very long and confusing names. 
     The improved generator greatly improves the names of operationId when converting from RAML to OAS3

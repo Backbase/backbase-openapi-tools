@@ -2,39 +2,37 @@
 
 The `boat` plugin has multiple goals:
 
-- `bundle` (Not fully implemented)
-
-    Bundles all references in the OpenAPI specification into one
-    file.
-
-- `decompose`
-
-    Merges any components using allOf references.
-
-- `diff`
-
-    Calculates a Change log for APIs.
 
 - `export`
-
-    Converts a RAML spec to an OpenAPI spec.
-
-- `export-bom`
-
-    Converts all RAML spec dependencies to OpenAPI Specs.
-
-- `export-dep`
-
-    Exports project dependencies where the ArtifactId ends with
-    '-spec'.
-
-- `generate`
 
     Generates client/server code from a OpenAPI json/yaml
     definition. Finds files name `api.raml`, `client-api.raml` or `service-api.raml`. Processes these files (and the 
     json schemes they refer to) to produce `open-api.yaml` files in the output directory.
+
+- `export-bom`
+
+    Converts all RAML spec dependencies to OpenAPI Specs. See integration tests for examples
+
+- `export-dep`
+
+    Exports project dependencies where the ArtifactId ends with.  See integration tests for examples
+    '-spec'.
+
+- `generate`
+    
+    Open API Generator based on https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin. All configuration options as 
+    defined on openapi-generator-maven-plugin can be applied here too. 
+    boat-maven-plugin uses slightly modified templates for html, java and webclient that help genereate specs and clients that work best in a Backbase projects.
    
 - `generate-spring-boot-embedded`, `generate` but with opinionated defaults
+
+            <configuration>
+                <inputSpec>${project.basedir}/../api/product-service-api/src/main/resources/openapi.yaml</inputSpec>
+                <apiPackage>com.backbase.product.api.service.v2</apiPackage>
+                <modelPackage>com.backbase.product.api.service.v2.model</modelPackage>
+            </configuration>
+            
+            Is the same as:
 
               <configuration>
                 <output>${project.build.directory}/generated-sources/openapi</output>
@@ -107,6 +105,14 @@ The `boat` plugin has multiple goals:
                 <modelPackage>com.backbase.goldensample.product.api.client.v2.model</modelPackage>
               </configOptions>
             </configuration>
+
+- `decompose`
+
+    Merges any components using allOf references.
+
+- `diff`
+
+    Calculates a Change log for APIs.
 
 - `remove-deprecated`
 
