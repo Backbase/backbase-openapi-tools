@@ -29,3 +29,8 @@ target/
 hs_err_pid*
 
 *.versionsBackup
+
+# All dot files
+.*
+# but not git dot files (e.g. .gitattribute)
+!.git?*
