@@ -403,8 +403,16 @@ public class GenerateMojo extends AbstractMojo {
      * Add the output directory to the project as a source root, so that the generated java types
      * are compiled and included in the project artifact.
      */
-    @Parameter(defaultValue = "true")
+    @Parameter(defaultValue = "true", property = "openapi.generator.maven.plugin.addCompileSourceRoot")
     protected boolean addCompileSourceRoot = true;
+
+    /**
+     * Add the output directory to the project as a test source root, so that the generated java types
+     * are compiled only for the test classpath of the project. Mutually exclusive with
+     * {@link #addCompileSourceRoot}.
+     */
+    @Parameter(defaultValue = "false", property = "openapi.generator.maven.plugin.addTestCompileSourceRoot")
+    private boolean addTestCompileSourceRoot = false;
 
     @Parameter
     protected Map<String, String> environmentVariables = new HashMap<>();
@@ -874,15 +882,25 @@ public class GenerateMojo extends AbstractMojo {
         final Object sourceFolderObject =
             configOptions == null ? null : configOptions
                 .get(CodegenConstants.SOURCE_FOLDER);
-        final String sourceFolder =
-            sourceFolderObject == null ? "src/main/java" : sourceFolderObject.toString();
+        final String sourceFolder;
+        if (sourceFolderObject != null) {
+            sourceFolder = sourceFolderObject.toString();
+        } else {
+            sourceFolder = addTestCompileSourceRoot ? "src/test/java" : "src/main/java";
+        }
 
         return output.toString() + "/" + sourceFolder;
     }
 
-    private void addCompileSourceRootIfConfigured() {
+    private void addCompileSourceRootIfConfigured() throws MojoExecutionException {
         if (addCompileSourceRoot) {
+            if (addTestCompileSourceRoot) {
+                throw new MojoExecutionException(
+                    "Either 'addCompileSourceRoot' or 'addTestCompileSourceRoot' may be active, not both.");
+            }
             project.addCompileSourceRoot(getCompileSourceRoot());
+        } else if (addTestCompileSourceRoot) {
+            project.addTestCompileSourceRoot(getCompileSourceRoot());
         }
 
         // Reset all environment variables to their original value. This prevents unexpected
