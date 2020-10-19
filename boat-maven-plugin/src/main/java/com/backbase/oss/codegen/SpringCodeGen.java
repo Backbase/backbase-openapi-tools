@@ -19,6 +19,7 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
+    public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
 
     static private class NewLineIndent implements Mustache.Lambda {
@@ -72,6 +73,8 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
     @Getter
     protected boolean openApiNullable = true;
 
+    private boolean useSetForUniqueItems = true;
+
     public SpringCodeGen() {
         cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces", useClassLevelBeanValidation));
@@ -81,6 +84,8 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
             "Add Lombok to class-level Api models. Defaults to false.", useLombokAnnotations));
         cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
             "Enable OpenAPI Jackson Nullable library", openApiNullable));
+        cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
+            "Use java.util.Set for arrays that have uniqueItems set to true", useSetForUniqueItems));
 
         apiNameSuffix = "Api";
         instantiationTypes.put("set", "LinkedHashSet");
@@ -118,17 +123,22 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
         if (additionalProperties.containsKey(OPENAPI_NULLABLE)) {
             openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
         }
+        if (additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
+            useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
+        }
 
-        typeMapping.put("set", "Set");
-        instantiationTypes.put("set", "LinkedHashSet");
-        importMapping.put("Set", "java.util.Set");
-        importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
+        if (useSetForUniqueItems) {
+            typeMapping.put("set", "Set");
+            instantiationTypes.put("set", "LinkedHashSet");
+            importMapping.put("Set", "java.util.Set");
+            importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
 
-        if (fullJavaUtil) {
-            typeMapping.put("set", "java.util.Set");
-            instantiationTypes.put("set", "java.util.LinkedHashSet");
-            importMapping.remove("Set");
-            importMapping.remove("LinkedHashSet");
+            if (fullJavaUtil) {
+                typeMapping.put("set", "java.util.Set");
+                instantiationTypes.put("set", "java.util.LinkedHashSet");
+                importMapping.remove("Set");
+                importMapping.remove("LinkedHashSet");
+            }
         }
 
         additionalProperties.put("indent4", new IndentedLambda(4, " "));
@@ -141,15 +151,17 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer && p.getUniqueItems()) {
-            model.imports.add("Set");
-            model.imports.add("LinkedHashSet");
+        if (p.isContainer) {
+            if (useSetForUniqueItems && p.getUniqueItems()) {
+                model.imports.add("Set");
+                model.imports.add("LinkedHashSet");
 
-            p.containerType = "set";
-            p.baseType = javaUtilPrefix + "Set";
-            p.dataType = javaUtilPrefix + "Set<" + p.items.dataType + ">";
-            p.datatypeWithEnum = javaUtilPrefix + "Set<" + p.items.datatypeWithEnum + ">";
-            p.defaultValue = "new " + javaUtilPrefix + "LinkedHashSet<>()";
+                p.containerType = "set";
+                p.baseType = javaUtilPrefix + "Set";
+                p.dataType = javaUtilPrefix + "Set<" + p.items.dataType + ">";
+                p.datatypeWithEnum = javaUtilPrefix + "Set<" + p.items.datatypeWithEnum + ">";
+                p.defaultValue = "new " + javaUtilPrefix + "LinkedHashSet<>()";
+            }
         }
     }
 
@@ -158,14 +170,14 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            if (p.getUniqueItems()) {
+            // XXX the model set this to the container type, why is this different?
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+
+            if (useSetForUniqueItems && p.getUniqueItems()) {
                 p.baseType = javaUtilPrefix + "Set";
                 p.dataType = javaUtilPrefix + "Set<" + p.items.dataType + ">";
                 p.datatypeWithEnum = javaUtilPrefix + "Set<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + javaUtilPrefix + "LinkedHashSet<>()";
-            } else {
-                // XXX the model set this to the container type, why is this set to the element type for parameters?
-                p.baseType = p.dataType.replaceAll("^(.+)<.+>$", "$1");
             }
         }
     }

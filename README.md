@@ -25,9 +25,9 @@ BOAT is still under development and subject to change.
 * *Spring Generator*
   * added in-container validation, e.g. `List<@Size(max = 36) String>` (see [JSR-380 - Container element constraints](https://beanvalidation.org/2.0/spec/#constraintdeclarationvalidationprocess-containerelementconstraints)).
   * added vendor extensions: `x-abstract`, `x-implements`.
-  * arrays with `uniqueItems` are mapped to `Set` instead of `List` (breaking change).
   * added `useLombokAnnotations` option.
   * added `openApiNullable` option (taken from 5.0, defaults to `true` for compatibility).
+  * added `useSetForUniqueItems` to map arrays with `uniqueItems` to `Set` instead of `List` (defaults to `true`).
   * added `additionalDependencies` template property to generated `spring-boot/pom.mustache`
   * formatted method parameters.
 
