@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.2.6</version>
+        <version>0.2.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>boat-maven-plugin</artifactId>
@@ -19,7 +19,8 @@
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
         <sonar.coverage.exclusions>
-            src/main/java/com/backbase/oss/boat/GenerateMojo.java
+            src/main/java/com/backbase/oss/boat/GenerateMojo.java,
+            src/main/java/com/backbase/oss/codegen/SpringCodeGen/java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
@@ -33,6 +34,12 @@
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-engine</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -41,12 +48,10 @@
             <version>${project.version}</version>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
 
@@ -79,7 +84,16 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-simple</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>2.0.2</version>
         </dependency>
 
         <dependency>
@@ -108,6 +122,42 @@
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.backbase.buildingblocks</groupId>
+            <artifactId>building-blocks-common</artifactId>
+            <version>11.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.3.3.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>2.3.3.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>2.3.3.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -124,8 +174,8 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -217,10 +267,22 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>examples</id>
                         <goals>
                             <goal>install</goal>
                             <goal>run</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <skipInvocation>${skip.unit.tests}</skipInvocation>
+                            <projectsDirectory>${projects.build.directory}/test-outputs</projectsDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
