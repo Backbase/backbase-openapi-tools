@@ -123,7 +123,6 @@ public class GeneratorTests {
         mojo.inputSpec = input.getAbsolutePath();
         mojo.output = new File("target/spring-mvc");
         mojo.skip = false;
-//        mojo.useClassLevelBeanValidation = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
 
