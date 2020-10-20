@@ -1,0 +1,23 @@
+openapi: 3.0.3
+
+info:
+  title: Arrangement Support
+  version: '1.0'
+  
+paths:
+  /simple-types:
+    $ref: paths/simple-types.yaml
+  /simple-types/{id}/{ids}:
+    $ref: paths/simple-types-ids.yaml
+  /array-types:
+    $ref: paths/array-types.yaml
+  /array-types/{id}/{ids}:
+    $ref: paths/array-types-ids.yaml
+  /set-types:
+    $ref: paths/set-types.yaml
+  /set-types/{id}/{ids}:
+    $ref: paths/set-types-ids.yaml
+  /map-types:
+    $ref: paths/map-types.yaml
+  /map-types/{id}/{ids}:
+    $ref: paths/map-types-ids.yaml
