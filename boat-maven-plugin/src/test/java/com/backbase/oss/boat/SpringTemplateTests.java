@@ -39,40 +39,35 @@ public class SpringTemplateTests {
     static public Object parameters() {
         final List<Object[]> data = new ArrayList<>();
 
-        for (final String resource : asList("simple", "array", "set", "map")) {
-            // all combinations of
-            for (int mask = 0; mask < 1 << 6; mask++) {
-                final boolean useBeanValidation = (mask & 1 << 0) != 0;
-                final boolean useOptional = (mask & 1 << 1) != 0;
-                final boolean useLombokAnnotations = (mask & 1 << 2) != 0;
-                final boolean fullJavaUtil = (mask & 1 << 3) != 0;
-                final boolean openApiNullable = (mask & 1 << 4) != 0;
-                final boolean useSetForUniqueItems = (mask & 1 << 5) != 0;
+        // all combinations of
+        for (int mask = 0; mask < 1 << 6; mask++) {
+            final boolean useBeanValidation = (mask & 1 << 0) != 0;
+            final boolean useOptional = (mask & 1 << 1) != 0;
+            final boolean useLombokAnnotations = (mask & 1 << 2) != 0;
+            final boolean fullJavaUtil = (mask & 1 << 3) != 0;
+            final boolean openApiNullable = (mask & 1 << 4) != 0;
+            final boolean useSetForUniqueItems = (mask & 1 << 5) != 0;
 
-                data.add(new Object[] {
-                    caseName(resource,
-                        useBeanValidation,
-                        useOptional,
-                        useLombokAnnotations,
-                        fullJavaUtil,
-                        openApiNullable,
-                        useSetForUniqueItems),
-                    resource,
-                    useBeanValidation,
+            data.add(new Object[] {
+                caseName(useBeanValidation,
                     useOptional,
                     useLombokAnnotations,
                     fullJavaUtil,
                     openApiNullable,
-                    useSetForUniqueItems,
-                });
-            }
+                    useSetForUniqueItems),
+                useBeanValidation,
+                useOptional,
+                useLombokAnnotations,
+                fullJavaUtil,
+                openApiNullable,
+                useSetForUniqueItems,
+            });
         }
 
         return data;
     }
 
     static private String caseName(
-        String resource,
         boolean useBeanValidation,
         boolean useOptional,
         boolean useLombokAnnotations,
@@ -80,8 +75,7 @@ public class SpringTemplateTests {
         boolean openApiNullable,
         boolean useSetForUniqueItems) {
 
-        return format("%s%s%s%s%s%s%s",
-            resource,
+        return format("gen%s%s%s%s%s%s",
             useBeanValidation ? "-val" : "",
             useOptional ? "-opt" : "",
             useLombokAnnotations ? "-lmb" : "",
@@ -91,7 +85,6 @@ public class SpringTemplateTests {
     }
 
     private final String testName;
-    private final String resource;
     private final boolean useBeanValidation;
     private final boolean useOptional;
     private final boolean useLombokAnnotations;
@@ -116,7 +109,6 @@ public class SpringTemplateTests {
     @SneakyThrows
     private GenerateMojo createMojo(boolean original) {
         final String target = caseName(
-            this.resource,
             this.useBeanValidation,
             this.useOptional,
             this.useLombokAnnotations,
@@ -125,7 +117,7 @@ public class SpringTemplateTests {
             this.useSetForUniqueItems)
             + (original ? "-orig" : "");
 
-        final File input = new File(format("src/test/resources/backbase/%s-types.yaml", this.resource));
+        final File input = new File("src/test/resources/backbase/spring/openapi.yaml");
         final File output = new File("target/test-outputs/" + target);
 
         FileUtils.deleteDirectory(output);
@@ -162,7 +154,6 @@ public class SpringTemplateTests {
         mojo.generateModelTests = false;
         mojo.generateSupportingFiles = !original; // don't compile 4.3.1 code (wrong for JsonNullable with Map)
         mojo.apiNameSuffix = target + "-api";
-        mojo.modelNamePrefix = "model-";
         mojo.modelNameSuffix = target;
 
         final Map<String, String> configOptions = new HashMap<>();
