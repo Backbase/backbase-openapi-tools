@@ -20,6 +20,25 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.7
+
+* *Spring Generator*
+  * added in-container validation, e.g. `List<@Size(max = 36) String>` (see [JSR-380 - Container element constraints](https://beanvalidation.org/2.0/spec/#constraintdeclarationvalidationprocess-containerelementconstraints)).
+  * added vendor extensions: `x-abstract`, `x-implements`.
+  * added `useLombokAnnotations` option (defaults to `true`)
+  * added `openApiNullable` option (taken from 5.0,  breaking change, defaults to `false`, set to `true` if not ready).
+  * added `useSetForUniqueItems` to map arrays with `uniqueItems` to `Set` instead of `List` (breaking change, defaults to `true`, set to `false` if not ready).
+  * added `additionalDependencies` to be used in `spring-boot/pom.mustache` template.
+  * formatted method parameters.
+
+* *Maven Plugin*
+  * added `addTestCompileSourceRoot` which adds the output directory to the project as a test source root.
+  * added `apiNameSuffix` to customise the name of the API interface.
+  * corrected `generatorName` property to point to `openapi.generator.maven.plugin.generatorName`.
+  * fixed the generated code generation of `Map` properties in model.
+  * refactored `GenerateMojo` so `mvn boat:generate -Dcodegen.configHelp -Dopenapi.generator.maven.plugin.generatorName=spring` works correctly.
+  * test the generated code in the integration test phase
+
 ## 0.2.6
 * Ensure RAML traits that are converted to OAS extenions are all using lower case. 
 
@@ -444,6 +463,7 @@ For the `spring` generator, the additional configuration options are:
 | `useBeanValidation` | Use BeanValidation API annotations (Default: true) |
 | `performBeanValidation` | Use Bean Validation Impl. to perform BeanValidation (Default: false) |
 | `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
+| `useLombokAnnotations` | Use Lombok annotations to generate properties accessors and `hashCode`/`equals` methods (Default: false) |
 | `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
 | `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
 | `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
