@@ -1,9 +1,21 @@
 package {{package}};
 
+/*
+    current configuration:
+        useBeanValidation = {{useBeanValidation}}
+	    useOptional = {{useOptional}}
+	    useLombokAnnotations = {{useLombokAnnotations}}
+	    fullJavaUtil = {{fullJavaUtil}}
+	    openApiNullable = {{openApiNullable}}
+*/
+
 import java.util.Objects;
-{{#imports}}import {{import}};
+{{#imports}}
+import {{import}};
 {{/imports}}
+{{#openApiNullable}}
 import org.openapitools.jackson.nullable.JsonNullable;
+{{/openApiNullable}}
 {{#serializableModel}}
 import java.io.Serializable;
 {{/serializableModel}}
@@ -15,6 +27,7 @@ import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.*;
 {{/performBeanValidation}}
 {{#jackson}}
+import com.fasterxml.jackson.annotation.*;
 {{#withXml}}
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;

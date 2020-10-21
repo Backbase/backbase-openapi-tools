@@ -1,6 +1,8 @@
 package com.backbase.oss.boat;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -59,6 +61,67 @@ public class GeneratorTests {
         mojo.generatorName = "html2";
         mojo.inputSpec = input.getAbsolutePath();
         mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.execute();
+
+    }
+
+    /**
+     * <configuration>
+     *               <output>${project.build.directory}/generated-sources/</output>
+     *               <generateSupportingFiles>true</generateSupportingFiles>
+     *               <generatorName>spring</generatorName>
+     *               <strictSpec>true</strictSpec>
+     *               <generateApiTests>false</generateApiTests>
+     *               <generateModelTests>false</generateModelTests>
+     *               <inputSpec>${project.build.directory}/yaml/legalentity-presentation-service-spec.yaml</inputSpec>
+     *               <configOptions>
+     *                 <library>spring-mvc</library>
+     *                 <dateLibrary>legacy</dateLibrary>
+     *                 <interfaceOnly>true</interfaceOnly>
+     *                 <skipDefaultInterface>true</skipDefaultInterface>
+     *                 <useBeanValidation>false</useBeanValidation>
+     *                 <useClassLevelBeanValidation>true</useClassLevelBeanValidation>
+     *                 <useTags>true</useTags>
+     *                 <java8>true</java8>
+     *                 <useOptional>false</useOptional>
+     *                 <apiPackage>com.backbase.accesscontrol.service.rest.spec.api</apiPackage>
+     *                 <>com.backbase.accesscontrol.service.rest.spec.model</modelPackage>
+     *               </configOptions>
+     *             </configuration>
+     * @throws MojoExecutionException
+     */
+    @Test
+    public void testBeanValidation() throws MojoExecutionException {
+        GenerateMojo mojo = new GenerateMojo();
+
+        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
+        File input = new File(inputFile);
+        File output = new File("target");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        Map<String,String> configOption = new HashMap<>();
+        configOption.put("library", "spring-mvc");
+        configOption.put("dateLibrary", "java8");
+        configOption.put("apiPackage", "com.backbase.accesscontrol.service.rest.spec.api");
+        configOption.put("modelPackage", "com.backbase.accesscontrol.service.rest.spec.model");
+        configOption.put("useBeanValidation", "true");
+        configOption.put("useClassLevelBeanValidation", "false");
+
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.generatorName = "spring";
+        mojo.configOptions = configOption;
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = new File("target/spring-mvc");
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
