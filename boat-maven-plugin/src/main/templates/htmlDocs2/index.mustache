@@ -155,7 +155,6 @@
     }
     {{/swagger.vendorExtensions.x-shared-errors}}
   </script>
-
   <div class="container-fluid">
     <div class="row-fluid">
       <div id="sidenav" class="span2">
@@ -176,7 +175,10 @@
                   <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
                   {{#operation}}
                     <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                      <a href="#api-{{baseName}}-{{nickname}}">{{nickname}}</a>
+                        <a href="#api-{{baseName}}-{{nickname}}">
+                            <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
+                            {{nickname}}
+                        </a>
                     </li>
                   {{/operation}}
                 {{/operations}}
@@ -215,13 +217,25 @@
                           <h1>{{nickname}}</h1>
                           <p>{{summary}}</p>
                         </div>
-                        <div class="pull-right"></div>
+
+                          <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
                         <p class="marked">{{notes}}</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="{{httpMethod}}"><code><span class="pln">{{path}}</span></code></pre>
+                          {{#vendorExtensions}}
+                              <div class="secured-by">
+                                  <h2>Secured by Backbase Access Control</h2>
+                                  {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
+                                  {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
+                                  {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
+                              </div>
+                          {{/vendorExtensions}}
+
+                          <br />
+
+                          <pre class="prettyprint language-html prettyprinted" data-type="{{httpMethod}}"><code><span class="pln">{{path}}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
@@ -363,6 +377,14 @@
                               {{/queryParams}}
                             </table>
                           {{/hasQueryParams}}
+
+                          {{#hasExamples}}
+                              {{#examples}}
+                                  <h3 class="field-label">Example data</h3>
+                                  <div class="example-data-content-type">Content-Type: {{{contentType}}}</div>
+                                  <pre class="prettyprint language-json prettyprinted"><code class="json">{{{example}}}</code></pre>
+                              {{/examples}}
+                          {{/hasExamples}}
 
                           <h2>Responses</h2>
                           {{#responses}}

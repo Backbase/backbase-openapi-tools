@@ -4,14 +4,15 @@
 
 
 * {
-  font-family: 'Source Code Pro', sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
 }
 body {
   min-width: 980px;
+  background-color: #eee;
 }
 
 .app-desc {
-  color: #808080
+  color: #121212
 }
 
 body, p, a, div, th, td, li {
@@ -31,7 +32,7 @@ td.code {
 #content {
   padding-top: 16px;
   z-Index: -1;
-  margin-left: 270px;
+  margin-left: 350px;
 }
 
 p {
@@ -56,9 +57,61 @@ h2 {
   padding: 0;
 }
 
+#project {
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+#header {
+  padding: 16px 32px;
+  background-color: white;
+  margin-bottom: 32px;
+  border-radius: 6px;
+}
+
+
+div.secured-by {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+div.secured-by > h2 {
+  border-left: 4px solid orange;
+  padding-top: 0;
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+div.secured-by > h2:only-child {
+  display: none!important;
+}
+
+div.secured-by > pre{
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  padding-top: 0;
+  padding-bottom: 8;
+}
+
+div.secured-by > pre:nth-child(2){
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding-top: 8px;
+}
+
+div.secured-by > pre:last-child{
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding-bottom: 8px;
+}
+
 section {
-  border-top: 1px solid #ebebeb;
-  padding: 30px 0;
+  padding: 16px 32px;
+  background-color: white;
+  margin-bottom: 32px;
+  border-radius: 6px;
 }
 
 section h1 {
@@ -80,6 +133,8 @@ article h1 {
   font-weight: 600;
   font-size: 24px;
   line-height: 26px;
+  padding-top: 30px;
+  margin-bottom: 10px;
 }
 
 article h2 {
@@ -87,7 +142,8 @@ article h2 {
   font-weight: 600;
   font-size: 18px;
   line-height: 24px;
-  margin: 0 0 10px 0;
+  padding-top: 30px;
+  margin-bottom: 10px;
 }
 
 article h3 {
@@ -95,7 +151,8 @@ article h3 {
   font-weight: 600;
   font-size: 16px;
   line-height: 18px;
-  margin: 0 0 10px 0;
+  padding-top: 30px;
+  margin-bottom: 10px;
 }
 
 article h4 {
@@ -103,7 +160,8 @@ article h4 {
   font-weight: 600;
   font-size: 14px;
   line-height: 16px;
-  margin: 0 0 8px 0;
+  padding-top: 30px;
+  margin-bottom: 10px;
 }
 
 table {
@@ -173,12 +231,29 @@ td {
  * pre / code
  * ------------------------------------------------------------------------------------------ */
 pre {
+  font-family: 'Source Code Pro', sans-serif;
   background-color: #292b36;
   color: #ffffff;
   padding: 10px;
   border-radius: 6px;
   position: relative;
   margin: 10px 0 20px 0;
+}
+
+span.language-html{
+  margin-right: 16px;
+  display: inline-flex;
+  width: 36px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 600;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  color: #ffffff;
 }
 
 code.language-text {
@@ -189,11 +264,11 @@ pre.language-json {
   overflow: auto;
 }
 
-pre.language-html {
+pre.language-html{
   margin: 40px 0 20px 0;
 }
 
-pre.language-html:before {
+pre.language-html:before{
   content: attr(data-type);
   position: absolute;
   top: -30px;
@@ -209,19 +284,23 @@ pre.language-html:before {
   color: #ffffff;
 }
 
-pre.language-html[data-type="get"]:before {
+pre.language-html[data-type="get"]:before,
+span.language-html[data-type="get"]{
   background-color: green;
 }
 
-pre.language-html[data-type="put"]:before {
+pre.language-html[data-type="put"]:before,
+span.language-html[data-type="put"]{
   background-color: #e5c500;
 }
 
-pre.language-html[data-type="post"]:before {
+pre.language-html[data-type="post"]:before,
+span.language-html[data-type="post"]{
   background-color: #4070ec;
 }
 
-pre.language-html[data-type="delete"]:before {
+pre.language-html[data-type="delete"]:before,
+span.language-html[data-type="delete"]{
   background-color: #ed0039;
 }
 
@@ -252,7 +331,7 @@ pre code.sample-request-response-json {
  * Sidenav
  * ------------------------------------------------------------------------------------------ */
 .sidenav {
-  width: 228px;
+  width: 300px;
   margin: 0;
   padding: 20px;
   position: fixed;
@@ -263,39 +342,45 @@ pre code.sample-request-response-json {
   overflow-y: auto;
   background-color: #f5f5f5;
   z-index: 10;
+  border-right: 1px solid #ddd;
+}
+
+.sidenav > li {
+ line-height: 24px;
 }
 
 .sidenav > li > a {
   display: block;
-  width: 192px;
   margin: 0;
   padding: 2px 11px;
-  border: 0;
-  border-left: transparent 4px solid;
-  border-right: transparent 4px solid;
   font-family: "Source Sans Pro", sans-serif;
   font-weight: 400;
   font-size: 14px;
+  color: rgb(40, 45, 68);
+  text-decoration: none;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidenav > li.nav-header > a {
-  padding: 5px 15px;
-  border: 1px solid #e5e5e5;
-  width: 190px;
   font-family: "Source Sans Pro", sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  background-color: #4c8eca;
-  color: #fff;
+  font-size: 14px;
+  color: rgb(133, 139, 165);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
+.sidenav > li.nav-header {
+  margin-top: 16px;
+}
+.sidenav > li.nav-header:first-child {
+  margin-top: 0px;
+}
 .sidenav > li.nav-header.active > a {
-  background-color: #4c8eca;
-  color: #fff;
+  color: #121212;
 }
-
-
-00427D
 
 .sidenav > .active > a {
   position: relative;
