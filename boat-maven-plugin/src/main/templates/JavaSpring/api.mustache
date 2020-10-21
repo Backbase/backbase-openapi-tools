@@ -7,6 +7,9 @@ package {{package}};
 
 {{#imports}}import {{import}};
 {{/imports}}
+{{^fullJavaUtil}}
+import java.util.Set;
+import java.util.LinkedHashSet;{{/fullJavaUtil}}
 import io.swagger.annotations.*;
 {{#jdk8-no-delegate}}
 {{#virtualService}}
@@ -39,6 +42,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 {{/reactive}}
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 {{#addServletRequest}}
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +78,24 @@ import java.util.concurrent.{{^jdk8}}Callable{{/jdk8}}{{#jdk8}}CompletableFuture
 {{/virtualService}}
 public interface {{classname}} {
 {{#jdk8-default-interface}}
+	{{^reactive}}
+    static void setExampleResponse(NativeWebRequest req, String contentType, String example) {
+        try {
+            HttpServletResponse res = req.getNativeResponse(HttpServletResponse.class);
+            res.setCharacterEncoding("UTF-8");
+            res.addHeader("Content-Type", contentType);
+            res.getWriter().print(example);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+	{{/reactive}}
+	{{#reactive}}
+    static Mono<Void> getExampleResponse(ServerWebExchange exchange, String example) {
+        return exchange.getResponse().writeWith(Mono.just(new DefaultDataBufferFactory().wrap(example.getBytes(StandardCharsets.UTF_8))));
+    }
+	{{/reactive}}
+
     {{^isDelegate}}
         {{^reactive}}
 
@@ -134,7 +157,10 @@ public interface {{classname}} {
         produces = { {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }, {{/hasProduces}}{{#hasConsumes}}
         consumes = { {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} },{{/hasConsumes}}{{/singleContentTypes}}
         method = RequestMethod.{{httpMethod}})
-  {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{#responseWrapper}}{{.}}<{{/responseWrapper}}ResponseEntity<{{>returnTypes}}>{{#responseWrapper}}>{{/responseWrapper}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{#hasMore}},{{/hasMore}}{{^hasMore}}{{#reactive}}, {{/reactive}}{{^reactive}}{{#addServletRequest}}, {{/addServletRequest}}{{/reactive}}{{/hasMore}}{{/allParams}}{{#addServletRequest}}HttpServletRequest httpServletRequest{{#reactive}}, {{/reactive}}{{/addServletRequest}}{{#reactive}}ServerWebExchange exchange{{/reactive}}){{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}}{{#unhandledException}} throws Exception{{/unhandledException}} {
+    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{#responseWrapper}}{{.}}<{{/responseWrapper}}ResponseEntity<{{>returnTypes}}>{{#responseWrapper}}>{{/responseWrapper}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}(
+{{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{#hasMore}},
+        {{/hasMore}}{{^hasMore}}{{#reactive}}, {{/reactive}}{{/hasMore}}{{/allParams}}{{#reactive}}ServerWebExchange exchange{{/reactive}}
+    ){{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}}{{#unhandledException}} throws Exception{{/unhandledException}} {
         {{#delegate-method}}
         return {{operationId}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}});
     }

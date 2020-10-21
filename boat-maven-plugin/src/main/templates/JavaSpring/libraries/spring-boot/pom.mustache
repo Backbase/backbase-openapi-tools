@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>{{#java8}}2.0.1.RELEASE{{/java8}}{{^java8}}1.5.12.RELEASE{{/java8}}</version>
+        <version>{{#java8}}2.3.3.RELEASE{{/java8}}{{^java8}}1.5.12.RELEASE{{/java8}}</version>
     </parent>
 {{/parentOverridden}}
     <build>
@@ -44,9 +44,10 @@
             </plugin>
             {{#apiFirst}}
             <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>{{{generatorVersion}}}</version>
+                <groupId>com.backbase.oss</groupId>
+                    <artifactId>boat-maven-plugin</artifactId>
+                    <version>{{{generatorVersion}}}</version>
+                </parent>
                 <executions>
                     <execution>
                         <goals>
@@ -56,6 +57,9 @@
                             <inputSpec>src/main/resources/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>{{{apiPackage}}}</apiPackage>
+                            {{#apiNameSuffix}}
+                            <apiNameSuffix>{{{apiNameSuffix}}}</apiNameSuffix>
+                            {{/apiNameSuffix}}
                             <modelPackage>{{{modelPackage}}}</modelPackage>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             {{#modelNamePrefix}}
@@ -148,16 +152,27 @@
             <version>2.8.4</version>
         </dependency>
         {{/threetenbp}}
+{{#openApiNullable}}
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.1.0</version>
+            <version>0.2.1</version>
         </dependency>
+{{/openApiNullable}}
+{{#useLombokAnnotations}}
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+{{/useLombokAnnotations}}
 {{#useBeanValidation}}
     <!-- Bean Validation API support -->
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>2.0.2</version>
         </dependency>
 {{/useBeanValidation}}
 {{#virtualService}}
@@ -176,7 +191,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>1.5.9.RELEASE</version>
+            <version>{{#java8}}2.3.3.RELEASE{{/java8}}{{^java8}}1.5.12.RELEASE{{/java8}}</version>
         </dependency>
     <!-- END Virtual Service API support -->
 {{/virtualService}}
@@ -187,5 +202,6 @@
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
 {{/hateoas}}
+        {{{additionalDependencies}}}
     </dependencies>
 </project>
