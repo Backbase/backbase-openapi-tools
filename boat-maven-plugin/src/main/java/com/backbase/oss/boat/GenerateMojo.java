@@ -75,8 +75,6 @@ public class GenerateMojo extends AbstractMojo {
     public static final String ADDITIONAL_PROPERTIES = "additional-properties";
     public static final String SERVER_VARIABLES = "server-variables";
     public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
-    public static final String USE_CLASS_LEVEL_BEANVALIDATION = "useClassLevelBeanValidation";
-    public static final String ADD_SERVLET_REQUEST = "addServletRequest";
 
     /**
      * The build context is only avail when running from within eclipse.
@@ -98,7 +96,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * The name of the generator to use.
      */
-    @Parameter(name = "generatorName")
+    @Parameter(name = "generatorName", property = "openapi.generator.maven.plugin.generatorName")
     protected String generatorName;
 
     /**
@@ -218,6 +216,12 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter(name = "library", property = "openapi.generator.maven.plugin.library", required = false)
     protected String library;
+
+    /**
+     * Sets the suffix for API classes.
+     */
+    @Parameter(name = "apiNameSuffix", property = "openapi.generator.maven.plugin.apiNameSuffix", required = false)
+    protected String apiNameSuffix;
 
     /**
      * Sets the prefix for model enums and classes.
@@ -403,8 +407,16 @@ public class GenerateMojo extends AbstractMojo {
      * Add the output directory to the project as a source root, so that the generated java types
      * are compiled and included in the project artifact.
      */
-    @Parameter(defaultValue = "true")
+    @Parameter(defaultValue = "true", property = "openapi.generator.maven.plugin.addCompileSourceRoot")
     protected boolean addCompileSourceRoot = true;
+
+    /**
+     * Add the output directory to the project as a test source root, so that the generated java types
+     * are compiled only for the test classpath of the project. Mutually exclusive with
+     * {@link #addCompileSourceRoot}.
+     */
+    @Parameter(defaultValue = "false", property = "openapi.generator.maven.plugin.addTestCompileSourceRoot")
+    private boolean addTestCompileSourceRoot = false;
 
     @Parameter
     protected Map<String, String> environmentVariables = new HashMap<>();
@@ -414,16 +426,6 @@ public class GenerateMojo extends AbstractMojo {
 
     @Parameter(property = "codegen.configHelp")
     protected boolean configHelp = false;
-
-    /**
-     * Add @Validated to class-level Api interfaces. Defaults to false
-     */
-    protected boolean useClassLevelBeanValidation = false;
-
-    /**
-     * Adds a HttpServletRequest object to the API definition method.
-     */
-    protected boolean addServletRequest = false;
 
     /**
      * The project being built.
@@ -537,7 +539,11 @@ public class GenerateMojo extends AbstractMojo {
             }
 
             if (isNotEmpty(generatorName)) {
-                configurator.setGeneratorName(generatorName);
+                if ("spring".equals(generatorName)) {
+                    configurator.setGeneratorName(com.backbase.oss.codegen.SpringCodeGen.class.getName());
+                } else {
+                    configurator.setGeneratorName(generatorName);
+                }
 
                 // check if generatorName & language are set together, inform user this needs to be updated to prevent future issues.
                 if (isNotEmpty(language)) {
@@ -592,6 +598,10 @@ public class GenerateMojo extends AbstractMojo {
                 configurator.setLibrary(library);
             }
 
+            if (isNotEmpty(apiNameSuffix)) {
+                configurator.setApiNameSuffix(apiNameSuffix);
+            }
+
             if (isNotEmpty(modelNamePrefix)) {
                 configurator.setModelNamePrefix(modelNamePrefix);
             }
@@ -634,22 +644,6 @@ public class GenerateMojo extends AbstractMojo {
             GlobalSettings.setProperty(CodegenConstants.WITH_XML, withXml.toString());
 
             if (configOptions != null) {
-
-                // Configures the Class Level Validation for API interfaces.
-                if (configOptions.containsKey(USE_CLASS_LEVEL_BEANVALIDATION)) {
-                    useClassLevelBeanValidation = Boolean
-                        .parseBoolean((String) configOptions.get(USE_CLASS_LEVEL_BEANVALIDATION));
-                }
-                configurator.addAdditionalProperty(USE_CLASS_LEVEL_BEANVALIDATION, useClassLevelBeanValidation);
-
-                // Configures the addition of ServletRequests to API methods
-                if (configOptions.containsKey(ADD_SERVLET_REQUEST)) {
-                    addServletRequest = Boolean
-                        .parseBoolean((String) configOptions.get(ADD_SERVLET_REQUEST));
-                }
-                configurator.addAdditionalProperty(ADD_SERVLET_REQUEST, addServletRequest);
-
-
                 // Retained for backwards-compataibility with configOptions -> instantiation-types
                 if (instantiationTypes == null && configOptions.containsKey(INSTANTIATION_TYPES)) {
                     applyInstantiationTypesKvp(configOptions.get(INSTANTIATION_TYPES).toString(),
@@ -874,15 +868,25 @@ public class GenerateMojo extends AbstractMojo {
         final Object sourceFolderObject =
             configOptions == null ? null : configOptions
                 .get(CodegenConstants.SOURCE_FOLDER);
-        final String sourceFolder =
-            sourceFolderObject == null ? "src/main/java" : sourceFolderObject.toString();
+        final String sourceFolder;
+        if (sourceFolderObject != null) {
+            sourceFolder = sourceFolderObject.toString();
+        } else {
+            sourceFolder = addTestCompileSourceRoot ? "src/test/java" : "src/main/java";
+        }
 
         return output.toString() + "/" + sourceFolder;
     }
 
-    private void addCompileSourceRootIfConfigured() {
+    private void addCompileSourceRootIfConfigured() throws MojoExecutionException {
         if (addCompileSourceRoot) {
+            if (addTestCompileSourceRoot) {
+                throw new MojoExecutionException(
+                    "Either 'addCompileSourceRoot' or 'addTestCompileSourceRoot' may be active, not both.");
+            }
             project.addCompileSourceRoot(getCompileSourceRoot());
+        } else if (addTestCompileSourceRoot) {
+            project.addTestCompileSourceRoot(getCompileSourceRoot());
         }
 
         // Reset all environment variables to their original value. This prevents unexpected
