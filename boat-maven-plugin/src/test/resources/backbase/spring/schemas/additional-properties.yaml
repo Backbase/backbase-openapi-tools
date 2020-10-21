@@ -1,6 +1,5 @@
 title: AdditionalProperties
 type: object
-x-implements: com.backbase.buildingblocks.persistence.model.AdditionalPropertiesAware
 x-abstract: true
 properties:
   additions:
