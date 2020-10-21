@@ -123,12 +123,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.backbase.buildingblocks</groupId>
-            <artifactId>building-blocks-common</artifactId>
-            <version>11.2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.1</version>
