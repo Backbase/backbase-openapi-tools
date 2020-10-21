@@ -136,11 +136,6 @@ public class SpringTemplateTests {
                     + "        <groupId>jakarta.persistence</groupId>\n"
                     + "            <artifactId>jakarta.persistence-api</artifactId>\n"
                     + "            <version>2.2.3</version>\n"
-                    + "        </dependency>"
-                    + "        <dependency>\n"
-                    + "            <groupId>com.backbase.buildingblocks</groupId>\n"
-                    + "            <artifactId>building-blocks-common</artifactId>\n"
-                    + "            <version>11.2.1</version>\n"
                     + "        </dependency>");
         mojo.inputSpec = input.getAbsolutePath();
         mojo.output = output.getAbsoluteFile();
