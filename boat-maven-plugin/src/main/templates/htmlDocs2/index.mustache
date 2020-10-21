@@ -378,6 +378,14 @@
                             </table>
                           {{/hasQueryParams}}
 
+                          {{#hasExamples}}
+                              {{#examples}}
+                                  <h3 class="field-label">Example data</h3>
+                                  <div class="example-data-content-type">Content-Type: {{{contentType}}}</div>
+                                  <pre class="prettyprint language-json prettyprinted"><code class="json">{{{example}}}</code></pre>
+                              {{/examples}}
+                          {{/hasExamples}}
+
                           <h2>Responses</h2>
                           {{#responses}}
                             <h3 id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
