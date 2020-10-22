@@ -1,7 +1,7 @@
 package com.backbase.oss.boat.transformers;
 
+import com.backbase.oss.boat.transformers.bundler.BoatOpenAPIResolver;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.parser.OpenAPIResolver;
 import java.io.File;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +9,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Bundler implements Transformer {
 
+    private final File inputFile;
+
+    public Bundler(File inputFile) {
+        super();
+        this.inputFile = inputFile;
+    }
 
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
-
-        File inputFile = (File) options.get("input");
-
-        OpenAPIResolver openAPIResolver = new OpenAPIResolver(openAPI, null, inputFile.toURI().toString());
+        // Use the BoatOpenApiResolver...
+        BoatOpenAPIResolver openAPIResolver = new BoatOpenAPIResolver(openAPI, null, inputFile.toURI().toString());
         openAPIResolver.resolve();
-
     }
+
 }
