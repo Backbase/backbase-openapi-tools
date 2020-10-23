@@ -20,6 +20,13 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.2.8
+* *HTML2 Generator*
+  * Removes examples
+  * Adds title of API to the left navigation
+  * Removes unnecessary spaces in the docs
+  * Fixes item focus on left navigation
+
 ## 0.2.7
 
 * *Spring Generator*
