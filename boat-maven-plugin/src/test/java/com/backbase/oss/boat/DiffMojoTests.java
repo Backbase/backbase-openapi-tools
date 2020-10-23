@@ -47,6 +47,19 @@ public class DiffMojoTests {
         diffMojo.execute();
     }
 
+    @SneakyThrows
+    @Test
+    public void testJsonRenderer() {
+        DiffMojo diffMojo = new DiffMojo();
+        diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
+        diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
+        diffMojo.setWriteChangelog(false);
+        diffMojo.setChangelogOutput(new File("target"));
+        diffMojo.setChangelogRenderer("json");
+        diffMojo.execute();
+        Assert.assertTrue(new File(diffMojo.getChangelogOutput(), "changelog.json").exists());
+    }
+
 
     private File getFile(String fileName) {
         return new File(getClass().getResource(fileName).getFile());
