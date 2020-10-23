@@ -47,7 +47,7 @@ BOAT is still under development and subject to change.
   * test the generated code in the integration test phase
 
 ## 0.2.6
-* Ensure RAML traits that are converted to OAS extenions are all using lower case. 
+* Ensure RAML traits that are converted to OAS extensions are all using lower case. 
 
 ## 0.2.5 
 * Fixed a bug how duplicate names are generated if RAML source has duplicate names for references. The parent resource name is now prepended to the schema name without removing the last character of the parent resource name

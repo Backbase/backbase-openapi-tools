@@ -1,0 +1,13 @@
+title: BadRequestError
+type: object
+properties:
+  message:
+    description: Any further information
+    type: string
+  errors:
+    description: Detailed error information
+    type: array
+    items:
+      $ref: error-item.yaml
+required:
+  - message
