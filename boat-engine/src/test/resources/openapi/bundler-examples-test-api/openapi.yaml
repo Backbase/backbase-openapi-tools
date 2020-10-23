@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Exampled API
+  description: No description available
+  version: v1
+servers:
+  - url: /serviceName/client-api/v1
+    description: The server
+tags:
+  - name: examples
+paths:
+  /users:
+    summary: Requests and responses have a singe example - 'all' operations
+    get:
+      summary: Get, does not support request body.
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              example:
+                $ref: ./examples/user-post-response.json
+    post:
+      summary: Single example
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPostRequest'
+            example:
+              $ref: ./examples/user-post-request.json
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              example:
+                $ref: ./examples/user-post-response.json
+        '400':
+          $ref: ./schemas/components.yaml#/components/schemas/BadRequestResponse
+    put:
+      summary: Single example
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPostRequest'
+            example:
+              $ref: ./examples/user-post-request.json
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              example:
+                $ref: ./examples/user-post-response.json
+        '400':
+          description: Fixing an invalid example reference
+          content:
+            application/json:
+              schema:
+                $ref: ./lib/schema/bad-request-error.yaml
+              example:
+                value:
+                  $ref: ./examples/user-post-response.json
+        '401':
+          description: Fixing an invalid example reference
+          content:
+            application/json:
+              schema:
+                $ref: ./lib/schema/bad-request-error.yaml
+              examples:
+                named-bad-example:
+                  value:
+                    $ref: ./examples/user-post-response.json
+    patch:
+      summary: Single example
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPostRequest'
+            example:
+              $ref: ./examples/user-post-request.json
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              example:
+                $ref: ./examples/user-post-response.json
+  /multi-users:
+    summary: An endpoint that has multiple examples for both request and response bodies. Also, multiple media types
+    post:
+      summary: Multiple examples
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPostRequest'
+            examples:
+              example-number-one:
+                $ref: ./examples/user-post-request.json
+              example-number-two:
+                $ref: ./examples/user-post-request-2.json
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              examples:
+                example-number-one:
+                  $ref: ./examples/user-post-response.json
+                example-number-two:
+                  $ref: ./examples/user-post-response-2.json
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserPostResponse'
+              examples:
+                example-number-one:
+                  $ref: ./examples/user-post-response.xml
+  /example-in-component:
+    post:
+      summary: Examples in schema cannot contain a ref
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithExampleRequest'
+      responses:
+        '200':
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithExampleResponse'
+              examples:
+                in-component:
+                  $ref: '#/components/examples/example-in-components'
+                in-component-1:
+                  $ref: '#/components/examples/example-in-components-1'
+components:
+  schemas:
+    UserPostRequest:
+      $ref: 'schemas/post-user-request.json'
+    UserPostResponse:
+      $ref: 'schemas/post-user-response.json'
+    WithExampleRequest:
+      $ref: 'schemas/post-user-request.json'
+      example:
+        name: "Eddie"
+        rank: 99
+    WithExampleResponse:
+      $ref: 'schemas/post-user-response.json'
+  examples:
+    example-in-components:
+      $ref: ./examples/user-post-response.json
+    example-in-components-1:
+      summary: component-examples with example - should be left alone
+      value:
+        id: "1"
+        name: "Michel"
+        rank: 22
+    example-number-one:
+      summary: component-examples with reference, matching the name of a path examples - also, summary ignored.
+      $ref: ./examples/user-post-request.json
