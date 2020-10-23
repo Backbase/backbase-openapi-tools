@@ -77,7 +77,7 @@ public class DiffMojo extends AbstractMojo {
             try {
                 FileUtils.write(new File(changelogOutput, "changelog." + extension), render.render(changedOpenApi));
             } catch (IOException e) {
-                throw new MojoExecutionException("Failed to write markdown output", e);
+                throw new MojoExecutionException("Failed to write output", e);
             }
         }
 
