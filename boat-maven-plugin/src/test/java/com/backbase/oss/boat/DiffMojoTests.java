@@ -53,7 +53,7 @@ public class DiffMojoTests {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
-        diffMojo.setWriteChangelog(false);
+        diffMojo.setWriteChangelog(true);
         diffMojo.setChangelogOutput(new File("target"));
         diffMojo.setChangelogRenderer("json");
         diffMojo.execute();
