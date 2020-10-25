@@ -1,0 +1,158 @@
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+group = '{{groupId}}'
+version = '{{artifactVersion}}'
+
+buildscript {
+    repositories {
+        maven { url "https://repo1.maven.org/maven2" }
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.+'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+
+if(hasProperty('target') && target == 'android') {
+
+    apply plugin: 'com.android.library'
+    apply plugin: 'com.github.dcendents.android-maven'
+
+    android {
+        compileSdkVersion 25
+        buildToolsVersion '25.0.2'
+        defaultConfig {
+            minSdkVersion 14
+            targetSdkVersion 25
+        }
+        compileOptions {
+            {{#supportJava6}}
+            sourceCompatibility JavaVersion.VERSION_1_6
+            targetCompatibility JavaVersion.VERSION_1_6
+            {{/supportJava6}}
+            {{^supportJava6}}
+            {{#java8}}
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+            {{/java8}}
+            {{^java8}}
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+            {{/java8}}
+            {{/supportJava6}}
+        }
+
+        // Rename the aar correctly
+        libraryVariants.all { variant ->
+            variant.outputs.each { output ->
+                def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                    def fileName = "${project.name}-${variant.baseName}-${version}.aar"
+                    output.outputFile = new File(outputFile.parent, fileName)
+                }
+            }
+        }
+
+        dependencies {
+            provided 'javax.annotation:jsr250-api:1.0'
+        }
+    }
+
+    afterEvaluate {
+        android.libraryVariants.all { variant ->
+            def task = project.tasks.create "jar${variant.name.capitalize()}", Jar
+            task.description = "Create jar artifact for ${variant.name}"
+            task.dependsOn variant.javaCompile
+            task.from variant.javaCompile.destinationDir
+            task.destinationDir = project.file("${project.buildDir}/outputs/jar")
+            task.archiveName = "${project.name}-${variant.baseName}-${version}.jar"
+            artifacts.add('archives', task);
+        }
+    }
+
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
+} else {
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    {{#supportJava6}}
+    sourceCompatibility = JavaVersion.VERSION_1_6
+    targetCompatibility = JavaVersion.VERSION_1_6
+    {{/supportJava6}}
+    {{^supportJava6}}
+    {{#java8}}
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    {{/java8}}
+    {{^java8}}
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+    {{/java8}}
+    {{/supportJava6}}
+
+    install {
+        repositories.mavenInstaller {
+            pom.artifactId = '{{artifactId}}'
+        }
+    }
+
+    task execute(type:JavaExec) {
+       main = System.getProperty('mainClass')
+       classpath = sourceSets.main.runtimeClasspath
+    }
+}
+
+ext {
+    swagger_annotations_version = "1.5.24"
+    jackson_version = "2.10.3"
+    jackson_databind_version = "2.10.3"
+    jackson_databind_nullable_version = "0.2.1"
+    {{#threetenbp}}
+    jackson_threetenbp_version = "2.9.10"
+    {{/threetenbp}}
+    feign_version = "{{#useFeign10}}11.0{{/useFeign10}}{{^useFeign10}}9.7.0{{/useFeign10}}"
+    feign_form_version = "{{#useFeign10}}3.8.0{{/useFeign10}}{{^useFeign10}}2.1.0{{/useFeign10}}"
+    junit_version = "4.13"
+    oltu_version = "1.0.1"
+}
+
+dependencies {
+    compile "io.swagger:swagger-annotations:$swagger_annotations_version"
+    compile "com.google.code.findbugs:jsr305:3.0.2"
+    compile "io.github.openfeign:feign-core:$feign_version"
+    compile "io.github.openfeign:feign-jackson:$feign_version"
+    compile "io.github.openfeign:feign-slf4j:$feign_version"
+    compile "io.github.openfeign.form:feign-form:$feign_form_version"
+    compile "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jackson_databind_version"
+    compile "org.openapitools:jackson-databind-nullable:$jackson_databind_nullable_version"
+    {{#joda}}
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson_version"
+    {{/joda}}
+    {{#java8}}
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+    {{/java8}}
+    {{#threetenbp}}
+    compile "com.github.joschi.jackson:jackson-datatype-threetenbp:$jackson_threetenbp_version"
+    {{/threetenbp}}
+    compile "org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version"
+    compile "com.brsanthu:migbase64:2.2"
+    testCompile "junit:junit:$junit_version"
+}
