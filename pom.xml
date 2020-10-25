@@ -70,7 +70,7 @@
     <modules>
         <module>boat-diff</module>
         <module>boat-engine</module>
-        <module>boat-skaffold</module>
+        <module>boat-scaffold</module>
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
         <!-- Code Coverage Project -->
