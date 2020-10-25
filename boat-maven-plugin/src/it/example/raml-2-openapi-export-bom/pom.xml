@@ -15,7 +15,7 @@
             <plugin>
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>0.2.8</version>
+                <version>@pom.version@</version>
                 <configuration>
                     <specBom>
                         <groupId>com.backbase.oss.boat</groupId>
