@@ -26,7 +26,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
 
     @Test
     public void testHelloWorld() throws Exception {
-        File inputFile = getFile("/raml-examples/helloworld/helloworld.raml");
+        File inputFile = new File("/Users/bartv/IdeaProjects/github/backbase/backbase-openapi-tools/boat-maven-plugin/src/it/example/raml-2-openapi-generate-rest-template-embedded/target/raml/1.0.0-SNAPSHOT/raml-spec/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);

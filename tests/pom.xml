@@ -39,6 +39,12 @@
             <artifactId>boat-diff</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-skaffold</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
