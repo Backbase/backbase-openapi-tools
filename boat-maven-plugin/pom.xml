@@ -49,7 +49,7 @@
 
         <dependency>
             <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-skaffold</artifactId>
+            <artifactId>boat-scaffold</artifactId>
             <version>${project.version}</version>
         </dependency>
 
