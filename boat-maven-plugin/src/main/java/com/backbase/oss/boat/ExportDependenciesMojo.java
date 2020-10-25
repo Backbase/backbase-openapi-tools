@@ -3,6 +3,7 @@ package com.backbase.oss.boat;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -12,6 +13,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * Exports project dependencies where the ArtifactId ends with "-spec".
  */
 @Mojo(name = "export-dep", requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME, threadSafe = true)
+@Slf4j
 public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
 
     @Override
@@ -32,6 +34,7 @@ public class ExportDependenciesMojo extends AbstractRamlToOpenApi {
 
     private void export(Artifact artifact) throws MojoExecutionException {
         File outputDirectory = new File(this.output, artifact.getGroupId().replace('.', '/'));
+        log.info("Export artifact: {} to: {}", artifact.getFile(), outputDirectory);
         exportArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getFile(), outputDirectory);
     }
 
