@@ -23,7 +23,7 @@
             <plugin>
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>@pom.version@</version>
+                <version>0.2.8</version>
                 <executions>
                     <execution>
                         <id>export-dep</id>
