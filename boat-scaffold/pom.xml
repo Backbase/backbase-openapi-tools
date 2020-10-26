@@ -32,10 +32,6 @@
             <version>${openapi-generator.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>javax.validation</groupId>
                     <artifactId>validation-api</artifactId>
                 </exclusion>
@@ -43,8 +39,22 @@
                     <groupId>io.swagger.core.v3</groupId>
                     <artifactId>swagger-core</artifactId>
                 </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>org.slf4j</groupId>-->
+<!--                    <artifactId>*</artifactId>-->
+<!--                </exclusion>-->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-ext</artifactId>-->
+<!--            <version>1.7.30</version>-->
+<!--        </dependency>-->
 
 
         <dependency>
@@ -54,22 +64,16 @@
         </dependency>
 
 
-<!--        <dependency>-->
-<!--            <groupId>com.backbase.oss</groupId>-->
-<!--            <artifactId>boat-engine</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
         </dependency>
 
         <dependency>
@@ -92,7 +96,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 
