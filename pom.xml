@@ -69,6 +69,8 @@
         <swagger-parser.version>2.0.22</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+
+        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
     </properties>
 
     <modules>
@@ -77,6 +79,7 @@
         <module>boat-scaffold</module>
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
+        <module>boat-wharf</module>
         <!-- Code Coverage Project -->
         <module>tests</module>
     </modules>
@@ -104,12 +107,21 @@
             </dependency>
 
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+
+
+
+            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.3</version>
             </dependency>
 
 
+            <!-- Jackson Dependencies -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -152,6 +164,20 @@
                 <version>${jackson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jsonSchema</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-parameter-names</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+
+            <!-- Joda -->
             <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
@@ -228,17 +254,39 @@
             </dependency>
 
             <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-core</artifactId>
                 <version>${swagger-core.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-core.version}</version>
+                <scope>compile</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
                 <artifactId>swagger-parser</artifactId>
                 <version>${swagger-parser.version}</version>
-
             </dependency>
 
             <dependency>
