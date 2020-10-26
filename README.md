@@ -21,11 +21,15 @@ The project is very much Work In Progress and will be published on maven central
 BOAT is still under development and subject to change.
 
 ## 0.2.8
+
 * *HTML2 Generator*
   * Removes examples
   * Adds title of API to the left navigation
   * Removes unnecessary spaces in the docs
   * Fixes item focus on left navigation
+* Moved the code generation into a separate module to be used by other BOAT components.
+* Cleaning up dependencies
+* Added boat:bundle mojo to bundle fragments into a single spec. 
 
 ## 0.2.7
 
