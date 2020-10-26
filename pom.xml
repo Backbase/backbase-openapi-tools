@@ -50,7 +50,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jacoco.version>0.8.4</jacoco.version>
-
+        <skipTests>true</skipTests>
         <sonar.organization>backbase-technology-prototyping</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>***REMOVED***</sonar.login>
@@ -65,14 +65,18 @@
         <swagger-core.version>2.1.5</swagger-core.version>
         <swagger-parser.version>2.0.22</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
+
+        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
     </properties>
 
     <modules>
         <module>boat-diff</module>
         <module>boat-engine</module>
         <module>boat-scaffold</module>
+
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
+        <module>boat-wharf</module>
         <!-- Code Coverage Project -->
         <module>tests</module>
     </modules>
@@ -137,6 +141,15 @@
                 </executions>
                 <configuration>
                     <source>8</source>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <skip>${skipTests}</skip>
                 </configuration>
             </plugin>
         </plugins>
@@ -210,6 +223,9 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
             <build>
                 <plugins>
                     <!-- Surefire plugin - for running unit tests-->
