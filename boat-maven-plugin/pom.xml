@@ -17,6 +17,7 @@
 
     <properties>
         <maven.api.version>3.6.0</maven.api.version>
+        <maven.version>3.6.0</maven.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
             src/main/java/com/backbase/oss/codegen/SpringCodeGen/java
@@ -26,6 +27,58 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-annotations</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-classworlds</artifactId>
+                <version>2.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven.shared</groupId>
+                <artifactId>maven-shared-utils</artifactId>
+                <version>3.3.3</version>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
 
     <dependencies>
 
@@ -52,13 +105,13 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- Maven Dependencies -->
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${maven.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        &lt;!&ndash; Maven Dependencies &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.maven</groupId>-->
+<!--            <artifactId>maven-core</artifactId>-->
+<!--            <version>${maven.api.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -66,11 +119,11 @@
             <version>0.12.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-common-artifact-filters</artifactId>
-            <version>3.1.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.maven.shared</groupId>-->
+<!--            <artifactId>maven-common-artifact-filters</artifactId>-->
+<!--            <version>3.1.0</version>-->
+<!--        </dependency>-->
 
 
         <dependency>
@@ -79,11 +132,11 @@
             <version>3.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.sonatype.plexus</groupId>
-            <artifactId>plexus-build-api</artifactId>
-            <version>0.0.7</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.sonatype.plexus</groupId>-->
+<!--            <artifactId>plexus-build-api</artifactId>-->
+<!--            <version>0.0.7</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -113,6 +166,11 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.plexus</groupId>
+            <artifactId>plexus-build-api</artifactId>
+            <version>0.0.7</version>
         </dependency>
 
     </dependencies>

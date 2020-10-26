@@ -27,7 +27,7 @@ public class ExportMojoTests {
         outputYaml.delete();
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
 
         mojo.getLog();
         mojo.project = new MavenProject();
@@ -50,7 +50,7 @@ public class ExportMojoTests {
         }
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
 
         mojo.getLog();
         mojo.project = new MavenProject();
