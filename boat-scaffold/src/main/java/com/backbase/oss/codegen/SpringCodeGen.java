@@ -51,6 +51,7 @@ public class SpringCodeGen extends org.openapitools.codegen.languages.SpringCode
     @Getter
     protected boolean useClassLevelBeanValidation = false;
 
+
     /**
      * Adds a HttpServletRequest object to the API definition method.
      */
