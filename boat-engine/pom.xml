@@ -15,17 +15,13 @@
     <name>BOAT :: Engine</name>
 
     <properties>
-        <jackson.version>2.11.3</jackson.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/ExporterOptions.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <version.openapi-parser>1.6.16</version.openapi-parser>
-
-        <guava-version>28.1-android</guava-version>
     </properties>
-
 
     <dependencies>
 
@@ -234,19 +230,16 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
 
