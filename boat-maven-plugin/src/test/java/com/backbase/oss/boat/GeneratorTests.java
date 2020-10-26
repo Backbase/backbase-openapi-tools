@@ -26,8 +26,7 @@ public class GeneratorTests {
             output.mkdirs();
         }
 
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        DefaultBuildContext defaultBuildContext = getDefaultBuildContext();
 
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
@@ -52,8 +51,7 @@ public class GeneratorTests {
             output.mkdirs();
         }
 
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        DefaultBuildContext defaultBuildContext = getDefaultBuildContext();
 
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
@@ -103,8 +101,7 @@ public class GeneratorTests {
             output.mkdirs();
         }
 
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        DefaultBuildContext defaultBuildContext = getDefaultBuildContext();
 
         Map<String,String> configOption = new HashMap<>();
         configOption.put("library", "spring-mvc");
@@ -139,8 +136,7 @@ public class GeneratorTests {
             output.mkdirs();
         }
 
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        DefaultBuildContext defaultBuildContext = getDefaultBuildContext();
 
         mojo.buildContext = defaultBuildContext;
         mojo.project = new MavenProject();
@@ -150,5 +146,11 @@ public class GeneratorTests {
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
 
+    }
+
+    private DefaultBuildContext getDefaultBuildContext() {
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
+        return defaultBuildContext;
     }
 }

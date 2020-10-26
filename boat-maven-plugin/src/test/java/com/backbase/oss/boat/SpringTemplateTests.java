@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -33,6 +34,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
  */
 @RunWith(Parameterized.class)
 @RequiredArgsConstructor
+@Slf4j
 public class SpringTemplateTests {
 
     @Parameterized.Parameters(name = "{0}")
@@ -125,7 +127,7 @@ public class SpringTemplateTests {
 
         final GenerateMojo mojo = new GenerateMojo();
         final DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        defaultBuildContext.enableLogging(new ConsoleLogger(1,"BOAT"));
 
         mojo.buildContext = defaultBuildContext;
         mojo.project = new MavenProject();
