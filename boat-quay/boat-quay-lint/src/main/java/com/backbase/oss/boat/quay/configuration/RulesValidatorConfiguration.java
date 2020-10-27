@@ -2,10 +2,10 @@ package com.backbase.oss.boat.quay.configuration;
 
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.impl.ConfigImpl;
 import com.typesafe.config.impl.Parseable;
-import java.util.Arrays;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ import org.zalando.zally.core.DefaultContextFactory;
 import org.zalando.zally.core.JsonRulesValidator;
 import org.zalando.zally.core.RuleProcessor;
 import org.zalando.zally.core.RulesManager;
-import org.zalando.zally.rule.api.Rule;
 
 public class RulesValidatorConfiguration {
 
@@ -26,9 +25,9 @@ public class RulesValidatorConfiguration {
         RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
         Config config = rulesValidatorConfiguration.config("boat.conf");
         RulesManager rulesManager = rulesValidatorConfiguration.rulesManager(config);
-        ApiValidator apiValidator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
-        return apiValidator;
+        return rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
     }
+
 
     public void scanAnnotations() {
         RuleProcessor ruleProcessor = new RuleProcessor();
@@ -37,12 +36,12 @@ public class RulesValidatorConfiguration {
 //        RoundEnvironment renv = new JavacRoundEnvironment(true,
 
 
-
         log.info("Scanned for Rules in Classpath: {}", supportedAnnotationTypes);
     }
 
     public Config config(String ruleSetFile) {
-        return defaultReference(this.getClass().getClassLoader(), ruleSetFile);
+        return defaultReference(this.getClass().getClassLoader(), ruleSetFile)
+            .withFallback(ConfigFactory.defaultReference());
     }
 
     public static Config defaultReference(final ClassLoader loader, String file) {

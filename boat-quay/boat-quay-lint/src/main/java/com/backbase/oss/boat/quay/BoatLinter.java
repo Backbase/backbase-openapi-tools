@@ -19,6 +19,10 @@ public class BoatLinter {
 
     public List<Result> lint(String openApiContent) {
         RulesPolicy rulesPolicy = new RulesPolicy(new ArrayList<>());
+
+
+
+
         return validator.validate(openApiContent, rulesPolicy, null);
     }
 
