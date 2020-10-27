@@ -32,7 +32,11 @@ BOAT is still under development and subject to change.
 * Added boat:bundle mojo to bundle fragments into a single spec. 
 
 * *Spring Generator*
-  * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (breaking change, defaults to `true` for compatibility with the old RAML generator).
+  * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (defaults to `false`; for compatibility with the old RAML generator must be set to `true`).
+  * Reset the defaults of the options added in 0.2.7 to avoid breaking changes.
+    - useLombokAnnotations: false
+    - openApiNullable: true
+    - useSetForUniqueItems: false
 
 ## 0.2.7
 
