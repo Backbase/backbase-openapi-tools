@@ -5,6 +5,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.impl.ConfigImpl;
 import com.typesafe.config.impl.Parseable;
+import java.util.Arrays;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.zalando.zally.core.DefaultContextFactory;
 import org.zalando.zally.core.JsonRulesValidator;
 import org.zalando.zally.core.RuleProcessor;
 import org.zalando.zally.core.RulesManager;
+import org.zalando.zally.rule.api.Rule;
 
 public class RulesValidatorConfiguration {
 
@@ -23,7 +25,6 @@ public class RulesValidatorConfiguration {
     public static ApiValidator defaultApiValidator() {
         RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
         Config config = rulesValidatorConfiguration.config("boat.conf");
-        rulesValidatorConfiguration.scanAnnotations();
         RulesManager rulesManager = rulesValidatorConfiguration.rulesManager(config);
         ApiValidator apiValidator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
         return apiValidator;

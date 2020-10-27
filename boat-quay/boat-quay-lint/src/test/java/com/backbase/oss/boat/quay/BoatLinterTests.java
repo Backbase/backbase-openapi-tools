@@ -1,8 +1,6 @@
 package com.backbase.oss.boat.quay;
 
 import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
-import com.backbase.oss.boat.trail.OpenAPITestResources;
-import io.swagger.v3.oas.models.OpenAPI;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.io.IOUtils;
@@ -19,4 +17,5 @@ public class BoatLinterTests {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         boatLinter.lint(openApiContents);
     }
+
 }
