@@ -44,6 +44,7 @@
         </dependency>
 
 
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -55,7 +56,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -78,6 +78,29 @@
                             <goal>report-aggregate</goal>
                         </goals>
                         <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <skipInvocation>${skipTests}</skipInvocation>
+                            <projectsDirectory>target/test-outputs</projectsDirectory>
+                            <pomIncludes>
+                                <pomInclude>pom.xml</pomInclude>
+                            </pomIncludes>
+                            <streamLogs>true</streamLogs>
+                            <postBuildHookScript>compile</postBuildHookScript>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -17,6 +17,8 @@ import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
 public class SpringBoatCodeGen extends SpringCodegen {
+    public static final String NAME = "spring-boat";
+
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
@@ -107,7 +109,7 @@ public class SpringBoatCodeGen extends SpringCodegen {
 
     @Override
     public String getName() {
-        return "spring-boat";
+        return NAME;
     }
 
     @Override
