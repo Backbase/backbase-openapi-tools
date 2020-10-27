@@ -24,7 +24,7 @@ class OpenApiVersionRule(config: Config) {
         return when {
             !context.isOpenAPI3() -> emptyList()
             context.isOpenAPI3() && !openApiVersions.contains(version) ->
-                listOf(Violation("Wrong version '$version' used", "/openapi".toJsonPointer()))
+                listOf(Violation("OpenAPI specification version must be $openApiVersions. It's now set to `$version`" , "/openapi".toJsonPointer()))
             else -> emptyList()
         }
     }
