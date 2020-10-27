@@ -1,5 +1,0 @@
-logging:
-  level:
-    root: debug
-    springfox: info
-    org.springframework.org.web: debug
