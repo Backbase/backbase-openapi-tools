@@ -34,11 +34,6 @@
             <artifactId>boat-terminal</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-diff</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.backbase.oss</groupId>
