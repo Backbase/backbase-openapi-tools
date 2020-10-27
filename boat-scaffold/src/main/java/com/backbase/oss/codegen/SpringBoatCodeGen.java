@@ -22,6 +22,7 @@ public class SpringBoatCodeGen extends SpringCodegen {
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
+    public static final String USE_WITH_MODIFIERS = "useWithModifiers";
 
     static private class NewLineIndent implements Mustache.Lambda {
         private final int level;
@@ -51,14 +52,14 @@ public class SpringBoatCodeGen extends SpringCodegen {
      */
     @Setter
     @Getter
-    protected boolean useClassLevelBeanValidation = false;
+    protected boolean useClassLevelBeanValidation;
 
     /**
      * Adds a HttpServletRequest object to the API definition method.
      */
     @Setter
     @Getter
-    protected boolean addServletRequest = false;
+    protected boolean addServletRequest;
 
     /**
      * Add Lombok to class-level Api models. Defaults to false
@@ -67,16 +68,23 @@ public class SpringBoatCodeGen extends SpringCodegen {
     @Getter
     protected boolean useLombokAnnotations = true;
 
-    /**
-     * "Enable OpenAPI Jackson Nullable library"
-     */
-    @Setter
-    @Getter
-    protected boolean openApiNullable = false;
-
     @Setter
     @Getter
     protected boolean useSetForUniqueItems = true;
+
+    /**
+     * Enable OpenAPI Jackson Nullable library
+     */
+    @Setter
+    @Getter
+    protected boolean openApiNullable;
+
+    /**
+     * Whether to use {@code with} prefix for pojos modifiers.
+     */
+    @Setter
+    @Getter
+    protected boolean useWithModifiers = true;
 
     public SpringBoatCodeGen() {
         this.embeddedTemplateDir = this.templateDir = "JavaSpringBoat";
@@ -87,10 +95,12 @@ public class SpringBoatCodeGen extends SpringCodegen {
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
-        this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
             "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
+        this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
+            "Enable OpenAPI Jackson Nullable library", this.openApiNullable));
+        this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
+            "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
 
         this.apiNameSuffix = "Api";
     }
@@ -129,12 +139,19 @@ public class SpringBoatCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
             this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
         }
-        if (this.additionalProperties.containsKey(OPENAPI_NULLABLE)) {
-            this.openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
-        }
         if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
             this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
         }
+        if (this.additionalProperties.containsKey(OPENAPI_NULLABLE)) {
+            this.openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
+        }
+        if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
+            this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
+        }
+
+        writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
+        writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
+        writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
         if (this.useSetForUniqueItems) {
             this.typeMapping.put("set", "java.util.Set");
@@ -169,7 +186,7 @@ public class SpringBoatCodeGen extends SpringCodegen {
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            // XXX the model set this to the container type, why is this different?
+            // XXX the model set baseType to the container type, why is this different?
             p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
