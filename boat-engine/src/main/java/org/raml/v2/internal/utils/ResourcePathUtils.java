@@ -19,16 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
 
 /**
  * This utility has been modified by Backbase to enable this to work with windows file paths.
  */
+@UtilityClass
 public class ResourcePathUtils {
     private static final Pattern TEMPLATE_PATTERN = Pattern.compile("\\{([^}]+)\\}");
-
-    private ResourcePathUtils() {
-        throw new AssertionError("Private constructor");
-    }
 
     /**
      * Returns the absolute resource location using the basePath basePath and relativePath must have
@@ -62,16 +60,12 @@ public class ResourcePathUtils {
         return result;
     }
 
-    public static boolean isUri(String includePath) {
-        return includePath.startsWith("http:") || includePath.startsWith("https:") || includePath.startsWith("file:");
-    }
-
     public static boolean isAbsolute(String includePath) {
         return includePath.startsWith("http:") || includePath.startsWith("https:") || includePath.startsWith("file:") || includePath.startsWith("/") || (new File(includePath)).isAbsolute();
     }
 
     public static List<String> getUriTemplates(String value) {
-        List<String> result = new ArrayList();
+        List<String> result = new ArrayList<>();
         if (value != null) {
             Matcher m = TEMPLATE_PATTERN.matcher(value);
 
