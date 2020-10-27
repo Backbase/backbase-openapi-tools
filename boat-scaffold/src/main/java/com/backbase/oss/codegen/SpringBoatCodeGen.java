@@ -66,25 +66,25 @@ public class SpringBoatCodeGen extends SpringCodegen {
      */
     @Setter
     @Getter
-    protected boolean useLombokAnnotations = true;
+    protected boolean useLombokAnnotations;
 
     @Setter
     @Getter
-    protected boolean useSetForUniqueItems = true;
+    protected boolean useSetForUniqueItems;
 
     /**
      * Enable OpenAPI Jackson Nullable library
      */
     @Setter
     @Getter
-    protected boolean openApiNullable;
+    protected boolean openApiNullable = true;
 
     /**
      * Whether to use {@code with} prefix for pojos modifiers.
      */
     @Setter
     @Getter
-    protected boolean useWithModifiers = true;
+    protected boolean useWithModifiers;
 
     public SpringBoatCodeGen() {
         this.embeddedTemplateDir = this.templateDir = "JavaSpringBoat";
