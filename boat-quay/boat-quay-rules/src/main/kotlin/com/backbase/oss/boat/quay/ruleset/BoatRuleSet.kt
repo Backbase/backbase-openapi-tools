@@ -5,7 +5,7 @@ import org.zalando.zally.rule.api.Rule
 import java.net.URI
 
 class BoatRuleSet : AbstractRuleSet() {
-    override val url: URI = URI.create("https://github.com/zalando/zally/blob/master/server/rules.md")
+    override val url: URI = URI.create("https://backbase.github.io/backbase-openapi-tools/rules.md")
 
     override fun url(rule: Rule): URI {
         val heading = "${rule.id}: ${rule.title}"

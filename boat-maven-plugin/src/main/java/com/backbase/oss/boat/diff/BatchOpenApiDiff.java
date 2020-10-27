@@ -1,8 +1,5 @@
 package com.backbase.oss.boat.diff;
 
-import com.backbase.oss.boat.diff.compare.OpenApiDiff;
-import com.backbase.oss.boat.diff.model.ChangedOpenApi;
-import com.backbase.oss.boat.diff.output.MarkdownRender;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -20,6 +17,9 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.openapitools.openapidiff.core.compare.OpenApiDiff;
+import org.openapitools.openapidiff.core.model.ChangedOpenApi;
+import org.openapitools.openapidiff.core.output.MarkdownRender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
