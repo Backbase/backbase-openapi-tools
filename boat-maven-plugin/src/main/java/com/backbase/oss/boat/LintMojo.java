@@ -2,6 +2,7 @@ package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
+import com.typesafe.config.Config;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,8 +15,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.jetbrains.annotations.NotNull;
 import org.zalando.zally.core.ApiValidator;
+import org.zalando.zally.core.DefaultContextFactory;
 import org.zalando.zally.core.Result;
+import org.zalando.zally.core.RulesManager;
 
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
@@ -56,14 +60,9 @@ public class LintMojo extends AbstractMojo {
 
     private void lintOpenAPI(File inputFile) throws MojoExecutionException {
         try {
-
-            ApiValidator apiValidator = RulesValidatorConfiguration.defaultApiValidator();
-
+            BoatLinter boatLinter = getBoatLinter();
             String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
-
-            BoatLinter boatLinter = new BoatLinter(apiValidator);
             List<Result> lint = boatLinter.lint(contents);
-
             if (!lint.isEmpty()) {
                 log.warn("OpenAPI is not adhering to the rules!");
                 lint.forEach(result -> {
@@ -76,6 +75,15 @@ public class LintMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: " + inputFile, e);
         }
+    }
+
+    @NotNull
+    private BoatLinter getBoatLinter() {
+        RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
+        Config config = rulesValidatorConfiguration.config("boat.conf");
+        RulesManager rulesManager = rulesValidatorConfiguration.rulesManager(config);
+        ApiValidator apiValidator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
+        return new BoatLinter(apiValidator);
     }
 
     public void setInput(File input) {
