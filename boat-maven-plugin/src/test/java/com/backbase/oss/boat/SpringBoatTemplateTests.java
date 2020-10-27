@@ -177,8 +177,8 @@ public class SpringBoatTemplateTests {
         configOptions.put(OptionalFeatures.USE_OPTIONAL, Boolean.toString(this.useOptional));
         configOptions.put(SpringBoatCodeGen.USE_LOMBOK_ANNOTATIONS, Boolean.toString(this.useLombokAnnotations));
         configOptions.put(AbstractJavaCodegen.FULL_JAVA_UTIL, Boolean.toString(this.fullJavaUtil));
-        configOptions.put(SpringBoatCodeGen.OPENAPI_NULLABLE, Boolean.toString(this.openApiNullable));
         configOptions.put(SpringBoatCodeGen.USE_SET_FOR_UNIQUE_ITEMS, Boolean.toString(this.useSetForUniqueItems));
+        configOptions.put(SpringBoatCodeGen.OPENAPI_NULLABLE, Boolean.toString(this.openApiNullable));
 
         if (original) {
             mojo.templateDirectory = new File("src/test/resources/JavaSpring-4.3.1");
