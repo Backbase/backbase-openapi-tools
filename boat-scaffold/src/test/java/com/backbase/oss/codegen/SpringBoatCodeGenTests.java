@@ -6,11 +6,11 @@ import org.openapitools.codegen.CliOption;
 
 import static java.util.stream.Collectors.groupingBy;
 
-public class SpringCodeGenTests {
+public class SpringBoatCodeGenTests {
 
     @Test
     public void clientOptsUnicity() {
-        SpringCodeGen gen = new SpringCodeGen();
+        SpringBoatCodeGen gen = new SpringBoatCodeGen();
         gen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))

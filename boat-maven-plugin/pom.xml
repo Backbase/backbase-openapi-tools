@@ -19,7 +19,7 @@
         <maven.api.version>3.6.0</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
-            src/main/java/com/backbase/oss/codegen/SpringCodeGen/java
+            src/main/java/com/backbase/oss/codegen/*.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
@@ -246,6 +246,9 @@
                         </goals>
                         <configuration>
                             <projectsDirectory>${projects.build.directory}/test-outputs</projectsDirectory>
+                            <pomIncludes>
+                                <pomInclude>pom.xml</pomInclude>
+                            </pomIncludes>
                         </configuration>
                     </execution>
                 </executions>

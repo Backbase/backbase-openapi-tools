@@ -540,7 +540,7 @@ public class GenerateMojo extends AbstractMojo {
 
             if (isNotEmpty(generatorName)) {
                 if ("spring".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.SpringCodeGen.class.getName());
+                    configurator.setGeneratorName("spring-boat");
                 } else {
                     configurator.setGeneratorName(generatorName);
                 }
