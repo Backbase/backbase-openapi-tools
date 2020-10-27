@@ -21,24 +21,6 @@ public class RulesValidatorConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(BoatLinter.class);
 
-    public static ApiValidator defaultApiValidator() {
-        RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
-        Config config = rulesValidatorConfiguration.config("boat.conf");
-        RulesManager rulesManager = rulesValidatorConfiguration.rulesManager(config);
-        return rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
-    }
-
-
-    public void scanAnnotations() {
-        RuleProcessor ruleProcessor = new RuleProcessor();
-        Set<String> supportedAnnotationTypes = ruleProcessor.getSupportedAnnotationTypes();
-
-//        RoundEnvironment renv = new JavacRoundEnvironment(true,
-
-
-        log.info("Scanned for Rules in Classpath: {}", supportedAnnotationTypes);
-    }
-
     public Config config(String ruleSetFile) {
         return defaultReference(this.getClass().getClassLoader(), ruleSetFile)
             .withFallback(ConfigFactory.defaultReference());
@@ -61,5 +43,6 @@ public class RulesValidatorConfiguration {
     public ApiValidator apiValidator(RulesManager rulesManager, DefaultContextFactory defaultContextFactory) {
         return new CompositeRulesValidator(new ContextRulesValidator(rulesManager, defaultContextFactory), new JsonRulesValidator(rulesManager));
     }
+
 
 }
