@@ -31,6 +31,9 @@ BOAT is still under development and subject to change.
 * Cleaning up dependencies
 * Added boat:bundle mojo to bundle fragments into a single spec. 
 
+* *Spring Generator*
+  * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (breaking change, defaults to `true` for compatibility with the old RAML generator).
+
 ## 0.2.7
 
 * *Spring Generator*
@@ -46,7 +49,7 @@ BOAT is still under development and subject to change.
   * added `addTestCompileSourceRoot` which adds the output directory to the project as a test source root.
   * added `apiNameSuffix` to customise the name of the API interface.
   * corrected `generatorName` property to point to `openapi.generator.maven.plugin.generatorName`.
-  * fixed the generated code generation of `Map` properties in model.
+  * fixed the code generated for properties of type `Map` in model.
   * refactored `GenerateMojo` so `mvn boat:generate -Dcodegen.configHelp -Dopenapi.generator.maven.plugin.generatorName=spring` works correctly.
   * test the generated code in the integration test phase
 
