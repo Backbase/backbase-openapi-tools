@@ -8,5 +8,5 @@
         <appender-ref ref="COLOR"/>
     </root>
 
-    <logger name="io.swagger.v3.parser" level="DEBUG"/>
+    <logger name="io.swagger.v3.parser" level="INFO"/>
 </configuration>
