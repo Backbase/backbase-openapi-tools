@@ -1,37 +1,34 @@
-## Welcome to GitHub Pages
+## Welcome to Backbase Open Api Tools
 
-You can use the [editor on GitHub](https://github.com/Backbase/backbase-openapi-tools/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+BOAT FOR SHORT! 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```
+              |    |    |                 
+             )_)  )_)  )_)              
+            )___))___))___)\            
+           )____)____)_____)\\
+         _____|____|____|____\\\__
+---------\                   /---------
+  ^^^^^ ^^^^^^^^^^^^^^^^^^^^^
+    ^^^^      ^^^^     ^^^    ^^
+         ^^^^      ^^^
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI. 
 
-### Jekyll Themes
+With Boat you can:
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Backbase/backbase-openapi-tools/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+* Convert RAML1.0 Specs to OpenAPI 3.0. 
+* Generate Clients and Server stubs from OpenAPI files
+* Generate HTML documentation from OpenAPI
+* Bundle OpenAPI Fragments into a single Open API
+* Lint OpenAPI Specs
+* Transform OpenAPI Specs with tools such as the Decapricator, Case Format Transformer, License Adder, Name Normalizers and many more. 
 
-### Support or Contact
+Under the hood it uses many wondefull open source project which BOAT glues together to create a seamless workflow.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+* (https://github.com/raml-org/raml-java-parser) Mulesoft RAML Parser for reading RAML Specs
+* (https://openapi-generator.tech/) OpenAPI Generator for generating clients, server stubs and documentation
+* (https://github.com/zalando/zally) Zally: A minimalistic, simple-to-use OpenAPI 2 and 3 linter
+* (https://github.com/OpenAPITools/openapi-diff) Compare two OpenAPI specifications (3.x) and render the difference to HTML plaintext, or Markdown files.
+
