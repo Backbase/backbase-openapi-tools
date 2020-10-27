@@ -117,4 +117,8 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
             throw new RamlLoaderException("Failed to normalize json references", e);
         }
     }
+
+    public URI getUriCallBackParam() {
+        return this.resourceLoader != null && this.resourceLoader instanceof ResourceLoaderExtended ? ((ResourceLoaderExtended)this.resourceLoader).getUriCallBackParam() : null;
+    }
 }
