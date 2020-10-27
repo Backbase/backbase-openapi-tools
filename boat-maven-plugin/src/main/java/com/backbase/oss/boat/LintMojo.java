@@ -17,7 +17,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.zalando.zally.core.ApiValidator;
 import org.zalando.zally.core.Result;
 
-@Mojo(name = "bundle", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
+@Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
 /*
   Lint Specification
