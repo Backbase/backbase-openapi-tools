@@ -15,11 +15,16 @@
 package org.raml.v2.internal.utils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This utility has been modified by Backbase to enable this to work with windows file paths.
  */
 public class ResourcePathUtils {
+    private static final Pattern TEMPLATE_PATTERN = Pattern.compile("\\{([^}]+)\\}");
 
     private ResourcePathUtils() {
         throw new AssertionError("Private constructor");
@@ -57,8 +62,24 @@ public class ResourcePathUtils {
         return result;
     }
 
+    public static boolean isUri(String includePath) {
+        return includePath.startsWith("http:") || includePath.startsWith("https:") || includePath.startsWith("file:");
+    }
+
     public static boolean isAbsolute(String includePath) {
-        return includePath.startsWith("http:") || includePath.startsWith("https:") || includePath.startsWith("file:")
-            || new File(includePath).isAbsolute();
+        return includePath.startsWith("http:") || includePath.startsWith("https:") || includePath.startsWith("file:") || includePath.startsWith("/") || (new File(includePath)).isAbsolute();
+    }
+
+    public static List<String> getUriTemplates(String value) {
+        List<String> result = new ArrayList();
+        if (value != null) {
+            Matcher m = TEMPLATE_PATTERN.matcher(value);
+
+            while(m.find()) {
+                result.add(m.group(1));
+            }
+        }
+
+        return result;
     }
 }
