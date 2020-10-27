@@ -79,6 +79,6 @@ public class RamlResourceLoader implements ResourceLoaderExtended {
     }
 
     public URI getUriCallBackParam() {
-        return this.fallBackResourceLoader != null && this.fallBackResourceLoader instanceof ResourceLoaderExtended ? ((ResourceLoaderExtended)this.fallBackResourceLoader).getUriCallBackParam() : null;
+        return this.fallBackResourceLoader instanceof ResourceLoaderExtended ? ((ResourceLoaderExtended)this.fallBackResourceLoader).getUriCallBackParam() : null;
     }
 }

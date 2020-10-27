@@ -27,10 +27,6 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
     private ResourceLoaderExtended resourceLoader;
     private ObjectMapper jsonMapper = new ObjectMapper();
 
-    public CachingResourceLoader() {
-        this(new DefaultResourceLoader());
-    }
-
     public CachingResourceLoader(ResourceLoaderExtended resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
@@ -78,17 +74,6 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
     }
 
     /**
-     * Reverse lookup resource name based on the schema content.
-     */
-    public String getResourceName(String content) {
-        ContentItem contentItem = contentToName.get(content);
-        if (contentItem == null) {
-            return null;
-        }
-        return contentItem.getResourceName();
-    }
-
-    /**
      * Make all $ref properties in the JSON absolute and normalised.
      *
      * @param foundUri     the URI for the resource
@@ -119,6 +104,6 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
     }
 
     public URI getUriCallBackParam() {
-        return this.resourceLoader != null && this.resourceLoader instanceof ResourceLoaderExtended ? ((ResourceLoaderExtended)this.resourceLoader).getUriCallBackParam() : null;
+        return this.resourceLoader != null ? this.resourceLoader.getUriCallBackParam() : null;
     }
 }
