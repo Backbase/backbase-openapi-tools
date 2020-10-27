@@ -47,6 +47,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>zally-ruleset-zalando</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>zally-ruleset-zally</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
