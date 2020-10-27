@@ -89,9 +89,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-diff</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.openapitools.openapidiff</groupId>
+            <artifactId>openapi-diff-core</artifactId>
+            <version>${openapi-diff-version}</version>
         </dependency>
 
         <dependency>
