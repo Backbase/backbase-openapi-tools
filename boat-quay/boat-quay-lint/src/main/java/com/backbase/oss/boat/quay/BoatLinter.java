@@ -1,6 +1,6 @@
 package com.backbase.oss.boat.quay;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +18,7 @@ public class BoatLinter {
     }
 
     public List<Result> lint(String openApiContent) {
-        RulesPolicy rulesPolicy = new RulesPolicy(new ArrayList<>());
-
-
-
-
+        RulesPolicy rulesPolicy = new RulesPolicy(Arrays.asList("219", "105","M008", " M009", " M010", " M011", " H001", " H002", " S005", " S006", " S007"));
         return validator.validate(openApiContent, rulesPolicy, null);
     }
 
