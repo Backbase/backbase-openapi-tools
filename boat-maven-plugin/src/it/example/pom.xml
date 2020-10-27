@@ -21,6 +21,8 @@
         <module>raml-2-openapi-generate-rest-template-embedded</module>
         <module>raml-2-openapi-generate-spring-boot-embedded</module>
         <module>raml-2-openapi-generate-webclient-embedded</module>
+
+        <module>boat-lint</module>
     </modules>
 
 
