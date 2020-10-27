@@ -1,6 +1,5 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.diff.output.JsonRender;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -68,9 +67,6 @@ public class DiffMojo extends AbstractMojo {
             } else if ("html".equals(changelogRenderer)) {
                 render = new HtmlRender();
                 extension = "html";
-            } else if ("json".equals(changelogRenderer)) {
-                render = new JsonRender();
-                extension = "json";
             } else {
                 throw new MojoExecutionException("Invalid changelogRender. Supported types are 'markdown' and 'html");
             }
