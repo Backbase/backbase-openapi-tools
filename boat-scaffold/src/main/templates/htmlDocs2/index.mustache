@@ -143,7 +143,11 @@
     var defs = {}
     {{#models}}
     {{#model}}
+    <!-- Sometimes classname is referred.. -->
+    defs["{{classname}}"] = {{{modelJson}}};
+    <!-- Sometimes name is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
+    <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
     {{/models}}
 
