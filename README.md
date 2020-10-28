@@ -27,6 +27,11 @@ BOAT is still under development and subject to change.
   * Adds title of API to the left navigation
   * Removes unnecessary spaces in the docs
   * Fixes item focus on left navigation
+  * Updates Json Schema Ref Parser library
+  * Updates Json schema view library
+  * Adds support for allOf with Json schema merge all of https://github.com/mokkabonna/json-schema-merge-allof
+  * Fixes header x- params being escaped. eg X-Total-Count to XMinusTotalMunisCount
+  * Fixes markdown in description not being escaped and breaking javascript.
 * Moved the code generation into a separate module to be used by other BOAT components.
 * Cleaning up dependencies
 * Added boat:bundle mojo to bundle fragments into a single spec. 
