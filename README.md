@@ -32,9 +32,12 @@ BOAT is still under development and subject to change.
   * Adds support for allOf with Json schema merge all of https://github.com/mokkabonna/json-schema-merge-allof
   * Fixes header x- params being escaped. eg X-Total-Count to XMinusTotalMunisCount
   * Fixes markdown in description not being escaped and breaking javascript.
+  * Fixes missing references to extended simple types (set `unAlias` option to true).
+  * Fixes missing references because confusion over whether to reference name or classname.
 * Moved the code generation into a separate module to be used by other BOAT components.
 * Cleaning up dependencies
-* Added boat:bundle mojo to bundle fragments into a single spec. 
+* Added boat:bundle mojo to bundle fragments into a single spec.
+* boat:bundle unaliases the spec. 
 
 * *Spring Generator*
   * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (defaults to `false`; for compatibility with the old RAML generator must be set to `true`).
