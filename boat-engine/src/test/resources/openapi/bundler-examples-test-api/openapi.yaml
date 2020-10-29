@@ -79,6 +79,12 @@ paths:
                 named-bad-example:
                   value:
                     $ref: ./examples/user-post-response.json
+        '404':
+          description: Refering to a simple-type alias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AliasForString'
     patch:
       summary: Single example
       requestBody:
@@ -162,6 +168,11 @@ components:
         rank: 99
     WithExampleResponse:
       $ref: 'schemas/post-user-response.json'
+    AliasForString:
+      type: string
+      pattern: ^[0-9].*$
+      minLength: 1
+      maxLength: 30
   examples:
     example-in-components:
       $ref: ./examples/user-post-response.json

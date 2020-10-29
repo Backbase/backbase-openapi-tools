@@ -37,7 +37,7 @@ The `boat` plugin has multiple goals:
               <configuration>
                 <output>${project.build.directory}/generated-sources/openapi</output>
                 <generateSupportingFiles>true</generateSupportingFiles>
-                <generatorName>spring</generatorName>
+                <generatorName>spring-boat</generatorName>
                 <strictSpec>true</strictSpec>
                 <generateApiTests>false</generateApiTests>
                 <generateModelTests>false</generateModelTests>
