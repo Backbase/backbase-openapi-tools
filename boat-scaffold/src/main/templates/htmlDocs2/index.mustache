@@ -143,7 +143,11 @@
     var defs = {}
     {{#models}}
     {{#model}}
+    <!-- Sometimes classname is referred.. -->
+    defs["{{classname}}"] = {{{modelJson}}};
+    <!-- Sometimes name is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
+    <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
     {{/models}}
 
@@ -223,6 +227,7 @@
                           <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p class="marked">{{notes}}</p>
+                          <br/>
                           {{#vendorExtensions}}
                               <div class="secured-by">
                                   <h2>Secured by Backbase Access Control</h2>
@@ -312,7 +317,7 @@
 
                           {{#hasExamples}}
                               {{#examples}}
-                                  <h3 class="field-label">Example data</h3>
+                                  <h3 class="field-label">Example data </h3>
                                   <div class="example-data-content-type">Content-Type: {{{contentType}}}</div>
                                   <pre class="prettyprint language-json prettyprinted"><code class="json">{{{example}}}</code></pre>
                               {{/examples}}
@@ -323,7 +328,7 @@
                             <h3 id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
                             <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
                             <script>
-                              var response{{baseName}}{{code}}_description = `{{{message}}}`;
+                              var response{{baseName}}{{code}}_description = `{{message}}`;
                               var response{{baseName}}{{code}}_description_break = response{{baseName}}{{code}}_description.indexOf('\n');
                               if (response{{baseName}}{{code}}_description_break == -1) {
                                 $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").text("Status: {{code}} - " + response{{baseName}}{{code}}_description);
@@ -394,13 +399,19 @@
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {{{jsonSchema}}};
-                                        var schema = findNode('schema', schemaWrapper).schema;
+                                        var schema = findNode('schema', schemaWrapper.content).schema;
+
                                         if (!schema) {
                                           schema = schemaWrapper.schema;
                                         }
                                         if (schema.$ref != null) {
                                           schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                                          if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                                              schema.items = defsParser.$refs.get(schema.items.$ref);
+
+
+                                          }
+                                        }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
                                           schema.items = defsParser.$refs.get(schema.items.$ref);
                                         } else {
                                           schemaWrapper.definitions = Object.assign({}, defs);
@@ -408,6 +419,24 @@
                                             console.log(err);
                                           });
                                         }
+
+                                         if (schema && schema.allOf) {
+                                            schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                                            schema = mergeAllOf(schema,  {
+                                              resolvers: {
+                                                defaultResolver: mergeAllOf.options.resolvers.title
+                                              }
+                                            });
+                                          }
+
+                                         if (schema.items && schema.items.allOf) {
+                                            schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                                            schema.items = mergeAllOf(schema.items,  {
+                                              resolvers: {
+                                                defaultResolver: mergeAllOf.options.resolvers.title
+                                              }
+                                            });
+                                          }
 
                                         var view = new JSONSchemaView(schema, 3);
                                         $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
@@ -436,7 +465,7 @@
                                           </tr>
                                           {{#headers}}
                                               <tr>
-                                                  <td>{{#name}}{{name}}{{/name}}</td>
+                                                  <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
                                                   <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
                                                   <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
                                                   <td>{{#description}}{{description}}{{/description}}</td>
@@ -485,9 +514,11 @@
   {{>js_jsonformatter}}
   {{>js_jsonschemaview}}
   {{>js_json_schema_ref_parser}}
+  {{>js_jsonschemamergeallof}}
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
   <script>
+    var $RefParser = JsonSchemaRefParser;
     var schemaWrapper = { "components": { "schemas" : defs}};
     defsParser = new $RefParser();
     defsParser.dereference(schemaWrapper).catch(function(err) {
