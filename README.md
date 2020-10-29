@@ -1,5 +1,4 @@
-![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
-![Release](https://github.com/Backbase/backbase-openapi-tools/workflows/Release/badge.svg)
+![Build](https://github.com/Backbase/backbase-openapi-tools/workflows/build/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
 [![Mvn Central](https://maven-badges.herokuapp.com/maven-central/com.backbase.oss/backbase-openapi-tools/badge.svg)](https://mvnrepository.com/artifact/com.backbase.oss/boat-maven-plugin)
 # Backbase OpenApi Tools 
@@ -20,7 +19,7 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
-## 0.2.8
+## 0.3.0
 
 * *HTML2 Generator*
   * Removes examples
