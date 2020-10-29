@@ -26,9 +26,25 @@ BOAT is still under development and subject to change.
   * Adds title of API to the left navigation
   * Removes unnecessary spaces in the docs
   * Fixes item focus on left navigation
-* Moved the code generation into a separate module to be used by other BOAT components.
-* Cleaning up dependencies
-* Added boat:bundle mojo to bundle fragments into a single spec. 
+  * Updates Json Schema Ref Parser library
+  * Updates Json schema view library
+  * Adds support for allOf with Json schema merge all of https://github.com/mokkabonna/json-schema-merge-allof
+  * Fixes header x- params being escaped. eg X-Total-Count to XMinusTotalMunisCount
+  * Fixes markdown in description not being escaped and breaking javascript.
+  * Fixes missing references to extended simple types (set `unAlias` option to true).
+  * Fixes missing references because confusion over whether to reference name or classname.
+  * Moved the code generation into a separate module to be used by other BOAT components.
+  * Cleaning up dependencies
+  * Added boat:bundle mojo to bundle fragments into a single spec.
+  * boat:bundle unaliases the spec. 
+
+* *Spring Generator*
+  * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (defaults to `false`; for compatibility with the old RAML generator must be set to `true`).
+  * Fixed x-abstract extension (not generated)
+  * Reset the defaults of the options added in 0.2.7 to avoid breaking changes.
+    - useLombokAnnotations: false
+    - openApiNullable: true
+    - useSetForUniqueItems: false
 
 ## 0.2.7
 
@@ -45,7 +61,7 @@ BOAT is still under development and subject to change.
   * added `addTestCompileSourceRoot` which adds the output directory to the project as a test source root.
   * added `apiNameSuffix` to customise the name of the API interface.
   * corrected `generatorName` property to point to `openapi.generator.maven.plugin.generatorName`.
-  * fixed the generated code generation of `Map` properties in model.
+  * fixed the code generated for properties of type `Map` in model.
   * refactored `GenerateMojo` so `mvn boat:generate -Dcodegen.configHelp -Dopenapi.generator.maven.plugin.generatorName=spring` works correctly.
   * test the generated code in the integration test phase
 

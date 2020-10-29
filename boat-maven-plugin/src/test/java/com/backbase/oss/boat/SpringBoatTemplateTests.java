@@ -5,18 +5,19 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assume.assumeThat;
 
-import com.backbase.oss.codegen.SpringCodeGen;
+import com.backbase.oss.codegen.SpringBoatCodeGen;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +34,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
  */
 @RunWith(Parameterized.class)
 @RequiredArgsConstructor
-public class SpringTemplateTests {
+public class SpringBoatTemplateTests {
 
     @Parameterized.Parameters(name = "{0}")
     static public Object parameters() {
@@ -75,13 +76,22 @@ public class SpringTemplateTests {
         boolean openApiNullable,
         boolean useSetForUniqueItems) {
 
-        return format("gen%s%s%s%s%s%s",
+        return format("backbase%s%s%s%s%s%s",
             useBeanValidation ? "-val" : "",
             useOptional ? "-opt" : "",
             useLombokAnnotations ? "-lmb" : "",
             fullJavaUtil ? "-utl" : "",
             openApiNullable ? "-nul" : "",
             useSetForUniqueItems ? "-unq" : "");
+    }
+
+    static private final File TEST_OUTPUS = new File("target/test-outputs");
+
+    @BeforeClass
+    static public void setUpClass() throws IOException {
+        FileUtils.deleteDirectory(TEST_OUTPUS);
+
+        TEST_OUTPUS.mkdirs();
     }
 
     private final String testName;
@@ -106,7 +116,6 @@ public class SpringTemplateTests {
         createMojo(true).execute();
     }
 
-    @SneakyThrows
     private GenerateMojo createMojo(boolean original) {
         final String target = caseName(
             this.useBeanValidation,
@@ -118,10 +127,6 @@ public class SpringTemplateTests {
             + (original ? "-orig" : "");
 
         final File input = new File("src/test/resources/backbase/spring/openapi.yaml");
-        final File output = new File("target/test-outputs/" + target);
-
-        FileUtils.deleteDirectory(output);
-        output.mkdirs();
 
         final GenerateMojo mojo = new GenerateMojo();
         final DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
@@ -138,15 +143,15 @@ public class SpringTemplateTests {
                     + "            <version>2.2.3</version>\n"
                     + "        </dependency>");
         mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output.getAbsoluteFile();
+        mojo.output = TEST_OUTPUS.getAbsoluteFile();
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.generateApis = true;
         mojo.generateApiDocumentation = true;
-        mojo.generateApiTests = false;
+        mojo.generateApiTests = true;
         mojo.generateModels = true;
         mojo.generateModelDocumentation = true;
-        mojo.generateModelTests = false;
+        mojo.generateModelTests = true;
         mojo.generateSupportingFiles = !original; // don't compile 4.3.1 code (wrong for JsonNullable with Map)
         mojo.apiNameSuffix = target + "-api";
         mojo.modelNameSuffix = target;
@@ -155,10 +160,14 @@ public class SpringTemplateTests {
 
         configOptions.put("library", SpringCodegen.SPRING_BOOT);
         configOptions.put("dateLibrary", SpringCodegen.JAVA_8);
-        configOptions.put(SpringCodegen.BASE_PACKAGE, "base");
-        configOptions.put(SpringCodegen.CONFIG_PACKAGE, "config");
-        configOptions.put(CodegenConstants.API_PACKAGE, "api");
-        configOptions.put(CodegenConstants.MODEL_PACKAGE, "model");
+
+        String destPackage = target.replace('-', '.') + ".";
+
+        configOptions.put(SpringCodegen.BASE_PACKAGE, destPackage + "base");
+        configOptions.put(SpringCodegen.CONFIG_PACKAGE, destPackage + "config");
+        configOptions.put(CodegenConstants.API_PACKAGE, destPackage + "api");
+        configOptions.put(CodegenConstants.MODEL_PACKAGE, destPackage + "model");
+
         configOptions.put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true");
         configOptions.put(SpringCodegen.INTERFACE_ONLY, "true");
         configOptions.put(SpringCodegen.USE_TAGS, "true");
@@ -166,10 +175,10 @@ public class SpringTemplateTests {
 
         configOptions.put(BeanValidationFeatures.USE_BEANVALIDATION, Boolean.toString(this.useBeanValidation));
         configOptions.put(OptionalFeatures.USE_OPTIONAL, Boolean.toString(this.useOptional));
-        configOptions.put(SpringCodeGen.USE_LOMBOK_ANNOTATIONS, Boolean.toString(this.useLombokAnnotations));
+        configOptions.put(SpringBoatCodeGen.USE_LOMBOK_ANNOTATIONS, Boolean.toString(this.useLombokAnnotations));
         configOptions.put(AbstractJavaCodegen.FULL_JAVA_UTIL, Boolean.toString(this.fullJavaUtil));
-        configOptions.put(SpringCodeGen.OPENAPI_NULLABLE, Boolean.toString(this.openApiNullable));
-        configOptions.put(SpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, Boolean.toString(this.useSetForUniqueItems));
+        configOptions.put(SpringBoatCodeGen.USE_SET_FOR_UNIQUE_ITEMS, Boolean.toString(this.useSetForUniqueItems));
+        configOptions.put(SpringBoatCodeGen.OPENAPI_NULLABLE, Boolean.toString(this.openApiNullable));
 
         if (original) {
             mojo.templateDirectory = new File("src/test/resources/JavaSpring-4.3.1");
