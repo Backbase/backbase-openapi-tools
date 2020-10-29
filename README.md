@@ -34,13 +34,14 @@ BOAT is still under development and subject to change.
   * Fixes markdown in description not being escaped and breaking javascript.
   * Fixes missing references to extended simple types (set `unAlias` option to true).
   * Fixes missing references because confusion over whether to reference name or classname.
-* Moved the code generation into a separate module to be used by other BOAT components.
-* Cleaning up dependencies
-* Added boat:bundle mojo to bundle fragments into a single spec.
-* boat:bundle unaliases the spec. 
+  * Moved the code generation into a separate module to be used by other BOAT components.
+  * Cleaning up dependencies
+  * Added boat:bundle mojo to bundle fragments into a single spec.
+  * boat:bundle unaliases the spec. 
 
 * *Spring Generator*
   * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (defaults to `false`; for compatibility with the old RAML generator must be set to `true`).
+  * Fixed x-abstract extension (not generated)
   * Reset the defaults of the options added in 0.2.7 to avoid breaking changes.
     - useLombokAnnotations: false
     - openApiNullable: true
