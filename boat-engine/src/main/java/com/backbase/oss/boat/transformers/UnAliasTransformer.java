@@ -66,8 +66,6 @@ public class UnAliasTransformer implements Transformer {
         dontOverride(schema::getMinProperties, schema::setMinProperties, alias::getMinProperties);
         dontOverride(schema::getRequired, schema::setRequired, alias::getRequired);
         dontOverride(schema::getNot, schema::setNot, alias::getNot);
-
-        dontOverride(schema::getNot, schema::setNot, alias::getNot); 
         dontOverride(schema::getProperties, schema::setProperties, alias::getProperties); 
         dontOverride(schema::getAdditionalProperties, schema::setAdditionalProperties, alias::getAdditionalProperties); 
         dontOverride(schema::getDescription, schema::setDescription, alias::getDescription); 

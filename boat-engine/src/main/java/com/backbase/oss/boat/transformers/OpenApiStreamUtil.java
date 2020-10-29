@@ -83,7 +83,7 @@ public class OpenApiStreamUtil {
     }
 
     private static Stream<Schema> streamContentSchemas(Content content) {
-        return content.values().stream().map(MediaType::getSchema);
+        return content.values().stream().map(MediaType::getSchema).filter(Objects::nonNull);
     }
 
     static Stream<Operation> streamOperations(PathItem pathItem) {
