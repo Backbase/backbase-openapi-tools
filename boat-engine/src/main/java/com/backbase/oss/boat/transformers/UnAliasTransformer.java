@@ -37,6 +37,7 @@ public class UnAliasTransformer implements Transformer {
             RefUtils.extractSimpleName(schema.get$ref()).getLeft());
         if (referredSchema == null) {
             log.warn("Referred schema {} not found in {}", schema.get$ref(), schema.getName());
+            return;
         }
         if (!isAliasOfSimpleTypes(referredSchema)) {
             return;
