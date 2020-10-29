@@ -2,7 +2,8 @@ package com.backbase.oss.boat.transformers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class BundlerTest {
@@ -71,6 +74,13 @@ public class BundlerTest {
             openAPI.getPaths().get("/users").getPut().getResponses().get("401").getContent().get(APPLICATION_JSON)
                 .getExamples().get("named-bad-example").get$ref(), isComponentExample);
 
+        Schema aliasedSchema = openAPI.getPaths().get("/users").getPut().getResponses().get("404").getContent().get(
+            APPLICATION_JSON).getSchema();
+        assertThat("Schema referring to aliased simple type is un-aliased",
+            aliasedSchema.get$ref(),
+            nullValue());
+        assertThat("Attributes of aliased schema are copied",
+            aliasedSchema.getPattern(), is("^[0-9].*$"));
     }
 
     private ObjectNode singleExampleNode(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
