@@ -1,5 +1,4 @@
-name:  SCDF Maven Plugin
-
+name: BOAT
 on:
   push:
     branches:
