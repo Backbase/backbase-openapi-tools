@@ -21,6 +21,9 @@ BOAT is still under development and subject to change.
 
 ## 0.3.0
 
+* *Maven Plugin*
+  * Added `bundle.skip` parameter to `bundle` goal (defaults to false).
+
 * *HTML2 Generator*
   * Removes examples
   * Adds title of API to the left navigation
