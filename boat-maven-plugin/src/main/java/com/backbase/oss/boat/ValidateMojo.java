@@ -1,11 +1,13 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -28,30 +30,56 @@ public class ValidateMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        log.info("Validating OpenAPI: {}", input);
+
+        if (!input.exists()) {
+            throw new MojoFailureException("File not found: " + input.getName());
+        }
+
+        if (input.isDirectory()) {
+            log.info("Validating files '*.yaml' in: {}", input);
+            for (File inputFile: input.listFiles(pathname -> StringUtils.endsWith(pathname.getName(), ".yaml"))) {
+                validate(inputFile);
+            }
+        } else {
+            validate(input);
+        }
+    }
+
+    private void validate(File inputFile) throws MojoFailureException {
+
+        log.info("Validating {}", inputFile);
 
         OpenAPIParser openAPIParser = new OpenAPIParser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlatten(true);
         parseOptions.setResolveFully(true);
 
-        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(input.toURI().toString(), new ArrayList<>(), parseOptions);
+        SwaggerParseResult swaggerParseResult =
+            openAPIParser.readLocation(inputFile.toURI().toString(), new ArrayList<>(), parseOptions);
 
         if (swaggerParseResult.getMessages().isEmpty()) {
             log.info("OpenAPI: {} is valid", swaggerParseResult.getOpenAPI().getInfo().getTitle());
         } else {
-            log.error("Validation errors while parsing OpenAPI: {}", openAPIParser);
             for (String message : swaggerParseResult.getMessages()) {
                 if (failOnWarning) {
+                    log.error("Validation errors while parsing OpenAPI: {}", inputFile.getName());
                     log.error(message);
                 } else {
+                    log.warn("Validation errors while parsing OpenAPI: {}", inputFile.getName());
                     log.warn(message);
+                }
+                if (log.isDebugEnabled()) {
+                    try {
+                        log.debug("Dumping open api");
+                        log.debug(SerializerUtils.toYamlString(swaggerParseResult.getOpenAPI()));
+                    } catch (RuntimeException e) {
+                        log.debug("That did not end well: ", e);
+                    }
                 }
             }
             if (failOnWarning) {
                 throw new MojoFailureException("Validation errors validating OpenAPI");
             }
         }
-
     }
 }
