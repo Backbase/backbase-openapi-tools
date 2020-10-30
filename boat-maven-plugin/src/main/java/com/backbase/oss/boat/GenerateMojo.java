@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
@@ -16,6 +17,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServ
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
+import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
@@ -436,6 +438,13 @@ public class GenerateMojo extends AbstractMojo {
     protected boolean unAlias;
 
     /**
+     * Deference components/schemas properties. html2 document generator does not like.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.dereferenceComponents")
+    protected boolean dereferenceComponents;
+
+
+    /**
      * The project being built.
      */
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
@@ -774,7 +783,10 @@ public class GenerateMojo extends AbstractMojo {
             adjustAdditionalProperties(config);
 
             if (unAlias) {
-                new UnAliasTransformer().transform(input.getOpenAPI(), Collections.emptyMap());
+                new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
+            }
+            if (dereferenceComponents) {
+                new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
             }
             new DefaultGenerator().opts(input).generate();
 
