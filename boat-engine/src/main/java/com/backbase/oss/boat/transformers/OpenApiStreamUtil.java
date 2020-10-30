@@ -22,7 +22,25 @@ import lombok.experimental.UtilityClass;
 public class OpenApiStreamUtil {
 
     /**
-     * Returns a stream of all(*) the Schema in the openAPI.
+     * Returns a stream of all(*) the Schema in the openAPI. Like {@link #streamSchemas(OpenAPI)} but does not include
+     * the components and does only include the first level.
+     *
+     * (*) Currently includes:
+     * - operation (get, post, put, delete, patch) requests & response bodies.
+     *
+     * @param openAPI to get the schema of
+     * @return a stream of the schemas in the open api.
+     */
+    static Stream<Schema> streamPathSchemas(OpenAPI openAPI) {
+        // Schema's used in operations request & response bodies as well as proper components.
+        return
+            openAPI.getPaths().values().stream()
+                .flatMap(OpenApiStreamUtil::streamOperations)
+                .flatMap(OpenApiStreamUtil::streamSchemas);
+    }
+
+    /**
+     * Returns a deep (including schemas embedded in other schemas) stream of all(*) the Schema in the openAPI.
      *
      * (*) Currently includes:
      * - operation (get, post, put, delete, patch) requests & response bodies.
