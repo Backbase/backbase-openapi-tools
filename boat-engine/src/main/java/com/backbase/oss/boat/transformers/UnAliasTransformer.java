@@ -24,7 +24,7 @@ public class UnAliasTransformer implements Transformer {
     }
 
     private void unAliasType(Schema schema, OpenAPI openAPI) {
-        log.info("Processing {}, ref {}", schema.getName(), schema.get$ref());
+        log.debug("Processing {}, ref {}", schema.getName(), schema.get$ref());
         if (schema.get$ref() == null) {
             return;
         }
@@ -33,11 +33,15 @@ public class UnAliasTransformer implements Transformer {
                 schema.get$ref(), schema.getName());
             return;
         }
-        Schema referredSchema = openAPI.getComponents().getSchemas().get(
-            RefUtils.extractSimpleName(schema.get$ref()).getLeft());
-        if (referredSchema == null) {
-            log.warn("Referred schema {} not found in {}", schema.get$ref(), schema.getName());
-            return;
+        Schema referredSchema = schema;
+        int count = 0;
+        while (referredSchema.get$ref() != null) {
+            // sometimes references go wild...
+            referredSchema = openAPI.getComponents().getSchemas().get(RefUtils.extractSimpleName(
+                referredSchema.get$ref()).getLeft());
+            if (count++ > 20) {
+                throw new RuntimeException("Did not resolve " + schema.get$ref() + " after following 20 refs.");
+            }
         }
         if (!isAliasOfSimpleTypes(referredSchema)) {
             return;

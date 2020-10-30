@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Exampled API
+  description: No description available
+  version: v1
+servers:
+  - url: /serviceName/client-api/v1
+    description: The server
+tags:
+  - name: examples
+paths:
+  /null:
+    description: not implemented
+
+components:
+  schemas:
+    SingleReference:
+      $ref: '#/components/schemas/direct'
+    DirectReference:
+      $ref: '#/components/schemas/direct'
+    direct:
+      description: direct
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+    directer:
+      description: directer
+      type: object
+      properties:
+        code:
+          type: string
+      required:
+        - code
+    DoubleReference:
+      $ref: '#/components/schemas/DirectReference'
+    ReferencingProperties:
+      type: object
+      properties:
+        direct:
+          $ref: '#/components/schemas/DirectReference'
+        doubleReference:
+          $ref: '#/components/schemas/DoubleReference'
+        myOwn:
+          description: myOwn
+          type: boolean
+    Composite:
+      description: Composite
+      type: object
+      properties:
+        ofMyOwn:
+          type: boolean
+      allOf:
+        - $ref: '#/components/schemas/direct'
+        - $ref: '#/components/schemas/directer'
+      required:
+        - ofMyOwn
+    Array:
+      type: array
+      items:
+        $ref: '#/components/schemas/direct'
