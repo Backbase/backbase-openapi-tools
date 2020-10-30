@@ -37,7 +37,7 @@ The `boat` plugin has multiple goals:
               <configuration>
                 <output>${project.build.directory}/generated-sources/openapi</output>
                 <generateSupportingFiles>true</generateSupportingFiles>
-                <generatorName>spring</generatorName>
+                <generatorName>spring-boat</generatorName>
                 <strictSpec>true</strictSpec>
                 <generateApiTests>false</generateApiTests>
                 <generateModelTests>false</generateModelTests>
@@ -121,6 +121,34 @@ The `boat` plugin has multiple goals:
 - `boat:validate`
 
     Validates OpenAPI specs.
+    
+    Configuration can point to a specific file, or a directory. When a directory is specified all files with a `.yaml` 
+    extension are validated. `failOnWarning` specifies whether to fail the build when validation violations are found,
+    otherwise, warnings are written to the log for everyone to ignore.
+    
+    ```
+    <configuration>
+        <input>${project.build.outputDirectory}/specs/</input>
+        <failOnWarning>true</failOnWarning>
+    </configuration>
+    ```
+
+- `boat:bundle`
+    
+    Bundles a spec by resolving external references.
+    
+    Configuration can point to a single in- and output file, or to in- and output directories. When directories are
+    specified, all file with a `.yaml` extension are bundled.
+    
+    Examples in `json` files are parsed to objects.
+    ```
+    <configuration>
+        <input>${project.basedir}/src/main/resources/</input>
+        <output>${project.build.outputDirectory}/specs/</output>
+    </configuration>
+
+    ```
+    
 
 For more information, run 
 

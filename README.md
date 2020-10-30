@@ -1,5 +1,4 @@
-![Java CI](https://github.com/Backbase/backbase-openapi-tools/workflows/Java%20CI/badge.svg)
-![Release](https://github.com/Backbase/backbase-openapi-tools/workflows/Release/badge.svg)
+![Build](https://github.com/Backbase/backbase-openapi-tools/workflows/build/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
 [![Mvn Central](https://maven-badges.herokuapp.com/maven-central/com.backbase.oss/backbase-openapi-tools/badge.svg)](https://mvnrepository.com/artifact/com.backbase.oss/boat-maven-plugin)
 # Backbase OpenApi Tools 
@@ -20,6 +19,36 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.3.0
+
+* *Maven Plugin*
+  * Added `bundle.skip` parameter to `bundle` goal (defaults to false).
+
+* *HTML2 Generator*
+  * Removes examples
+  * Adds title of API to the left navigation
+  * Removes unnecessary spaces in the docs
+  * Fixes item focus on left navigation
+  * Updates Json Schema Ref Parser library
+  * Updates Json schema view library
+  * Adds support for allOf with Json schema merge all of https://github.com/mokkabonna/json-schema-merge-allof
+  * Fixes header x- params being escaped. eg X-Total-Count to XMinusTotalMunisCount
+  * Fixes markdown in description not being escaped and breaking javascript.
+  * Fixes missing references to extended simple types (set `unAlias` option to true).
+  * Fixes missing references because confusion over whether to reference name or classname.
+  * Moved the code generation into a separate module to be used by other BOAT components.
+  * Cleaning up dependencies
+  * Added boat:bundle mojo to bundle fragments into a single spec.
+  * boat:bundle unaliases the spec. 
+
+* *Spring Generator*
+  * Added `useWithModifiers` to use the `with` prefix for POJO modifiers (defaults to `false`; for compatibility with the old RAML generator must be set to `true`).
+  * Fixed x-abstract extension (not generated)
+  * Reset the defaults of the options added in 0.2.7 to avoid breaking changes.
+    - useLombokAnnotations: false
+    - openApiNullable: true
+    - useSetForUniqueItems: false
+
 ## 0.2.7
 
 * *Spring Generator*
@@ -35,12 +64,12 @@ BOAT is still under development and subject to change.
   * added `addTestCompileSourceRoot` which adds the output directory to the project as a test source root.
   * added `apiNameSuffix` to customise the name of the API interface.
   * corrected `generatorName` property to point to `openapi.generator.maven.plugin.generatorName`.
-  * fixed the generated code generation of `Map` properties in model.
+  * fixed the code generated for properties of type `Map` in model.
   * refactored `GenerateMojo` so `mvn boat:generate -Dcodegen.configHelp -Dopenapi.generator.maven.plugin.generatorName=spring` works correctly.
   * test the generated code in the integration test phase
 
 ## 0.2.6
-* Ensure RAML traits that are converted to OAS extenions are all using lower case. 
+* Ensure RAML traits that are converted to OAS extensions are all using lower case. 
 
 ## 0.2.5 
 * Fixed a bug how duplicate names are generated if RAML source has duplicate names for references. The parent resource name is now prepended to the schema name without removing the last character of the parent resource name

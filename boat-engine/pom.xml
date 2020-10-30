@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.2.7</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>boat-engine</artifactId>
     <packaging>jar</packaging>
@@ -15,7 +15,6 @@
     <name>BOAT :: Engine</name>
 
     <properties>
-        <jackson.version>2.11.0</jackson.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/ExporterOptions.java
         </sonar.coverage.exclusions>
@@ -24,13 +23,11 @@
         <version.openapi-parser>1.6.16</version.openapi-parser>
     </properties>
 
-
     <dependencies>
+
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/me.andrz.jackson/jackson-json-reference-core -->
@@ -38,22 +35,11 @@
             <groupId>me.andrz.jackson</groupId>
             <artifactId>jackson-json-reference-core</artifactId>
             <version>0.3.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
             <scope>provided</scope>
         </dependency>
 
@@ -61,43 +47,27 @@
             <groupId>org.raml</groupId>
             <artifactId>raml-parser-2</artifactId>
             <version>1.0.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.yaml</groupId>
-                    <artifactId>snakeyaml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-
 
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
-            <version>2.0.21</version>
         </dependency>
 
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.26</version>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
