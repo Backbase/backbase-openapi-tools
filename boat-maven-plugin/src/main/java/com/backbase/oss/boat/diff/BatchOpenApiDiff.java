@@ -146,7 +146,7 @@ public class BatchOpenApiDiff {
 
     private static SwaggerParseResult parseOpenAPI(Path file) {
 
-        log.debug("Parsing OpenAPI: {}", file);
+        log.info("Parsing OpenAPI: {}", file);
 
         OpenAPIParser openAPIParser = new OpenAPIParser();
         ParseOptions parseOptions = new ParseOptions();
