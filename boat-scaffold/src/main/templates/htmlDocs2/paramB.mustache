@@ -1,0 +1,46 @@
+<tr><td style="width:150px;">{{paramName}} {{^required}}{{/required}}{{#required}}<span style="color:red;">*</span>{{/required}}</td>
+<td>
+<p class="marked">{{description}}</p>
+<script>
+$(document).ready(function() {
+  var schemaWrapper = {{{jsonSchema}}};
+  var schema = findNode('schema', schemaWrapper).schema;
+  if (!schema) {
+    schema = schemaWrapper.schema;
+  }
+  if (schema.$ref != null) {
+    schema = defsParser.$refs.get(schema.$ref);
+  } else {
+    schemaWrapper.definitions = Object.assign({}, defs);
+    $RefParser.dereference(schemaWrapper).catch(function(err) {
+      console.log(err);
+    });
+  }
+
+  if (schema && schema.allOf) {
+    schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+    schema = mergeAllOf(schema,  {
+      resolvers: {
+        defaultResolver: mergeAllOf.options.resolvers.title
+      }
+    });
+  }
+
+  if (schema.items && schema.items.allOf) {
+    schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+    schema.items = mergeAllOf(schema.items,  {
+      resolvers: {
+        defaultResolver: mergeAllOf.options.resolvers.title
+      }
+    });
+  }
+
+  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+  var result = $('#d2e199_{{nickname}}_{{paramName}}');
+  result.empty();
+  result.append(view.render());
+});
+</script>
+<div id="d2e199_{{nickname}}_{{paramName}}"></div>
+</td>
+</tr>
