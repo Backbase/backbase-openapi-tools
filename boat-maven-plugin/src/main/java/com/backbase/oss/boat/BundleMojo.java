@@ -32,9 +32,20 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "output", required = true)
     private File output;
 
+    /**
+     * Skip the execution.
+     */
+    @Parameter(name = "skip", property = "bundle.skip", defaultValue = "false", alias = "codegen.skip")
+    private boolean skip;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Skipping OpenAPI bundle.");
+
+            return;
+        }
+
         log.info("Bundling OpenAPI: {} to: {}", input, output);
 
         if (input.isDirectory() && output.getName().endsWith(".yaml")) {
