@@ -1,4 +1,4 @@
-![Build](https://github.com/Backbase/backbase-openapi-tools/workflows/build/badge.svg)
+![Build](https://github.com/Backbase/backbase-openapi-tools/workflows/BOAT/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
 [![Mvn Central](https://maven-badges.herokuapp.com/maven-central/com.backbase.oss/backbase-openapi-tools/badge.svg)](https://mvnrepository.com/artifact/com.backbase.oss/boat-maven-plugin)
 # Backbase OpenApi Tools 
@@ -18,6 +18,22 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+
+## 0.6.0
+* simple fix to check for null value in openApi.getComponents().getSchemas()
+* ability to resolve references like #/components/schemas/myObject/items or #/components/schemas/myObject/properties/embeddedObject
+* simple fix to avoid npe in StaticHtml2Generation escaping response message.
+
+
+## 0.5.0
+
+* Add DereferenceComponentsPropertiesTransformer (that does a bit extra)
+* Fix recursive referencing in UnAliasTransformer
+
+
+## 0.4.0
+* Added bundle skip
+* Changed numbering scheme
 
 ## 0.3.0
 
