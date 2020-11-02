@@ -14,7 +14,7 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DereferenceComponentsPropertiesTransformerTest {
@@ -83,14 +83,23 @@ public class DereferenceComponentsPropertiesTransformerTest {
     @Test
     public void testNullComponentsShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
-        new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        try {
+            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        } catch (NullPointerException e) {
+            Assert.fail("Unexpected NullPointerException");
+        }
+
     }
 
     @Test
     public void testNullComponentSchemasShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
         openAPI.setComponents(new Components());
-        new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        try {
+            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        } catch (NullPointerException e) {
+            Assert.fail("Unexpected NullPointerException");
+        }
     }
 
     private Schema getProperty(OpenAPI openAPI, String direct, String component) {
