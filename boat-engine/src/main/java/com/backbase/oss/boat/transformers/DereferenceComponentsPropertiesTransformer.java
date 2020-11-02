@@ -23,6 +23,10 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
+        if (openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) {
+            log.debug("nothing to dereference.");
+            return;
+        }
         // Find all the components referenced from paths.
         openAPI.getComponents().getSchemas().entrySet().stream()
             .forEach(e -> deferenceSchema(e.getValue(), openAPI, e.getKey()));
