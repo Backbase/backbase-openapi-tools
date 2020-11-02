@@ -2,7 +2,6 @@ package com.backbase.oss.boat.transformers;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Dereferences openApi.
@@ -21,8 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
+    private static final String COMPONENTS_SCHEMAS_PATH = "#/components/schemas/";
+
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
+        if (openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) {
+            log.debug("nothing to dereference.");
+            return;
+        }
         // Find all the components referenced from paths.
         openAPI.getComponents().getSchemas().entrySet().stream()
             .forEach(e -> deferenceSchema(e.getValue(), openAPI, e.getKey()));
@@ -103,14 +109,26 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
     }
 
     private Schema getSchemaByInternalReference(String internalReference, OpenAPI openAPI) {
-        if (!internalReference.startsWith("#/components/schemas")) {
+        if (!internalReference.startsWith(COMPONENTS_SCHEMAS_PATH)) {
             throw new IllegalArgumentException(String.format("Not an internal ref %s", internalReference));
         }
-        Schema schema = openAPI.getComponents().getSchemas().get(
-            RefUtils.extractSimpleName(internalReference).getLeft());
+        String[] parts = StringUtils.removeStart(internalReference, COMPONENTS_SCHEMAS_PATH).split("/");
+
+        Schema schema = openAPI.getComponents().getSchemas().get(parts[0]);
         if (schema == null) {
             throw new RuntimeException(String.format("No component schema found by name %s", internalReference));
         }
+
+        for (int i = 1; i < parts.length; i++) {
+            if (parts[i].equals("properties")) {
+                schema = (Schema) schema.getProperties().get(parts[++i]);
+            } else if (parts[i].equals("items")) {
+                schema = ((ArraySchema) schema).getItems();
+            } else {
+                throw new RuntimeException("Unable to process $ref " + internalReference);
+            }
+        }
+
         if (schema.get$ref() != null) {
             // sometimes refs go wild
             return getSchemaByInternalReference(schema.get$ref(), openAPI);
