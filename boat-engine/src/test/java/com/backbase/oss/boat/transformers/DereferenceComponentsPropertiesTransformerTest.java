@@ -65,6 +65,19 @@ public class DereferenceComponentsPropertiesTransformerTest {
             ((ArraySchema)openAPI.getComponents().getSchemas().get("Array")).getItems().get$ref(),
             nullValue());
 
+        assertThat("Referencing another schema's property schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myCode")).getDescription(),
+                is("directors code"));
+        assertThat("Referencing another schema's property properties schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myNested")).getDescription(),
+            is("nested id"));
+        assertThat("Referencing another schema's items schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myDirect")).getDescription(),
+            is("direct"));
+
     }
 
     @Test
