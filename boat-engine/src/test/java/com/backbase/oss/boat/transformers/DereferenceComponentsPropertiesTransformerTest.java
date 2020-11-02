@@ -1,39 +1,25 @@
 package com.backbase.oss.boat.transformers;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DereferenceComponentsPropertiesTransformerTest {
 
     private static final String APPLICATION_JSON = "application/json";
-    private static org.hamcrest.Matcher<String> isComponentExample = new BaseMatcher<String>() {
-
-        @Override
-        public boolean matches(Object item) {
-            return String.valueOf(item).startsWith("#/components/examples/");
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText(" should start with '#/components/examples/'");
-        }
-    };
 
     @Test
     public void testDereferenceComponentsPropertiesApi() throws OpenAPILoaderException {
@@ -41,7 +27,7 @@ public class DereferenceComponentsPropertiesTransformerTest {
         File input = new File("src/test/resources/openapi/decomposer-test-api/openapi.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
 
-        new DereferenceComponentsPropertiesTransformer().transform(openAPI, Collections.emptyMap());
+        new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
 
         assertThat("SingleReference is not affected.",
             openAPI.getComponents().getSchemas().get("SingleReference").get$ref(),
@@ -79,6 +65,41 @@ public class DereferenceComponentsPropertiesTransformerTest {
             ((ArraySchema)openAPI.getComponents().getSchemas().get("Array")).getItems().get$ref(),
             nullValue());
 
+        assertThat("Referencing another schema's property schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myCode")).getDescription(),
+                is("directors code"));
+        assertThat("Referencing another schema's property properties schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myNested")).getDescription(),
+            is("nested id"));
+        assertThat("Referencing another schema's items schema also works",
+            ((Schema) openAPI.getComponents().getSchemas().get("ReferencingOtherComponentsProperty").getProperties()
+                .get("myDirect")).getDescription(),
+            is("direct"));
+
+    }
+
+    @Test
+    public void testNullComponentsShouldNotFailWithNPE() {
+        OpenAPI openAPI = new OpenAPI();
+        try {
+            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        } catch (NullPointerException e) {
+            Assert.fail("Unexpected NullPointerException");
+        }
+
+    }
+
+    @Test
+    public void testNullComponentSchemasShouldNotFailWithNPE() {
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.setComponents(new Components());
+        try {
+            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+        } catch (NullPointerException e) {
+            Assert.fail("Unexpected NullPointerException");
+        }
     }
 
     private Schema getProperty(OpenAPI openAPI, String direct, String component) {
