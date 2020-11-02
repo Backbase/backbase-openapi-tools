@@ -32,8 +32,22 @@ components:
       properties:
         code:
           type: string
+          description: directors code
       required:
         - code
+    nesting:
+      type: object
+      properties:
+        internal:
+          type: object
+          properties:
+            nested:
+              type: object
+              description: nested
+              properties:
+                nestedId:
+                  type: string
+                  description: nested id
     DoubleReference:
       $ref: '#/components/schemas/DirectReference'
     ReferencingProperties:
@@ -61,3 +75,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/direct'
+    ReferencingOtherComponentsProperty:
+      type: object
+      properties:
+        myCode:
+          $ref: '#/components/schemas/directer/properties/code'
+        myNested:
+          $ref: '#/components/schemas/nesting/properties/internal/properties/nested/properties/nestedId'
+        myDirect:
+          $ref: '#/components/schemas/Array/items'
