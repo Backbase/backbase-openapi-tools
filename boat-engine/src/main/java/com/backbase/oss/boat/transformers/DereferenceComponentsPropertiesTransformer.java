@@ -2,13 +2,10 @@ package com.backbase.oss.boat.transformers;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
