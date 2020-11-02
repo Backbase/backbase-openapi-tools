@@ -1,6 +1,7 @@
 package com.backbase.oss.codegen;
 
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 
 public class StaticHtml2Generator extends org.openapitools.codegen.languages.StaticHtml2Generator {
@@ -9,7 +10,7 @@ public class StaticHtml2Generator extends org.openapitools.codegen.languages.Sta
 
     public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
         CodegenResponse r = super.fromResponse(responseCode,response);
-        r.message = r.message.replace("`", "\\`");
+        r.message = StringUtils.replace(r.message, "`", "\\`");
         return r;
     }
 
