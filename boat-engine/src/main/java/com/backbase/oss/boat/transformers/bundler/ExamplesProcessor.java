@@ -20,6 +20,7 @@ import io.swagger.v3.parser.util.RefUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,8 +57,8 @@ public class ExamplesProcessor {
 
     }
 
-    public void processContent(Content content) {
-        streamContentExamples(content).forEach(this::fixInlineExamples);
+    public void processContent(Content content, String relativePath) {
+        streamContentExamples(content).forEach(example ->  fixInlineExamples(example, relativePath));
     }
 
     private Map<String, Example> getComponentExamplesFromOpenAPI() {
@@ -113,7 +114,11 @@ public class ExamplesProcessor {
     }
 
     private void fixInlineExamples(ExampleHolder exampleHolder) {
-        log.debug("fixInlineExamples: '{}'", exampleHolder);
+        fixInlineExamples(exampleHolder, null);
+    }
+
+    private void fixInlineExamples(ExampleHolder exampleHolder, String relativePath) {
+        log.debug("fixInlineExamples: '{}', relative path '{}'", exampleHolder, relativePath);
 
         if (exampleHolder.getRef() == null) {
             log.debug("not fixing (ref not found): {}", exampleHolder);
@@ -124,8 +129,13 @@ public class ExamplesProcessor {
             log.debug("not fixing (not relative ref): '{}'", exampleHolder);
             return;
         }
+        Path path;
+        if (relativePath == null) {
+            path = rootDir.resolve(StringUtils.strip(refPath, "./"));
+        } else {
+            path = Paths.get(rootDir.toString(), relativePath, refPath);
+        }
         try {
-            Path path = rootDir.resolve(StringUtils.strip(refPath, "./"));
             String content = StringUtils.strip(StringUtils.replaceEach(
                 new String(Files.readAllBytes(path)),
                 new String[] {"\t"},
