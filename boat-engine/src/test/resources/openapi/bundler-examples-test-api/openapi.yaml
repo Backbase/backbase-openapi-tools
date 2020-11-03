@@ -79,6 +79,8 @@ paths:
                 named-bad-example:
                   value:
                     $ref: ./examples/user-post-response.json
+        '403':
+          $ref: ./lib/common-types.yaml#/components/responses/400BadRequest
         '404':
           description: Refering to a simple-type alias
           content:

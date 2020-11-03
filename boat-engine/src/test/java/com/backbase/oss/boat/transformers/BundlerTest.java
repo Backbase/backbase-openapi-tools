@@ -74,6 +74,10 @@ public class BundlerTest {
             openAPI.getPaths().get("/users").getPut().getResponses().get("401").getContent().get(APPLICATION_JSON)
                 .getExamples().get("named-bad-example").get$ref(), isComponentExample);
 
+        assertThat("Relative path works",
+            openAPI.getPaths().get("/users").getPut().getResponses().get("403").getContent().get(APPLICATION_JSON)
+                .getExample(), notNullValue());
+
         Schema aliasedSchema = openAPI.getPaths().get("/users").getPut().getResponses().get("404").getContent().get(
             APPLICATION_JSON).getSchema();
         assertThat("Schema referring to aliased simple type is un-aliased",
@@ -99,10 +103,10 @@ public class BundlerTest {
             .getExample();
     }
 
-    // @Test - not really a test.
+    @Test // - not really a test.
     public void testDraftsApi() throws OpenAPILoaderException, IOException {
 
-        File input = new File("/Users/jasper/git/paym/payment-order-presentation-spec/src/main/resources/payment-batch-client-api-v2.yaml");
+        File input = new File("/Users/jasper/git/jasper/collect-specs/projects/payment-order-a2a-id-provider-spec/src/main/resources/payment-order-a2a-id-provider-service-api-v1.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
