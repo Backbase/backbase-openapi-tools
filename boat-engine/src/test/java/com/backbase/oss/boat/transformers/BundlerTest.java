@@ -103,7 +103,7 @@ public class BundlerTest {
             .getExample();
     }
 
-    @Test // - not really a test.
+    // @Test - not really a test.
     public void testDraftsApi() throws OpenAPILoaderException, IOException {
 
         File input = new File("/Users/jasper/git/jasper/collect-specs/projects/payment-order-a2a-id-provider-spec/src/main/resources/payment-order-a2a-id-provider-service-api-v1.yaml");
