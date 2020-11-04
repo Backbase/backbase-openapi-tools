@@ -89,7 +89,7 @@ public class SpringBoatCodeGen extends SpringCodegen {
     protected boolean useWithModifiers;
 
     public SpringBoatCodeGen() {
-        this.embeddedTemplateDir = this.templateDir = "JavaSpringBoat";
+        this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));

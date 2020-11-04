@@ -557,13 +557,13 @@ public class GenerateMojo extends AbstractMojo {
             }
 
             if (isNotEmpty(generatorName)) {
-                if ("spring".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.SpringBoatCodeGen.NAME);
-                }else if ("html2".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.StaticHtml2Generator.class.getName());
-                } else {
-                    configurator.setGeneratorName(generatorName);
+                switch (generatorName) {
+                    case "spring":
+                    case "html2":
+                        generatorName += "-boat";
                 }
+
+                configurator.setGeneratorName(generatorName);
 
                 // check if generatorName & language are set together, inform user this needs to be updated to prevent future issues.
                 if (isNotEmpty(language)) {
