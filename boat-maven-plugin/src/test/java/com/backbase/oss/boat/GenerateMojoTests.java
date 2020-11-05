@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.backbase.oss.codegen.JavaClientBoatCodeGen;
 import com.backbase.oss.codegen.SpringBoatCodeGen;
 import com.backbase.oss.codegen.StaticHtml2BoatGenerator;
 import java.io.File;
@@ -19,24 +20,19 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 public class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
-    private final GenerateMojo mojo = new GenerateMojo();
     private final MavenProject project = new MavenProject();
 
     @Before
     public void setUp() {
         buildContext.enableLogging(new ConsoleLogger());
-        mojo.buildContext = buildContext;
-        mojo.project = project;
-        mojo.inputSpec = "src/test/resources/oas-examples/petstore.yaml";
     }
 
     @Test
     public void addTestCompileSourceRoot() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateMojo(), DefaultCodegen.class.getName());
+
         mojo.addCompileSourceRoot = false;
         mojo.addTestCompileSourceRoot = true;
-
-        mojo.generatorName = DefaultCodegen.class.getName();
-        mojo.output = new File("target/add-test-compile-source-root");
         mojo.configOptions = singletonMap("sourceFolder", "here-i-am");
 
         int testRoots = mojo.project.getTestCompileSourceRoots().size();
@@ -51,9 +47,26 @@ public class GenerateMojoTests {
     }
 
     @Test
+    public void useHtml2Boat() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateMojo(), "html2");
+
+        mojo.execute();
+
+        assertThat(mojo.generatorName, equalTo(StaticHtml2BoatGenerator.NAME));
+    }
+
+    @Test
+    public void useJavaBoat() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateMojo(), "java");
+
+        mojo.execute();
+
+        assertThat(mojo.generatorName, equalTo(JavaClientBoatCodeGen.NAME));
+    }
+
+    @Test
     public void useSpringBoat() throws MojoExecutionException {
-        mojo.generatorName = "spring";
-        mojo.output = new File("target/use-spring-boat");
+        GenerateMojo mojo = configure(new GenerateMojo(), "spring");
 
         mojo.execute();
 
@@ -61,13 +74,40 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useHtml2Boat() throws MojoExecutionException {
-        mojo.generatorName = "html2";
-        mojo.output = new File("target/use-html2-boat");
+    public void useJavaBoatForRestTemplateEmbedded() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateRestTemplateEmbeddedMojo(), null);
 
         mojo.execute();
 
-        assertThat(mojo.generatorName, equalTo(StaticHtml2BoatGenerator.NAME));
+        assertThat(mojo.generatorName, equalTo(JavaClientBoatCodeGen.NAME));
+    }
+
+    @Test
+    public void useSpringBoatForSpringBootEmbedded() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateSpringBootEmbeddedMojo(), null);
+
+        mojo.execute();
+
+        assertThat(mojo.generatorName, equalTo(SpringBoatCodeGen.NAME));
+    }
+
+    @Test
+    public void useJavaBoatForWebClientEmbedded() throws MojoExecutionException {
+        GenerateMojo mojo = configure(new GenerateWebClientEmbeddedMojo(), null);
+
+        mojo.execute();
+
+        assertThat(mojo.generatorName, equalTo(JavaClientBoatCodeGen.NAME));
+    }
+
+    private <T extends GenerateMojo> T configure(T mojo, String generatorName) {
+        mojo.buildContext = buildContext;
+        mojo.project = project;
+        mojo.inputSpec = "src/test/resources/oas-examples/petstore.yaml";
+        mojo.output = new File("target/generate-mojo-tests");
+        mojo.generatorName = generatorName;
+
+        return mojo;
     }
 }
 

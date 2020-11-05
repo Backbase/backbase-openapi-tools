@@ -557,8 +557,9 @@ public class GenerateMojo extends AbstractMojo {
 
             if (isNotEmpty(generatorName)) {
                 switch (generatorName) {
-                    case "spring":
                     case "html2":
+                    case "java":
+                    case "spring":
                         generatorName += "-boat";
                 }
 
