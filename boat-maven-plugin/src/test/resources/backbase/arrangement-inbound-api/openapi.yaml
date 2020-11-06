@@ -1,0 +1,1946 @@
+openapi: 3.0.3
+info:
+  title: Arrangement Inbound Integration API
+  description: 'This API allows Financial Institutions to create, update and get products'
+  version: v2.0.0
+servers:
+  - url: 'http://localhost:4010'
+    description: Arrangement manager mock server
+tags:
+  - name: arrangement-state
+  - name: arrangements
+  - name: balance-history
+  - name: product-kinds
+  - name: products
+paths:
+  /integration-api/v2/arrangements:
+    summary: Arrangements
+    description: Manage arrangements from integration service.
+    get:
+      tags:
+        - arrangements
+      summary: Arrangement List
+      description: Retrieve a list arrangements by their ids.
+      operationId: getArrangements
+      parameters:
+        - name: ids
+          in: query
+          description: An array of arrangements ids
+          required: true
+          schema:
+            minimum: 1
+            type: array
+            items:
+              type: string
+          example:
+            - oiuoi6464223500oi3893oweroji241112985023lelw12k1ra
+            - '86740390819729071072646422350015892880623494111947'
+      responses:
+        '200':
+          description: List of arrangements found for the provided products ids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrangementItemListResponse'
+              example:
+                - id: id1
+                  internalId: cc4543a9-d40b-4130-93fb-370d3d305d90
+                  name: name1
+                  productId: internalProductId1
+                  legalEntityIds:
+                    - le1
+                    - le2
+                  bankAlias: bankAlias1
+                  bookedBalance: 100.1
+                  availableBalance: 100.2
+                  creditLimit: 100.3
+                  IBAN: DE89370400440532013000
+                  BBAN: BBAN
+                  currency: EUR
+                  externalTransferAllowed: true
+                  urgentTransferAllowed: false
+                  accruedInterest: 123.123
+                  number: PANS
+                  principalAmount: 100.4
+                  currentInvestmentValue: 100.5
+                  productNumber: productNumber1
+                  BIC: BIC12345678
+                  bankBranchCode: bankBranchCode1
+                  accountOpeningDate: '2016-01-28T16:41:41.090Z'
+                  accountInterestRate: 100.2
+                  valueDateBalance: 100.1
+                  creditLimitUsage: 100.3
+                  creditLimitInterestRate: 100.4
+                  creditLimitExpiryDate: '2019-09-28T16:41:41.090Z'
+                  startDate: '2016-02-28T16:41:41.090Z'
+                  termUnit: 'Y'
+                  termNumber: 50
+                  maturityDate: '2017-02-28T16:41:41.090Z'
+                  maturityAmount: 99.5
+                  autoRenewalIndicator: true
+                  interestPaymentFrequencyUnit: M
+                  interestPaymentFrequencyNumber: 15
+                  interestSettlementAccount: interestSettlementAccount1
+                  outstandingPrincipalAmount: 100.2
+                  monthlyInstalmentAmount: 100.1
+                  amountInArrear: 100.3
+                  minimumRequiredBalance: 80.4
+                  creditCardAccountNumber: '123456'
+                  validThru: '2019-02-28T16:41:41.090Z'
+                  applicableInterestRate: 101.2
+                  remainingCredit: 50
+                  outstandingPayment: 105.5
+                  minimumPayment: 51.1
+                  minimumPaymentDueDate: '2018-02-28T16:41:41.090Z'
+                  totalInvestmentValue: 110.2
+                  debitCards:
+                    - number: '4578'
+                      expiryDate: '2020-08-22'
+                      cardId: id2
+                      cardholderName: John Doe
+                      cardType: Visa Electron
+                    - number: '3241'
+                      expiryDate: '2019-01-14'
+                      cardId: id1
+                      cardholderName: John Doe
+                      cardType: Visa
+                  accountHolderAddressLine1: accountHolderAddressLine1
+                  accountHolderAddressLine2: accountHolderAddressLine2
+                  accountHolderStreetName: street1
+                  town: Amsterdam
+                  postCode: '5000'
+                  countrySubDivision: subDivision
+                  accountHolderName: Robin Green
+                  accountHolderNames: 'Robin Green,Sarah Lee'
+                  accountHolderCountry: MK
+                  creditAccount: true
+                  debitAccount: true
+                  lastUpdateDate: '2016-01-28T16:41:41.090Z'
+                  stateId: externalStateId1
+                  state: Active
+                  parentId: externalParentId100
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - arrangements
+      summary: Update arrangement by an arrangement id.
+      description: Update arrangement by an arrangement id
+      operationId: putArrangements
+      requestBody:
+        description: Update arrangement by an arrangement id
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutArrangement'
+            example:
+              id: id1
+              name: name1
+              productId: externalProductId1
+              bankAlias: bankAlias1
+              bookedBalance: 100.1
+              availableBalance: 100.2
+              creditLimit: 100.3
+              IBAN: DE89370400440532013000
+              BBAN: BBAN
+              currency: EUR
+              externalTransferAllowed: true
+              urgentTransferAllowed: false
+              accruedInterest: 3.3
+              number: PANS
+              principalAmount: 100.4
+              currentInvestmentValue: 100.5
+              productNumber: productNumber1
+              BIC: BIC12345678
+              bankBranchCode: bankBranchCode1
+              accountOpeningDate: '2016-01-28T16:41:41.090Z'
+              accountInterestRate: 100.2
+              valueDateBalance: 100.1
+              creditLimitUsage: 100.3
+              creditLimitInterestRate: 100.4
+              creditLimitExpiryDate: '2019-09-28T16:41:41.090Z'
+              startDate: '2016-02-28T16:41:41.090Z'
+              termUnit: 'Y'
+              termNumber: 50
+              maturityDate: '2017-02-28T16:41:41.090Z'
+              maturityAmount: 99.5
+              autoRenewalIndicator: true
+              interestPaymentFrequencyUnit: M
+              interestPaymentFrequencyNumber: 15
+              interestSettlementAccount: interestSettlementAccount1
+              outstandingPrincipalAmount: 100.2
+              monthlyInstalmentAmount: 100.1
+              amountInArrear: 100.3
+              minimumRequiredBalance: 80.4
+              creditCardAccountNumber: '123456'
+              validThru: '2019-02-28T16:41:41.090Z'
+              applicableInterestRate: 101.2
+              remainingCredit: 50
+              outstandingPayment: 105.5
+              minimumPayment: 51.1
+              minimumPaymentDueDate: '2018-02-28T16:41:41.090Z'
+              totalInvestmentValue: 110.2
+              debitCards:
+                - number: '4578'
+                  expiryDate: '2020-08-22'
+                  cardId: id2
+                  cardholderName: John Doe
+                  cardType: Visa Electron
+                - number: '3241'
+                  expiryDate: '2019-01-14'
+                  cardId: id1
+                  cardholderName: John Doe
+                  cardType: Visa
+              accountHolderAddressLine1: accountHolderAddressLine11
+              accountHolderAddressLine2: accountHolderAddressLine12
+              accountHolderStreetName: street1
+              town: Amsterdam
+              postCode: '5000'
+              countrySubDivision: subDivision
+              accountHolderName: Robin Green
+              accountHolderNames: 'Robin Green,Sarah Lee'
+              accountHolderCountry: MK
+              creditAccount: true
+              debitAccount: true
+              lastUpdateDate: '2016-01-28T16:41:41.090Z'
+              sourceId: LJBASI2XXXX
+              stateId: externalStateId1
+              parentId: externalParentId100
+      responses:
+        '204':
+          description: Indicates successful update of an arrangement
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - arrangements
+      summary: Create arrangement.
+      description: Create arrangement
+      operationId: postArrangements
+      requestBody:
+        description: Create arrangement
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostArrangement'
+            example:
+              id: id1
+              name: name1
+              productId: externalProductId1
+              legalEntityIds:
+                - le1
+                - le2
+              bankAlias: bankAlias1
+              bookedBalance: 100.1
+              availableBalance: 100.2
+              creditLimit: 100.3
+              IBAN: DE89370400440532013000
+              BBAN: BBAN
+              currency: EUR
+              externalTransferAllowed: true
+              urgentTransferAllowed: false
+              accruedInterest: 123.123
+              number: PANS
+              principalAmount: 100.4
+              currentInvestmentValue: 100.5
+              productNumber: productNumber1
+              BIC: BIC12345678
+              bankBranchCode: bankBranchCode1
+              accountOpeningDate: '2016-01-28T16:41:41.090Z'
+              accountInterestRate: 100.2
+              valueDateBalance: 100.1
+              creditLimitUsage: 100.3
+              creditLimitInterestRate: 100.4
+              creditLimitExpiryDate: '2019-09-28T16:41:41.090Z'
+              startDate: '2016-02-28T16:41:41.090Z'
+              termUnit: 'Y'
+              termNumber: 50
+              maturityDate: '2017-02-28T16:41:41.090Z'
+              maturityAmount: 99.5
+              autoRenewalIndicator: true
+              interestPaymentFrequencyUnit: M
+              interestPaymentFrequencyNumber: 15
+              interestSettlementAccount: interestSettlementAccount1
+              outstandingPrincipalAmount: 100.2
+              monthlyInstalmentAmount: 100.1
+              amountInArrear: 100.3
+              minimumRequiredBalance: 80.4
+              creditCardAccountNumber: '123456'
+              validThru: '2019-02-28T16:41:41.090Z'
+              applicableInterestRate: 101.2
+              remainingCredit: 50
+              outstandingPayment: 105.5
+              minimumPayment: 51.1
+              minimumPaymentDueDate: '2018-02-28T16:41:41.090Z'
+              totalInvestmentValue: 110.2
+              debitCards:
+                - number: '4578'
+                  expiryDate: '2020-08-22'
+                  cardId: id2
+                  cardholderName: John Doe
+                  cardType: Visa Electron
+                - number: '3241'
+                  expiryDate: '2019-01-14'
+                  cardId: id1
+                  cardholderName: John Doe
+                  cardType: Visa
+              accountHolderAddressLine1: accountHolderAddressLine11
+              accountHolderAddressLine2: accountHolderAddressLine12
+              accountHolderStreetName: street1
+              town: Amsterdam
+              postCode: '5000'
+              countrySubDivision: subDivision
+              accountHolderName: Robin Green
+              accountHolderNames: 'Robin Green,Sarah Lee'
+              accountHolderCountry: MK
+              creditAccount: true
+              debitAccount: true
+              lastUpdateDate: '2016-01-28T16:41:41.090Z'
+              sourceId: LJBASI2XXXX
+              stateId: externalStateId1
+              parentId: externalParentId100
+      responses:
+        '201':
+          description: Creating new Arrangement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrangementAddedResponse'
+              example:
+                id: 729190df-a421-4937-94fd-5e1a3da132cc
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /integration-api/v2/arrangements/batch:
+    summary: BatchUpsertArrangements
+    description: Manage batch insert or update an arrangement from integration service.
+    post:
+      tags:
+        - arrangements
+      summary: Batch insert or update an arrangement by an arrangement id.
+      description: Batch insert or update an arrangement by an arrangement id
+      operationId: postBatchUpsertArrangements
+      requestBody:
+        description: batch insert or update an arrangement by an arrangement id
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpsertArrangement'
+            example:
+              - id: id1
+                name: name1
+                productId: externalProductId1
+                legalEntityId: legalEntityId1
+                legalEntityIds:
+                  - le1
+                  - le2
+                bankAlias: bankAlias1
+                bookedBalance: 100.1
+                availableBalance: 100.2
+                creditLimit: 100.3
+                IBAN: DE89370400440532013000
+                BBAN: BBAN
+                currency: EUR
+                externalTransferAllowed: true
+                urgentTransferAllowed: false
+                accruedInterest: 123.123
+                number: PANS
+                principalAmount: 100.4
+                currentInvestmentValue: 100.5
+                productNumber: productNumber1
+                BIC: BIC12345678
+                bankBranchCode: bankBranchCode1
+                accountOpeningDate: '2016-01-28T16:41:41.090Z'
+                accountInterestRate: 100.2
+                valueDateBalance: 100.1
+                creditLimitUsage: 100.3
+                creditLimitInterestRate: 100.4
+                creditLimitExpiryDate: '2019-09-28T16:41:41.090Z'
+                startDate: '2016-02-28T16:41:41.090Z'
+                termUnit: 'Y'
+                termNumber: 50
+                maturityDate: '2017-02-28T16:41:41.090Z'
+                maturityAmount: 99.5
+                autoRenewalIndicator: true
+                interestPaymentFrequencyUnit: M
+                interestPaymentFrequencyNumber: 15
+                interestSettlementAccount: interestSettlementAccount1
+                outstandingPrincipalAmount: 100.2
+                monthlyInstalmentAmount: 100.1
+                amountInArrear: 100.3
+                minimumRequiredBalance: 80.4
+                creditCardAccountNumber: '123456'
+                validThru: '2019-02-28T16:41:41.090Z'
+                applicableInterestRate: 101.2
+                remainingCredit: 50
+                outstandingPayment: 105.5
+                minimumPayment: 51.1
+                minimumPaymentDueDate: '2018-02-28T16:41:41.090Z'
+                totalInvestmentValue: 110.2
+                debitCards:
+                  - number: '4578'
+                    expiryDate: '2020-08-22'
+                    cardId: id2
+                    cardholderName: John Doe
+                    cardType: Visa Electron
+                  - number: '3241'
+                    expiryDate: '2019-01-14'
+                    cardId: id1
+                    cardholderName: John Doe
+                    cardType: Visa
+                accountHolderAddressLine1: accountHolderAddressLine11
+                accountHolderAddressLine2: accountHolderAddressLine12
+                accountHolderStreetName: street1
+                town: Amsterdam
+                postCode: '5000'
+                countrySubDivision: subDivision
+                accountHolderName: Robin Green
+                accountHolderNames: 'Robin Green,Sarah Lee'
+                accountHolderCountry: MK
+                creditAccount: true
+                debitAccount: true
+                lastUpdateDate: '2016-01-28T16:41:41.090Z'
+                stateId: externalStateId1
+                parentId: externalParentId100
+      responses:
+        '207':
+          description: multiStatusExtended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponseItemExtendedList'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  '/integration-api/v2/arrangements/{externalArrangementId}':
+    summary: '/{externalArrangementId}'
+    description: Manage arrangements by id from integration service.
+    parameters:
+      - $ref: '#/components/parameters/path-external-arrangement-id'
+    delete:
+      tags:
+        - arrangements
+      summary: Delete Arrangement.
+      description: Delete arrangement by external id.
+      operationId: deleteByExternalId
+      responses:
+        '204':
+          description: Indicates successful delete on an arrangement.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  '/integration-api/v2/arrangements/{externalArrangementId}/legalentities':
+    summary: ArrangementLegalEntities
+    description: Manage legal entities from integration service.
+    parameters:
+      - $ref: '#/components/parameters/path-external-arrangement-id'
+    post:
+      tags:
+        - arrangements
+      summary: Add legal entity by external id to an existing arrangement by its external id.
+      description: Add legal entity by external id to an existing arrangement by its external id
+      operationId: postArrangementLegalEntities
+      requestBody:
+        description: Add legal entity by external id to an existing arrangement by its external id
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalLegalEntityIds'
+            example:
+              ids:
+                - TNPnu8Qp1T3TkpGblrgFSoBYBlQ9cVTUQwyRip1PWa0u6IKgUz
+                - kn3Ai4iLcnT52VpsBdMCuukRLVTBpqkHVfLQr4VVaCjAgHRibU
+      responses:
+        '204':
+          description: Indicates successful addition of legal entities ids related to a specific arrangement.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - arrangements
+      summary: Remove legal entity from an existing arrangement by its external id.
+      description: Remove legal entity from an existing arrangement by its external id
+      operationId: deleteArrangementLegalEntities
+      requestBody:
+        description: Remove legal entity from an existing arrangement by its external id.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalLegalEntityIds'
+            example:
+              $ref: '#/paths/~1integration-api~1v2~1arrangements~1%7BexternalArrangementId%7D~1legalentities/post/requestBody/content/application~1json/example'
+      responses:
+        '204':
+          description: Indicates successful removal of legal entities ids related to a specific arrangement.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /integration-api/v2/product-kinds:
+    summary: ProductKinds
+    description: Manage product kinds from integration service.
+    get:
+      tags:
+        - product-kinds
+      summary: Endpoint for getting a list of product kinds.
+      description: Endpoint for getting a list of product kinds
+      operationId: getProductKinds
+      parameters:
+        - name: externalKindIds
+          in: query
+          description: The external kind ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          examples:
+            example:
+              summary: example
+              value:
+                - '1'
+                - '2'
+                - '3'
+        - name: kindName
+          in: query
+          description: The product kind name
+          required: false
+          schema:
+            maxLength: 50
+            type: string
+          examples:
+            example:
+              summary: example
+              value: Current Account
+        - name: kindUri
+          in: query
+          description: 'The uri path to the specific product kind, which can be used by banks that require it'
+          required: false
+          schema:
+            maxLength: 50
+            type: string
+          examples:
+            example:
+              summary: example
+              value: current-account
+      responses:
+        '200':
+          description: Retrieves product kinds from database based on search criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationProductKindListResponse'
+              example:
+                - id: 1
+                  externalKindId: 123123-123f
+                  kindName: Current Account
+                  kindUri: current-account
+                  translations:
+                    - locale: de_DE
+                      localeTranslations:
+                        - fieldName: kind_name
+                          fieldValue: Aktuelles Konto
+                    - locale: ar_JO
+                      localeTranslations:
+                        - fieldName: kind_name
+                          fieldValue: الحساب الحالي
+                - id: 2
+                  externalKindId: asdads67-asd
+                  kindName: Savings Account
+                  kindUri: savings-account
+                  translations:
+                    - locale: de_DE
+                      localeTranslations:
+                        - fieldName: kind_name
+                          fieldValue: Sparkonto
+                    - locale: ar_JO
+                      localeTranslations:
+                        - fieldName: kind_name
+                          fieldValue: حساب التوفير
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - product-kinds
+      summary: Endpoint for updating a new product kind into database.
+      description: Endpoint for updating a new product kind into database
+      operationId: putProductKinds
+      requestBody:
+        description: Endpoint for updating a new product kind into database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationProductKindItemPut'
+            example:
+              externalKindId: '1'
+              kindName: Current Account
+              kindUri: current-account
+              translations:
+                - locale: de_DE
+                  localeTranslations:
+                    - fieldName: kind_name
+                      fieldValue: Aktuelles Konto
+                - locale: ar_JO
+                  localeTranslations:
+                    - fieldName: kind_name
+                      fieldValue: الحساب الحالي
+      responses:
+        '204':
+          description: Indicates successful update of a product
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - product-kinds
+      summary: Endpoint for inserting a new product kind into database.
+      description: Endpoint for inserting a new product kind into database
+      operationId: postProductKinds
+      requestBody:
+        description: Endpoint for inserting a new product kind into database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationProductKindItemPost'
+            example:
+              $ref: '#/paths/~1integration-api~1v2~1product-kinds/put/requestBody/content/application~1json/example'
+      responses:
+        '201':
+          description: Indication that the Product Kind was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationProductKindId'
+              example:
+                id: 123798342
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /integration-api/v2/products:
+    summary: Products
+    description: Manage products for the current context from integration service.
+    get:
+      tags:
+        - products
+      summary: Retrieve a list of products by their ids.
+      description: Retrieve a list of products by their ids
+      operationId: getProducts
+      parameters:
+        - name: ids
+          in: query
+          description: An array of products ids
+          required: false
+          schema:
+            minItems: 1
+            type: array
+            items:
+              type: string
+          examples:
+            example:
+              summary: example
+              value:
+                - iasnBG96znpwenv37he7KKWRGWCBPtvN5wgTQm61joxEU0vMg2
+                - 79L0AoqmNYxquyE6YmNRjfVIsoUqvAE34RpJfA83PatvpCDbIK
+        - name: productKindName
+          in: query
+          description: Product kind name
+          required: false
+          schema:
+            maxLength: 50
+            minLength: 1
+            type: string
+          examples:
+            example:
+              summary: example
+              value: Checking accounts
+      responses:
+        '200':
+          description: List of products found for the provided products ids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductItemListResponse'
+              example:
+                - id: p001
+                  internalId: 6e896ab6-a066-451b-898b-dbfef2744c88
+                  productKindId: pk001
+                  productKindName: Current Account
+                  productTypeId: pt001
+                  productTypeName: Custom Current Account
+                  translations:
+                    - locale: de_DE
+                      localeTranslations:
+                        - fieldName: type_name
+                          fieldValue: Benutzerdefiniertes Girokonto
+                    - locale: ar_JO
+                      localeTranslations:
+                        - fieldName: type_name
+                          fieldValue: الحساب الجاري المخصص
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - products
+      summary: Updates a product.
+      description: Updates a product.
+      operationId: putProducts
+      requestBody:
+        description: Updates a product.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductItem'
+            example:
+              id: p001
+              productKindId: pk001
+              productKindName: Current Account
+              productTypeId: pt001
+              productTypeName: productTypeName
+              translations:
+                - locale: de_DE
+                  localeTranslations:
+                    - fieldName: type_name
+                      fieldValue: Benutzerdefiniertes Girokonto
+                - locale: ar_JO
+                  localeTranslations:
+                    - fieldName: type_name
+                      fieldValue: الحساب الجاري المخصص
+      responses:
+        '204':
+          description: Indicates successful update of a product
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - products
+      summary: Ingest a product.
+      description: Ingest a product.
+      operationId: postProducts
+      requestBody:
+        description: Ingest a product.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductItem'
+            example:
+              $ref: '#/paths/~1integration-api~1v2~1products/put/requestBody/content/application~1json/example'
+      responses:
+        '201':
+          description: New product ingested successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductItemId'
+              example:
+                id: 0955e686-d31e-4216-b3dd-5d66161d536d
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /integration-api/v2/balance-history:
+    summary: BalanceHistory
+    description: Manage balance history from integration service.
+    post:
+      tags:
+        - balance-history
+      summary: Creates a new balance item and sends it to the account presentation service.
+      description: Creates a new balance item and sends it to the account presentation service.
+      operationId: postBalanceHistory
+      requestBody:
+        description: Creates a new balance item and sends it to the account presentation service.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceHistoryItem'
+            example:
+              arrangementId: 9u86j4p3itbfvoe8uy13452voo
+              balance: 9834587923.2
+              updatedDate: '2016-01-28T16:41:41.090Z'
+      responses:
+        '201':
+          description: New balance item integrated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceHistoryId'
+              example:
+                id: 0955e686-d31e-4216-b3dd-5d66161d536d
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /integration-api/v2/arrangement-state:
+    summary: ArrangementState
+    description: Manage arrangement states from integration service
+    get:
+      tags:
+        - arrangement-state
+      description: Endpoint for getting arrangement state
+      operationId: getArrangementState
+      parameters:
+        - name: externalStateIds
+          in: query
+          description: The external state ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          examples:
+            example:
+              summary: example
+              value:
+                - '1'
+                - '2'
+                - '3'
+        - name: state
+          in: query
+          description: The state name
+          required: false
+          schema:
+            minLength: 1
+            maxLength: 50
+            type: string
+          examples:
+            example:
+              summary: example
+              value: Active
+      responses:
+        '200':
+          description: Retrieve all arrangement states from database based on filtering params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationStateWrapper'
+              example:
+                states:
+                  - id: 1
+                    externalStateId: external state id
+                    state: Active
+                    description: indicates the arrangement is active
+                  - id: 2
+                    externalStateId: external state id 2
+                    state: Open
+                    description: indicates the arrangement is open
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - arrangement-state
+      summary: Endpoint for updating state into database.
+      description: Endpoint for updating state into database
+      operationId: putArrangementState
+      requestBody:
+        description: Endpoint for updating state into database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationStateItem'
+            example:
+              externalStateId: external state id
+              state: Active
+              description: indicates the arrangement is active
+      responses:
+        '204':
+          description: Indication that the state was updated successfully.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - arrangement-state
+      summary: Endpoint for inserting a new state into database.
+      description: Endpoint for inserting a new state into database
+      operationId: postArrangementState
+      requestBody:
+        description: Endpoint for inserting a new state into database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationStateItem'
+            example:
+              $ref: '#/paths/~1integration-api~1v2~1arrangement-state/put/requestBody/content/application~1json/example'
+      responses:
+        '201':
+          description: Indication that the state was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateItemId'
+              example:
+                id: 2147483646
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    BalanceHistoryItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines the balance item.
+      properties:
+        arrangementId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Externally used unique identification of the balance history item.
+        balance:
+          type: number
+          description: The value of the balance history item.
+        updatedDate:
+          type: string
+          description: Date and time when the balance history item was updated.
+          format: date-time
+      required:
+        - arrangementId
+        - balance
+        - updatedDate
+    BalanceHistoryId:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines an id attribute only.
+      properties:
+        id:
+          maxLength: 50
+          type: string
+          description: Internally used unique identification
+      required:
+        - id
+    ArrangementAddedResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines the response of added arrangement.
+      properties:
+        id:
+          maxLength: 50
+          type: string
+          description: A unique identifier for the Arrangement object that is generated and used Internally in DBS
+      required:
+        - id
+    ArrangementItemResponseBody:
+      allOf:
+        - $ref: '#/components/schemas/BaseArrangement'
+      properties:
+        legalEntityIds:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            maxLength: 36
+            minLength: 1
+            type: string
+            description: An internal unique identifier for the Legal Entity object.
+        productId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: An internal reference to the product of which the arrangement is an instantiation.
+        internalId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: A DBS internal unique identifier for the arrangement.
+        state:
+          maxLength: 50
+          type: string
+          description: Name that describes the specific arrangement state.
+      required:
+        - internalId
+        - legalEntityIds
+        - productId
+        - id
+        - debitCards
+    ArrangementItemListResponse:
+      type: array
+      description: Arrangement item response list.
+      items:
+        $ref: '#/components/schemas/ArrangementItemResponseBody'
+    BaseArrangement:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Arrangement item with id included.
+      properties:
+        id:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique identifier for the Arrangement object coming from the core banking system.
+        name:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label an arrangement.
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the customer to label the arrangement.
+        bookedBalance:
+          $ref: '#/components/schemas/Amount'
+          description: 'Amount of money available before any adjustments have been made for deposits in transit, checks that have not yet been cleared, reserve requirements and interest received.'
+        availableBalance:
+          $ref: '#/components/schemas/Amount'
+          description: The amount that is available for transactions.
+        creditLimit:
+          $ref: '#/components/schemas/Amount'
+          description: The maximum amount of credit that the financial institution will extend to the account holder for this arrangement.
+        IBAN:
+          maxLength: 34
+          pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+          type: string
+          description: Specifying the IBAN - IBAN is short for International Bank Account Number of the account
+        BBAN:
+          maxLength: 50
+          type: string
+          description: Specifying the BBAN of the account - BBAN is short for Basic Bank Account Number. It represents a country-specific bank account number
+        currency:
+          pattern: '^[A-Z]{3}$'
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency that qualifies the amount
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed.
+        urgentTransferAllowed:
+          type: boolean
+          description: Defines if urgent transfer is allowed.
+        accruedInterest:
+          $ref: '#/components/schemas/Amount'
+          description: The interest that is earned (credit interest) or due (debit interest) but not settled yet.
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits will/to be masked. Be aware that using card number differently is potential PCI risk.
+        principalAmount:
+          $ref: '#/components/schemas/Amount'
+          description: The amount that was (originally) contracted for the respective product. This is mainly used in the context of loans and deposits.
+        currentInvestmentValue:
+          type: number
+          minimum: 0
+          maximum: 1000000000000000000
+          exclusiveMaximum: true
+          description: The total current value of all the securities kept in the account.
+        productNumber:
+          maxLength: 36
+          type: string
+          description: A unique identifier(number) assigned to identify the contract for the product
+        BIC:
+          maxLength: 11
+          type: string
+          description: Bank Identifier Code - international bank code that identifies particular banks worldwide
+        bankBranchCode:
+          maxLength: 20
+          type: string
+          description: (This is to accommodate additional country specific fields like Sort Code in UK)
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system.
+          format: date-time
+        accountInterestRate:
+          $ref: '#/components/schemas/InterestRate'
+          description: The annualized cost of credit or debt-capital computed as the percentage ratio of interest to the principal.
+        valueDateBalance:
+          $ref: '#/components/schemas/Amount'
+          description: The balance of the account on a specific date that needs to be used for the calculation of interest. NB! If no date is specified (like for the book date balance) the current date can be assumed.
+        creditLimitUsage:
+          $ref: '#/components/schemas/Amount'
+          description: Monetary amount of the used overdraft.
+        creditLimitInterestRate:
+          $ref: '#/components/schemas/InterestRate'
+          description: Overdraft Interest is an interest applied to the account for any time throughout the month when the account is overdrawn.
+        creditLimitExpiryDate:
+          type: string
+          description: The date after which overdraft will no longer be available to the account (renewed automatically or cancelled).
+          format: date-time
+        startDate:
+          type: string
+          description: The date on which the credit card becomes active
+          format: date-time
+        termUnit:
+          $ref: '#/components/schemas/TimeUnit'
+          description: 'The period of time for the product arranged between Bank and customer - D(ay), W(eek), M(onth), Y(ear)'
+        termNumber:
+          type: number
+          minimum: -10000000000000000
+          exclusiveMinimum: true
+          maximum: 10000000000000000
+          exclusiveMaximum: true
+          description: Number for the Term Unit for the product arranged between Bank and customer
+        maturityDate:
+          type: string
+          description: End term of a holding period.
+          format: date-time
+        maturityAmount:
+          $ref: '#/components/schemas/Amount'
+          description: Amount payable at the end of a holding period of a product (maturity date). For deposit all of the interest is usualy paid at maturity date (IF the term is shorter then one year).
+        autoRenewalIndicator:
+          type: boolean
+          description: Indicates whether or not an arrangement is to be continued after maturity automatically. Usually the product is renewed using the same principal and term unless renegotiation has taken place prior to expiration.
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/TimeUnit'
+          description: The period of time for the product interest arranged between Bank and customer
+        interestPaymentFrequencyNumber:
+          type: number
+          minimum: -10000000000000000
+          exclusiveMinimum: true
+          maximum: 10000000000000000
+          exclusiveMaximum: true
+          description: 'Number of times per year when the accumulated interest is settled to the account on a regular basis. The frequency could be yearly, half-yearly, quarterly, monthly, weekly, daily (or not at all, until maturity)'
+        interestSettlementAccount:
+          maxLength: 32
+          type: string
+          description: Account for settlement of accumulated interest on a regular basis / Account that provides quick access to accumulated cash to facilitate daily settlements with other businesses
+        outstandingPrincipalAmount:
+          $ref: '#/components/schemas/Amount'
+          description: 'The remaining portion of the original loan amount, plus any interest that has been capitalized, that is still owed. Interest accrues on the outstanding principal balance / The value date balance of the arrangement'
+        monthlyInstalmentAmount:
+          $ref: '#/components/schemas/Amount'
+          description: A fixed payment amount paid by a borrower to the bank at a specified date each calendar month.
+        amountInArrear:
+          $ref: '#/components/schemas/Amount'
+          description: The part of a debt that is overdue after missing one or more required payments. The amount of the arrears is the amount accrued from the date on which the first missed payment was due.
+        minimumRequiredBalance:
+          $ref: '#/components/schemas/Amount'
+          description: 'Minimum amount that a customer must have in an account in order to receive some sort of service, such as keeping the account open or receive interest.'
+        creditCardAccountNumber:
+          maxLength: 32
+          type: string
+          description: The number of the account the credit card transactions settle on (so actually the reference to the settlement account of the card)?
+        validThru:
+          type: string
+          description: 'Expiration date of a credit card, after which is no longer valid.'
+          format: date-time
+        applicableInterestRate:
+          $ref: '#/components/schemas/InterestRate'
+          description: The interest rate or rates which would be used for a particular arrangement.
+        remainingCredit:
+          $ref: '#/components/schemas/Amount'
+          description: Amount of money the user is available to use from the Credit limit of the account
+        outstandingPayment:
+          $ref: '#/components/schemas/Amount'
+          description: 'Outstanding payment refers to the outstanding [unpaid] balance, i.e., the current amount due.'
+        minimumPayment:
+          $ref: '#/components/schemas/Amount'
+          description: 'The minimum payment set a percentage of balance, or a fixed cash amount.'
+        minimumPaymentDueDate:
+          type: string
+          description: Minimum Payment Due Date shown on your monthly statement to remain in good standing.
+          format: date-time
+        totalInvestmentValue:
+          $ref: '#/components/schemas/Amount'
+          description: 'The value of an asset to its owner, depending on his or her expectations'
+        debitCards:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/IntegrationDebitCardItem'
+        accountHolderAddressLine1:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the account.
+        accountHolderAddressLine2:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the account.
+        accountHolderStreetName:
+          maxLength: 70
+          type: string
+          description: Street name of the Payer/Payee - Alternate street name for the account.
+        town:
+          maxLength: 35
+          type: string
+          description: Town of the Payer/Payee - Alternate town for the account.
+        postCode:
+          maxLength: 16
+          type: string
+          description: Post Code of the Payer/Payee
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Country SubDivision of the Payer/Payee
+        accountHolderName:
+          maxLength: 256
+          type: string
+          description: This field is deprecated from 2.17.1 version. It will be removed in 2.19.0 and will be replaced with 'accountHolderNames'
+          deprecated: true
+        accountHolderNames:
+          maxLength: 256
+          type: string
+          description: Party(s) with a relationship to the account.
+        accountHolderCountry:
+          pattern: '^[A-Z]{2}$'
+          type: string
+          description: Country of the account holder
+        creditAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment orders as credit account - account to transfer TO
+        debitAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment orders as debit account - account to transfer FROM
+        lastUpdateDate:
+          type: string
+          description: Last date of balance (or other) parameter update for the particular arrangement
+          format: date-time
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        stateId:
+          maxLength: 50
+          type: string
+          description: External reference to the arrangement state
+        parentId:
+          maxLength: 50
+          type: string
+          description: Indicate if the arrangement has parent child relationship with another account. Coming from core banking system
+        financialInstitutionId:
+          $ref: '#/components/schemas/FinancialInstitutionId'
+        lastSyncDate:
+          $ref: '#/components/schemas/LastSyncDate'
+      required:
+        - currency
+        - id
+    PostArrangement:
+      allOf:
+        - $ref: '#/components/schemas/BaseArrangement'
+      properties:
+        legalEntityIds:
+          type: array
+          uniqueItems: true
+          items:
+            maxLength: 50
+            minLength: 1
+            type: string
+            description: An external unique identifier for the Legal Entity object.
+        productId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+      required:
+        - legalEntityIds
+        - productId
+        - currency
+        - id
+    PutArrangement:
+      allOf:
+        - $ref: '#/components/schemas/BaseArrangement'
+      properties:
+        productId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+    BatchResponseItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      properties:
+        resourceId:
+          minLength: 1
+          type: string
+          description: Id of the resource
+        status:
+          $ref: '#/components/schemas/BatchResponseStatusCode'
+        errors:
+          type: array
+          description: List of error messages
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      required:
+        - resourceId
+        - status
+        - errors
+    BatchResponseItemExtended:
+      allOf:
+        - $ref: '#/components/schemas/BatchResponseItem'
+      properties:
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Arrangement id
+        action:
+          $ref: '#/components/schemas/PersistenceAction'
+    BatchUpsertArrangement:
+      type: array
+      description: List of arrangements post used to create or update arrangements
+      minItems: 1
+      maxItems: 50
+      items:
+        $ref: '#/components/schemas/PostArrangement'
+    BatchResponseItemExtendedList:
+      type: array
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/BatchResponseItemExtended'
+    PersistenceAction:
+      type: string
+      description: Persistence action
+      enum:
+        - add
+        - remove
+        - update
+    ExternalLegalEntityIds:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Container for a list of external unique identifiers for the Legal Entities related to the arrangement.
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            minLength: 1
+            maxLength: 50
+            type: string
+            description: A unique identifier for the Legal Entity object coming from the core banking system.
+    IntegrationDebitCardItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Debit card item
+      properties:
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits will/to be masked. Be aware that using card number differently is potential PCI risk.
+        expiryDate:
+          maxLength: 32
+          type: string
+          description: 'Expiration date of a credit card, after which is no longer valid'
+        cardId:
+          maxLength: 32
+          type: string
+          description: External ID of the card
+        cardholderName:
+          maxLength: 64
+          type: string
+          description: First Name and Last Name of card holder.
+        cardType:
+          maxLength: 32
+          type: string
+          description: 'Card type to change card image based on it, ex. Maestro Gold'
+    IntegrationBaseProductKindItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      properties:
+        externalKindId:
+          maxLength: 50
+          minLength: 1
+          type: string
+        kindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+        kindUri:
+          maxLength: 50
+          minLength: 1
+          pattern: '[a-z\-0-9]*?'
+          type: string
+        translations:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/TranslationItem'
+      required:
+        - externalKindId
+    IntegrationProductKindId:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines an id attribute only.
+      properties:
+        id:
+          type: integer
+          description: A unique identifier for an object that is generated and used Internally in DBS.
+          format: int32
+      required:
+        - id
+    IntegrationProductKindItem:
+      allOf:
+        - $ref: '#/components/schemas/IntegrationBaseProductKindItem'
+      properties:
+        id:
+          type: integer
+          description: A unique identifier for the product in DBS
+          format: int32
+        kindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+        kindUri:
+          maxLength: 50
+          minLength: 1
+          pattern: '[a-z\-0-9]*?'
+          type: string
+      required:
+        - id
+        - kindName
+        - kindUri
+        - translations
+    IntegrationProductKindListResponse:
+      type: array
+      description: Product kind item response list.
+      items:
+        $ref: '#/components/schemas/IntegrationProductKindItem'
+    IntegrationProductKindItemPost:
+      allOf:
+        - $ref: '#/components/schemas/IntegrationBaseProductKindItem'
+      properties:
+        kindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+        kindUri:
+          maxLength: 50
+          minLength: 1
+          pattern: '[a-z\-0-9]*?'
+          type: string
+      required:
+        - kindName
+        - kindUri
+    IntegrationProductKindItemPut:
+      allOf:
+        - $ref: '#/components/schemas/IntegrationBaseProductKindItem'
+    ProductItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      properties:
+        id:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique identifier for the product.
+        productKindId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The ID that is internally used to uniquely identify the kind of product - External refernce to the product Kind
+        productKindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The label that is used for the respective product kind
+        productTypeId:
+          maxLength: 50
+          type: string
+          description: The ID that is used by the Bank to identify the specific Product type - External reference to the product Type.
+        productTypeName:
+          maxLength: 50
+          type: string
+          description: The label/name that is used to label a specific product type.
+        translations:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/TranslationItem'
+      required:
+        - id
+        - productKindId
+    ProductItemId:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines an id attribute only.
+      properties:
+        id:
+          maxLength: 50
+          type: string
+          description: Internally used unique identification
+      required:
+        - id
+    ProductItemListResponse:
+      type: array
+      description: Product item response list.
+      items:
+        $ref: '#/components/schemas/ProductItemResponseBody'
+    ProductItemResponseBody:
+      allOf:
+        - $ref: '#/components/schemas/ProductItem'
+      properties:
+        internalId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: A DBS internal unique identifier for the product.
+      required:
+        - internalId
+        - translations
+    IntegrationStateItem:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      properties:
+        externalStateId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: unique external identifier for the state
+        state:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: 'unique identifier for the state. Example: Active'
+        description:
+          maxLength: 200
+          type: string
+          description: description of the state
+      required:
+        - externalStateId
+        - state
+    IntegrationStateItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        externalStateId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: unique external identifier for the state
+        state:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: 'unique identifier for the state. Example: Active'
+        description:
+          maxLength: 200
+          type: string
+          description: description of the state
+      required:
+        - id
+        - externalStateId
+        - state
+    StateItemId:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      description: Object that defines an id attribute only.
+      properties:
+        id:
+          type: integer
+          description: A unique identifier for an object that is generated and used internally in DBS.
+          format: int32
+      required:
+        - id
+    IntegrationStateWrapper:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntegrationStateItemResponse'
+      required:
+        - states
+    ApiError:
+      title: ApiError
+      type: object
+      x-abstract: true
+      properties:
+        message:
+          description: Any further information
+          type: string
+      required:
+        - message
+    BadRequestError:
+      title: BadRequestError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 400 *Bad Request* HTTP error.
+      example:
+        message: Bad Request
+        errors:
+          - message: 'Value Exceeded. Must be between {min} and {max}.'
+            key: common.api.shoesize
+            context:
+              max: '50'
+              min: '1'
+    ErrorAwareApi:
+      title: ApiErrorExt
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      x-abstract: true
+      properties:
+        errors:
+          description: Detailed error information
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      required:
+        - errors
+    ErrorItem:
+      title: ErrorItem
+      type: object
+      properties:
+        message:
+          description: Any further information.
+          type: string
+        key:
+          description: '{capability-name}.api.{api-key-name}. For generated validation errors this is the path in the document the error resolves to. e.g. object name + ''.'' + field'
+          type: string
+        context:
+          description: Context can be anything used to construct localised messages.
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        message: 'Value Exceeded. Must be between {min} and {max}.'
+        key: common.api.shoesize
+        context:
+          max: '50'
+          min: '1'
+    ForbiddenError:
+      title: ForbiddenError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 403 *Forbidden* HTTP error.
+      example:
+        message: Access to requested resource denied.
+        errors:
+          - message: 'Resource access denied due to an insufficient user quota of {quota}.'
+            key: common.api.quota
+            context:
+              quota: someQuota
+    InternalServerError:
+      title: InternalServerError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      description: Represents a 500 *Internal Server Error* HTTP error.
+      example:
+        message: Description of error
+    NotAcceptableError:
+      title: NotAcceptableError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      properties:
+        supportedMediaTypes:
+          type: array
+          description: List of supported media types for this endpoint
+          items:
+            type: string
+      description: Represents a 406 *Not Acceptable* HTTP error.
+      example:
+        message: Could not find acceptable representation
+        supportedMediaTypes:
+          - application/json
+    NotFoundError:
+      title: NotFoundError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 404 *Not Found* HTTP error.
+      example:
+        message: Resource not found.
+        errors:
+          - message: 'Unable to find the resource requested resource: {resource}.'
+            key: common.api.resource
+            context:
+              resource: aResource
+    UnauthorizedError:
+      title: UnauthorizedError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 401 *Unauthorized* HTTP error.
+      example:
+        message: Access to requested resource denied.
+        errors:
+          - message: Resource access denied due to invalid credentials.
+            key: common.api.token
+            context:
+              accessToken: expired
+    UnsupportedMediaTypeError:
+      title: UnsupportedMediaTypeError
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 415 *Unsupported Media Type* HTTP error.
+      example:
+        message: Unsupported media type.
+        errors:
+          - message: 'The request entity has a media type {mediaType} which the resource does not support.'
+            key: common.api.mediaType
+            context:
+              mediaType: application/javascript
+    AdditionalProperties:
+      title: AdditionalProperties
+      type: object
+      x-implements: com.backbase.buildingblocks.persistence.model.AdditionalPropertiesAware
+      x-abstract: true
+      properties:
+        additions:
+          x-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY)'
+          type: object
+          additionalProperties:
+            type: string
+      description: Additional Properties
+    Amount:
+      type: number
+      minimum: -1000000000000000000
+      exclusiveMinimum: true
+      maximum: 1000000000000000000
+      exclusiveMaximum: true
+      example: 2132.21131
+    InterestRate:
+      type: number
+      minimum: -1000000
+      exclusiveMinimum: true
+      maximum: 1000000
+      exclusiveMaximum: true
+      description: interest rate
+      example: 4.32
+    BatchResponseStatusCode:
+      title: BatchResponseStatusCode
+      type: string
+      enum:
+        - '200'
+        - '400'
+        - '404'
+        - '500'
+      x-enum-varnames:
+        - HTTP_STATUS_OK
+        - HTTP_STATUS_BAD_REQUEST
+        - HTTP_STATUS_NOT_FOUND
+        - HTTP_STATUS_INTERNAL_SERVER_ERROR
+    ConflictError:
+      title: ConflictError
+      allOf:
+        - $ref: '#/components/schemas/ErrorAwareApi'
+      description: Represents a 409 *Conflict* HTTP error.
+      example:
+        $ref: '#/components/responses/409/content/application~1json/example'
+    FinancialInstitutionId:
+      type: integer
+      description: Financial institution ID
+      format: int64
+      example: 1
+    LastSyncDate:
+      type: string
+      description: Last synchronization datetime
+      format: date-time
+    LocaleTranslationItem:
+      title: LocaleTranslationItem
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      description: Locale Translation item
+      properties:
+        fieldName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Defines the name of the field that is translated.
+        fieldValue:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Defines the translated value of the field.
+      required:
+        - fieldName
+        - fieldValue
+    TimeUnit:
+      title: TimeUnit
+      type: string
+      enum:
+        - D
+        - W
+        - M
+        - 'Y'
+    TranslationItem:
+      title: TranslationItem
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AdditionalProperties'
+      description: Translation item
+      properties:
+        locale:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 'Defines the translation natural language as specified in ISO 639-1, and territory two-letter form of ISO 3166.'
+        localeTranslations:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/LocaleTranslationItem'
+  parameters:
+    path-external-arrangement-id:
+      name: externalArrangementId
+      in: path
+      description: external arrangement id
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+      example: ja12u49303-29202028hdu822-28ckqewer
+  responses:
+    '400':
+      description: BadRequest
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+          example:
+            message: Bad Request
+            errors:
+              - message: 'Value Exceeded. Must be between {min} and {max}.'
+                key: common.api.shoesize
+                context:
+                  max: '50'
+                  min: '1'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            message: Access to requested resource denied.
+            errors:
+              - message: Resource access denied due to invalid credentials.
+                key: common.api.token
+                context:
+                  accessToken: expired
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+          example:
+            message: Access to requested resource denied.
+            errors:
+              - message: 'Resource access denied due to an insufficient user quota of {quota}.'
+                key: common.api.quota
+                context:
+                  quota: someQuota
+    '404':
+      description: NotFound
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+          example:
+            message: Resource not found.
+            errors:
+              - message: 'Unable to find the resource requested resource: {resource}.'
+                key: common.api.resource
+                context:
+                  resource: aResource
+    '406':
+      description: NotAcceptable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAcceptableError'
+          example:
+            message: Could not find acceptable representation
+            supportedMediaTypes:
+              - application/json
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+          example:
+            message: Conflict error
+            errors:
+              - message: The request could not be completed due to a conflict with the current state of the resource.
+                key: transactions.api.billingstatus.transaction
+                context:
+                  billingStatus: BILLED
+    '415':
+      description: UnsupportedMediaType
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            message: Unsupported media type.
+            errors:
+              - message: 'The request entity has a media type {mediaType} which the resource does not support.'
+                key: common.api.mediaType
+                context:
+                  mediaType: application/javascript
+    '500':
+      description: InternalServerError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+          example:
+            message: Description of error
