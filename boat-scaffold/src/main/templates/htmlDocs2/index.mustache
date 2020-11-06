@@ -165,12 +165,12 @@
         <nav id="scrollingNav">
           <ul class="sidenav nav nav-list">
             <!-- Logo Area -->
-              <!--<div style="width: 80%; background-color: #4c8eca; color: white; padding: 20px; text-align: center; margin-bottom: 20px; ">
+<!--              <div style="width: 80%; background-color: #4c8eca; color: white; padding: 20px; text-align: center; margin-bottom: 20px; ">-->
 
-              API Docs 2
+<!--              API Docs 2-->
 
-              </div>
-            -->
+<!--              </div>-->
+<!--            -->
               <h1 class="nav-header">{{appName}}</h1>
 
               <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
@@ -220,7 +220,9 @@
                     <div id="api-{{baseName}}-{{nickname}}">
                       <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
                         <div class="pull-left">
-                          <h1>{{nickname}}</h1>
+                          <h1>{{summary}}</h1>
+                            <h2>{{operationId}}</h2>
+
                           <p>{{summary}}</p>
                         </div>
 
@@ -308,20 +310,13 @@
                               <tr>
                                 <th width="150px">Name</th>
                                 <th>Description</th>
+                                <th>Examples</th>
                               </tr>
                               {{#queryParams}}
-                                {{>param}}
+                                {{>query_param}}
                               {{/queryParams}}
                             </table>
                           {{/hasQueryParams}}
-
-                          {{#hasExamples}}
-                              {{#examples}}
-                                  <h3 class="field-label">Example data </h3>
-                                  <div class="example-data-content-type">Content-Type: {{{contentType}}}</div>
-                                  <pre class="prettyprint language-json prettyprinted"><code class="json">{{{example}}}</code></pre>
-                              {{/examples}}
-                          {{/hasExamples}}
 
                           <h2>Responses</h2>
                           {{#responses}}
