@@ -1,5 +1,8 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +45,10 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testHTML2() throws MojoExecutionException {
+    public void testHTML2() throws MojoExecutionException, OpenAPILoaderException {
         GenerateMojo mojo = new GenerateMojo();
 
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
+        String inputFile = getClass().getResource("/backbase/arrangement-inbound-api/openapi.yaml").getFile();
         File input = new File(inputFile);
         File output = new File("target");
         if (!output.exists()) {
@@ -54,6 +57,8 @@ public class GeneratorTests {
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
         defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        OpenAPI openApi = OpenAPILoader.load(input);
 
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
