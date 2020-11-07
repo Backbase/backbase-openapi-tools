@@ -1,6 +1,9 @@
 package com.backbase.oss.codegen;
 
 import static java.lang.String.format;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,7 +98,9 @@ public class SpringBoatTemplatesTests {
 
     @Test
     public void boat() {
-        generateFrom(null);
+        final List<File> files = generateFrom(null);
+
+        assertThat(files.size(), not(equalTo(0)));
     }
 
     // @Test // used in development
@@ -103,7 +108,7 @@ public class SpringBoatTemplatesTests {
         generateFrom("openapi-generator-originals/JavaSpring-4.3.1");
     }
 
-    private void generateFrom(String templates) {
+    private List<File> generateFrom(String templates) {
         final String target = caseName(
             this.useBeanValidation,
             this.useOptional,
@@ -156,6 +161,6 @@ public class SpringBoatTemplatesTests {
 
         final ClientOptInput coi = cf.toClientOptInput();
 
-        new DefaultGenerator().opts(coi).generate();
+        return new DefaultGenerator().opts(coi).generate();
     }
 }

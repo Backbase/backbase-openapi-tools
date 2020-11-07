@@ -561,6 +561,10 @@ public class GenerateMojo extends AbstractMojo {
                     case "java":
                     case "spring":
                         generatorName += "-boat";
+                        break;
+
+                    default:
+                        // use the original generator
                 }
 
                 configurator.setGeneratorName(generatorName);
