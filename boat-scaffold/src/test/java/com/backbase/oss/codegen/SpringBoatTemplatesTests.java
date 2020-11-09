@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -149,6 +150,7 @@ public class SpringBoatTemplatesTests {
         cf.addAdditionalProperty(SpringCodegen.INTERFACE_ONLY, true);
         cf.addAdditionalProperty(SpringCodegen.USE_TAGS, true);
         cf.addAdditionalProperty(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
+        cf.addAdditionalProperty(SpringBoatCodeGen.ADD_SERVLET_REQUEST, true);
         cf.addAdditionalProperty(CodegenConstants.ARTIFACT_ID, "boat-templates-tests");
         cf.addAdditionalProperty("additionalDependencies", ""
             + "        <dependency>\n"

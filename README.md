@@ -19,6 +19,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.6.1
+* * Spring Generator*
+  * Restored `HttpServletRequest` parameter (regression).
+
 ## 0.6.0
 * simple fix to check for null value in openApi.getComponents().getSchemas()
 * ability to resolve references like #/components/schemas/myObject/items or #/components/schemas/myObject/properties/embeddedObject
