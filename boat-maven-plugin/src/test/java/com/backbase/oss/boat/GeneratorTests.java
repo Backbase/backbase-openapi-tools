@@ -18,38 +18,11 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 public class GeneratorTests {
 
     @Test
-    @Ignore
-    public void testBundleSpec() throws MojoExecutionException {
-        GenerateMojo mojo = new GenerateMojo();
-
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.generatorName = "html2";
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.execute();
-
-    }
-
-    @Test
     public void testHTML2() throws MojoExecutionException, OpenAPILoaderException {
-        GenerateMojo mojo = new GenerateMojo();
 
-        String inputFile = getClass().getResource("/backbase/arrangement-inbound-api/openapi.yaml").getFile();
-        File input = new File(inputFile);
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
         File output = new File("target");
         if (!output.exists()) {
             output.mkdirs();
@@ -72,31 +45,6 @@ public class GeneratorTests {
 
     }
 
-    /**
-     * <configuration>
-     *               <output>${project.build.directory}/generated-sources/</output>
-     *               <generateSupportingFiles>true</generateSupportingFiles>
-     *               <generatorName>spring</generatorName>
-     *               <strictSpec>true</strictSpec>
-     *               <generateApiTests>false</generateApiTests>
-     *               <generateModelTests>false</generateModelTests>
-     *               <inputSpec>${project.build.directory}/yaml/legalentity-presentation-service-spec.yaml</inputSpec>
-     *               <configOptions>
-     *                 <library>spring-mvc</library>
-     *                 <dateLibrary>legacy</dateLibrary>
-     *                 <interfaceOnly>true</interfaceOnly>
-     *                 <skipDefaultInterface>true</skipDefaultInterface>
-     *                 <useBeanValidation>false</useBeanValidation>
-     *                 <useClassLevelBeanValidation>true</useClassLevelBeanValidation>
-     *                 <useTags>true</useTags>
-     *                 <java8>true</java8>
-     *                 <useOptional>false</useOptional>
-     *                 <apiPackage>com.backbase.accesscontrol.service.rest.spec.api</apiPackage>
-     *                 <>com.backbase.accesscontrol.service.rest.spec.model</modelPackage>
-     *               </configOptions>
-     *             </configuration>
-     * @throws MojoExecutionException
-     */
     @Test
     public void testBeanValidation() throws MojoExecutionException {
         GenerateMojo mojo = new GenerateMojo();
