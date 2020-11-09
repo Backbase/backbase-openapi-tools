@@ -23,15 +23,13 @@ public class GeneratorTests {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
-        File output = new File("target");
+        File output = new File("target/html2");
         if (!output.exists()) {
             output.mkdirs();
         }
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
         defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        OpenAPI openApi = OpenAPILoader.load(input);
 
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
@@ -42,8 +40,33 @@ public class GeneratorTests {
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
-
     }
+
+    @Test
+    public void testBoatDocs() throws MojoExecutionException, OpenAPILoaderException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.generatorName = "boat-docs";
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.execute();
+    }
+
 
     @Test
     public void testBeanValidation() throws MojoExecutionException {
