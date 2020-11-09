@@ -19,7 +19,6 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
-import com.backbase.oss.codegen.BoatStaticHtml2Generator;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
@@ -559,8 +558,6 @@ public class GenerateMojo extends AbstractMojo {
             if (isNotEmpty(generatorName)) {
                 if ("spring".equals(generatorName)) {
                     configurator.setGeneratorName("spring-boat");
-                }else if ("html2".equals(generatorName)) {
-                    configurator.setGeneratorName(BoatStaticHtml2Generator.class.getName());
                 } else {
                     configurator.setGeneratorName(generatorName);
                 }
