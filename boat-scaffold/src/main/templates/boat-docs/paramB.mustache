@@ -47,17 +47,25 @@
             <div id="d2e199_{{nickname}}_{{paramName}}"></div>
 </td>
     <td>
+        {{#hasExamples}}
+            <ul class="nav nav-tabs nav-tabs-examples">
+                {{#examples}}
+                <li>
+                   <a class="dropdown-item" href="#{{nickname}}_{{paramName}}-example-{{name}}">{{name}}</a>
+                </li>
+                {{/examples}}
+            </ul>
+            <div class="tab-content">
+                {{#examples}}
+                    <div class="tab-pane" id="{{nickname}}_{{paramName}}-example-{{name}}">
+                        <pre><code id="code-{{nickname}}_{{paramName}}-example-{{name}}"></code></pre>
 
-
-        {{#examples}}
-            <div class="tab-pane" id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-                <pre class="prettyprint"><code class="json">{{example}}</code></pre>
+                    </div>
+                {{/examples}}
             </div>
-        {{/examples}}
-        {{^examples}}
-            <div class="tab-pane" id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-                <pre class="prettyprint"><code class="json">{{example}}</code></pre>
-            </div>
-        {{/examples}}
+        {{/hasExamples}}
+        {{#hasSingleExample}}
+            <code>{{example}}</code>
+        {{/hasSingleExample}}
     </td>
 </tr>
