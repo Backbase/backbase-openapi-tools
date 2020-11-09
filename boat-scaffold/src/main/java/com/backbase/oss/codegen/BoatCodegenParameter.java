@@ -1,37 +1,37 @@
 package com.backbase.oss.codegen;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.parameters.Parameter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.LinkedHashMap;
+import io.swagger.v3.oas.models.parameters.RequestBody;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenParameter;
 
 @Slf4j
+@ToString(callSuper = true)
 public class BoatCodegenParameter extends CodegenParameter {
 
-    public Map<String, Example> examples;
+    public List<BoatExample> examples;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final ObjectReader paramReader = objectMapper.readerFor(new TypeReference<List<String>>() {
-    });
+    public boolean hasSingleExample() {
+        return example != null;
+    }
+
+    public boolean hasExamples() {
+        return examples != null && !examples.isEmpty();
+    }
 
     public BoatCodegenParameter() {
         super();
     }
 
-    static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter) {
+    static BoatCodegenParameter fromCodegenParameter(CodegenParameter codegenParameter) {
 
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
@@ -72,81 +72,72 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.multipleOf = codegenParameter.multipleOf;
         output.jsonSchema = codegenParameter.jsonSchema;
         output.defaultValue = codegenParameter.defaultValue;
-        output.example = formatExample(parameter, codegenParameter);
+
         output.isEnum = codegenParameter.isEnum;
         output.setMaxProperties(codegenParameter.getMaxProperties());
         output.setMinProperties(codegenParameter.getMinProperties());
         output.maximum = codegenParameter.maximum;
         output.minimum = codegenParameter.minimum;
         output.pattern = codegenParameter.pattern;
+        output.example = codegenParameter.example;
+        if(codegenParameter instanceof BoatCodegenParameter) {
+            output.examples = ((BoatCodegenParameter)codegenParameter).examples;
+        }
 
-        // Copy Parameter Examples if applicable
-        output.examples = formatExamples(parameter, codegenParameter);
         return output;
     }
 
-    public static Map<String, Example> formatExamples(Parameter parameter, CodegenParameter codegenParameter) {
 
-
-        Map<String, Example> result = new LinkedHashMap<>();
-
-        if (parameter.getExamples() != null && parameter.getExamples().size() > 1) {
-            return result;
-
-//            parameter.getExamples().forEach((key, example) -> {
-//                result.
-//
-//                result.put(key, formatExample(parameter, example, codegenParameter));
-//            });
-        } else {
-            return null;
-        }
+    @Override
+    public CodegenParameter copy() {
+        BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(this);
+        boatCodegenParameter.examples = this.examples;
+        boatCodegenParameter.example = this.example;
+        return boatCodegenParameter;
     }
 
+    static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter) {
+        BoatCodegenParameter output = fromCodegenParameter(codegenParameter);
+        // Copy Parameter Examples if applicable\
+        if (parameter.getExamples() != null) {
+            output.examples = parameter.getExamples().entrySet().stream()
+                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(), null, stringExampleEntry.getValue()))
+                .collect(Collectors.toList());
+        }
+        return output;
+    }
 
-    public static String formatExample(Parameter parameter, CodegenParameter codegenParameter) {
-        String result = codegenParameter.example;
-
-        if (parameter.getExample() != null) {
-            result = formatExample(parameter, parameter.getExample(), codegenParameter);
-        } else if (hasSingleExampleInExamples(parameter)) {
-
-            Optional<Map.Entry<String, Example>> examples = parameter.getExamples().entrySet().stream().findFirst();
-            if (examples.isPresent()) {
-                Example example = examples.get().getValue();
-                result = formatExample(parameter, example.getValue(), codegenParameter);
+    //
+    public static CodegenParameter fromCodegenParameter(CodegenParameter codegenParameter, RequestBody body, Set<String> imports, String bodyParameterName, OpenAPI openAPI) {
+        BoatCodegenParameter output = fromCodegenParameter(codegenParameter);
+        body.getContent().forEach((contentType, mediaType) -> {
+            if (output.examples == null) {
+                output.examples = new ArrayList<>();
             }
+            List<BoatExample> examples = new ArrayList<>();
 
-        }
-        return result;
-    }
+            if (mediaType.getExample() != null) {
+                examples.add(new BoatExample(null, null, new Example().value(mediaType.getExample())));
+            } else if (mediaType.getExamples() != null) {
+                mediaType.getExamples().forEach((key, example) -> {
+                    examples.add(new BoatExample(key, contentType, example));
+                });
+            }
+            // dereference examples
+            examples.stream().filter(boatExample -> boatExample.example.get$ref() != null)
+                .forEach(boatExample -> {
 
-    private static boolean hasSingleExampleInExamples(Parameter parameter) {
-        return parameter.getExamples() != null && parameter.getExamples().size() == 1;
-    }
-
-    private static String formatExample(Parameter parameter, Object example, CodegenParameter codegenParameter) {
-        String result = codegenParameter.example;
-        switch (parameter.getStyle()) {
-            case FORM:
-                if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
-                    try {
-                        List<String> values = paramReader.readValue((ArrayNode) example);
-                        List<BasicNameValuePair> params = values.stream()
-                            .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
-                            .collect(Collectors.toList());
-                        result = URLEncodedUtils.format(params, Charset.defaultCharset());
-                    } catch (IOException e) {
-                        log.warn("Failed to format query string parameter: {}", codegenParameter.example);
-                        result = codegenParameter.example;
+                    String ref = StringUtils.substringAfterLast(boatExample.example.get$ref(), "/");
+                    Example example = openAPI.getComponents().getExamples().get(ref);
+                    if (example == null) {
+                        log.warn("Example ref: {} refers to an example that does not exist", ref);
+                    } else {
+                        log.debug("Replacing Example ref: {} with example from components: {}", ref, example);
+                        boatExample.example = example;
                     }
-                }
-                break;
-            default:
-                result = codegenParameter.example;
-                break;
-        }
-        return result;
+                });
+            output.examples.addAll(examples);
+        });
+        return output;
     }
-
 }

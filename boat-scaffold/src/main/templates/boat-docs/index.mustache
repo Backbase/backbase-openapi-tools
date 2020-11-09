@@ -11,6 +11,31 @@
   {{>js_bootstrap}}
   {{>marked}}
   <script>
+
+      if (!library)
+          var library = {};
+
+      library.json = {
+          replacer: function(match, pIndent, pKey, pVal, pEnd) {
+              var key = '<span class=json-key>';
+              var val = '<span class=json-value>';
+              var str = '<span class=json-string>';
+              var r = pIndent || '';
+              if (pKey)
+                  r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+              if (pVal)
+                  r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+              return r + (pEnd || '');
+          },
+          prettyPrint: function(obj) {
+              var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+              return JSON.stringify(obj, null, 3)
+                      .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+                      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                      .replace(jsonLine, library.json.replacer);
+          }
+      };
+
     $( document ).ready(function() {
       marked.setOptions({
         renderer: new marked.Renderer(),
@@ -103,28 +128,27 @@
     });
 
     function findNode(id, currentNode) {
-      return (Object.keys(currentNode)[0] === id)
-          ? currentNode
-          : findNodeInChildren(id, currentNode);
+        return (Object.keys(currentNode)[0] === id) ? currentNode : findNodeInChildren(id, currentNode);
     }
+
     function findNodeInChildren(id, currentNode) {
-      for (let prop in currentNode) {
-        if (currentNode.hasOwnProperty(prop)) {
-          let currentChild = currentNode[prop];
-          if (id === prop) {
-            return currentChild;
-          } else {
-            // Search in the current child
-            if (typeof (currentChild) === 'object') {
-              let result = findNode(id, currentChild);
-              if (result !== false) {
-                return result;
-              }
+        for (let prop in currentNode) {
+            if (currentNode.hasOwnProperty(prop)) {
+                let currentChild = currentNode[prop];
+                if (id === prop) {
+                    return currentChild;
+                } else {
+                    // Search in the current child
+                    if (typeof (currentChild) === 'object') {
+                        let result = findNode(id, currentChild);
+                        if (result !== false) {
+                            return result;
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-      return false;
+        return false;
     }
 
   </script>
@@ -327,7 +351,7 @@
                             <h3 id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
                             <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
                             <script>
-                              var response{{baseName}}{{code}}_description = `{{message}}`;
+                              var response{{baseName}}{{code}}_description = `{{{message}}}`;
                               var response{{baseName}}{{code}}_description_break = response{{baseName}}{{code}}_description.indexOf('\n');
                               if (response{{baseName}}{{code}}_description_break == -1) {
                                 $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").text("Status: {{code}} - " + response{{baseName}}{{code}}_description);
@@ -398,44 +422,20 @@
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {{{jsonSchema}}};
-                                        var schema = findNode('schema', schemaWrapper.content).schema;
-
+                                        var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
-                                          schema = schemaWrapper.schema;
+                                            schema = schemaWrapper.schema;
                                         }
                                         if (schema.$ref != null) {
                                           schema = defsParser.$refs.get(schema.$ref);
-                                          if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                                              schema.items = defsParser.$refs.get(schema.items.$ref);
-
-
-                                          }
-                                        }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                                          schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
                                         } else {
                                           schemaWrapper.definitions = Object.assign({}, defs);
                                           $RefParser.dereference(schemaWrapper).catch(function(err) {
                                             console.log(err);
                                           });
                                         }
-
-                                         if (schema && schema.allOf) {
-                                            schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                                            schema = mergeAllOf(schema,  {
-                                              resolvers: {
-                                                defaultResolver: mergeAllOf.options.resolvers.title
-                                              }
-                                            });
-                                          }
-
-                                         if (schema.items && schema.items.allOf) {
-                                            schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                                            schema.items = mergeAllOf(schema.items,  {
-                                              resolvers: {
-                                                defaultResolver: mergeAllOf.options.resolvers.title
-                                              }
-                                            });
-                                          }
 
                                         var view = new JSONSchemaView(schema, 3);
                                         $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
@@ -464,7 +464,7 @@
                                           </tr>
                                           {{#headers}}
                                               <tr>
-                                                  <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
+                                                  <td>{{#name}}{{name}}{{/name}}</td>
                                                   <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
                                                   <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
                                                   <td>{{#description}}{{description}}{{/description}}</td>
@@ -513,11 +513,9 @@
   {{>js_jsonformatter}}
   {{>js_jsonschemaview}}
   {{>js_json_schema_ref_parser}}
-  {{>js_jsonschemamergeallof}}
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
   <script>
-    var $RefParser = JsonSchemaRefParser;
     var schemaWrapper = { "components": { "schemas" : defs}};
     defsParser = new $RefParser();
     defsParser.dereference(schemaWrapper).catch(function(err) {

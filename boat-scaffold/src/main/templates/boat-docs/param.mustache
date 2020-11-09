@@ -35,10 +35,20 @@
         </div>
     </td>
     <td>
-        {{#example}}
-            <code>
-                {{.}}
-            </code>
-        {{/example}}
+        {{#hasExamples}}
+            <ul class="nav nav-tabs">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"  aria-haspopup="true" aria-expanded="false">Examples</a>
+                    <div class="dropdown-menu">
+                        {{#examples}}
+                        <a class="dropdown-item" href="#">{{name}}</a>
+                        {{/examples}}
+                    </div>
+                </li>
+            </ul>
+        {{/hasExamples}}
+        {{#hasSingleExample}}
+            <code>{{example}}</code>
+        {{/hasSingleExample}}
     </td>
 </tr>
