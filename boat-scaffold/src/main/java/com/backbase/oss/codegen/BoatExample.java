@@ -1,11 +1,21 @@
 package com.backbase.oss.codegen;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.ToString;
 
 @Data
 public class BoatExample {
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
 
     private String name;
     private String contentType;
@@ -15,6 +25,17 @@ public class BoatExample {
         this.name = key;
         this.contentType = contentType;
         this.example = value;
+    }
+
+    public String prettyPrintValue() {
+        String s = null;
+        try {
+            s = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(example.getValue());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return s;
+
     }
 
 
