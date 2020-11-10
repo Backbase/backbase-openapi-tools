@@ -40,13 +40,13 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
         CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
-        return BoatCodegenParameter.fromCodegenParameter(parameter, codegenParameter);
+        return BoatCodegenParameter.fromCodegenParameter(parameter, codegenParameter, openAPI);
     }
 
     @Override
     public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
         CodegenParameter codegenParameter = super.fromRequestBody(body, imports, bodyParameterName);
-        return BoatCodegenParameter.fromCodegenParameter(codegenParameter, body, imports, bodyParameterName, openAPI);
+        return BoatCodegenParameter.fromCodegenParameter(codegenParameter, body, openAPI);
     }
 
     @Override

@@ -279,11 +279,6 @@
                           {{#hasPathParams}}
                             <div class="methodsubtabletitle">Path parameters</div>
                             <table id="methodsubtable">
-                                <tr>
-                                  <th width="150px">Name</th>
-                                  <th>Description</th>
-                                    <th width="500px">Examples</th>
-                                </tr>
                                 {{#pathParams}}
                                   {{>param}}
                                 {{/pathParams}}
@@ -293,11 +288,6 @@
                           {{#hasHeaderParams}}
                             <div class="methodsubtabletitle">Header parameters</div>
                             <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                                  <th width="500px">Examples</th>
-                              </tr>
                               {{#headerParams}}
                                   {{>param}}
                               {{/headerParams}}
@@ -307,11 +297,6 @@
                           {{#hasBodyParam}}
                             <div class="methodsubtabletitle">Body parameters</div>
                             <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                                  <th width="500px">Examples</th>
-                              </tr>
                               {{#bodyParams}}
                                 {{>paramB}}
                               {{/bodyParams}}
@@ -321,11 +306,6 @@
                           {{#hasFormParams}}
                             <div class="methodsubtabletitle">Form parameters</div>
                             <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                                  <th width="500px">Examples</th>
-                              </tr>
                               {{#formParams}}
                                   {{>param}}
                               {{/formParams}}
@@ -335,11 +315,6 @@
                           {{#hasQueryParams}}
                             <div class="methodsubtabletitle">Query parameters</div>
                             <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                                  <th width="500px">Examples</th>
-                              </tr>
                               {{#queryParams}}
                                 {{>param}}
                               {{/queryParams}}
@@ -422,20 +397,44 @@
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {{{jsonSchema}}};
-                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        var schema = findNode('schema', schemaWrapper.content).schema;
+
                                         if (!schema) {
-                                            schema = schemaWrapper.schema;
+                                          schema = schemaWrapper.schema;
                                         }
                                         if (schema.$ref != null) {
                                           schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.items != null && schema.items.$ref != null) {
-                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                          if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                                              schema.items = defsParser.$refs.get(schema.items.$ref);
+
+
+                                          }
+                                        }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                                          schema.items = defsParser.$refs.get(schema.items.$ref);
                                         } else {
                                           schemaWrapper.definitions = Object.assign({}, defs);
                                           $RefParser.dereference(schemaWrapper).catch(function(err) {
                                             console.log(err);
                                           });
                                         }
+
+                                         if (schema && schema.allOf) {
+                                            schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                                            schema = mergeAllOf(schema,  {
+                                              resolvers: {
+                                                defaultResolver: mergeAllOf.options.resolvers.title
+                                              }
+                                            });
+                                          }
+
+                                         if (schema.items && schema.items.allOf) {
+                                            schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                                            schema.items = mergeAllOf(schema.items,  {
+                                              resolvers: {
+                                                defaultResolver: mergeAllOf.options.resolvers.title
+                                              }
+                                            });
+                                          }
 
                                         var view = new JSONSchemaView(schema, 3);
                                         $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
@@ -513,9 +512,11 @@
   {{>js_jsonformatter}}
   {{>js_jsonschemaview}}
   {{>js_json_schema_ref_parser}}
+  {{>js_jsonschemamergeallof}}
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
   <script>
+    var $RefParser = JsonSchemaRefParser;
     var schemaWrapper = { "components": { "schemas" : defs}};
     defsParser = new $RefParser();
     defsParser.dereference(schemaWrapper).catch(function(err) {

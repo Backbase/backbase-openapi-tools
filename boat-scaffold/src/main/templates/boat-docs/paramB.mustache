@@ -1,6 +1,6 @@
 <tr>
     <td style="width:150px;">
-        {{paramName}} {{^required}}{{/required}}{{#required}}<span style="color:red;">*</span>{{/required}}
+<!--        {{paramName}} {{^required}}{{/required}}{{#required}}<span style="color:red;">*</span>{{/required}}-->
     </td>
         <td>
             <p class="marked">{{description}}</p>
@@ -45,27 +45,8 @@
             });
             </script>
             <div id="d2e199_{{nickname}}_{{paramName}}"></div>
-</td>
-    <td>
-        {{#hasExamples}}
-            <ul class="nav nav-tabs nav-tabs-examples">
-                {{#examples}}
-                <li>
-                   <a class="dropdown-item" href="#{{nickname}}_{{paramName}}-example-{{name}}">{{name}}</a>
-                </li>
-                {{/examples}}
-            </ul>
-            <div class="tab-content">
-                {{#examples}}
-                    <div class="tab-pane" id="{{nickname}}_{{paramName}}-example-{{name}}">
-                        <pre><code id="code-{{nickname}}_{{paramName}}-example-{{name}}"></code></pre>
 
-                    </div>
-                {{/examples}}
-            </div>
-        {{/hasExamples}}
-        {{#hasSingleExample}}
-            <code>{{example}}</code>
-        {{/hasSingleExample}}
-    </td>
+
+</td>
+
 </tr>

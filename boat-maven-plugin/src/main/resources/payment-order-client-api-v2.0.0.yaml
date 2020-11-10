@@ -1,0 +1,5283 @@
+openapi: 3.0.3
+info:
+  title: Payment Orders Client Api
+  description: "Provides access to querying, initiating, approving and managing (recurring)\
+    \ payment orders, payment order drafts and batch payments.\n# Payment types\n\
+    Different payment types are supported: SEPA, US domestic wire, ACH debit, among\
+    \ others. The configuration of the service determines which types will be accepted.\
+    \ The service supports configuring custom payment types.\n# Dates\nA general note\
+    \ on all the dates that are used by this API.\nAll dates accept the format of\
+    \ yyyy-MM-dd.\nValues will be interpreted according to the local time zone of\
+    \ where this application is running!\nThis means that any timezone is ignored.\n"
+  version: 2.0.0
+servers:
+- url: http://localhost:4010
+  description: mock-api-server
+- url: http://localhost:8080
+  description: Springboot default port
+- url: https://localhost:8081
+  description: "Best practice: use https"
+tags:
+- name: approve
+  description: Payment approval API.
+- name: payment-orders
+  description: Core payments API.
+- name: utility
+  description: Utility endpoints.
+- name: validate
+  description: Validation of a payment.
+paths:
+  /client-api/v2/payment-orders:
+    summary: Payment Orders
+    get:
+      tags:
+      - payment-orders
+      summary: Retrieve list of payments orders.
+      description: Retrieve list of payments orders.
+      operationId: getPaymentOrders
+      parameters:
+      - name: status
+        in: query
+        description: Status of the payment
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ENTERED
+            - READY
+            - ACCEPTED
+            - PROCESSED
+            - REJECTED
+            - CANCELLED
+            - CANCELLATION_PENDING
+      - name: paymentTypeGroup
+        in: query
+        description: |
+          Field used for searching payment orders by payment type group. Value should be one of the 'paymentTypeGroups'
+          which is configured in the application properties in the service.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: CREDIT
+      - name: createdByMe
+        in: query
+        description: "If true: filter payment orders to return only the payments that\
+          \ have been created by the current user.\nIf false: No additional filter\
+          \ should be added.\n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      - name: userId
+        in: query
+        description: |
+          The internal userId to load the payment orders from.
+          You will need to send the saId in conjunction with this parameter.
+          You must have the view privilege for "Support Access for Payments" function of "Support Access" resource
+          and be higher in the legal entities hierarchy to access other user payments.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: b3e4692d-6772-4fb2-9446-374857684932
+      - name: saId
+        in: query
+        description: |
+          The internal service agreement id that should be used for loading payment of a passed userId.
+          You will need to send the userId in conjunction with this parameter.
+          You must have the view privilege for "Support Access for Payments" function of "Support Access" resource
+          and be higher in the legal entities hierarchy to access other user payments.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: c3f62ff9-2894-47d9-a34a-2c8b54e6e9be
+      - name: query
+        in: query
+        description: "Minimum length is 3.\nThe search term used to make partial search\
+          \ on properties account name and iban/bban.\nAdditions for batch-orders\
+          \ only: full search on currency, partial on batch name.\n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: John
+      - name: amountFrom
+        in: query
+        description: Lower value of the range search. The value is inclusive so this
+          is acting as >=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+        example: 1000
+      - name: amountTo
+        in: query
+        description: Upper value of the range search. The value is inclusive so this
+          is acting as <=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+        example: 10000
+      - name: executionDate
+        in: query
+        description: Exact value to match against the requested execution date.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2015-05-23
+      - name: executionDateFrom
+        in: query
+        description: Lower value of the range search. The value is inclusive so this
+          is acting as >=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2015-05-24
+      - name: executionDateTo
+        in: query
+        description: Upper value of the range search. The value is inclusive so this
+          is acting as <=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2015-05-25
+      - name: nextExecutionDate
+        in: query
+        description: Next execution date equals to
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2015-05-26
+      - name: nextExecutionDateFrom
+        in: query
+        description: Lower value of the range search. The value is inclusive so this
+          is acting as >=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2017-07-25
+      - name: nextExecutionDateTo
+        in: query
+        description: Upper value of the range search. The value is inclusive so this
+          is acting as <=.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2017-07-26
+      - name: paymentMode
+        in: query
+        description: Whether to return recurring or single payment orders only.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - SINGLE
+          - RECURRING
+      - name: paymentSetupId
+        in: query
+        description: Field used for searching by exact matches on payment setup id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: abc
+      - name: transferFrequency
+        in: query
+        description: Field for searching on transfer frequencies
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - ONCE
+          - DAILY
+          - WEEKLY
+          - BIWEEKLY
+          - MONTHLY
+          - QUARTERLY
+          - YEARLY
+      - name: from
+        in: query
+        description: Page Number. Skip over pages of elements by specifying a start
+          value for the query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 0
+        example: 20
+      - name: size
+        in: query
+        description: "Limit the number of elements on the response. When used in combination\
+          \ with cursor, the value\nis allowed to be a negative number to indicate\
+          \ requesting records upwards from the starting point indicated\nby the cursor.\n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 10
+        example: 80
+      - name: orderBy
+        in: query
+        description: "Order by field: status, originatorName, originatorAccount, counterpartyName,\
+          \ counterpartyAccount,\ncurrency, amount, requestedExecutionDate\n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: direction
+        in: query
+        description: Direction
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: DESC
+          enum:
+          - ASC
+          - DESC
+      responses:
+        "200":
+          description: Gets a list of payment orders
+          headers:
+            X-Total-Count:
+              description: The total number of payments matching the search criteria.
+              style: simple
+              explode: false
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersGet'
+              example:
+                $ref: '#/components/examples/payment-orders-payment-orders-get'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+              examples:
+                example:
+                  $ref: '#/components/examples/example'
+                invalid-payment-type-group:
+                  $ref: '#/components/examples/invalid-payment-type-group'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: view
+    post:
+      tags:
+      - payment-orders
+      summary: Start a new Payment Order initiation process.
+      description: Start a new Payment Order initiation process
+      operationId: postPaymentOrders
+      parameters:
+      - name: X-MFA
+        in: header
+        description: Challenge payload response
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: sms challenge="123456789"
+      requestBody:
+        description: Start a new Payment Order initiation process
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrdersPost'
+            examples:
+              simple:
+                $ref: '#/components/examples/simple'
+              approved:
+                $ref: '#/components/examples/approved'
+              complex:
+                $ref: '#/components/examples/complex'
+              us-wire-domestic-payment-post:
+                $ref: '#/components/examples/us-wire-domestic-payment-post'
+              us-wire-international-payment-post:
+                $ref: '#/components/examples/us-wire-international-payment-post'
+              us-wire-international-payment-post-transfer-fee:
+                $ref: '#/components/examples/us-wire-international-payment-post-transfer-fee'
+              ach-debit-post:
+                $ref: '#/components/examples/ach-debit-post'
+              ach-credit-post:
+                $ref: '#/components/examples/ach-credit-post'
+        required: true
+      responses:
+        "201":
+          description: PaymentOrderCreated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersPostResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-1'
+                approved:
+                  $ref: '#/components/examples/approved-1'
+        "202":
+          description: PaymentOrderAccepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersPostResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-1'
+                approved:
+                  $ref: '#/components/examples/approved-1'
+        "403":
+          description: BreachReportError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreachReportError'
+              example:
+                $ref: '#/components/examples/error-breach-report-error'
+        "401":
+          description: Unauthorized
+          headers:
+            WWW-Authenticate:
+              description: Comma separated challenges
+              style: simple
+              explode: false
+              schema:
+                type: string
+              example: "sms challenge=\"\", pki challenge=\"Z8nlwZe0daUNWCWIbfJe3iIgauh\""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+              example:
+                $ref: '#/components/examples/lib-unauthorized-error'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+      x-BbAccessControl-resource: Payments;Product Summary (for enrichment)
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc; Product Summary"
+      x-BbAccessControl-privilege: create;view
+  /client-api/v2/payment-orders/validate:
+    summary: /validate
+    post:
+      tags:
+      - payment-orders
+      - validate
+      summary: Validate a payment order.
+      description: Validate a payment order
+      operationId: postValidate
+      requestBody:
+        description: Validate a payment order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrdersValidatePost'
+            examples:
+              simple:
+                $ref: '#/components/examples/simple'
+              complex:
+                $ref: '#/components/examples/complex'
+        required: true
+      responses:
+        "200":
+          description: "The payment order is valid, enriched payment order is returned."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersValidatePostResponse'
+              examples:
+                default:
+                  $ref: '#/components/examples/default'
+                intra-legal-entity:
+                  $ref: '#/components/examples/intra-legal-entity'
+                can-approve:
+                  $ref: '#/components/examples/can-approve'
+                final-approver:
+                  $ref: '#/components/examples/final-approver'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+      x-BbAccessControl-resource: Product Summary (for enrichment)
+      x-BbAccessControl-function: Product Summary
+      x-BbAccessControl-privilege: view
+  /client-api/v2/payment-orders/bulk-approvals:
+    summary: Bulk Approvals
+    description: Performs a bulk approval operation on a set of payment orders
+    put:
+      tags:
+      - payment-orders
+      summary: Approve or reject a set of given payment orders at once.
+      description: Approve or reject a set of given payment orders at once
+      operationId: putBulkApprovals
+      requestBody:
+        description: Approve or reject a set of given payment orders at once
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkPaymentOrdersApprovalPutRequest'
+            example:
+              $ref: '#/components/examples/payment-orders-approval-bulk-payment-orders-approval-put-request'
+        required: true
+      responses:
+        "200":
+          description: Payment order with the approval status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkPaymentOrdersApprovalPutResponse'
+              examples:
+                success:
+                  $ref: '#/components/examples/success'
+                limits-breach:
+                  $ref: '#/components/examples/limits-breach'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: "view,approve"
+  /client-api/v2/payment-orders/approvals:
+    summary: Approvable Payment Orders
+    description: This resources only provides and acts upon payment orders which can
+      be approved or rejected by the user.
+    get:
+      tags:
+      - payment-orders
+      summary: Retrieve payment orders that can be approved or rejected by the user.
+      description: Retrieve payment orders that can be approved or rejected by the
+        user.
+      operationId: getApprovablePaymentOrders
+      parameters:
+      - name: cursor
+        in: query
+        description: Record UUID. As an alternative for specifying 'from' this allows
+          to point to the record to start the selection from.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: ""
+        example: 76d5be8b-e80d-4842-8ce6-ea67519e8f74
+      - name: size
+        in: query
+        description: "Limit the number of elements on the response. When used in combination\
+          \ with cursor, the value is allowed to be a negative number to indicate\
+          \ requesting records upwards from the starting point indicated by the cursor."
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 10
+        example: 80
+      responses:
+        "200":
+          description: Response containing payment orders
+          headers:
+            X-Cursor:
+              description: The value to pass in the cursor query parameter to request
+                the next page.
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersGet'
+              example:
+                $ref: '#/components/examples/payment-orders-approvable-payment-orders-get'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: "view,approve"
+  /client-api/v2/payment-orders/{paymentOrderId}:
+    summary: Payment Order
+    description: The operations on the single payment order identified by the Id
+    get:
+      tags:
+      - payment-orders
+      description: Retrieve the single payment order
+      operationId: getPaymentOrderById
+      parameters:
+      - name: paymentOrderId
+        in: path
+        description: Payment Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 36
+          type: string
+      - name: userId
+        in: query
+        description: The internal userId to load the payment orders from. You will
+          need to send the saId in conjunction with this parameter. You must have
+          the view privilege for "Support Access for Payments" function of "Support
+          Access" resource and be higher in the legal entities hierarchy to access
+          other user payments.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: b3e4692d-6772-4fb2-9446-374857684932
+      - name: saId
+        in: query
+        description: The internal service agreement id that should be used for loading
+          payment of a passed userId. You will need to send the userId in conjunction
+          with this parameter. You must have the view privilege for "Support Access
+          for Payments" function of "Support Access" resource and be higher in the
+          legal entities hierarchy to access other user payments.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: c3f62ff9-2894-47d9-a34a-2c8b54e6e9be
+      responses:
+        "200":
+          description: Gets a single payment order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrderGetResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-2'
+                withApprovalDetails:
+                  $ref: '#/components/examples/withApprovalDetails'
+                withLogicalApprovalDetails:
+                  $ref: '#/components/examples/withLogicalApprovalDetails'
+        "404":
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/not-found-error'
+              example:
+                $ref: '#/components/examples/lib-not-found-error'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: view
+    put:
+      tags:
+      - payment-orders
+      summary: Updates a single payment order.
+      description: "### Updates a single payment order.  \n\nNot implemented.\n\n"
+      operationId: putPaymentOrderById
+      parameters:
+      - name: paymentOrderId
+        in: path
+        description: Payment Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 36
+          type: string
+      - name: X-MFA
+        in: header
+        description: Challenge payload response
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: sms challenge="123456789"
+      requestBody:
+        description: "### Updates a single payment order.  \n\nNot implemented.\n\n"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrderPut'
+            example:
+              $ref: '#/components/examples/payment-orders-payment-orders-put-single'
+        required: true
+      responses:
+        "201":
+          description: PaymentOrderCreated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersPostResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-1'
+                approved:
+                  $ref: '#/components/examples/approved-1'
+        "202":
+          description: PaymentOrderAccepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersPostResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-1'
+                approved:
+                  $ref: '#/components/examples/approved-1'
+        "403":
+          description: BreachReportError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreachReportError'
+              example:
+                $ref: '#/components/examples/error-breach-report-error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorized-error'
+              example:
+                $ref: '#/components/examples/lib-unauthorized-error'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+    delete:
+      tags:
+      - payment-orders
+      summary: Deletes a payment order if:.
+      description: |-
+        Deletes a payment order if:
+
+        - The version is the exact same as the stored database.
+        - The payment status in DBS is Entered
+        - Has no approvals or approval is disabled
+        - Request comes from a user who is the creator/initiator of the payment
+        - The user has the required entitlement:
+          - ?Delete' permission for the corresponding business function (respective payment type) and arrangement id
+      operationId: deletePaymentOrderById
+      parameters:
+      - name: paymentOrderId
+        in: path
+        description: Payment Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 36
+          type: string
+      - name: version
+        in: query
+        description: Query string
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Payment Order has been deleted
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: delete
+  /client-api/v2/payment-orders/{paymentOrderId}/approvals:
+    summary: Approvals
+    description: Performs an approval operation on the given payment order
+    put:
+      tags:
+      - payment-orders
+      - approve
+      description: Approves or rejects a given payment order
+      operationId: putApprovalsByPaymentOrderId
+      parameters:
+      - name: paymentOrderId
+        in: path
+        description: Payment Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 36
+          type: string
+      requestBody:
+        description: Approves or rejects a given payment order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrderApprovalPutRequest'
+            example:
+              $ref: '#/components/examples/payment-orders-approval-payment-order-approval-put-request'
+        required: true
+      responses:
+        "202":
+          description: PaymentOrderAccepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrdersPostResponse'
+              examples:
+                simple:
+                  $ref: '#/components/examples/simple-1'
+                approved:
+                  $ref: '#/components/examples/approved-1'
+        "403":
+          description: BreachReportError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreachReportError'
+              example:
+                $ref: '#/components/examples/error-breach-report-error'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: "view,approve"
+  /client-api/v2/payment-orders/{paymentOrderId}/cancel:
+    summary: Cancel payment order
+    description: The operations on the single payment order identified by the internal
+      id
+    post:
+      tags:
+      - payment-orders
+      description: Cancel a single payment order.
+      operationId: postCancelByPaymentOrderId
+      parameters:
+      - name: paymentOrderId
+        in: path
+        description: Payment Order ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 36
+          type: string
+      requestBody:
+        description: Cancel a single payment order.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrderCancelPostRequest'
+            example:
+              $ref: '#/components/examples/payment-orders-payment-order-cancel-request'
+        required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrderCancelPostResponse'
+              example:
+                $ref: '#/components/examples/payment-orders-payment-order-cancel-response'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbidden-error'
+              example:
+                $ref: '#/components/examples/lib-forbidden-error'
+        "404":
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/not-found-error'
+              example:
+                $ref: '#/components/examples/lib-not-found-error'
+      x-BbAccessControl-resource: Payments
+      x-BbAccessControl-function: "Different functions per payment type, eg 'SEPA\
+        \ CT', 'US Domestic Wire', etc"
+      x-BbAccessControl-privilege: cancel
+  /client-api/v2/payment-orders/currencies:
+    summary: Currencies
+    description: Endpoint to manipulate currencies
+    get:
+      tags:
+      - payment-orders
+      - utility
+      description: Get currencies available for payment
+      operationId: getCurrencies
+      responses:
+        "200":
+          description: Currencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrenciesGet'
+              example:
+                $ref: '#/components/examples/payment-orders-currencies-get-response'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+  /client-api/v2/payment-orders/rate:
+    summary: Rate
+    description: Endpoint to get exchange rate
+    get:
+      tags:
+      - payment-orders
+      - utility
+      description: Get available rate for currencies
+      operationId: getRate
+      parameters:
+      - name: currencyFrom
+        in: query
+        description: Currency transfer from
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: EUR
+      - name: currencyTo
+        in: query
+        description: Currency transfer to
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: USD
+      responses:
+        "200":
+          description: Response containing converted rate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateGet'
+              example:
+                $ref: '#/components/examples/payment-orders-rate-get-response'
+        "500":
+          description: InternalServer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal-server-error'
+              example:
+                $ref: '#/components/examples/lib-internal-server-error'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bad-request-error'
+              example:
+                $ref: '#/components/examples/lib-bad-request-validation-error'
+components:
+  schemas:
+    PaymentOrdersGet:
+      title: PaymentOrdersGet
+      type: array
+      description: List of Payment Orders
+      items:
+        $ref: '#/components/schemas/IdentifiedPaymentOrder'
+    PaymentOrdersPost:
+      title: InitiatePaymentOrder
+      required:
+      - originatorAccount
+      - requestedExecutionDate
+      - transferTransactionInformation
+      type: object
+      properties:
+        originatorAccount:
+          $ref: '#/components/schemas/AccountIdentification'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        transferTransactionInformation:
+          $ref: '#/components/schemas/InitiateTransaction'
+        approved:
+          type: boolean
+          description: "When set to true, the submitted payment order will also be\
+            \ approved by the user."
+    PaymentOrdersPostResponse:
+      title: PaymentOrdersPostResponse
+      required:
+      - id
+      - status
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          description: The internal DBS status of the payment order..
+          enum:
+          - DRAFT
+          - ENTERED
+          - READY
+          - ACCEPTED
+          - PROCESSED
+          - REJECTED
+          - CANCELLED
+          - CANCELLATION_PENDING
+          - CONFIRMATION_PENDING
+          - CONFIRMATION_DECLINED
+        bankStatus:
+          maxLength: 35
+          type: string
+          description: Internal status of the payment or batch order in the core banking
+            system.
+        reasonCode:
+          maxLength: 4
+          type: string
+          description: Reason code the core banking system accepted/rejected the payment
+            or batch.
+        reasonText:
+          maxLength: 35
+          type: string
+          description: Human readable reason the core banking system accepted/rejected
+            the payment or batch.
+        errorDescription:
+          maxLength: 105
+          type: string
+          description: Additional information from the core banking system on why
+            the payment was refused.
+        nextExecutionDate:
+          type: string
+          description: The execution date of the payment that the core system calculated.
+          format: date
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        approvalStatus:
+          maxLength: 70
+          type: string
+          description: The status as returned by the approval service.
+        transferFee:
+          $ref: '#/components/schemas/Currency'
+        exchangeRateInformation:
+          $ref: '#/components/schemas/ExchangeRateInformation'
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    PaymentOrdersValidatePost:
+      title: InitiatePaymentOrder
+      required:
+      - originatorAccount
+      - requestedExecutionDate
+      - transferTransactionInformation
+      type: object
+      properties:
+        originatorAccount:
+          $ref: '#/components/schemas/AccountIdentification'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        transferTransactionInformation:
+          $ref: '#/components/schemas/InitiateTransaction'
+        approved:
+          type: boolean
+          description: "When set to true, the submitted payment order will also be\
+            \ approved by the user."
+    PaymentOrdersValidatePostResponse:
+      title: PaymentOrdersValidatePostResponse
+      required:
+      - canApprove
+      - finalApprover
+      - isIntraLegalEntityPaymentOrder
+      type: object
+      properties:
+        originatorAccount:
+          $ref: '#/components/schemas/OriginatorAccount'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        transferTransactionInformation:
+          $ref: '#/components/schemas/IdentifiedTransaction'
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        originator:
+          $ref: '#/components/schemas/InvolvedParty'
+        totalAmount:
+          $ref: '#/components/schemas/Currency'
+        isIntraLegalEntityPaymentOrder:
+          type: boolean
+          description: This flag is true to indicate the validated payment order is
+            a payment order between two accounts within the same legal entity.
+        canApprove:
+          type: boolean
+          description: This flag is true to indicate that an approval can be created
+            and approved by the current user for the validated payment order.
+        finalApprover:
+          type: boolean
+          description: This flag is true to indicate that the current user will be
+            the final approver for the validated payment order.
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    BulkPaymentOrdersApprovalPutRequest:
+      title: BulkPaymentOrdersApprovalPutRequest
+      required:
+      - approvalStatus
+      - paymentOrderIds
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The options for approval.
+          enum:
+          - APPROVED
+          - REJECTED
+        paymentOrderIds:
+          type: array
+          description: The list of ids of the payment orders to bulk update.
+          items:
+            pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            type: string
+            description: Unique identification of the payment order.
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+    BulkPaymentOrdersApprovalPutResponse:
+      title: BulkPaymentOrdersApprovalPutResponse
+      required:
+      - approvalStatus
+      - failCount
+      - paymentOrders
+      - successCount
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The status of the approval.
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - CANCELLED
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+        paymentOrders:
+          type: array
+          description: The list of payment orders including details about the operation
+            and new status.
+          items:
+            required:
+            - paymentOrderId
+            - status
+            type: object
+            properties:
+              paymentOrderId:
+                pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                type: string
+                description: Unique identification of the payment order.
+              paymentOrder:
+                $ref: '#/components/schemas/IdentifiedPaymentOrder'
+              approvalStatus:
+                maxLength: 70
+                type: string
+                description: The current status of the approval request as returned
+                  by the approval service after the update. This will be empty if
+                  the payment order or approval was not found.
+              status:
+                required:
+                - code
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: "OK if the payment order was updated successfully,\
+                      \ ERROR otherwise."
+                    enum:
+                    - OK
+                    - ERROR
+                  message:
+                    type: string
+                    description: Main error message
+                  errors:
+                    type: array
+                    description: Details why the update failed. Uses the same error
+                      items from building blocks.
+                    items:
+                      $ref: '#/components/schemas/ErrorItem'
+                description: A status object to report about the result of the operation.
+                  In case of error it contains details about why it failed.
+              breachReport:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BreachReportItem'
+        successCount:
+          type: integer
+          description: The number of payment orders processed successfully.
+          format: int32
+        failCount:
+          type: integer
+          description: The number of payment orders that failed processing.
+          format: int32
+    PaymentOrderGetResponse:
+      title: PaymentOrderGet
+      required:
+      - id
+      - status
+      - version
+      type: object
+      properties:
+        approvalDetails:
+          $ref: '#/components/schemas/PresentationApprovalDetailDto'
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Unique identification of the payment order.
+        approvalId:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: The id of the approval request that is or was used to get this
+            item approved.
+        status:
+          type: string
+          description: The internal DBS status of the payment order..
+          enum:
+          - DRAFT
+          - ENTERED
+          - READY
+          - ACCEPTED
+          - PROCESSED
+          - REJECTED
+          - CANCELLED
+          - CANCELLATION_PENDING
+          - CONFIRMATION_PENDING
+          - CONFIRMATION_DECLINED
+        bankStatus:
+          maxLength: 35
+          type: string
+          description: Internal status of the payment or batch order in the core banking
+            system.
+        reasonCode:
+          maxLength: 4
+          type: string
+          description: Reason code the core banking system accepted/rejected the payment
+            or batch.
+        reasonText:
+          maxLength: 35
+          type: string
+          description: Human readable reason the core banking system accepted/rejected
+            the payment or batch.
+        errorDescription:
+          maxLength: 105
+          type: string
+          description: Additional information from the core banking system on why
+            the payment was refused.
+        createdBy:
+          maxLength: 128
+          type: string
+          description: Creator user info.
+        createdAt:
+          type: string
+          description: Date and time indicating when the payment was created
+          format: date-time
+        updatedBy:
+          maxLength: 128
+          type: string
+          description: Updater user info.
+        updatedAt:
+          type: string
+          description: Date and time indicating when the payment was updated
+          format: date-time
+        actions:
+          $ref: '#/components/schemas/Actions'
+        version:
+          type: integer
+          description: Indication of what version the payment order currently has
+          format: int32
+        contextualInformation:
+          $ref: '#/components/schemas/ContextualInformation'
+        intraLegalEntity:
+          type: boolean
+          description: Indication if this payment was an intra-company payment.
+        originatorAccountCurrency:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: Currency code of the payment order originating account
+        confirmationId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The confirmation id for transaction signing.
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        originator:
+          $ref: '#/components/schemas/InvolvedParty'
+        originatorAccount:
+          $ref: '#/components/schemas/OriginatorAccount'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        transferTransactionInformation:
+          $ref: '#/components/schemas/IdentifiedTransaction'
+        totalAmount:
+          $ref: '#/components/schemas/Currency'
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    PaymentOrderPut:
+      title: InitiatePaymentOrderWithId
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/InitiatePaymentOrder'
+      - required:
+        - id
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/PaymentId'
+    PaymentOrderApprovalPutRequest:
+      title: ApprovalStatusPutRequest
+      required:
+      - approvalStatus
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The options for approval.
+          enum:
+          - APPROVED
+          - REJECTED
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+    PaymentOrderCancelPostRequest:
+      title: CancelRequest
+      required:
+      - version
+      type: object
+      properties:
+        version:
+          type: integer
+          description: Indication of what version the payment the user wants to cancel
+          format: int32
+    PaymentOrderCancelPostResponse:
+      title: CancelResponse
+      required:
+      - accepted
+      type: object
+      properties:
+        accepted:
+          type: boolean
+          description: Indication if the cancel request was accepted
+    CurrenciesGet:
+      title: CurrenciesGet
+      type: array
+      description: Currencies available for payment response
+      items:
+        $ref: '#/components/schemas/CurrenciesGetResponseBody'
+    RateGet:
+      title: RateGet
+      required:
+      - rate
+      type: object
+      properties:
+        rate:
+          type: number
+          description: Rate for given currencies
+    BadRequestError:
+      title: BadRequestError
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    UnauthorizedError:
+      title: UnauthorizedError
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    internal-server-error:
+      title: InternalServerError
+      type: object
+      properties:
+        message:
+          type: string
+          description: Further Information
+      description: Represents HTTP 500 Internal Server Error
+    forbidden-error:
+      title: ForbiddenError
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    BreachReportError:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+        payment:
+          $ref: '#/components/schemas/IdentifiedPaymentOrder'
+        checkTime:
+          type: string
+          format: date-time
+        breachReport:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreachReportItem'
+    IdentifiedPaymentOrder:
+      required:
+      - id
+      - status
+      - version
+      properties:
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Unique identification of the payment order.
+        approvalId:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: The id of the approval request that is or was used to get this
+            item approved.
+        status:
+          type: string
+          description: The internal DBS status of the payment order..
+          enum:
+          - DRAFT
+          - ENTERED
+          - READY
+          - ACCEPTED
+          - PROCESSED
+          - REJECTED
+          - CANCELLED
+          - CANCELLATION_PENDING
+          - CONFIRMATION_PENDING
+          - CONFIRMATION_DECLINED
+        bankStatus:
+          maxLength: 35
+          type: string
+          description: Internal status of the payment or batch order in the core banking
+            system.
+        reasonCode:
+          maxLength: 4
+          type: string
+          description: Reason code the core banking system accepted/rejected the payment
+            or batch.
+        reasonText:
+          maxLength: 35
+          type: string
+          description: Human readable reason the core banking system accepted/rejected
+            the payment or batch.
+        errorDescription:
+          maxLength: 105
+          type: string
+          description: Additional information from the core banking system on why
+            the payment was refused.
+        createdBy:
+          maxLength: 128
+          type: string
+          description: Creator user info.
+        createdAt:
+          type: string
+          description: Date and time indicating when the payment was created
+          format: date-time
+        updatedBy:
+          maxLength: 128
+          type: string
+          description: Updater user info.
+        updatedAt:
+          type: string
+          description: Date and time indicating when the payment was updated
+          format: date-time
+        actions:
+          $ref: '#/components/schemas/Actions'
+        version:
+          type: integer
+          description: Indication of what version the payment order currently has
+          format: int32
+        contextualInformation:
+          $ref: '#/components/schemas/ContextualInformation'
+        intraLegalEntity:
+          type: boolean
+          description: Indication if this payment was an intra-company payment.
+        originatorAccountCurrency:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: Currency code of the payment order originating account
+        confirmationId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The confirmation id for transaction signing.
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        originator:
+          $ref: '#/components/schemas/InvolvedParty'
+        originatorAccount:
+          $ref: '#/components/schemas/OriginatorAccount'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        transferTransactionInformation:
+          $ref: '#/components/schemas/IdentifiedTransaction'
+        totalAmount:
+          $ref: '#/components/schemas/Currency'
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    Actions:
+      type: array
+      description: An array of actions that could be performed on a payment order.
+        Actions that can be done are dependant on the payment itself.
+      items:
+        type: string
+        description: The actions that can be performed by the user (with the current
+          context). This field is not evaluated when payment is requested by support
+          employee on behalf of another user.
+        enum:
+        - APPROVE
+        - FINAL_APPROVE
+        - REJECT
+        - CANCEL
+        - DELETE
+    ContextualInformation:
+      required:
+      - externalUserId
+      - origin
+      - serviceAgreementId
+      type: object
+      properties:
+        externalUserId:
+          maxLength: 64
+          type: string
+          description: The (unique and human readable) external user id of the user.
+        internalUserId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        serviceAgreementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        legalEntityId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        origin:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: Name the system where endpoint is calling from
+    ExternalUserId:
+      maxLength: 64
+      type: string
+      description: The (unique and human readable) external user id of the user.
+    InvolvedParty:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 140
+          type: string
+        role:
+          type: string
+          description: These are the possible values the role of an involved party
+            can  have.
+          enum:
+          - CREDITOR
+          - DEBTOR
+        postalAddress:
+          $ref: '#/components/schemas/PostalAddress'
+        recipientId:
+          maxLength: 15
+          type: string
+          description: Used for ACH Credit to indicate the id of the recipient
+      description: This object is a common denominator for the debtor or creditor
+        party.
+    BatchBooking:
+      type: boolean
+      description: Indicate whenever there should be only one debit posting for the
+        whole set of instructions
+    PaymentMode:
+      type: string
+      description: Denotes whether payment will be single or will be recurring
+      enum:
+      - SINGLE
+      - RECURRING
+    Schedule:
+      required:
+      - every
+      - "on"
+      - startDate
+      - transferFrequency
+      type: object
+      properties:
+        nonWorkingDayExecutionStrategy:
+          type: string
+          description: Strategy for executing payments on non-working days
+          enum:
+          - BEFORE
+          - AFTER
+          - NONE
+        transferFrequency:
+          type: string
+          description: Denotes how frequently the transfer should be made
+          enum:
+          - ONCE
+          - DAILY
+          - WEEKLY
+          - BIWEEKLY
+          - MONTHLY
+          - QUARTERLY
+          - YEARLY
+        "on":
+          type: integer
+          description: Denotes day on which transfer should be executed. For WEEKLY
+            transferFrequency it will be 1..7 indicating weekday. For BIWEEKLY it
+            will be 1..14 indicating the day of the two week period. For MONTHLY it
+            will be 1..31 indicating day of month. For YEARLY it will be 1..12 indicating
+            month of the year.
+          format: int32
+        startDate:
+          type: string
+          description: When to start executing the schedule. First transfer will be
+            executed on first calculated date by schedule after this date.
+          format: date
+        endDate:
+          type: string
+          description: When to stop transfers. Transfers will not be executed after
+            this date. Only one of endDate and repeat is possible. If neither repeat
+            nor endDate is provided transfer will be executed until canceled
+          format: date
+        repeat:
+          type: integer
+          description: Number of transfer to be executed. Only one of endDate and
+            repeat is possible. If neither repeat nor endDate is provided transfer
+            will be executed until canceled
+          format: int32
+        every:
+          type: integer
+          description: "Indicates skip interval of transfer. 1 would mean execute\
+            \ every time, 2 - every other time"
+          format: int32
+          enum:
+          - 1
+          - 2
+        nextExecutionDate:
+          type: string
+          description: "Date when the next payment will be executed, taking in consideration\
+            \ bank holidays and cut-off times. It will be only retrieved when getting\
+            \ payments, it will be dismissed when creating or updating."
+          format: date
+      description: Schedule for recurring transfer. Mandatory if paymentMode is RECURRING
+    IdentifiedTransaction:
+      required:
+      - counterparty
+      - counterpartyAccount
+      - instructedAmount
+      type: object
+      properties:
+        counterparty:
+          $ref: '#/components/schemas/InvolvedParty'
+        counterpartyAccount:
+          $ref: '#/components/schemas/CounterpartyAccount'
+        counterpartyBank:
+          $ref: '#/components/schemas/Bank'
+        instructedAmount:
+          $ref: '#/components/schemas/Currency'
+        correspondentBank:
+          $ref: '#/components/schemas/Bank'
+        intermediaryBank:
+          $ref: '#/components/schemas/Bank'
+        messageToBank:
+          maxLength: 140
+          type: string
+          description: The message to the bank used for US domestic wire payments
+        targetCurrency:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+        remittanceInformation:
+          $ref: '#/components/schemas/RemittanceInformation'
+        endToEndIdentification:
+          maxLength: 35
+          type: string
+        mandateIdentifier:
+          maxLength: 15
+          type: string
+          description: "The mandate identifier, of the counter party, giving permission\
+            \ for the debit order."
+        chargeBearer:
+          type: string
+          description: "Indicated who pays the fees for an international transfer.\
+            \ Possible values: OUR(originator), BEN(beneficiary or SHA(shared)."
+          enum:
+          - OUR
+          - BEN
+          - SHA
+        transferFee:
+          $ref: '#/components/schemas/Currency'
+        exchangeRateInformation:
+          $ref: '#/components/schemas/ExchangeRateInformation'
+      description: "The object defining the identified transaction, which means the\
+        \ counterparty will have a arrangementId where applicable."
+    CounterpartyAccount:
+      required:
+      - identification
+      properties:
+        accountType:
+          maxLength: 10
+          type: string
+          description: "The type of the account, e.g. for ACH we have CHECKING/SAVINGS"
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The unique arrangement id.
+        externalArrangementId:
+          maxLength: 70
+          minLength: 1
+          type: string
+          description: The external unique arrangement id.
+        identification:
+          $ref: '#/components/schemas/Identification'
+        name:
+          maxLength: 140
+          type: string
+          description: Default name field used in DBS
+      description: The counterparty Account is the original account identification
+        plus the arrangement if applicable.
+    Name:
+      maxLength: 140
+      type: string
+      description: Default name field used in DBS
+    Bank:
+      type: object
+      properties:
+        bankBranchCode:
+          maxLength: 11
+          type: string
+          description: "Some code to identify a bank office, p.e. ABA routing transit\
+            \ number (9) or Swift BIC code (11)"
+        name:
+          maxLength: 140
+          type: string
+          description: The name of a bank
+        postalAddress:
+          $ref: '#/components/schemas/PostalAddress'
+        bic:
+          pattern: "^([A-Z0-9]){4}([A-Z]){2}([A-Z0-9]){2}([A-Z0-9]{3})?$"
+          type: string
+          description: Business identifier code as specified by ISO 9362:2014
+      description: This object is used to identify the counterparty or correspondent
+        bank.
+    Currency:
+      $ref: '#/components/schemas/currency'
+    currency:
+      title: Currency
+      required:
+      - amount
+      - currencyCode
+      type: object
+      properties:
+        amount:
+          maximum: 1.0E+18
+          minimum: -1.0E+18
+          type: string
+          description: The amount in the specified currency
+        currencyCode:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+            that qualifies the amount
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+          description: Additional properties
+    EndToEndIdentification:
+      maxLength: 35
+      type: string
+    MandateIdentifier:
+      maxLength: 15
+      type: string
+      description: "The mandate identifier, of the counter party, giving permission\
+        \ for the debit order."
+    BreachReportItem:
+      required:
+      - breachInfo
+      type: object
+      properties:
+        limitedEntity:
+          type: array
+          description: "When not set, user-BBID must be set"
+          items:
+            $ref: '#/components/schemas/EntityDescription'
+        shadow:
+          type: boolean
+          description: Shadow limit flag. Applicable for certain entity-types
+        currency:
+          type: string
+          description: Currency code
+        user-BBID:
+          type: string
+          description: BBID of the user for whom the personal limit is assigned
+        breachInfo:
+          type: array
+          description: List of breached periodic limits related to a particular limitable
+            entity
+          items:
+            $ref: '#/components/schemas/BreachInfo'
+    EntityDescription:
+      required:
+      - description
+      - ref
+      - type
+      type: object
+      properties:
+        ref:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+    BreachInfo:
+      required:
+      - breachType
+      - currentConsumption
+      - currentThreshold
+      type: object
+      properties:
+        breachType:
+          type: string
+          enum:
+          - THRESHOLD
+          - CONSUMPTION
+        breachedLimitType:
+          type: string
+          enum:
+          - PERIODIC
+          - TRANSACTIONAL
+        timeframe:
+          $ref: '#/components/schemas/TimeFrame'
+        currentConsumption:
+          type: string
+          description: The amount in the specified currency
+        currentThreshold:
+          type: string
+          description: The amount in the specified currency
+    TimeFrame:
+      required:
+      - endTime
+      - period
+      - startTime
+      type: object
+      properties:
+        period:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+    Amount:
+      type: string
+      description: The amount in the specified currency
+    bad-request-error:
+      title: BadRequestError
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    not-found-error:
+      title: NotFoundError
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    unauthorized-error:
+      title: UnauthorizedError
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information
+        errors:
+          type: array
+          description: Detailed error information
+          items:
+            $ref: '#/components/schemas/error-item'
+    payment-orders-get:
+      title: PaymentOrdersGet
+      type: array
+      description: List of Payment Orders
+      items:
+        $ref: '#/components/schemas/IdentifiedPaymentOrder'
+    InitiatePaymentOrder:
+      title: InitiatePaymentOrder
+      required:
+      - originatorAccount
+      - requestedExecutionDate
+      - transferTransactionInformation
+      type: object
+      properties:
+        originatorAccount:
+          $ref: '#/components/schemas/AccountIdentification'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        transferTransactionInformation:
+          $ref: '#/components/schemas/InitiateTransaction'
+        approved:
+          type: boolean
+          description: "When set to true, the submitted payment order will also be\
+            \ approved by the user."
+    InitiateTransaction:
+      required:
+      - counterparty
+      - counterpartyAccount
+      - instructedAmount
+      type: object
+      properties:
+        counterparty:
+          $ref: '#/components/schemas/InvolvedParty'
+        counterpartyAccount:
+          $ref: '#/components/schemas/InitiateCounterpartyAccount'
+        counterpartyBank:
+          $ref: '#/components/schemas/Bank'
+        instructedAmount:
+          $ref: '#/components/schemas/Currency'
+        correspondentBank:
+          $ref: '#/components/schemas/Bank'
+        intermediaryBank:
+          $ref: '#/components/schemas/Bank'
+        messageToBank:
+          maxLength: 140
+          type: string
+          description: The message to the bank used for US domestic wire payments
+        targetCurrency:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+        remittanceInformation:
+          maxLength: 140
+          type: string
+          description: The remittance info for manually initiated credit transfers.
+            Does not have a type since it will always default to UNSTRUCTURED.
+        endToEndIdentification:
+          maxLength: 35
+          type: string
+        mandateIdentifier:
+          maxLength: 15
+          type: string
+          description: "The mandate identifier, of the counter party, giving permission\
+            \ for the debit order."
+        chargeBearer:
+          type: string
+          description: "Indicated who pays the fees for an international transfer.\
+            \ Possible values: OUR(originator), BEN(beneficiary or SHA(shared)."
+          enum:
+          - OUR
+          - BEN
+          - SHA
+        transferFee:
+          $ref: '#/components/schemas/Currency'
+        additions:
+          type: object
+          additionalProperties:
+            type: object
+      description: The object defining the transaction to be initiated.
+    InitiateCounterpartyAccount:
+      type: object
+      properties:
+        accountType:
+          maxLength: 10
+          type: string
+          description: "The type of the account, e.g. for ACH we have CHECKING/SAVINGS"
+        selectedContact:
+          $ref: '#/components/schemas/SelectedContactDto'
+      description: "The counterparty Account is the original account identification\
+        \ plus the type of account if applicable. It also holds the details of the\
+        \ selected contact, if any."
+      allOf:
+      - $ref: '#/components/schemas/AccountIdentification'
+      - type: object
+    SelectedContactDto:
+      type: object
+      properties:
+        contactId:
+          type: string
+          description: The id of the selected contact.
+        accountId:
+          type: string
+          description: The id of the selected account.
+      description: Holds the contact and account id when an account from a contact
+        was selected while creating a payment. This information is not persisted in
+        DBS but can be used in service extensions to enrich details from the selected
+        contact and store it in the additional properties of the payment order.
+    payment-orders-post-response:
+      title: PaymentOrdersPostResponse
+      required:
+      - id
+      - status
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          description: The internal DBS status of the payment order..
+          enum:
+          - DRAFT
+          - ENTERED
+          - READY
+          - ACCEPTED
+          - PROCESSED
+          - REJECTED
+          - CANCELLED
+          - CANCELLATION_PENDING
+          - CONFIRMATION_PENDING
+          - CONFIRMATION_DECLINED
+        bankStatus:
+          maxLength: 35
+          type: string
+          description: Internal status of the payment or batch order in the core banking
+            system.
+        reasonCode:
+          maxLength: 4
+          type: string
+          description: Reason code the core banking system accepted/rejected the payment
+            or batch.
+        reasonText:
+          maxLength: 35
+          type: string
+          description: Human readable reason the core banking system accepted/rejected
+            the payment or batch.
+        errorDescription:
+          maxLength: 105
+          type: string
+          description: Additional information from the core banking system on why
+            the payment was refused.
+        nextExecutionDate:
+          type: string
+          description: The execution date of the payment that the core system calculated.
+          format: date
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        approvalStatus:
+          maxLength: 70
+          type: string
+          description: The status as returned by the approval service.
+        transferFee:
+          $ref: '#/components/schemas/Currency'
+        exchangeRateInformation:
+          $ref: '#/components/schemas/ExchangeRateInformation'
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    validate-payment-order-response:
+      title: PaymentOrdersValidatePostResponse
+      required:
+      - canApprove
+      - finalApprover
+      - isIntraLegalEntityPaymentOrder
+      type: object
+      properties:
+        originatorAccount:
+          $ref: '#/components/schemas/OriginatorAccount'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        transferTransactionInformation:
+          $ref: '#/components/schemas/IdentifiedTransaction'
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        originator:
+          $ref: '#/components/schemas/InvolvedParty'
+        totalAmount:
+          $ref: '#/components/schemas/Currency'
+        isIntraLegalEntityPaymentOrder:
+          type: boolean
+          description: This flag is true to indicate the validated payment order is
+            a payment order between two accounts within the same legal entity.
+        canApprove:
+          type: boolean
+          description: This flag is true to indicate that an approval can be created
+            and approved by the current user for the validated payment order.
+        finalApprover:
+          type: boolean
+          description: This flag is true to indicate that the current user will be
+            the final approver for the validated payment order.
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    bulk-payment-orders-approval-put-request:
+      title: BulkPaymentOrdersApprovalPutRequest
+      required:
+      - approvalStatus
+      - paymentOrderIds
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The options for approval.
+          enum:
+          - APPROVED
+          - REJECTED
+        paymentOrderIds:
+          type: array
+          description: The list of ids of the payment orders to bulk update.
+          items:
+            pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            type: string
+            description: Unique identification of the payment order.
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+    bulk-payment-orders-approval-put-response:
+      title: BulkPaymentOrdersApprovalPutResponse
+      required:
+      - approvalStatus
+      - failCount
+      - paymentOrders
+      - successCount
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The status of the approval.
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - CANCELLED
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+        paymentOrders:
+          type: array
+          description: The list of payment orders including details about the operation
+            and new status.
+          items:
+            required:
+            - paymentOrderId
+            - status
+            type: object
+            properties:
+              paymentOrderId:
+                pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+                type: string
+                description: Unique identification of the payment order.
+              paymentOrder:
+                $ref: '#/components/schemas/IdentifiedPaymentOrder'
+              approvalStatus:
+                maxLength: 70
+                type: string
+                description: The current status of the approval request as returned
+                  by the approval service after the update. This will be empty if
+                  the payment order or approval was not found.
+              status:
+                required:
+                - code
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: "OK if the payment order was updated successfully,\
+                      \ ERROR otherwise."
+                    enum:
+                    - OK
+                    - ERROR
+                  message:
+                    type: string
+                    description: Main error message
+                  errors:
+                    type: array
+                    description: Details why the update failed. Uses the same error
+                      items from building blocks.
+                    items:
+                      $ref: '#/components/schemas/ErrorItem'
+                description: A status object to report about the result of the operation.
+                  In case of error it contains details about why it failed.
+              breachReport:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BreachReportItem'
+        successCount:
+          type: integer
+          description: The number of payment orders processed successfully.
+          format: int32
+        failCount:
+          type: integer
+          description: The number of payment orders that failed processing.
+          format: int32
+    payment-order-get-response:
+      title: PaymentOrderGet
+      required:
+      - id
+      - status
+      - version
+      type: object
+      properties:
+        approvalDetails:
+          $ref: '#/components/schemas/PresentationApprovalDetailDto'
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Unique identification of the payment order.
+        approvalId:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: The id of the approval request that is or was used to get this
+            item approved.
+        status:
+          type: string
+          description: The internal DBS status of the payment order..
+          enum:
+          - DRAFT
+          - ENTERED
+          - READY
+          - ACCEPTED
+          - PROCESSED
+          - REJECTED
+          - CANCELLED
+          - CANCELLATION_PENDING
+          - CONFIRMATION_PENDING
+          - CONFIRMATION_DECLINED
+        bankStatus:
+          maxLength: 35
+          type: string
+          description: Internal status of the payment or batch order in the core banking
+            system.
+        reasonCode:
+          maxLength: 4
+          type: string
+          description: Reason code the core banking system accepted/rejected the payment
+            or batch.
+        reasonText:
+          maxLength: 35
+          type: string
+          description: Human readable reason the core banking system accepted/rejected
+            the payment or batch.
+        errorDescription:
+          maxLength: 105
+          type: string
+          description: Additional information from the core banking system on why
+            the payment was refused.
+        createdBy:
+          maxLength: 128
+          type: string
+          description: Creator user info.
+        createdAt:
+          type: string
+          description: Date and time indicating when the payment was created
+          format: date-time
+        updatedBy:
+          maxLength: 128
+          type: string
+          description: Updater user info.
+        updatedAt:
+          type: string
+          description: Date and time indicating when the payment was updated
+          format: date-time
+        actions:
+          $ref: '#/components/schemas/Actions'
+        version:
+          type: integer
+          description: Indication of what version the payment order currently has
+          format: int32
+        contextualInformation:
+          $ref: '#/components/schemas/ContextualInformation'
+        intraLegalEntity:
+          type: boolean
+          description: Indication if this payment was an intra-company payment.
+        originatorAccountCurrency:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: Currency code of the payment order originating account
+        confirmationId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The confirmation id for transaction signing.
+        paymentSetupId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP sets up the payments before the Backbase
+            authorization flow.
+        paymentSubmissionId:
+          maxLength: 128
+          type: string
+          description: Generated when the PISP submits the payment which is after
+            the Backbase authorization flow.
+        originator:
+          $ref: '#/components/schemas/InvolvedParty'
+        originatorAccount:
+          $ref: '#/components/schemas/OriginatorAccount'
+        batchBooking:
+          type: boolean
+          description: Indicate whenever there should be only one debit posting for
+            the whole set of instructions
+        instructionPriority:
+          type: string
+          description: Specify the priority of execution of the payment order.
+          enum:
+          - NORM
+          - HIGH
+        requestedExecutionDate:
+          type: string
+          description: The preferred date for the payment order to be executed.
+          format: date
+        paymentMode:
+          type: string
+          description: Denotes whether payment will be single or will be recurring
+          enum:
+          - SINGLE
+          - RECURRING
+        paymentType:
+          maxLength: 22
+          minLength: 1
+          type: string
+          description: The type of payment.
+        entryClass:
+          maxLength: 3
+          type: string
+          description: Used for ACH Standard Entry Class (SEC) Code to designate how
+            the transaction was authorized by the originator.
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        transferTransactionInformation:
+          $ref: '#/components/schemas/IdentifiedTransaction'
+        totalAmount:
+          $ref: '#/components/schemas/Currency'
+        additions:
+          type: object
+          additionalProperties:
+            type: string
+    initiate-payment-order-with-id:
+      title: InitiatePaymentOrderWithId
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/InitiatePaymentOrder'
+      - required:
+        - id
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/PaymentId'
+    payment-order-approval-request:
+      title: ApprovalStatusPutRequest
+      required:
+      - approvalStatus
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          description: The options for approval.
+          enum:
+          - APPROVED
+          - REJECTED
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+    payment-order-cancel-request:
+      title: CancelRequest
+      required:
+      - version
+      type: object
+      properties:
+        version:
+          type: integer
+          description: Indication of what version the payment the user wants to cancel
+          format: int32
+    payment-order-cancel-response:
+      title: CancelResponse
+      required:
+      - accepted
+      type: object
+      properties:
+        accepted:
+          type: boolean
+          description: Indication if the cancel request was accepted
+    currencies-get-response:
+      title: CurrenciesGet
+      type: array
+      description: Currencies available for payment response
+      items:
+        $ref: '#/components/schemas/CurrenciesGetResponseBody'
+    rate-get-response:
+      title: RateGet
+      required:
+      - rate
+      type: object
+      properties:
+        rate:
+          type: number
+          description: Rate for given currencies
+    error-item:
+      title: ErrorItem
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any further information.
+        key:
+          type: string
+          description: "{capability-name}.api.{api-key-name}. For generated validation\
+            \ errors this is the path in the document the error resolves to. e.g.\
+            \ object name + '.' + field"
+        context:
+          type: object
+          additionalProperties:
+            type: string
+          description: Context can be anything used to construct localised messages.
+    PaymentId:
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+      type: string
+      description: Unique identification of the payment order.
+    ApprovalId:
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+      type: string
+      description: The id of the approval request that is or was used to get this
+        item approved.
+    Status:
+      type: string
+      description: The internal DBS status of the payment order..
+      enum:
+      - DRAFT
+      - ENTERED
+      - READY
+      - ACCEPTED
+      - PROCESSED
+      - REJECTED
+      - CANCELLED
+      - CANCELLATION_PENDING
+      - CONFIRMATION_PENDING
+      - CONFIRMATION_DECLINED
+    BankStatus:
+      maxLength: 35
+      type: string
+      description: Internal status of the payment or batch order in the core banking
+        system.
+    ReasonCode:
+      maxLength: 4
+      type: string
+      description: Reason code the core banking system accepted/rejected the payment
+        or batch.
+    ReasonText:
+      maxLength: 35
+      type: string
+      description: Human readable reason the core banking system accepted/rejected
+        the payment or batch.
+    ErrorDescription:
+      maxLength: 105
+      type: string
+      description: Additional information from the core banking system on why the
+        payment was refused.
+    ConfirmationId:
+      maxLength: 36
+      minLength: 1
+      type: string
+      description: The confirmation id for transaction signing.
+    PaymentSetupId:
+      maxLength: 128
+      type: string
+      description: Generated when the PISP sets up the payments before the Backbase
+        authorization flow.
+    PaymentSubmissionId:
+      maxLength: 128
+      type: string
+      description: Generated when the PISP submits the payment which is after the
+        Backbase authorization flow.
+    OriginatorAccount:
+      required:
+      - arrangementId
+      - identification
+      properties:
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The unique arrangement id.
+        externalArrangementId:
+          maxLength: 70
+          minLength: 1
+          type: string
+          description: The external unique arrangement id.
+        identification:
+          $ref: '#/components/schemas/Identification'
+        name:
+          maxLength: 140
+          type: string
+          description: "This is the name of the account, and not the name of the account\
+            \ holder."
+      description: The product identification of the originator
+    ArrangementId:
+      maxLength: 36
+      minLength: 1
+      type: string
+      description: The unique arrangement id.
+    ExternalArrangementId:
+      maxLength: 70
+      minLength: 1
+      type: string
+      description: The external unique arrangement id.
+    Identification:
+      required:
+      - identification
+      - schemeName
+      type: object
+      properties:
+        identification:
+          maxLength: 36
+          type: string
+          description: "The identifier of the account. Can be a regular account number,\
+            \ or an ID."
+        schemeName:
+          type: string
+          description: This describes the type of the account identifier. ID will
+            mean it refers to an account known within DBS.
+          enum:
+          - IBAN
+          - BBAN
+          - ID
+          - EXTERNAL_ID
+    SchemeNames:
+      type: string
+      description: This describes the type of the account identifier. ID will mean
+        it refers to an account known within DBS.
+      enum:
+      - IBAN
+      - BBAN
+      - ID
+      - EXTERNAL_ID
+    InstructionPriority:
+      type: string
+      description: Specify the priority of execution of the payment order.
+      enum:
+      - NORM
+      - HIGH
+    RequestedExecutionDate:
+      type: string
+      description: The preferred date for the payment order to be executed.
+      format: date
+    PaymentType:
+      maxLength: 22
+      minLength: 1
+      type: string
+      description: The type of payment.
+    EntryClass:
+      maxLength: 3
+      type: string
+      description: Used for ACH Standard Entry Class (SEC) Code to designate how the
+        transaction was authorized by the originator.
+    Id:
+      maxLength: 36
+      minLength: 1
+      type: string
+      description: General purpose identifier. Can be UUID but does not have to.
+    InvolvedPartyRole:
+      type: string
+      description: These are the possible values the role of an involved party can  have.
+      enum:
+      - CREDITOR
+      - DEBTOR
+    PostalAddress:
+      type: object
+      properties:
+        addressLine1:
+          maxLength: 70
+          type: string
+        addressLine2:
+          maxLength: 70
+          type: string
+        streetName:
+          maxLength: 70
+          type: string
+        postCode:
+          maxLength: 16
+          type: string
+        town:
+          maxLength: 35
+          type: string
+        countrySubDivision:
+          maxLength: 35
+          type: string
+        country:
+          maxLength: 2
+          type: string
+      description: Postal address object with fields
+    RecipientId:
+      maxLength: 15
+      type: string
+      description: Used for ACH Credit to indicate the id of the recipient
+    MessageToBank:
+      maxLength: 140
+      type: string
+      description: The message to the bank used for US domestic wire payments
+    CurrencyCode:
+      pattern: "^[A-Z]{3}$"
+      type: string
+      description: The alpha-3 code (complying with ISO 4217) of the currency
+    RemittanceInformation:
+      required:
+      - content
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: When type is structured it consists of some XML tags used when
+            the transaction was uploaded.
+          enum:
+          - STRUCTURED
+          - UNSTRUCTURED
+        content:
+          maxLength: 140
+          type: string
+          description: The content of the remittance information.
+      description: "This is the object representation of the remittance info and can\
+        \ contain different types of remittance info. It is only used in responses,\
+        \ not for input requests!"
+    ChargeBearer:
+      type: string
+      description: "Indicated who pays the fees for an international transfer. Possible\
+        \ values: OUR(originator), BEN(beneficiary or SHA(shared)."
+      enum:
+      - OUR
+      - BEN
+      - SHA
+    ExchangeRateInformation:
+      type: object
+      properties:
+        currencyCode:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: Currency in which the rate of exchange is expressed in a currency
+            exchange.
+        rate:
+          maximum: 1.0E+18
+          minimum: -1.0E+18
+          type: string
+          description: The factor used for conversion of an amount from one currency
+            to another.
+        rateType:
+          type: string
+          description: Specifies the type used to complete the currency exchange.
+          enum:
+          - ACTUAL
+          - INDICATIVE
+          - AGREED
+        contractIdentification:
+          maxLength: 256
+          type: string
+          description: Unique and unambiguous reference to the foreign exchange contract
+            agreed between the initiating party/creditor and the debtor agent.
+      description: The detailed information on the exchange rate that has been used
+        in the payment transaction.
+    AccountType:
+      maxLength: 10
+      type: string
+      description: "The type of the account, e.g. for ACH we have CHECKING/SAVINGS"
+    BankBranchCode:
+      maxLength: 11
+      type: string
+      description: "Some code to identify a bank office, p.e. ABA routing transit\
+        \ number (9) or Swift BIC code (11)"
+    BankName:
+      maxLength: 140
+      type: string
+      description: The name of a bank
+    Bic:
+      pattern: "^([A-Z0-9]){4}([A-Z]){2}([A-Z0-9]){2}([A-Z0-9]{3})?$"
+      type: string
+      description: Business identifier code as specified by ISO 9362:2014
+    AccountIdentification:
+      required:
+      - identification
+      type: object
+      properties:
+        identification:
+          $ref: '#/components/schemas/Identification'
+        name:
+          maxLength: 140
+          type: string
+          description: "This is the name of the account, and not the name of the account\
+            \ holder."
+    NextExecutionDate:
+      type: string
+      description: The execution date of the payment that the core system calculated.
+      format: date
+    ApprovalStatusResponse:
+      maxLength: 70
+      type: string
+      description: The status as returned by the approval service.
+    ApprovalStatus:
+      type: string
+      description: The options for approval.
+      enum:
+      - APPROVED
+      - REJECTED
+    Comment:
+      maxLength: 140
+      type: string
+      description: "When approving or rejecting, the user can add comments which would\
+        \ explain the reason for the action."
+    ApprovalStatus_2:
+      type: string
+      description: The status of the approval.
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+    ErrorItem:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Default Message. Any further information.
+        key:
+          type: string
+          description: "{capability-name}.api.{api-key-name}. For generated validation\
+            \ errors this is the path in the document the error resolves to. e.g.\
+            \ object name + '.' + field"
+        context:
+          type: object
+          description: Context can be anything used to construct localised messages.
+      description: A validation error
+    SuccessCount:
+      type: integer
+      description: The number of payment orders processed successfully.
+      format: int32
+    FailCount:
+      type: integer
+      description: The number of payment orders that failed processing.
+      format: int32
+    PresentationApprovalDetailDto:
+      required:
+      - approvalTypes
+      - createdAt
+      - function
+      - id
+      - itemId
+      - policy
+      - resource
+      - serviceAgreementId
+      - status
+      - userId
+      properties:
+        approvalTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentationApprovalTypeDto'
+        policy:
+          $ref: '#/components/schemas/PresentationPolicyDto'
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        userId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        externalUserId:
+          maxLength: 64
+          type: string
+          description: The (unique and human readable) external user id of the user.
+        userFullName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: The full name of a user.
+        serviceAgreementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        itemId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        dataAccessItemId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        resource:
+          maxLength: 32
+          type: string
+          description: This is the name of the resource.
+        function:
+          maxLength: 32
+          type: string
+          description: This is the name of the business function.
+        status:
+          type: string
+          description: The status of the approval.
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - CANCELLED
+        records:
+          type: array
+          description: A list of records of all the approve and reject actions on
+            the approval.
+          items:
+            $ref: '#/components/schemas/PresentationRecordDto'
+        canApprove:
+          type: boolean
+          description: "This flag indicates if the user (with the current context)\
+            \ that is requesting the approval can approve it, depending on the policy\
+            \ that applies. In case a support employee requests the payment on behalf\
+            \ of another user, this flag is indicating whether the target user can\
+            \ approve the item and not the support employee himself."
+        canReject:
+          type: boolean
+          description: "This flag indicates if the user (with the current context)\
+            \ that is requesting the approval can reject it, depending on the policy\
+            \ that applies. In case a support employee requests the payment on behalf\
+            \ of another user, this flag is indicating whether the target user can\
+            \ reject the item and not the support employee himself."
+        finalApprover:
+          type: boolean
+          description: "This flag indicates if the user (with the current context)\
+            \ is the final approver that is needed. In case a support employee requests\
+            \ the payment on behalf of another user, this flag is indicating whether\
+            \ the target user is a final approver and not the support employee himself."
+        action:
+          maxLength: 20
+          type: string
+          description: The action of the approval request
+        createdAt:
+          type: string
+          description: The timestamp indicates when the object was created.
+          format: date-time
+      description: A detailed approval object that holds extended details of a single
+        item to be approved.
+    PresentationApprovalTypeDto:
+      required:
+      - id
+      - name
+      - rank
+      type: object
+      properties:
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        name:
+          maxLength: 50
+          type: string
+          description: The name of an item.
+        description:
+          maxLength: 255
+          type: string
+          description: This gives a more in detailed description of the item and its
+            purpose.
+        rank:
+          minimum: 1
+          type: integer
+          description: The rank determines which item takes precedence over another.
+            1 means highest precedence and 100 takes lower precedence than 10. Must
+            be unique!
+          format: int32
+      description: A simple object that represents a type of approval that can be
+        placed on an approval.
+    Description:
+      maxLength: 255
+      type: string
+      description: This gives a more in detailed description of the item and its purpose.
+    PresentationPolicyDto:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        name:
+          maxLength: 140
+          type: string
+          description: Default name field used in DBS
+        description:
+          maxLength: 255
+          type: string
+          description: This gives a more in detailed description of the item and its
+            purpose.
+        items:
+          type: array
+          description: A list of approval types and the number of each approval type
+            is required. If there are 0 items a zero-approval-policy applies.
+          items:
+            $ref: '#/components/schemas/PresentationPolicyItemDto'
+        logicalItems:
+          type: array
+          description: Contains a list of logical approval policy items. These items
+            have been used in the calculation of this approval state.
+          items:
+            $ref: '#/components/schemas/LogicalPolicyDetailsDto'
+      description: This object describes how a policy is built up. It tells you what
+        policies apply (#policyItems) or if you can self-approve.
+    PresentationPolicyItemDto:
+      required:
+      - approvalTypeId
+      - numberOfApprovals
+      type: object
+      properties:
+        approvalTypeId:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        numberOfApprovals:
+          type: integer
+          description: The number of a certain type of approval that is required.
+          format: int32
+    NumberOfApprovalNumberOfApprovals:
+      type: integer
+      description: The number of a certain type of approval that is required.
+      format: int32
+    FullName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: The full name of a user.
+    PresentationRecordDto:
+      required:
+      - approvalTypeId
+      - createdAt
+      - id
+      - status
+      - userId
+      type: object
+      properties:
+        id:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        userId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: General purpose identifier. Can be UUID but does not have to.
+        externalUserId:
+          maxLength: 64
+          type: string
+          description: The (unique and human readable) external user id of the user.
+        userFullName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: The full name of a user.
+        approvalTypeId:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          description: Universally Unique Identifier (UUID).
+        status:
+          type: string
+          description: The list of accepted statuses that a user can request to update
+            an approval to.
+          enum:
+          - APPROVED
+          - REJECTED
+        createdAt:
+          type: string
+          description: The timestamp indicates when the object was created.
+          format: date-time
+        comment:
+          maxLength: 140
+          type: string
+          description: "When approving or rejecting, the user can add comments which\
+            \ would explain the reason for the action."
+      description: A single record of either an approval or rejection by a user on
+        an approval request.
+    CreatedAt:
+      type: string
+      description: The timestamp indicates when the object was created.
+      format: date-time
+    Action:
+      maxLength: 20
+      type: string
+      description: The action of the approval request
+    CurrenciesGetResponseBody:
+      $ref: '#/components/schemas/currencies-get-response-body'
+    currencies-get-response-body:
+      title: Currency
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          pattern: "^[A-Z]{3}$"
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+      description: Currency
+    Uuid:
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+      type: string
+      description: Universally Unique Identifier (UUID).
+    ResourceName:
+      maxLength: 32
+      type: string
+      description: This is the name of the resource.
+    FunctionName:
+      maxLength: 32
+      type: string
+      description: This is the name of the business function.
+    Name_2:
+      maxLength: 50
+      type: string
+      description: The name of an item.
+    Rank:
+      minimum: 1
+      type: integer
+      description: The rank determines which item takes precedence over another. 1
+        means highest precedence and 100 takes lower precedence than 10. Must be unique!
+      format: int32
+    LogicalPolicyDetailsDto:
+      type: object
+      properties:
+        rank:
+          minimum: 0
+          type: integer
+          description: Rank of this logical operation with 1 as the highest precedence.
+            The rank is unique inside the details list.
+          format: int32
+        operator:
+          type: string
+          description: "Type of logical operation, please see Community for each operation\
+            \ implementation"
+          enum:
+          - OR
+        items:
+          maxItems: 5
+          minItems: 0
+          type: array
+          description: List of policy items inside this logical operation.
+          items:
+            $ref: '#/components/schemas/PolicyItemDetailsDto'
+          default: []
+      description: A policy declaration that allows you to add logical operators to
+        the contained policy items.
+    LogicalOperator:
+      type: string
+      description: "Type of logical operation, please see Community for each operation\
+        \ implementation"
+      enum:
+      - OR
+    PolicyItemDetailsDto:
+      required:
+      - approvalType
+      - numberOfApprovals
+      type: object
+      properties:
+        approvalType:
+          $ref: '#/components/schemas/ApprovalTypeDto'
+        numberOfApprovals:
+          maximum: 99
+          minimum: 1
+          type: integer
+          description: The number of a certain type of approval that is required.
+          format: int32
+      description: A detailed policy item with the full approval type.
+    ApprovalTypeDto:
+      required:
+      - id
+      - name
+      - rank
+      type: object
+      properties:
+        id:
+          pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+          type: string
+          description: "Universal Unique Identifier, "
+        name:
+          maxLength: 50
+          type: string
+          description: The name of an item.
+        description:
+          maxLength: 255
+          type: string
+          description: This gives a more in detailed description of the item and its
+            purpose.
+        rank:
+          minimum: 1
+          type: integer
+          description: The rank determines which item takes precedence over another.
+            1 means highest precedence and 100 takes lower precedence than 10. Must
+            be unique!
+          format: int32
+      description: "An approval type, also known as approval level, is used to allow\
+        \ a hierarchy of approvals to grant to various users or groups to allow complex\
+        \ policies to be defined."
+    Uuid_2:
+      pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+      type: string
+      description: "Universal Unique Identifier, "
+    NumberOfApprovals:
+      maximum: 99
+      minimum: 1
+      type: integer
+      description: The number of a certain type of approval that is required.
+      format: int32
+    RecordStatus:
+      type: string
+      description: The list of accepted statuses that a user can request to update
+        an approval to.
+      enum:
+      - APPROVED
+      - REJECTED
+  examples:
+    invalid-payment-type-group:
+      summary: invalid-payment-type-group
+      value:
+        message: "Payment type group invalid. Must be one of [credit, debit]"
+    payment-orders-rate-get-response:
+      summary: payment-orders-rate-get-response
+      value:
+        rate: 1.07
+    error-breach-report-error:
+      summary: error-breach-report-error
+      value:
+        message: "Limits has been breached, check the report for more details"
+        payment:
+          id: 7d341c28-6714-11e7-907b-a6006ad3dba0
+          status: ENTERED
+          originatorAccount:
+            arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+            identification:
+              identification: NL53RABO0309349755
+              schemeName: IBAN
+          instructionPriority: NORM
+          requestedExecutionDate: 2017-07-16
+          transferTransactionInformation:
+            name: Jack Jackson
+            instructedAmount:
+              amount: "5000.55"
+              currencyCode: EUR
+            counterpartyAccount:
+              identification:
+                identification: FR708933019952AUNHQNQ0KZ
+                schemeName: IBAN
+              arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            counterparty:
+              name: Backbase
+              postalAddress:
+                addressLine1: Jacob Bontiusplaats 9
+                zipcode: 1018LL
+                city: Amsterdam
+                country: NL
+            remittanceInformation:
+              type: UNSTRUCTURED
+              content: Return a debt
+          version: 0
+        checkTime: 2017-01-31T12:12:12Z
+        breachReport:
+        - limitedEntity:
+          - ref: 1234567-12312-123123
+            type: Service Agreement
+            description: "Kuhic, Gislason and Kemmer. SERVICE AGREEMENT"
+          shadow: false
+          currency: EUR
+          user-BBID: oleksii
+          breachInfo:
+          - breachType: THRESHOLD
+            breachedLimitType: PERIODIC
+            timeframe:
+              period: daily
+              startTime: 2017-01-31T00:00:00Z
+              endTime: 2017-01-31T23:59:59Z
+            currentConsumption: "250.0"
+            currentThreshold: "499.9"
+          - breachType: CONSUMPTION
+            timeframe:
+              period: monthly
+              startTime: 2017-01-01T00:00:00Z
+              endTime: 2017-01-31T23:59:59Z
+            currentConsumption: "9950.0"
+            currentThreshold: "10000.0"
+        - user-BBID: oleksii
+          shadow: false
+          currency: EUR
+          breachInfo:
+          - breachType: CONSUMPTION
+            timeframe:
+              period: daily
+              startTime: 2017-01-31T00:00:00Z
+              endTime: 2017-01-31T23:59:59Z
+            currentConsumption: "500.0"
+            currentThreshold: "1000.0"
+        - limitedEntity:
+          - ref: 1234567-12312-123123
+            type: Function Access Group
+            description: Payments approvers
+          - ref: 1234567-12312-123123
+            type: Function
+            description: Domestic payments
+          - ref: Approve
+            type: Privilege
+            description: Approve
+          shadow: false
+          currency: EUR
+          breachInfo:
+          - breachType: THRESHOLD
+            timeframe:
+              period: daily
+              startTime: 2017-01-31T00:00:00Z
+              endTime: 2017-01-31T23:59:59Z
+            currentConsumption: "250.0"
+            currentThreshold: "499.9"
+        - limitedEntity:
+          - ref: 1234567-12312-123123
+            type: Legal Entity
+            description: "Kuhic, Gislason and Kemmer"
+          shadow: false
+          currency: EUR
+          breachInfo:
+          - breachType: CONSUMPTION
+            timeframe:
+              period: quarterly
+              startTime: 2017-01-01T00:00:00Z
+              endTime: 2017-03-31T23:59:59Z
+            currentConsumption: "99950.0"
+            currentThreshold: "100000.0"
+    us-wire-domestic-payment-post:
+      summary: us-wire-domestic-payment-post
+      value:
+        originatorAccount:
+          identification:
+            identification: 8a48e08c60daa5940160dac699050088
+            schemeName: ID
+        totalAmount:
+          amount: "10.29"
+          currencyCode: USD
+        requestedExecutionDate: 2016-05-16
+        paymentType: US_DOMESTIC_WIRE
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "10.29"
+            currencyCode: USD
+          counterparty:
+            name: Jane Doe
+          counterpartyAccount:
+            identification:
+              identification: "4902331374"
+              schemeName: BBAN
+          counterpartyBank:
+            bankBranchCode: "111000025"
+    us-wire-international-payment-post:
+      summary: us-wire-international-payment-post
+      value:
+        originatorAccount:
+          identification:
+            identification: 8a48e08c60daa5940160dac699050088
+            schemeName: ID
+        requestedExecutionDate: 2018-01-04
+        paymentType: US_FOREIGN_WIRE
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "29.99"
+            currencyCode: USD
+          counterparty:
+            name: John Doe
+          counterpartyAccount:
+            identification:
+              identification: "4902331374"
+              schemeName: BBAN
+          counterpartyBank:
+            bankBranchCode: "111000025"
+            bic: INGBNL2A
+            name: ING BANK N.V.
+            postalAddress:
+              addressLine1: FINANCIAL PLAZA BIJLMERDREEF 109 1102 BW AMSTERDAM
+              country: NL
+          correspondentBank:
+            bankBranchCode: "011000015"
+            name: FEDERAL RESERVE BANK
+          intermediaryBank:
+            bankBranchCode: "122105155"
+            name: SNSB2886803298
+          messageToBank: My us domestic wire payment explanation.
+          targetCurrency: EUR
+    simple:
+      summary: simple
+      value:
+        originatorAccount:
+          identification:
+            identification: 729190df-a421-4937-94fd-5e1a3da132cc
+            schemeName: ID
+        requestedExecutionDate: 2017-08-11
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "100.00"
+            currencyCode: EUR
+          counterparty:
+            name: J. Sparrow
+          counterpartyAccount:
+            identification:
+              identification: NL21ABNA0136371124
+              schemeName: IBAN
+            selectedContact:
+              contactId: 14b0b245-c7a9-427e-8e77-26c2f98dfa3d
+              accountId: 61425aed-5d5c-4292-8f60-e2f3efc9b66a
+    lib-internal-server-error:
+      summary: lib-internal-server-error
+      value:
+        message: Description of error
+    ach-debit-post:
+      summary: ach-debit-post
+      value:
+        originatorAccount:
+          identification:
+            identification: 8a48e08c60daa5940160dac699050088
+            schemeName: ID
+        totalAmount:
+          amount: "10.29"
+          currencyCode: USD
+        requestedExecutionDate: 2016-05-16
+        paymentType: ACH_DEBIT
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "10.29"
+            currencyCode: USD
+          counterparty:
+            name: Jane Doe
+          counterpartyAccount:
+            identification:
+              identification: "4902331374"
+              schemeName: BBAN
+          counterpartyBank:
+            bankBranchCode: "111000025"
+          mandateIdentifier: MNDTREF0239-348
+    example:
+      summary: example
+      value:
+        message: Bad Request
+        errors:
+        - message: "Value Exceeded. Must be between {min} and {max}."
+          key: common.api.shoesize
+          context:
+            max: "50"
+            min: "1"
+    payment-orders-approval-bulk-payment-orders-approval-put-request:
+      summary: payment-orders-approval-bulk-payment-orders-approval-put-request
+      value:
+        approvalStatus: APPROVED
+        paymentOrderIds:
+        - 7d34169c-6714-11e7-907b-a6006ad3dba0
+        - d2ff7c65-24ae-430f-92b9-c7ca5b143081
+        - 9a20be2b-b8f3-45dc-a625-55635235de4c
+        - c7653c55-ee9b-4f65-96db-cbda76efd3ae
+    lib-not-found-error:
+      summary: lib-not-found-error
+      value:
+        message: Resource not found.
+        errors:
+        - message: "Unable to find the resource requested resource: {resource}."
+          key: common.api.resource
+          context:
+            resource: aResource
+    approved:
+      summary: approved
+      value:
+        originatorAccount:
+          identification:
+            identification: 729190df-a421-4937-94fd-5e1a3da132cc
+            schemeName: ID
+        requestedExecutionDate: 2017-08-11
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "100.00"
+            currencyCode: EUR
+          counterparty:
+            name: J. Sparrow
+          counterpartyAccount:
+            identification:
+              identification: NL21ABNA0136371124
+              schemeName: IBAN
+            selectedContact:
+              contactId: 14b0b245-c7a9-427e-8e77-26c2f98dfa3d
+              accountId: 61425aed-5d5c-4292-8f60-e2f3efc9b66a
+        approved: true
+    default:
+      summary: default
+      value:
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        originator:
+          name: Credit Account
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-07-16
+        paymentType: SEPA_CREDIT_TRANSFER
+        isIntraLegalEntityPaymentOrder: false
+        canApprove: false
+        finalApprover: false
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            name: ABN Amro
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+    limits-breach:
+      summary: limits-breach
+      value:
+        approvalStatus: APPROVED
+        paymentOrders:
+        - paymentOrderId: 7d34169c-6714-11e7-907b-a6006ad3dba0
+          paymentOrder:
+            id: 7d34169c-6714-11e7-907b-a6006ad3dba0
+            approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+            status: ENTERED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: 0260-0959-3
+                schemeName: BBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: 228 Park Ave S
+                town: New York
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: US_FOREIGN_WIRE
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+                postalAddress:
+                  addressLine1: 2589 Peaceful Lane
+                  postCode: "44128"
+                  town: Warrensville Heights
+                  country: US
+              remittanceInformation:
+                type: UNSTRUCTURED
+                content: Unstructured content
+              counterpartyBank:
+                bankBranchCode: "082000549"
+                name: Morgan Chase
+                postalAddress:
+                  addressLine1: 4789 Vernon Street
+                  postCode: "92028"
+                  town: Fallbrook
+                  country: US
+              correspondentBank:
+                bankBranchCode: "122105155"
+                name: Bank of America
+              intermediaryBank:
+                bic: DABAIE2D
+                bankBranchCode: "102000021"
+                name: SNSB
+              messageToBank: My us international wire payment explanation.
+              targetCurrency: EUR
+            actions:
+            - APPROVE
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          approvalStatus: PENDING
+          status:
+            code: OK
+        - paymentOrderId: d2ff7c65-24ae-430f-92b9-c7ca5b143081
+          paymentOrder:
+            id: d2ff7c65-24ae-430f-92b9-c7ca5b143081
+            approvalId: 2d9367dc-8af1-411d-81f6-9e28c46dd189
+            status: REJECTED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: NL81TRIO0212471066
+                schemeName: IBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: SEPA_CREDIT_TRANSFER
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+            actions: []
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          approvalStatus: REJECTED
+          status:
+            code: ERROR
+            message: "Not allowed to update this approval, status is final"
+            errors:
+            - message: "Not allowed to update this approval, status is final"
+              key: paymentorder.api.Approval.NotAllowed
+              context:
+                status: REJECTED
+        - paymentOrderId: 9a20be2b-b8f3-45dc-a625-55635235de4c
+          status:
+            code: ERROR
+            message: Payment not found
+            errors:
+            - message: Payment not found
+              key: paymentorder.api.PaymentOrder.NotFound
+        - paymentOrderId: c7653c55-ee9b-4f65-96db-cbda76efd3ae
+          paymentOrder:
+            id: c7653c55-ee9b-4f65-96db-cbda76efd3ae
+            approvalId: fe383f48-df2e-4b17-a0d2-3443b2e3738c
+            status: ENTERED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: NL81TRIO0212471066
+                schemeName: IBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: SEPA_CREDIT_TRANSFER
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+            actions: []
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          status:
+            code: ERROR
+            message: "Limits has been breached, check report for details"
+          breachReport:
+          - breachInfo:
+            - breachType: THRESHOLD
+              breachedLimitType: PERIODIC
+              currentConsumption: "999.00"
+              currentThreshold: "1000.00"
+              timeframe:
+                period: DAILY
+                startTime: 2017-05-12T00:00:00.000Z
+                endTime: 2017-05-12T23:59:59.999Z
+        successCount: 1
+        failCount: 3
+    payment-orders-payment-orders-get:
+      summary: payment-orders-payment-orders-get
+      value:
+      - id: 7d34169c-6714-11e7-907b-a6006ad3dba0
+        approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 3cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: a3f8defe-f447-4475-b5c1-d3971ec7a273
+          identification:
+            identification: NL81TRIO0212471066
+            schemeName: IBAN
+        originator:
+          name: Smith Bonus Savings
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        instructionPriority: HIGH
+        requestedExecutionDate: 2018-08-16
+        paymentMode: SINGLE
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          endToEndIdentification: Some reference
+          instructedAmount:
+            amount: "749.99"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: MR1300020001010000123456753
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: John Smith
+        actions:
+        - APPROVE
+        - FINAL_APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 0d0b6350-0ff9-11e8-b642-0ed5f89f718b
+        approvalId: 518bbd4a-0ff9-11e8-b642-0ed5f89f718b
+        status: PROCESSED
+        bankStatus: FINISHED
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL18INGB0664923638
+            schemeName: IBAN
+          name: Credit Account
+        originator:
+          name: Random Account
+          postalAddress:
+            country: NL
+        batchBooking: true
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-08-11
+        paymentMode: RECURRING
+        paymentType: SEPA_CREDIT_TRANSFER
+        schedule:
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2017-08-12
+          every: 1
+          nextExecutionDate: 2018-08-15
+          endDate: 2018-05-12
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "100.00"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: NO9386011117947
+              schemeName: IBAN
+          counterparty:
+            name: Jack Yellow
+          remittanceInformation:
+            type: STRUCTURED
+            content: <some-xml-tags>structured content with XML</some-xml-tags>
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 7d341c28-6714-11e7-907b-a6006ad3dba0
+        approvalId: c383c69f-38bf-4e3e-ad3f-5f58cf971bb1
+        status: REJECTED
+        bankStatus: ACCOUNT_BLOCKED
+        reasonCode: AB01
+        reasonText: Account blocked
+        errorDescription: Blocked by bank.
+        originatorAccount:
+          arrangementId: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: bcf10f4d-4b2f-4413-9bab-31ff693608b5
+          identification:
+            identification: FR188388353832IH3CAWFYXAA36
+            schemeName: IBAN
+        originator:
+          name: Mr and Mrs J. Smith
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-07-16
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: LT121000011101001000
+              schemeName: IBAN
+            name: ABN Amro
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 7d34215a-6714-11e7-907b-a6006ad3dba0
+        approvalId: ae01c614-d473-48d6-af7d-f516292b39cb
+        status: ACCEPTED
+        bankStatus: ACCEPTEDTECHNICALVALIDATION
+        reasonCode: AC01
+        reasonText: Accepted by bank
+        originatorAccount:
+          arrangementId: 3cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: a3f8defe-f447-4475-b5c1-d3971ec7a273
+          identification:
+            identification: NL81TRIO0212471066
+            schemeName: IBAN
+        originator:
+          name: Smith Bonus Savings
+        batchBooking: false
+        requestedExecutionDate: 2018-07-23
+        paymentMode: SINGLE
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          endToEndIdentification: Some reference
+          instructedAmount:
+            amount: "749.99"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: LI21088100002324013AA
+              schemeName: IBAN
+          counterparty:
+            name: Delivery Service
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 7d342c15-6714-11e7-907b-a6006ad3dba0
+        approvalId: ae01a624-d473-48d6-af7d-f516292b39cb
+        status: ACCEPTED
+        bankStatus: ACCEPTEDTECHNICALVALIDATION
+        reasonCode: AC01
+        reasonText: Accepted by bank
+        originatorAccount:
+          arrangementId: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: bcf10f4d-4b2f-4413-9bab-31ff693608b5
+          identification:
+            identification: FR188388353832IH3CAWFYXAA36
+            schemeName: IBAN
+        originator:
+          name: Mr and Mrs J. Smith
+        batchBooking: false
+        requestedExecutionDate: 2018-06-12
+        paymentMode: SINGLE
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          endToEndIdentification: Some reference
+          instructedAmount:
+            amount: "99.99"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: MR1300020001010000123456753
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: John Smith
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 7d341a2a-6714-11e7-907b-a6006ad3dba0
+        approvalId: 264b69e4-3df0-49c1-8cda-e2bb437461e8
+        status: ACCEPTED
+        bankStatus: FINISHED
+        originatorAccount:
+          arrangementId: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: bcf10f4d-4b2f-4413-9bab-31ff693608b5
+          identification:
+            identification: FR188388353832IH3CAWFYXAA36
+            schemeName: IBAN
+        originator:
+          name: Mr and Mrs J. Smith
+        batchBooking: true
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-08-11
+        paymentMode: RECURRING
+        paymentType: SEPA_CREDIT_TRANSFER
+        schedule:
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2017-08-12
+          every: 1
+          nextExecutionDate: 2018-08-15
+          endDate: 2018-05-12
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "133.33"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: NO9386011117947
+              schemeName: IBAN
+          counterparty:
+            name: Jack Yellow
+          remittanceInformation:
+            type: STRUCTURED
+            content: <some-xml-tags>structured content with XML</some-xml-tags>
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 9312
+      - id: 5cea81b2-0ff9-11e8-b642-0ed5f89f718b
+        approvalId: 61624e82-0ff9-11e8-b642-0ed5f89f718b
+        status: ACCEPTED
+        bankStatus: FINISHED
+        originatorAccount:
+          arrangementId: 3cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: a3f8defe-f447-4475-b5c1-d3971ec7a273
+          identification:
+            identification: NL81TRIO0212471066
+            schemeName: IBAN
+        originator:
+          name: Smith Bonus Savings
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        batchBooking: true
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-08-11
+        paymentMode: RECURRING
+        paymentType: SEPA_CREDIT_TRANSFER
+        schedule:
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2017-08-12
+          every: 1
+          nextExecutionDate: 2018-08-15
+          endDate: 2018-05-12
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "166.66"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: HU42117730161111101800000000
+              schemeName: IBAN
+          counterparty:
+            name: Jack Brown
+          remittanceInformation:
+            type: STRUCTURED
+            content: <some-xml-tags>structured content with XML</some-xml-tags>
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 42
+        originatingAccountCurrency: EUR
+      - id: 06db9298-189b-11e8-accf-0ed5f89f718b
+        approvalId: 11863018-189b-11e8-accf-0ed5f89f718b
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          identification:
+            identification: 0260-0959-3
+            schemeName: BBAN
+        originator:
+          name: John Doe
+          postalAddress:
+            addressLine1: 228 Park Ave S
+            town: New York
+        batchBooking: false
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-08-12
+        paymentMode: RECURRING
+        paymentType: US_FOREIGN_WIRE
+        schedule:
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2017-08-12
+          every: 1
+          nextExecutionDate: 2017-09-12
+          endDate: 2018-05-12
+        transferTransactionInformation:
+          endToEndIdentification: TRNSCT REF 1234567890
+          instructedAmount:
+            amount: "104.66"
+            currencyCode: USD
+          counterpartyAccount:
+            identification:
+              identification: NL91 ABNA 0417 1643 00
+              schemeName: IBAN
+          counterparty:
+            name: Jack Brown
+            postalAddress:
+              addressLine1: 2589 Peaceful Lane
+              postCode: "44128"
+              town: Warrensville Heights
+              country: US
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Unstructured content
+          counterpartyBank:
+            bankBranchCode: "082000549"
+            name: Morgan Chase
+            postalAddress:
+              addressLine1: 4789 Vernon Street
+              postCode: "92028"
+              town: Fallbrook
+              country: US
+          correspondentBank:
+            bankBranchCode: "122105155"
+            name: Bank of America
+          intermediaryBank:
+            bic: DABAIE2D
+            bankBranchCode: "102000021"
+            name: SNSB
+          messageToBank: My us international wire payment explanation.
+          targetCurrency: EUR
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 42
+      - id: fa088818-623a-4260-bc46-1ff678de8dae
+        approvalId: 8605dc85-726c-4795-9b55-ff698ad2d1e4
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 07642680-2b6f-11e8-b467-0ed5f89f718b
+          identification:
+            identification: "00400440116243"
+            schemeName: BBAN
+        originator:
+          name: Mr John Usmith
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, New York"
+        instructionPriority: HIGH
+        requestedExecutionDate: 2018-08-16
+        paymentMode: SINGLE
+        paymentType: INTERNAL
+        transferTransactionInformation:
+          endToEndIdentification: Some reference
+          instructedAmount:
+            amount: "749.99"
+            currencyCode: USD
+          counterpartyAccount:
+            accountType: SAVINGS
+            identification:
+              identification: "3242342348899"
+              schemeName: BBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+          counterparty:
+            name: John Doe
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: f58a410e-469c-41f1-8c51-21b6d24bd3c1
+        approvalId: 7527c230-01a7-41b8-a021-dc29aca98fe3
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 07642680-2b6f-11e8-b467-0ed5f89f718b
+          identification:
+            identification: "00400440116243"
+            schemeName: BBAN
+        originator:
+          name: Mr John Usmith
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Los Angeles"
+        instructionPriority: HIGH
+        requestedExecutionDate: 2018-08-16
+        paymentMode: SINGLE
+        paymentType: INTERNAL
+        transferTransactionInformation:
+          endToEndIdentification: Some reference
+          instructedAmount:
+            amount: "134"
+            currencyCode: USD
+          counterpartyAccount:
+            accountType: CHECKING
+            identification:
+              identification: "3242342123899"
+              schemeName: BBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+          counterparty:
+            name: Dan Brown
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt`
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+    lib-bad-request-validation-error:
+      summary: lib-bad-request-validation-error
+      value:
+        message: Bad Request
+        errors:
+        - message: "Value Exceeded. Must be between {min} and {max}."
+          key: common.api.shoesize
+          context:
+            max: "50"
+            min: "1"
+    complex:
+      summary: complex
+      value:
+        originatorAccount:
+          identification:
+            identification: 729190df-a421-4937-94fd-5e1a3da132cc
+            schemeName: ID
+        batchBooking: true
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-01-01
+        paymentMode: RECURRING
+        paymentType: SEPA_CREDIT_TRANSFER
+        schedule:
+          nonWorkingDayExecutionStrategy: AFTER
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2018-01-01
+          repeat: 2
+          every: 1
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "100.00"
+            currencyCode: EUR
+          counterparty:
+            name: Dagobert Duck
+            postalAddress:
+              addressLine1: Some other street
+              addressLine2: "99"
+              postCode: 1100 ZZ
+              town: Amsterdam
+              country: NL
+          counterpartyAccount:
+            identification:
+              identification: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+              schemeName: ID
+          remittanceInformation: Salary
+          endToEndIdentification: 5e1a3da132cc
+    us-wire-international-payment-post-transfer-fee:
+      summary: us-wire-international-payment-post-transfer-fee
+      value:
+        originatorAccount:
+          identification:
+            identification: 8a48e08c60daa5940160dac699050088
+            schemeName: ID
+        requestedExecutionDate: 2018-01-04
+        paymentType: US_FOREIGN_WIRE
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "29.99"
+            currencyCode: USD
+          counterparty:
+            name: John Doe
+          counterpartyAccount:
+            identification:
+              identification: "4902331374"
+              schemeName: BBAN
+          counterpartyBank:
+            bankBranchCode: "111000025"
+            bic: INGBNL2A
+            name: ING BANK N.V.
+            postalAddress:
+              addressLine1: FINANCIAL PLAZA BIJLMERDREEF 109 1102 BW AMSTERDAM
+              country: NL
+          correspondentBank:
+            bankBranchCode: "011000015"
+            name: FEDERAL RESERVE BANK
+          intermediaryBank:
+            bankBranchCode: "122105155"
+            name: SNSB2886803298
+          messageToBank: My us domestic wire payment explanation.
+          targetCurrency: EUR
+          chargeBearer: SHA
+          transferFee:
+            amount: "0.29"
+            currencyCode: USD
+    lib-unauthorized-error:
+      summary: lib-unauthorized-error
+      value:
+        message: Access to requested resource denied.
+        errors:
+        - message: Resource access denied due to invalid credentials.
+          key: common.api.token
+          context:
+            accessToken: expired
+    payment-orders-approvable-payment-orders-get:
+      summary: payment-orders-approvable-payment-orders-get
+      value:
+      - id: 7d34169c-6714-11e7-907b-a6006ad3dba0
+        approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+        status: ENTERED
+        originatorAccount:
+          name: Smith Bonus Savings
+          arrangementId: 3cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+          externalArrangementId: a3f8defe-f447-4475-b5c1-d3971ec7a273
+          identification:
+            identification: NL81TRIO0212471066
+            schemeName: IBAN
+        originator:
+          name: Smith Bonus Savings
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        batchBooking: false
+        instructionPriority: HIGH
+        requestedExecutionDate: 2018-08-16
+        paymentMode: SINGLE
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "749.99"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: MR1300020001010000123456753
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: John Smith
+        actions:
+        - APPROVE
+        - FINAL_APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+      - id: 06db9298-189b-11e8-accf-0ed5f89f718b
+        approvalId: 11863018-189b-11e8-accf-0ed5f89f718b
+        status: ENTERED
+        originatorAccount:
+          name: John Doe
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          identification:
+            identification: 0260-0959-3
+            schemeName: BBAN
+        originator:
+          name: John Doe
+          postalAddress:
+            addressLine1: 228 Park Ave S
+            town: New York
+        batchBooking: false
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-08-12
+        paymentMode: RECURRING
+        paymentType: US_FOREIGN_WIRE
+        schedule:
+          transferFrequency: MONTHLY
+          "on": 1
+          startDate: 2017-08-12
+          every: 1
+          nextExecutionDate: 2017-09-12
+          endDate: 2018-05-12
+        transferTransactionInformation:
+          endToEndIdentification: TRNSCT REF 1234567890
+          instructedAmount:
+            amount: "104.66"
+            currencyCode: USD
+          counterpartyAccount:
+            identification:
+              identification: NL91 ABNA 0417 1643 00
+              schemeName: IBAN
+          counterparty:
+            name: Jack Brown
+            postalAddress:
+              addressLine1: 2589 Peaceful Lane
+              postCode: "44128"
+              town: Warrensville Heights
+              country: US
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Unstructured content
+          counterpartyBank:
+            bankBranchCode: "082000549"
+            name: Morgan Chase
+            postalAddress:
+              addressLine1: 4789 Vernon Street
+              postCode: "92028"
+              town: Fallbrook
+              country: US
+          correspondentBank:
+            bankBranchCode: "122105155"
+            name: Bank of America
+          intermediaryBank:
+            bic: DABAIE2D
+            bankBranchCode: "102000021"
+            name: SNSB
+          messageToBank: My us international wire payment explanation.
+          targetCurrency: EUR
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 42
+      - id: fa088818-623a-4260-bc46-1ff678de8dae
+        approvalId: 8605dc85-726c-4795-9b55-ff698ad2d1e4
+        status: ENTERED
+        originatorAccount:
+          name: Mr John Usmith
+          arrangementId: 07642680-2b6f-11e8-b467-0ed5f89f718b
+          identification:
+            identification: "00400440116243"
+            schemeName: BBAN
+        originator:
+          name: Mr John Usmith
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, New York"
+        instructionPriority: HIGH
+        requestedExecutionDate: 2018-08-16
+        paymentMode: SINGLE
+        paymentType: INTERNAL
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "749.99"
+            currencyCode: USD
+          counterpartyAccount:
+            accountType: SAVINGS
+            identification:
+              identification: "3242342348899"
+              schemeName: BBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+          counterparty:
+            name: John Doe
+        actions:
+        - APPROVE
+        - REJECT
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        version: 1
+    payment-orders-approval-payment-order-approval-put-request:
+      summary: payment-orders-approval-payment-order-approval-put-request
+      value:
+        approvalStatus: APPROVED
+    simple-1:
+      summary: simple-1
+      value:
+        id: af2599ef-759a-4b78-8e67-4949055a532b
+        status: ENTERED
+    payment-orders-payment-order-cancel-request:
+      summary: payment-orders-payment-order-cancel-request
+      value:
+        version: 2
+    simple-2:
+      summary: simple-2
+      value:
+        id: 7d341c28-6714-11e7-907b-a6006ad3dba0
+        approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+        status: ACCEPTED
+        bankStatus: ACCEPTEDTECHNICALVALIDATION
+        reasonCode: AC01
+        reasonText: Accepted by bank
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-07-16
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+        actions: []
+        createdBy: U00243
+        createdAt: 2017-05-12T14:33:13.452Z
+        contextualInformation:
+          externalUserId: b3e4692d-6772-4fb2-9446-132435465768
+          internalUserId: b3e4692d-6772-4fb2-9446-374857684932
+          serviceAgreementId: c3f62ff9-2894-47d9-a34a-2c8b54e6e9be
+          legalEntityId: 27263171-94d5-4d82-975c-61d8c41644d0
+          origin: actions
+        originatorAccountCurrency: EUR
+        version: 1
+    payment-orders-payment-orders-put-single:
+      summary: payment-orders-payment-orders-put-single
+      value:
+        id: af2599ef-759a-4b78-8e67-4949055a532b
+        originatorAccount:
+          identification:
+            identification: 729190df-a421-4937-94fd-5e1a3da132cc
+            schemeName: ID
+        requestedExecutionDate: 2017-08-11
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "120.00"
+            currencyCode: EUR
+          counterparty:
+            name: J. Sparrow
+          counterpartyAccount:
+            identification:
+              identification: NL21ABNA0136371124
+              schemeName: IBAN
+    intra-legal-entity:
+      summary: intra-legal-entity
+      value:
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        originator:
+          name: Credit Account
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-07-16
+        paymentType: SEPA_CT_ILE
+        isIntraLegalEntityPaymentOrder: true
+        canApprove: false
+        finalApprover: false
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            name: ABN Amro
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+    withLogicalApprovalDetails:
+      summary: withLogicalApprovalDetails
+      value:
+        id: 7d341c28-6714-11e7-907b-a6006ad3dba0
+        approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-07-22
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+        version: 1
+        actions: []
+        createdBy: U00243
+        createdAt: 2018-07-22T13:44:02Z
+        originatorAccountCurrency: EUR
+        approvalDetails:
+          id: b3e4692d-6772-4fb2-9446-b8f4607f49b1
+          userId: b3e4692d-6772-4fb2-9446-bebebebebebe
+          externalUserId: davyJones88
+          userFullName: Davy Jones
+          serviceAgreementId: c3f62ff9-2894-47d9-a34a-2c8b54e6e9be
+          itemId: 7d341c28-6714-11e7-907b-a6006ad3dba0
+          dataAccessItemId: 729190df-a421-4937-94fd-5e1a3da132cc
+          resource: Payments
+          function: SEPA_CREDIT_TRANSFER
+          status: PENDING
+          createdAt: 2018-07-22T13:44:02Z
+          records:
+          - id: 59f23015-9007-4391-a604-1d17e85ab3c0
+            userId: b3e4692d-6772-4fb2-9446-babababababa
+            externalUserId: flying-dutchman
+            userFullName: Jack Sparrow
+            approvalTypeId: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+            status: APPROVED
+            createdAt: 2018-07-22T13:44:02Z
+          approvalTypes:
+          - id: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+            name: A
+            description: 1st approval
+            rank: 100
+          - id: 5fa97eb5-277f-4b2c-b05d-f13d630e05c8
+            name: B
+            description: 2nd approval
+            rank: 101
+          policy:
+            id: 8ac202da-273b-4d2b-8aa6-c12f9d9fa736
+            name: Or policy
+            description: A policy that requires A OR B approvals
+            logicalItems:
+            - rank: 1
+              operator: OR
+              items:
+              - approvalType:
+                  id: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+                  name: A
+                  description: Or A approval
+                  rank: 100
+                numberOfApprovals: 1
+              - approvalType:
+                  id: 5fa97eb5-277f-4b2c-b05d-f13d630e05c8
+                  name: B
+                  description: Or B approval
+                  rank: 101
+                numberOfApprovals: 1
+          canApprove: false
+          canReject: false
+          finalApprover: false
+    ach-credit-post:
+      summary: ach-credit-post
+      value:
+        originatorAccount:
+          identification:
+            identification: 8a48e08c60daa5940160dac699050088
+            schemeName: ID
+        totalAmount:
+          amount: "10.29"
+          currencyCode: USD
+        requestedExecutionDate: 2019-10-16
+        paymentType: ACH_CREDIT
+        entryClass: CCD
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "10.29"
+            currencyCode: USD
+          counterparty:
+            name: Jane Doe
+            recipientId: "1234567"
+          counterpartyAccount:
+            identification:
+              identification: "4902331374"
+              schemeName: BBAN
+            accountType: SAVINGS
+          counterpartyBank:
+            bankBranchCode: "111000025"
+    withApprovalDetails:
+      summary: withApprovalDetails
+      value:
+        id: 7d341c28-6714-11e7-907b-a6006ad3dba0
+        approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+        status: ENTERED
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        instructionPriority: NORM
+        requestedExecutionDate: 2018-07-22
+        paymentType: SEPA_CREDIT_TRANSFER
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+            externalArrangementId: "9669274787995385962"
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+        version: 1
+        actions: []
+        createdBy: U00243
+        createdAt: 2018-07-22T13:44:02Z
+        originatorAccountCurrency: EUR
+        approvalDetails:
+          id: b3e4692d-6772-4fb2-9446-b8f4607f49b1
+          userId: b3e4692d-6772-4fb2-9446-bebebebebebe
+          externalUserId: davyJones88
+          userFullName: Davy Jones
+          serviceAgreementId: c3f62ff9-2894-47d9-a34a-2c8b54e6e9be
+          itemId: 7d341c28-6714-11e7-907b-a6006ad3dba0
+          dataAccessItemId: 729190df-a421-4937-94fd-5e1a3da132cc
+          resource: Payments
+          function: SEPA_CREDIT_TRANSFER
+          status: PENDING
+          createdAt: 2018-07-22T13:44:02Z
+          records:
+          - id: 59f23015-9007-4391-a604-1d17e85ab3c0
+            userId: b3e4692d-6772-4fb2-9446-babababababa
+            externalUserId: flying-dutchman
+            userFullName: Jack Sparrow
+            approvalTypeId: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+            status: APPROVED
+            createdAt: 2018-07-22T13:44:02Z
+          approvalTypes:
+          - id: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+            name: A
+            description: 1st approval
+            rank: 100
+          - id: 5fa97eb5-277f-4b2c-b05d-f13d630e05c8
+            name: B
+            description: 2nd approval
+            rank: 101
+          policy:
+            id: 6546c424-d3b1-4848-bbda-31cd44ab6915
+            name: Default policy
+            description: "A default policy that requires two approvals of different\
+              \ types: A + B"
+            items:
+            - approvalTypeId: ed47a5d7-1626-4e8c-819c-8c1851cb0357
+              numberOfApprovals: 1
+            - approvalTypeId: 5fa97eb5-277f-4b2c-b05d-f13d630e05c8
+              numberOfApprovals: 1
+          canApprove: false
+          canReject: false
+          finalApprover: false
+    can-approve:
+      summary: can-approve
+      value:
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        originator:
+          name: Credit Account
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-07-16
+        paymentType: SEPA_CREDIT_TRANSFER
+        isIntraLegalEntityPaymentOrder: false
+        canApprove: true
+        finalApprover: false
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            name: ABN Amro
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
+    payment-orders-currencies-get-response:
+      summary: payment-orders-currencies-get-response
+      value:
+      - code: EUR
+      - code: USD
+      - code: GBP
+      - code: ISK
+      - code: KWD
+    payment-orders-payment-order-cancel-response:
+      summary: payment-orders-payment-order-cancel-response
+      value:
+        accepted: true
+    lib-forbidden-error:
+      summary: lib-forbidden-error
+      value:
+        message: Access to requested resource denied.
+        errors:
+        - message: "Resource access denied due to an insufficient user quota of {quota}."
+          key: common.api.quota
+          context:
+            quota: someQuota
+    success:
+      summary: success
+      value:
+        approvalStatus: APPROVED
+        paymentOrders:
+        - paymentOrderId: 7d34169c-6714-11e7-907b-a6006ad3dba0
+          paymentOrder:
+            id: 7d34169c-6714-11e7-907b-a6006ad3dba0
+            approvalId: 49dad7ab-604b-407a-ba47-a61ad93f31ce
+            status: ENTERED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: 0260-0959-3
+                schemeName: BBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: 228 Park Ave S
+                town: New York
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: US_FOREIGN_WIRE
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+                postalAddress:
+                  addressLine1: 2589 Peaceful Lane
+                  postCode: "44128"
+                  town: Warrensville Heights
+                  country: US
+              remittanceInformation:
+                type: UNSTRUCTURED
+                content: Unstructured content
+              counterpartyBank:
+                bankBranchCode: "082000549"
+                name: Morgan Chase
+                postalAddress:
+                  addressLine1: 4789 Vernon Street
+                  postCode: "92028"
+                  town: Fallbrook
+                  country: US
+              correspondentBank:
+                bankBranchCode: "122105155"
+                name: Bank of America
+              intermediaryBank:
+                bic: DABAIE2D
+                bankBranchCode: "102000021"
+                name: SNSB
+              messageToBank: My us international wire payment explanation.
+              targetCurrency: EUR
+            actions:
+            - APPROVE
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          approvalStatus: PENDING
+          status:
+            code: OK
+        - paymentOrderId: d2ff7c65-24ae-430f-92b9-c7ca5b143081
+          paymentOrder:
+            id: d2ff7c65-24ae-430f-92b9-c7ca5b143081
+            approvalId: 2d9367dc-8af1-411d-81f6-9e28c46dd189
+            status: REJECTED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: NL81TRIO0212471066
+                schemeName: IBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: SEPA_CREDIT_TRANSFER
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+            actions: []
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          approvalStatus: REJECTED
+          status:
+            code: ERROR
+            message: "Not allowed to update this approval, status is final"
+            errors:
+            - message: "Not allowed to update this approval, status is final"
+              key: paymentorder.api.Approval.NotAllowed
+              context:
+                status: REJECTED
+        - paymentOrderId: 9a20be2b-b8f3-45dc-a625-55635235de4c
+          status:
+            code: ERROR
+            message: Payment not found
+            errors:
+            - message: Payment not found
+              key: paymentorder.api.PaymentOrder.NotFound
+        - paymentOrderId: c7653c55-ee9b-4f65-96db-cbda76efd3ae
+          paymentOrder:
+            id: c7653c55-ee9b-4f65-96db-cbda76efd3ae
+            approvalId: fe383f48-df2e-4b17-a0d2-3443b2e3738c
+            status: ENTERED
+            originatorAccount:
+              arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+              externalArrangementId: "729190421493794513132"
+              identification:
+                identification: NL81TRIO0212471066
+                schemeName: IBAN
+            originator:
+              name: Smith Bonus Savings
+              postalAddress:
+                addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+            instructionPriority: HIGH
+            requestedExecutionDate: 2017-08-16
+            paymentMode: SINGLE
+            paymentType: SEPA_CREDIT_TRANSFER
+            transferTransactionInformation:
+              endToEndIdentification: Some reference
+              instructedAmount:
+                amount: "749.99"
+                currencyCode: EUR
+              counterpartyAccount:
+                identification:
+                  identification: MR1300020001010000123456753
+                  schemeName: IBAN
+                arrangementId: fe9d66ae-b927-4ac7-8799-c5a38a596ff2
+                externalArrangementId: "9669274787995385962"
+              counterparty:
+                name: John Smith
+            actions: []
+            createdBy: U00243
+            createdAt: 2017-05-12T14:33:13.452Z
+            version: 2
+          status:
+            code: ERROR
+            message: Approval not found
+            errors:
+            - message: Approval not found
+              key: paymentorder.api.Approval.NotFound
+        successCount: 1
+        failCount: 3
+    approved-1:
+      summary: approved-1
+      value:
+        id: af2599ef-759a-4b78-8e67-4949055a532b
+        status: ENTERED
+        approvalStatus: APPROVED
+    final-approver:
+      summary: final-approver
+      value:
+        originatorAccount:
+          arrangementId: 729190df-a421-4937-94fd-5e1a3da132cc
+          externalArrangementId: "729190421493794513132"
+          identification:
+            identification: NL53RABO0309349755
+            schemeName: IBAN
+        originator:
+          name: Credit Account
+          postalAddress:
+            addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+        instructionPriority: NORM
+        requestedExecutionDate: 2017-07-16
+        paymentType: SEPA_CREDIT_TRANSFER
+        isIntraLegalEntityPaymentOrder: false
+        canApprove: true
+        finalApprover: true
+        transferTransactionInformation:
+          instructedAmount:
+            amount: "5000.55"
+            currencyCode: EUR
+          counterpartyAccount:
+            identification:
+              identification: FR708933019952AUNHQNQ0KZ
+              schemeName: IBAN
+            name: ABN Amro
+          counterparty:
+            name: Backbase
+            postalAddress:
+              addressLine1: "Jacob Bontiusplaats 9, 1018LL, Amsterdam"
+              country: NL
+          remittanceInformation:
+            type: UNSTRUCTURED
+            content: Return a debt
