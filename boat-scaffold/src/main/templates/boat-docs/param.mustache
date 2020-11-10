@@ -1,54 +1,50 @@
 <tr>
-    <td style="width:150px;">{{baseName}}{{^required}}{{/required}}{{#required}}*{{/required}}</td>
+    <td style="width:150px;">
+        <span>{{baseName}}</span>{{^required}}{{/required}}{{#required}}<div class="inner required">
+        Required
+    </div>{{/required}}</td>
     <td>
-        <div id="d2e199_{{nickname}}_{{paramName}}">
-            <div class="json-schema-view">
-                <div class="primitive">
-                <span class="type">
-                    {{dataType}}
-                </span>
-                    {{#dataFormat}}
-                        <span class="format">
-                        ({{dataFormat}})
-                    </span>
-                    {{/dataFormat}}
-
-                    {{#description}}
-                        <div class="inner description marked">{{description}}</div>
-                    {{/description}}
-                </div>
-                {{#isEnum}}
-                    {{#vendorExtensions.x-eumFormatted}}
-                        <div class="inner enums" id="{{nickname}}_{{paramName}}_enum">
-                        <span class="inner">
-                            <b>Enum: </b>{{{vendorExtensions.x-eumFormatted}}}
-                        </span>
-                        </div>
-                    {{/vendorExtensions.x-eumFormatted}}
-                {{/isEnum}}
-                {{#required}}
-                    <div class="inner required">
-                        Required
-                    </div>
-                {{/required}}
-            </div>
+        <div>
+        <span class="format">{{dataTypeDisplayName}}</span>
+        {{#maxLength}}
+            <span>&lt;&equals; {{.}} characters</span>
+        {{/maxLength}}
         </div>
-    </td>
-    <td>
+        {{#isEnum}}
+            <div>Items Enum: {{#allowableValues}}
+                {{#enumVars}}
+                    <code>{{name}}</code>
+                {{/enumVars}}
+
+                {{/allowableValues}}
+            </div>
+        {{/isEnum}}
+
         {{#hasExamples}}
             <ul class="nav nav-tabs">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"  aria-haspopup="true" aria-expanded="false">Examples</a>
                     <div class="dropdown-menu">
                         {{#examples}}
-                        <a class="dropdown-item" href="#">{{name}}</a>
+                            <a class="dropdown-item" href="#">{{name}}</a>
                         {{/examples}}
                     </div>
                 </li>
             </ul>
         {{/hasExamples}}
         {{#hasSingleExample}}
-            <code>{{example}}</code>
+            <div>
+            Example: <code>{{example}}</code>
+            </div>
         {{/hasSingleExample}}
+        {{#hasDefaultValue}}
+        <div>
+            Default: <code>{{defaultValue}}</code>
+        </div>
+        {{/hasDefaultValue}}
+
+
+        <p>{{description}}</p>
     </td>
+
 </tr>
