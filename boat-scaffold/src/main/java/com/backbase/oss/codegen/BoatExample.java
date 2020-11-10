@@ -1,20 +1,21 @@
 package com.backbase.oss.codegen;
 
 import io.swagger.v3.oas.models.examples.Example;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
 public class BoatExample {
 
-    public String name;
-    public String contentType;
-    public Example example;
+    private String name;
+    private String contentType;
+    private Example example;
 
-    public BoatExample(Example value) {
-        this.example = value;
-    }
-
-    public BoatExample(String key, String ContentType, Example value) {
+    public BoatExample(String key, String contentType, Example value) {
         this.name = key;
+        this.contentType = contentType;
         this.example = value;
-
     }
+
+
 }
