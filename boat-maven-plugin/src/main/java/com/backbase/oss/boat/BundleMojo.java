@@ -12,8 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -26,6 +27,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /*
   Bundles all references in the OpenAPI specification into one file.
  */
+@Getter
+@Setter
 public class BundleMojo extends AbstractMojo {
 
     @Parameter(name = "input", required = true)
@@ -54,7 +57,7 @@ public class BundleMojo extends AbstractMojo {
         log.info("Bundling OpenAPI: {} to: {}", input, output);
 
         if (input.isDirectory() && output.getName().endsWith(".yaml")) {
-            throw new MojoFailureException("Both input and output need to be either a directory or a file.");
+            throw new MojoExecutionException("Both input and output need to be either a directory or a file.");
         }
 
         File[] inputFiles;
