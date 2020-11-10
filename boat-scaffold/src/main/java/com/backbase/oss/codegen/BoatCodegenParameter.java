@@ -21,7 +21,9 @@ public class BoatCodegenParameter extends CodegenParameter {
 
     public List<BoatExample> examples;
 
-    public boolean hasDefaultValue() { return StringUtils.isNotEmpty(defaultValue);}
+    public boolean hasDefaultValue() {
+        return StringUtils.isNotEmpty(defaultValue);
+    }
 
     public boolean hasSingleExample() {
         return example != null;
@@ -183,12 +185,17 @@ public class BoatCodegenParameter extends CodegenParameter {
             Object example = mediaType.getExample();
             BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example));
             if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
-                String ref = ((ObjectNode) example).get("$ref").asText();
-                ref = StringUtils.substringAfterLast(ref, "/");
-                boatExample.getExample().set$ref(ref);
+                boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
             }
             examples.add(boatExample);
-        }             // dereference examples
+        }
+        if (mediaType.getExamples() != null) {
+            mediaType.getExamples().forEach((key, example) -> {
+                BoatExample boatExample = new BoatExample(key, contentType, example);
+                examples.add(boatExample);
+            });
+        }
+        // dereference examples
         examples.stream().filter(boatExample -> boatExample.getExample().get$ref() != null)
             .forEach(boatExample -> {
                 String ref = StringUtils.substringAfterLast(boatExample.getExample().get$ref(), "/");
