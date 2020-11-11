@@ -4,7 +4,7 @@
 
 
 * {
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", sans-serif!important;
 }
 
 #methodsubtable>tbody>tr>td:first-child {
@@ -60,6 +60,7 @@ h2 {
   margin: 0 0 20px 0;
   padding: 0;
 }
+
 
 #project {
   margin-bottom: 16px;
@@ -168,6 +169,21 @@ article h4 {
   margin-bottom: 10px;
 }
 
+article h1,article h2 {
+border-bottom: 1px solid #e3e3e3;
+padding-bottom: 8px;
+margin-bottom: 16px;
+display: flex;
+}
+
+article h1 span {
+  color: #909090;
+  margin-left: 24px;
+  font-size: 18px;
+  font-weight: lighter;
+}
+
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -269,7 +285,7 @@ pre.language-json {
 }
 
 pre.language-html{
-  margin: 40px 0 20px 0;
+  margin: 68px 0 20px 0;
 }
 
 pre.language-html:before{
@@ -306,6 +322,11 @@ span.language-html[data-type="post"]{
 pre.language-html[data-type="delete"]:before,
 span.language-html[data-type="delete"]{
   background-color: #ed0039;
+}
+
+pre.language-html[data-type="patch"]:before,
+span.language-html[data-type="patch"]{
+background-color: #3387CC;
 }
 
 pre.language-api .str {
@@ -356,7 +377,7 @@ pre code.sample-request-response-json {
 .sidenav > li > a {
   display: block;
   margin: 0;
-  padding: 2px 11px;
+  padding: 8px 11px;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-size: 14px;
