@@ -23,6 +23,8 @@ import org.openapitools.codegen.CodegenResponse;
 
 @Slf4j
 public class BoatDocsGenerator extends org.openapitools.codegen.languages.StaticHtml2Generator {
+    public static final String NAME = "boat-docs";
+
     protected Boolean generateAliasModel = true;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -32,7 +34,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
     public BoatDocsGenerator() {
         super();
-        embeddedTemplateDir = templateDir = "boat-docs";
+        embeddedTemplateDir = templateDir = NAME;
         cliOptions.add(new CliOption(CodegenConstants.GENERATE_ALIAS_AS_MODEL, CodegenConstants.GENERATE_ALIAS_AS_MODEL));
         additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, generateAliasModel);
     }
@@ -91,6 +93,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
     @Override
     public String getName() {
-        return "boat-docs";
+        return NAME;
     }
 }
