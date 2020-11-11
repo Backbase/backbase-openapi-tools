@@ -62,7 +62,7 @@ public class BoatDocsTest {
 
     @Test
     public void testGenerateDocsQuery() {
-        System.setProperty("spec", getFile("oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
+        System.setProperty("spec", getFile("/oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
         generateDocs();
     }
 
