@@ -1,0 +1,26 @@
+openapi: "3.0.3"
+info:
+  version: 2.0.0
+  title: Another
+  license:
+    name: MIT
+paths:
+  '/client-api/v2/ones':
+    get:
+      summary: List all ones
+      operationId: listOnes
+      responses:
+        '200':
+          description: A paged array of ones
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/V2Ones"
+components:
+  schemas:
+    V2Ones:
+      type: object
+      properties:
+        -code:
+          type: string
+          description: The id of this one but named code which is a breaking change.
