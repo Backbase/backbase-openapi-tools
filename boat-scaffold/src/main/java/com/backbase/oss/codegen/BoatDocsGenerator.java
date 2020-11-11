@@ -73,7 +73,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
                         List<BasicNameValuePair> params = values.stream()
                             .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
                             .collect(Collectors.toList());
-                        parameter.setExample(URLEncodedUtils.format(params, Charset.defaultCharset()));
+                        codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
                     } catch (IOException e) {
                         log.warn("Failed to format query string parameter: {}", codegenParameter.example);
                     }

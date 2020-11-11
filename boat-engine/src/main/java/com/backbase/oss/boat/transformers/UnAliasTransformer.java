@@ -95,6 +95,10 @@ public class UnAliasTransformer implements Transformer {
     }
 
     private static Boolean isAliasOfSimpleTypes(Schema schema) {
+        if (schema.getType() == null) {
+            // is this an object - because then it is not an alias for a simple type?
+            return !(schema.getProperties() != null && !schema.getProperties().isEmpty());
+        }
         return !NON_ALIAS_TYPES.contains(schema.getType());
     }
 }
