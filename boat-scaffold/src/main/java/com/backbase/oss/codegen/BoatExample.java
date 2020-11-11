@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
-import lombok.SneakyThrows;
-import lombok.ToString;
 
 @Data
 public class BoatExample {
@@ -27,7 +25,7 @@ public class BoatExample {
         this.example = value;
     }
 
-    public String prettyPrintValue() {
+    public String getPrettyPrintValue() {
         String s = null;
         try {
             s = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(example.getValue());
