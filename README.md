@@ -24,6 +24,8 @@ BOAT is still under development and subject to change.
 * Created HTML templates for boat-docs
 * Pretty Print JSON Examples
 
+* * Spring Generator*
+  * Restored `HttpServletRequest` parameter (regression).
 
 ## 0.6.0
 * simple fix to check for null value in openApi.getComponents().getSchemas()
