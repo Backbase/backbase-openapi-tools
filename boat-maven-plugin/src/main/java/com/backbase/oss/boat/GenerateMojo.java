@@ -39,7 +39,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -559,8 +558,6 @@ public class GenerateMojo extends AbstractMojo {
             if (isNotEmpty(generatorName)) {
                 if ("spring".equals(generatorName)) {
                     configurator.setGeneratorName("spring-boat");
-                }else if ("html2".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.StaticHtml2Generator.class.getName());
                 } else {
                     configurator.setGeneratorName(generatorName);
                 }
