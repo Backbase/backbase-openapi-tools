@@ -1,8 +1,10 @@
 <tr>
     <td style="width:150px;">
-        <span>{{baseName}}</span>{{^required}}{{/required}}{{#required}}<div class="inner required">
-        Required
-    </div>{{/required}}</td>
+        <span>{{baseName}}</span>{{^required}}{{/required}}
+        {{#required}}
+            <div class="inner required">*</div>
+        {{/required}}
+    </td>
     <td>
         <div>
         <span class="format">{{dataTypeDisplayName}}</span>
