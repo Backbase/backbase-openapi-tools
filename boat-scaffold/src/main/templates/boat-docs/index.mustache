@@ -157,6 +157,7 @@
 
     {{>css_bootstrap}}
     {{>css_prettify}}
+      {{>css_json_schema_view}}
 
     {{>styles}}
   </style>
@@ -205,9 +206,14 @@
                   <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
                   {{#operation}}
                     <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                        <a href="#api-{{baseName}}-{{nickname}}">
+                        <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
                             <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
-                            {{nickname}}
+                            {{#summary}}
+                                {{summary}}
+                            {{/summary}}
+                            {{^summary}}
+                                {{nickname}}
+                            {{/summary}}
                         </a>
                     </li>
                   {{/operation}}
@@ -221,14 +227,14 @@
         <div id="project">
           <div class="pull-left">
             <h1>{{{appName}}}</h1>
+              {{#version}}
+                  <div class="app-desc">Version: {{{version}}}</div>
+              {{/version}}
           </div>
           <div class="clearfix"></div>
         </div>
         <div id="header">
           <div id="api-_">
-            {{#version}}
-              <div class="app-desc">Version: {{{version}}}</div>
-            {{/version}}
             <div id="app-description" class="app-desc">
                 {{{appDescription}}}
             </div>
@@ -243,11 +249,11 @@
                   {{#operation}}
                     <div id="api-{{baseName}}-{{nickname}}">
                       <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                        <div class="pull-left">
-                            {{#summary}}<h1>{{.}}</h1>{{/summary}}
-                            {{#description}}<p>{{description}}</p>{{/description}}
+                          <div class="pull-left">
+                              {{#summary}}<h1>{{.}}</h1>{{/summary}}
+                              {{#description}}<p>{{description}}</p>{{/description}}
 
-                        </div>
+                          </div>
 
                           <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -461,7 +467,7 @@
                                           </tr>
                                           {{#headers}}
                                               <tr>
-                                                  <td>{{#name}}{{name}}{{/name}}</td>
+                                                  <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
                                                   <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
                                                   <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
                                                   <td>{{#description}}{{description}}{{/description}}</td>
