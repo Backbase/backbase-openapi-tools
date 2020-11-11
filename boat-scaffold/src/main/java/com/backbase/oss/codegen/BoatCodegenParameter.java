@@ -19,7 +19,8 @@ import org.openapitools.codegen.CodegenParameter;
 @ToString(callSuper = true)
 public class BoatCodegenParameter extends CodegenParameter {
 
-    public List<BoatExample> examples;
+    private List<BoatExample> examples;
+    private String dataTypeDisplayName;
 
     public boolean hasDefaultValue() {
         return StringUtils.isNotEmpty(defaultValue);
@@ -32,8 +33,6 @@ public class BoatCodegenParameter extends CodegenParameter {
     public boolean hasExamples() {
         return examples != null && !examples.isEmpty();
     }
-
-    public String dataTypeDisplayName;
 
     public BoatCodegenParameter() {
         super();
@@ -90,10 +89,10 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.pattern = codegenParameter.pattern;
 
         if (codegenParameter._enum != null) {
-            output._enum = new ArrayList<String>(codegenParameter._enum);
+            output._enum = new ArrayList<>(codegenParameter._enum);
         }
         if (codegenParameter.allowableValues != null) {
-            output.allowableValues = new HashMap<String, Object>(codegenParameter.allowableValues);
+            output.allowableValues = new HashMap<>(codegenParameter.allowableValues);
         }
         if (codegenParameter.items != null) {
             output.items = codegenParameter.items;
@@ -102,7 +101,7 @@ public class BoatCodegenParameter extends CodegenParameter {
             output.mostInnerItems = codegenParameter.mostInnerItems;
         }
         if (codegenParameter.vendorExtensions != null) {
-            output.vendorExtensions = new HashMap<String, Object>(codegenParameter.vendorExtensions);
+            output.vendorExtensions = new HashMap<>(codegenParameter.vendorExtensions);
         }
         output.hasValidation = codegenParameter.hasValidation;
         output.isNullable = codegenParameter.isNullable;
@@ -150,7 +149,7 @@ public class BoatCodegenParameter extends CodegenParameter {
 
     static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
-        // Copy Parameter Examples if applicable\
+        // Copy Parameter Examples if applicable
         if (parameter.getExamples() != null) {
             boatCodegenParameter.examples = parameter.getExamples().entrySet().stream()
                 .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(), null, stringExampleEntry.getValue()))
@@ -158,9 +157,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         }
 
         if (parameter.getContent() != null) {
-            parameter.getContent().forEach((contentType, mediaType) -> {
-                dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType);
-            });
+            parameter.getContent().forEach((contentType, mediaType) ->
+                dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
 
         }
         return boatCodegenParameter;
@@ -169,9 +167,8 @@ public class BoatCodegenParameter extends CodegenParameter {
     //
     public static CodegenParameter fromCodegenParameter(CodegenParameter codegenParameter, RequestBody body, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
-        body.getContent().forEach((contentType, mediaType) -> {
-            dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType);
-        });
+        body.getContent().forEach((contentType, mediaType) ->
+            dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
         return boatCodegenParameter;
     }
 
@@ -208,5 +205,21 @@ public class BoatCodegenParameter extends CodegenParameter {
                 }
             });
         boatCodegenParameter.examples.addAll(examples);
+    }
+
+    public List<BoatExample> getExamples() {
+        return examples;
+    }
+
+    public void setExamples(List<BoatExample> examples) {
+        this.examples = examples;
+    }
+
+    public String getDataTypeDisplayName() {
+        return dataTypeDisplayName;
+    }
+
+    public void setDataTypeDisplayName(String dataTypeDisplayName) {
+        this.dataTypeDisplayName = dataTypeDisplayName;
     }
 }
