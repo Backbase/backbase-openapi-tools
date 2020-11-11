@@ -60,6 +60,13 @@ public class BoatDocsTest {
         generateDocs();
     }
 
+    @Test
+    public void testGenerateDocsQuery() {
+        System.setProperty("spec", getFile("oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
+        generateDocs();
+    }
+
+
     protected File getFile(String name) {
         URL resource = getClass().getResource(name);
         assert resource != null;
