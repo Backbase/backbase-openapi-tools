@@ -1,0 +1,26 @@
+openapi: "3.0.0"
+info:
+  version: 1.3.5
+  title: Another
+  license:
+    name: MIT
+paths:
+  '/client-api/v1/ones':
+    get:
+      summary: List all ones
+      operationId: listOnes
+      responses:
+        '200':
+          description: A paged array of ones
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ones"
+components:
+  schemas:
+    Ones:
+      type: object
+      properties:
+        -id:
+          type: string
+          description: The id of this one.

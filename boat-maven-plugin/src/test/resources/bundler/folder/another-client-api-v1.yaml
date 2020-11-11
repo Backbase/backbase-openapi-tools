@@ -1,0 +1,29 @@
+openapi: "3.0.0"
+info:
+  version: 1.7.9
+  title: Another
+  license:
+    name: MIT
+paths:
+  '/client-api/v1/other-ones':
+    get:
+      summary: List all other ones
+      operationId: listOtherOnes
+      responses:
+        '200':
+          description: A paged array of other ones
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtherOnes"
+components:
+  schemas:
+    OtherOnes:
+      type: object
+      properties:
+        -id:
+          type: string
+          description: The id of this one.
+        -oneId:
+          type: string
+          description: The id of the original One
