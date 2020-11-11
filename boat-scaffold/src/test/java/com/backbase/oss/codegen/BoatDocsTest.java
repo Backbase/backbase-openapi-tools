@@ -5,11 +5,13 @@ import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 
@@ -38,25 +40,45 @@ public class BoatDocsTest {
             while ((key = watcher.take()) != null) {
                 for (WatchEvent<?> event : key.pollEvents()) {
                     System.out.println("Event kind:" + event.kind() + ". File affected: " + event.context() + ".");
-                    generateDocs();
+                    new Thread(BoatDocsTest::generateDocs).start();
+
                 }
                 key.reset();
 
             }
 
 
-        } catch (IOException | InterruptedException | OpenAPILoaderException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
     }
 
-    private static void generateDocs() throws OpenAPILoaderException {
+    @Test
+    public void testGenerateDocs() {
+        System.setProperty("spec", getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml").getAbsolutePath());
+        generateDocs();
+    }
+
+    protected File getFile(String name) {
+        URL resource = getClass().getResource(name);
+        assert resource != null;
+        return new File(resource.getFile());
+    }
+
+
+    private static void generateDocs() {
 
 
         File spec = new File(System.getProperty("spec"));
 
-        OpenAPI openAPI = OpenAPILoader.load(spec, true, true);
+        OpenAPI openAPI = null;
+        try {
+            openAPI = OpenAPILoader.load(spec, true, true);
+        } catch (OpenAPILoaderException e) {
+            log.error("Failed to load open api: {}", spec, e);
+            System.exit(1);
+        }
         BoatDocsGenerator codegenConfig = new BoatDocsGenerator();
 
         codegenConfig.setSkipOverwrite(false);
@@ -66,7 +88,8 @@ public class BoatDocsTest {
         File output = new File(codegenConfig.getOutputDir());
 
 
-        log.info("Clearing output: {}, {}", output, output.delete());
+
+//        log.info("Clearing output: {}, {}", output);
 
 
         ClientOptInput input = new ClientOptInput();
