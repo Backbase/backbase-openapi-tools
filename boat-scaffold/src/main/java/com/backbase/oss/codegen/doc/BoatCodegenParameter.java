@@ -1,4 +1,4 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.doc;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +18,15 @@ import org.openapitools.codegen.CodegenParameter;
 
 @Slf4j
 @ToString(callSuper = true)
+@Data
 public class BoatCodegenParameter extends CodegenParameter {
 
     private List<BoatExample> examples;
     private String dataTypeDisplayName;
+
+    private Parameter parameter;
+
+    private RequestBody requestBody;
 
     public boolean hasDefaultValue() {
         return StringUtils.isNotEmpty(defaultValue);
@@ -130,6 +136,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (codegenParameter instanceof BoatCodegenParameter) {
             output.examples = ((BoatCodegenParameter) codegenParameter).examples;
             output.dataTypeDisplayName = ((BoatCodegenParameter) codegenParameter).dataTypeDisplayName;
+            output.parameter = ((BoatCodegenParameter)codegenParameter).parameter;
+            output.setRequestBody(((BoatCodegenParameter) codegenParameter).requestBody);
         } else {
             if (output.dataType != null && output.dataType.startsWith("array")) {
                 output.dataTypeDisplayName = "array of " + output.baseType.toLowerCase() + "s";
@@ -149,6 +157,7 @@ public class BoatCodegenParameter extends CodegenParameter {
 
     static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
+        boatCodegenParameter.parameter = parameter;
         // Copy Parameter Examples if applicable
         if (parameter.getExamples() != null) {
             boatCodegenParameter.examples = parameter.getExamples().entrySet().stream()
@@ -167,6 +176,7 @@ public class BoatCodegenParameter extends CodegenParameter {
     //
     public static CodegenParameter fromCodegenParameter(CodegenParameter codegenParameter, RequestBody body, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
+        boatCodegenParameter.setRequestBody(body);
         body.getContent().forEach((contentType, mediaType) ->
             dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
         return boatCodegenParameter;
@@ -207,19 +217,4 @@ public class BoatCodegenParameter extends CodegenParameter {
         boatCodegenParameter.examples.addAll(examples);
     }
 
-    public List<BoatExample> getExamples() {
-        return examples;
-    }
-
-    public void setExamples(List<BoatExample> examples) {
-        this.examples = examples;
-    }
-
-    public String getDataTypeDisplayName() {
-        return dataTypeDisplayName;
-    }
-
-    public void setDataTypeDisplayName(String dataTypeDisplayName) {
-        this.dataTypeDisplayName = dataTypeDisplayName;
-    }
 }

@@ -1,9 +1,10 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.doc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +31,7 @@ public class BoatExample {
 
     public String getPrettyPrintValue() {
         if (example.getValue() instanceof JsonNode) {
-            try {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(example.getValue());
-            } catch (JsonProcessingException e) {
-                log.error("Failed to pretty print example: {}", example.getValue(), e);
-                return example.getValue().toString();
-            }
+            return Json.pretty(example.getValue());
         } else {
             return example.getValue().toString();
         }

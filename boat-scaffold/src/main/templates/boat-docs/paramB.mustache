@@ -13,6 +13,7 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema">
+            <div class="tab-pane active" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema-json-view"></div>
             <div class="exampleStyle" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema-data">
                 <script>
                     $(document).ready(function() {
@@ -32,6 +33,7 @@
                         }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
                             schema.items = defsParser.$refs.get(schema.items.$ref);
                         } else {
+
                             schemaWrapper.definitions = Object.assign({}, defs);
                             $RefParser.dereference(schemaWrapper).catch(function(err) {
                                 console.log(err);
@@ -56,9 +58,11 @@
                             });
                         }
 
+                        console.log("Request Body: {{nickname}}  ", schema);
+
                         var view = new JSONSchemaView(schema,2,{isBodyParam: true});
                         $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
-                        var result = $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema');
+                        var result = $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-json-view');
                         result.empty();
                         result.append(view.render());
                     });
