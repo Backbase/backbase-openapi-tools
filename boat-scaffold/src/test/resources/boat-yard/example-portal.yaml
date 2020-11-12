@@ -1,0 +1,50 @@
+portals:
+  - key: "boat"
+    title: "Backbase OpenAPI Tools - Developer Portal"
+    subTitle: "Collect all your BOAT Docs in a Marina"
+    navTitle: "BOAT Developer Portal"
+    logoUrl: "static/images/BB_logo_redwhite.svg"
+    logoLink: https://backbase.github.io/backbase-openapi-tools/
+    version: 1.0.0
+    capabilities:
+      - key: boat-wharf
+        title: "Backbase OpenAPI Tools WHARF"
+        navTitle: "BOAT :: Wharf"
+        subTitle: "Web Hub Application Resource Files"
+        services:
+          - key: boat-wharf-api-manager
+            title: API manager
+            specs:
+              - key: client-api
+                title: Client API
+                openApiUrl: "oas-examples/petstore.yaml"
+              - key: service-api
+                title: Service API
+                openApiUrl: "oas-examples/petstore-query-string-array.yaml"
+          - key: boat-wharf-linting-rules-manager
+            title: Link rules manager
+            specs:
+              - key: client-api
+                title: Inbound API
+                openApiUrl: "oas-examples/petstore.yaml"
+      - key: boat-quay
+        title: "Backbase Open API Tools QUAY"
+        navTitle: "BOAT :: QUAY"
+        subTitle: "QUAlitY"
+        services:
+          - key: boat-quay-client-api
+            title: QUAY Client API
+            specs:
+              - key: client-api
+                title: Integration API
+                openApiUrl: "psd2/psd2-api-1.3.5-20191216v1.yaml"
+              - key: service-api
+                title: Service API
+                openApiUrl: "oas-examples/petstore-query-string-array.yaml"
+          - key: boat-quay-service-api
+            title: QUAY Service API
+            specs:
+              - key: client-api
+                title: External API
+                openApiUrl: "oas-examples/petstore.yaml"
+
