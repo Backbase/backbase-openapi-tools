@@ -9,7 +9,7 @@
   {{>js_jquery}}
   {{>js_prettify}}
   {{>js_bootstrap}}
-  {{>marked}}
+  {{>js_marked}}
   <script>
 
       if (!library)
@@ -162,14 +162,15 @@
   </style>
 </head>
 <body>
+
+
+
   <script>
     // Script section to load models into a JS Var
     var defs = {}
     {{#models}}
     {{#model}}
     <!-- Sometimes classname is referred.. -->
-    defs["{{classname}}"] = {{{modelJson}}};
-    <!-- Sometimes name is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
     <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
@@ -220,7 +221,9 @@
               {{/apis}}
             {{/apiInfo}}
           </ul>
+
         </nav>
+
       </div>
       <div id="content">
         <div id="project">
@@ -313,6 +316,7 @@
                           {{#hasBodyParam}}
                               <h2>Request Body Schema</h2>
                               {{#bodyParams}}
+
                                   {{>paramB}}
                               {{/bodyParams}}
 

@@ -1,11 +1,16 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.java;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
+
 import java.io.IOException;
 import java.io.Writer;
+import java.util.stream.IntStream;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +21,9 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
-public class SpringBoatCodeGen extends SpringCodegen {
+public class BoatSpringCodeGen extends SpringCodegen {
+    public static final String NAME = "boat-spring";
+
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
@@ -24,13 +31,13 @@ public class SpringBoatCodeGen extends SpringCodegen {
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
 
-    static private class NewLineIndent implements Mustache.Lambda {
+    static class NewLineIndent implements Mustache.Lambda {
         private final int level;
-        private final int space;
+        private final String prefix;
 
         NewLineIndent(int level, String space) {
             this.level = level;
-            this.space = Character.codePointAt(space, 0);
+            this.prefix = IntStream.range(0, this.level).mapToObj(n -> space).collect(joining());
         }
 
         @Override
@@ -41,9 +48,36 @@ public class SpringBoatCodeGen extends SpringCodegen {
                 return;
             }
 
-            out.write(System.lineSeparator());
-            out.write(StringUtils.repeat(new String(Character.toChars(this.space)), this.level));
-            out.write(text);
+            final String[] lines = splitLines(text);
+            final int indent = minIndent(lines);
+
+            for (final String line : lines) {
+                out.write(this.prefix);
+                out.write(StringUtils.substring(line, indent));
+                out.write(System.lineSeparator());
+            }
+        }
+
+        private String[] splitLines(final String text) {
+            return stream(text.split("\\r\\n|\\n"))
+                .map(s -> s.replaceFirst("\\s+$", ""))
+                .toArray(String[]::new);
+        }
+
+        private int minIndent(String[] lines) {
+            return stream(lines)
+                .filter(StringUtils::isNotBlank)
+                .map(s -> s.replaceFirst("\\s+$", ""))
+                .map(NewLineIndent::indentLevel)
+                .min(Integer::compareTo)
+                .orElse(0);
+        }
+
+        static int indentLevel(String text) {
+            return IntStream
+                .range(0, text.replaceFirst("\\s+$", text).length())
+                .filter(n -> !Character.isWhitespace(text.charAt(n)))
+                .findFirst().orElse(0);
         }
     }
 
@@ -86,8 +120,8 @@ public class SpringBoatCodeGen extends SpringCodegen {
     @Getter
     protected boolean useWithModifiers;
 
-    public SpringBoatCodeGen() {
-        this.embeddedTemplateDir = this.templateDir = "JavaSpringBoat";
+    public BoatSpringCodeGen() {
+        this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
@@ -107,7 +141,7 @@ public class SpringBoatCodeGen extends SpringCodegen {
 
     @Override
     public String getName() {
-        return "spring-boat";
+        return NAME;
     }
 
     @Override
