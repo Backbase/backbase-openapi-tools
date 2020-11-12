@@ -26,7 +26,7 @@ public class GeneratorTests {
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-        GenerateMojo mojo = new GenerateMojo();
+        GenerateDocMojo mojo = new GenerateDocMojo();
         File input = new File(spec);
         File output = new File("target/boat-docs");
         if (!output.exists()) {
@@ -39,7 +39,6 @@ public class GeneratorTests {
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
         mojo.project = new MavenProject();
-        mojo.generatorName = "boat-docs";
         mojo.inputSpec = input.getAbsolutePath();
         mojo.output = output;
         mojo.skip = false;

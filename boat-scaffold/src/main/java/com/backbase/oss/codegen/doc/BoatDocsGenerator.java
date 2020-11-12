@@ -113,14 +113,14 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
         CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
-        log.info("Created CodegenParameter model for parameter: {}", parameter.getName());
+        log.debug("Created CodegenParameter model for parameter: {}", parameter.getName());
         return BoatCodegenParameter.fromCodegenParameter(parameter, codegenParameter, openAPI);
     }
 
     @Override
     public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
         CodegenParameter codegenParameter = super.fromRequestBody(body, imports, bodyParameterName);
-        log.info("Created CodegenParameter model for request body: {} with bodyParameterName: {}", codegenParameter.baseName, bodyParameterName);
+        log.debug("Created CodegenParameter model for request body: {} with bodyParameterName: {}", codegenParameter.baseName, bodyParameterName);
         return BoatCodegenParameter.fromCodegenParameter(codegenParameter, body, openAPI);
     }
 
@@ -134,7 +134,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public CodegenModel fromModel(String name, Schema schema) {
         CodegenModel codegenModel = super.fromModel(name, schema);
-        log.info("Created CodegenModel for name: {}, schema: {} resulting in: {}", name, schema.getName(), codegenModel.getName());
+        log.debug("Created CodegenModel for name: {}, schema: {} resulting in: {}", name, schema.getName(), codegenModel.getName());
         codegenModel.isAlias = false;
         return codegenModel;
     }
