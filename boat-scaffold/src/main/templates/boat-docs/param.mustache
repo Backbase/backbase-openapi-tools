@@ -7,17 +7,33 @@
     </td>
     <td>
         <div>
-            <span class="format">{{dataTypeDisplayName}}</span>
+            <span class="datatype">{{dataTypeDisplayName}} <span class="format">{{format}}</span> </span>
+            {{#pattern}}
+                <span>pattern:</span> pattern: <span class="pattern">{{.}}</span>
+            {{/pattern}}
+
+            {{#minLength}}
+                <span>&lt;&equals; {{.}} characters</span>
+            {{/minLength}}
             {{#maxLength}}
                 <span>&lt;&equals; {{.}} characters</span>
             {{/maxLength}}
+            {{#exclusiveMaximum}}
+                <span>exclusive maximum {{.}}</span>
+            {{/exclusiveMaximum}}
+            {{#exclusiveMinimum}}
+                <span>exclusive minimum {{.}}</span>
+            {{/exclusiveMinimum}}
+            {{#isRange}}
+                <span class="range">minimum: {{mininum}} maximum: {{maximum}}</span>
+            {{/isRange}}
+
         </div>
         {{#isEnum}}
             <div>Items Enum: {{#allowableValues}}
                 {{#enumVars}}
                     <code>{{name}}</code>
                 {{/enumVars}}
-
             {{/allowableValues}}
             </div>
         {{/isEnum}}
