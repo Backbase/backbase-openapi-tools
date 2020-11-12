@@ -1,14 +1,17 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.doc;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +21,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenResponse;
 
@@ -37,17 +41,86 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
         embeddedTemplateDir = templateDir = NAME;
         cliOptions.add(new CliOption(CodegenConstants.GENERATE_ALIAS_AS_MODEL, CodegenConstants.GENERATE_ALIAS_AS_MODEL));
         additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, generateAliasModel);
+        additionalProperties.put("appName", "OpenAPI Sample");
+        additionalProperties.put("appDescription", "A sample OpenAPI server");
+        additionalProperties.put("infoUrl", "https://backbase.github.io/backbase-openapi-tools/");
+        additionalProperties.put("infoEmail", "oss@backbase.com");
+        additionalProperties.put("licenseInfo", "All rights reserved");
+        additionalProperties.put("licenseUrl", "http://apache.org/licenses/LICENSE-2.0.html");
+        typeAliases = new HashMap<>();
+    }
+
+
+
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        log.info("Preprocessing OpenAPI to get rid of wierd states");
+        openAPI.getComponents().getSchemas().forEach((key, schema) -> {
+            if(schema.get$ref() != null && schema.getType() == null) {
+                log.warn("Schema: {} has $ref set to: {} but no type set. Getting type from referred schema", key, schema.get$ref());
+                String ref = schema.get$ref();
+                if(!ref.startsWith("#/components/schemas/"))
+                    throw new RuntimeException("Schema reference: " + ref + " must be in components/schemas!");
+                ref = StringUtils.substringAfterLast(ref, "/");
+                Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
+                if(referredSchema.getType() == null) {
+                    throw new RuntimeException("Cannot get type from schema: " + ref);
+                }
+                // Copy over properties from referred schema
+                schema.setProperties(referredSchema.getProperties());
+                schema.setType(referredSchema.getType());
+            }
+        });
+    }
+
+    @Override
+    public String toModelName(String name) {
+        String modelName = super.toModelName(name);
+        if(!name.equals(modelName)) {
+            log.debug("NOT converting toModelName: {} to: {}", name, modelName);
+        }
+        return name;
+    }
+
+    @Override
+    public String toVarName(String name) {
+        String varName = super.toVarName(name);
+        if(!name.equals(varName)) {
+            log.debug("NOT converting varName: {} to: {}", name, varName);
+        }
+        return name;
+    }
+
+    @Override
+    public String toApiVarName(String name) {
+        String apiVarName = super.toApiVarName(name);
+        if (!name.equals(apiVarName)) {
+            log.debug("NOT converting apiVarName: {} to: {}", name, apiVarName);
+        }
+        return name;
+    }
+
+    @Override
+    public String toParamName(String name) {
+        String paramName =  super.toParamName(name);
+        if (!name.equals(paramName)) {
+            log.debug("NOT converting apiVarName: {} to: {}", name, paramName);
+        }
+        return name;
     }
 
     @Override
     public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
         CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
+        log.info("Created CodegenParameter model for parameter: {}", parameter.getName());
         return BoatCodegenParameter.fromCodegenParameter(parameter, codegenParameter, openAPI);
     }
 
     @Override
     public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
         CodegenParameter codegenParameter = super.fromRequestBody(body, imports, bodyParameterName);
+        log.info("Created CodegenParameter model for request body: {} with bodyParameterName: {}", codegenParameter.baseName, bodyParameterName);
         return BoatCodegenParameter.fromCodegenParameter(codegenParameter, body, openAPI);
     }
 
@@ -58,10 +131,15 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
         return r;
     }
 
+    @Override
+    public CodegenModel fromModel(String name, Schema schema) {
+        CodegenModel codegenModel = super.fromModel(name, schema);
+        log.info("Created CodegenModel for name: {}, schema: {} resulting in: {}", name, schema.getName(), codegenModel.getName());
+        codegenModel.isAlias = false;
+        return codegenModel;
+    }
 
-
-
-//    @Override
+    //    @Override
     public void setParameterExampleValue(CodegenParameter codegenParameter, Parameter parameter) {
         super.setParameterExampleValue(codegenParameter, parameter);
 
@@ -85,11 +163,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
                 break;
         }
     }
-//
-//    @Override
-//    public void setParameterExampleValue(CodegenParameter codegenParameter, RequestBody requestBody) {
-//        super.setParameterExampleValue(codegenParameter, requestBody);
-//    }
 
     @Override
     public String getName() {
