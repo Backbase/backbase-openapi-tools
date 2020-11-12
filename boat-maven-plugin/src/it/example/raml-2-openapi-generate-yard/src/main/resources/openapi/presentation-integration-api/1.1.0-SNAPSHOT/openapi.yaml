@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Example
+  description: "# Example\nTest Schema to test an integration-api\n\n# Disclaimer\n\
+    \                        This API is converted from RAML1.0 using the boat-maven-plugin.\n\
+    # Changelog\n## 1.1.0-SNAPSHOT - 1.1.0-SNAPSHOT\n**Note:** API has incompatible\
+    \ changes!!\n#### What's New\n---\n\n##### `GET` /integration-api/v1/items\n\n\
+    > Retrieve list of all items.\n\n#### What's Deleted\n---\n\n##### `GET` /service-api/v1/wallet/admin/{userId}/paymentcards\n\
+    \n> Returns available payment card details for user, optionally filtered by nameOnCard.\n\
+    \n##### `POST` /service-api/v1/wallet/admin/{userId}/paymentcards\n\n> Adds a\
+    \ payment card to the user's wallet.\n\n##### `GET` /service-api/v1/wallet/admin/{userId}/paymentcards/{cardId}\n\
+    \n> Returns details of a specific payment card.\n\n##### `DELETE` /service-api/v1/wallet/admin/{userId}/paymentcards/{cardId}\n\
+    \n> Deletes a payment card with a given id.\n\n##### `GET` /service-api/v1/testQuery/required-boolean-query-param\n\
+    \n\n"
+  version: 1.1.0-SNAPSHOT
+  x-logo:
+    altText: Backbase
+    url: http://www.backbase.com/wp-content/uploads/2017/04/backbase-logo-png.png
+servers:
+- url: /raml-service/
+  description: The server
+tags:
+- name: example
+paths:
+  /integration-api/v1/items:
+    summary: items
+    description: Retrieve all items.
+    get:
+      tags:
+      - items
+      summary: Retrieve list of all items.
+      description: Retrieve list of all items.
+      operationId: getitems
+      responses:
+        "200":
+          description: Test Schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                example:
+                  value:
+                    name: Example
+                    description: Example description
+components:
+  schemas:
+    ItemsGetResponseBody:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      description: this models a simple item.
+      example:
+        name: Example
+        description: Example description
+    inline_response_200:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      description: this models a simple item.
+      example:
+        name: Example
+        description: Example description
+x-compared: true
