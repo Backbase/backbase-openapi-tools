@@ -1,0 +1,46 @@
+portals:
+  - key: "boat"
+    title: "Backbase OpenAPI Tools - Developer Portal"
+    subTitle: "My milkshake brings all the boats to the yard"
+    navTitle: "BOAT Developer Portal"
+    logoUrl: "static/images/BB_logo_redwhite.svg"
+    logoLink: https://backbase.github.io/backbase-openapi-tools/
+    version: 1.0.0
+    capabilities:
+      - key: boat-wharf
+        title: "Backbase OpenAPI Tools WHARF"
+        navTitle: "BOAT :: Wharf"
+        subTitle: "Web Hub Application Resource Files"
+        services:
+          - key: boat-wharf-api-manager
+            title: API manager
+            specs:
+              - key: 1.1.0
+                title: Client API 1.1.0
+                openApiUrl: "openapi/presentation-client-api/1.1.0-SNAPSHOT/openapi.yaml"
+              - key: 1.2.0
+                title: Client API 1.2.0
+                openApiUrl: "openapi/presentation-client-api/1.2.0-SNAPSHOT/openapi.yaml"
+      - key: boat-quay
+        title: "Backbase Open API Tools QUAY"
+        navTitle: "BOAT :: QUAY"
+        subTitle: "QUAlitY"
+        services:
+          - key: boat-quay-client-api
+            title: QUAY Client API
+            specs:
+              - key: 1.1.0
+                title: Integration API 1.1.0
+                openApiUrl: "openapi/presentation-integration-api/1.1.0-SNAPSHOT/openapi.yaml"
+              - key: 1.2.0
+                title: Integration API 1.2.0
+                openApiUrl: "openapi/presentation-integration-api/1.2.0-SNAPSHOT/openapi.yaml"
+          - key: boat-quay-service-api
+            title: QUAY Service API
+            specs:
+              - key: 1.1.0
+                title: Service API 1.1.0
+                openApiUrl: "openapi/presentation-service-api/1.1.0-SNAPSHOT/openapi.yaml"
+              - key: 1.2.0
+                title: Service API 1.2.0
+                openApiUrl: "openapi/presentation-service-api/1.2.0-SNAPSHOT/openapi.yaml"

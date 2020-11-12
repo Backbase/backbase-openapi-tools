@@ -26,6 +26,7 @@ BOAT is still under development and subject to change.
 * Added boat:doc mojo for generating beautiful HTML2 docs
 * * Spring Generator*
   * Restored `HttpServletRequest` parameter (regression).
+* Added boat:yard to create static website based on a collection of specs
 
 ## 0.6.0
 * simple fix to check for null value in openApi.getComponents().getSchemas()
