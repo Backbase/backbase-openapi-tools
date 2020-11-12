@@ -1,53 +1,34 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-@Slf4j
 public class GeneratorTests {
 
     @Test
-    @Ignore
-    public void testBundleSpec() throws MojoExecutionException {
-        GenerateMojo mojo = new GenerateMojo();
-
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.generatorName = "html2";
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.execute();
+    public void testDereference() throws OpenAPILoaderException {
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        OpenAPI load = OpenAPILoader.load(new File(spec), true, false);
+        System.out.println(load.toString());
 
     }
 
     @Test
-    public void testHTML2() throws MojoExecutionException {
-        GenerateMojo mojo = new GenerateMojo();
+    public void testBoatDocs() throws MojoExecutionException {
 
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target");
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs");
         if (!output.exists()) {
             output.mkdirs();
         }
@@ -58,40 +39,14 @@ public class GeneratorTests {
         mojo.getLog();
         mojo.buildContext = defaultBuildContext;
         mojo.project = new MavenProject();
-        mojo.generatorName = "html2";
         mojo.inputSpec = input.getAbsolutePath();
         mojo.output = output;
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
-
     }
 
-    /**
-     * <configuration>
-     *               <output>${project.build.directory}/generated-sources/</output>
-     *               <generateSupportingFiles>true</generateSupportingFiles>
-     *               <generatorName>spring</generatorName>
-     *               <strictSpec>true</strictSpec>
-     *               <generateApiTests>false</generateApiTests>
-     *               <generateModelTests>false</generateModelTests>
-     *               <inputSpec>${project.build.directory}/yaml/legalentity-presentation-service-spec.yaml</inputSpec>
-     *               <configOptions>
-     *                 <library>spring-mvc</library>
-     *                 <dateLibrary>legacy</dateLibrary>
-     *                 <interfaceOnly>true</interfaceOnly>
-     *                 <skipDefaultInterface>true</skipDefaultInterface>
-     *                 <useBeanValidation>false</useBeanValidation>
-     *                 <useClassLevelBeanValidation>true</useClassLevelBeanValidation>
-     *                 <useTags>true</useTags>
-     *                 <java8>true</java8>
-     *                 <useOptional>false</useOptional>
-     *                 <apiPackage>com.backbase.accesscontrol.service.rest.spec.api</apiPackage>
-     *                 <>com.backbase.accesscontrol.service.rest.spec.model</modelPackage>
-     *               </configOptions>
-     *             </configuration>
-     * @throws MojoExecutionException
-     */
+
     @Test
     public void testBeanValidation() throws MojoExecutionException {
         GenerateMojo mojo = new GenerateMojo();

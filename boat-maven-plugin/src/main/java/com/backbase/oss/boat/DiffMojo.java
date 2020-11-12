@@ -1,12 +1,6 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.diff.OpenApiCompare;
-import com.backbase.oss.boat.diff.model.ChangedOpenApi;
-import com.backbase.oss.boat.diff.output.ConsoleRender;
-import com.backbase.oss.boat.diff.output.HtmlRender;
-import com.backbase.oss.boat.diff.output.JsonRender;
-import com.backbase.oss.boat.diff.output.MarkdownRender;
-import com.backbase.oss.boat.diff.output.Render;
+
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +10,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.openapitools.openapidiff.core.OpenApiCompare;
+import org.openapitools.openapidiff.core.model.ChangedOpenApi;
+import org.openapitools.openapidiff.core.output.ConsoleRender;
+import org.openapitools.openapidiff.core.output.HtmlRender;
+import org.openapitools.openapidiff.core.output.MarkdownRender;
+import org.openapitools.openapidiff.core.output.Render;
 
 /**
  * Calculates a Change log for APIs.
@@ -68,9 +68,6 @@ public class DiffMojo extends AbstractMojo {
             } else if ("html".equals(changelogRenderer)) {
                 render = new HtmlRender();
                 extension = "html";
-            } else if ("json".equals(changelogRenderer)) {
-                render = new JsonRender();
-                extension = "json";
             } else {
                 throw new MojoExecutionException("Invalid changelogRender. Supported types are 'markdown' and 'html");
             }
