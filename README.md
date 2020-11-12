@@ -23,7 +23,7 @@ BOAT is still under development and subject to change.
 * Render multiple requests and examples in boat-docs
 * Created HTML templates for boat-docs
 * Pretty Print JSON Examples
-
+* Added boat:doc mojo for generating beautiful HTML2 docs
 * * Spring Generator*
   * Restored `HttpServletRequest` parameter (regression).
 
