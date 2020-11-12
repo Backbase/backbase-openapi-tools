@@ -278,39 +278,39 @@
                           {{/hasAuthMethods}}
 
                           {{#hasPathParams}}
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Path parameters</h2>
+                            <div class="json-schema-view">
                                 {{#pathParams}}
                                   {{>param}}
                                 {{/pathParams}}
-                            </table>
+                            </div>
                           {{/hasPathParams}}
 
                           {{#hasHeaderParams}}
-                            <div class="methodsubtabletitle">Header parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Header parameters</h2>
+                            <div class="json-schema-view">
                               {{#headerParams}}
                                   {{>param}}
                               {{/headerParams}}
-                            </table>
+                            </div>
                           {{/hasHeaderParams}}
 
                           {{#hasFormParams}}
-                            <div class="methodsubtabletitle">Form parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Form parameters</h2>
+                            <div class="json-schema-view">
                               {{#formParams}}
                                   {{>param}}
                               {{/formParams}}
-                            </table>
+                            </div>
                           {{/hasFormParams}}
 
                           {{#hasQueryParams}}
-                            <div class="methodsubtabletitle">Query parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Query parameters</h2>
+                            <div class="json-schema-view">
                               {{#queryParams}}
                                 {{>param}}
                               {{/queryParams}}
-                            </table>
+                            </div>
                           {{/hasQueryParams}}
 
                           {{#hasBodyParam}}
