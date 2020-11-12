@@ -263,7 +263,7 @@
                                   {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
                               </div>
                           {{/vendorExtensions}}
-                          <pre class="prettyprint language-html prettyprinted" data-type="{{httpMethod}}"><code><span class="pln">{{path}}</span></code></pre>
+                          <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
 
                           {{#hasAuthMethods}}
                               <h2>Scopes</h2>
@@ -394,5 +394,13 @@
           });
        });
     </script>
+<script>
+      $(".response-header-tab").click(function() {
+        const id = $(this).attr('id');
+        $(`#${id}-content`).slideToggle();
+      });
+</script>
 </body>
 </html>
+
+
