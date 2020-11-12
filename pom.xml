@@ -66,7 +66,7 @@
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.1.5</swagger-core.version>
-        <swagger-parser.version>2.0.22</swagger-parser.version>
+        <swagger-parser.version>2.0.23</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     </properties>
@@ -290,6 +290,18 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>2.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.3.3</version>
+                <scope>test</scope>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -303,6 +315,7 @@
     </dependencies>
 
     <build>
+        <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
