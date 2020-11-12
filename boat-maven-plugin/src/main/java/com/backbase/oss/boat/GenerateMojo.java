@@ -39,7 +39,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -399,13 +398,13 @@ public class GenerateMojo extends AbstractMojo {
      * Skip the execution.
      */
     @Parameter(name = "skip", property = "codegen.skip", required = false, defaultValue = "false")
-    protected Boolean skip;
+    protected boolean skip;
 
     /**
      * Skip the execution if the source file is older than the output folder.
      */
     @Parameter(name = "skipIfSpecIsUnchanged", property = "codegen.skipIfSpecIsUnchanged", required = false, defaultValue = "false")
-    protected Boolean skipIfSpecIsUnchanged;
+    protected boolean skipIfSpecIsUnchanged;
 
     /**
      * Add the output directory to the project as a source root, so that the generated java types
@@ -420,7 +419,7 @@ public class GenerateMojo extends AbstractMojo {
      * {@link #addCompileSourceRoot}.
      */
     @Parameter(defaultValue = "false", property = "openapi.generator.maven.plugin.addTestCompileSourceRoot")
-    private boolean addTestCompileSourceRoot = false;
+    protected boolean addTestCompileSourceRoot;
 
     @Parameter
     protected Map<String, String> environmentVariables = new HashMap<>();
@@ -457,15 +456,15 @@ public class GenerateMojo extends AbstractMojo {
     @Override
     @SuppressWarnings({"java:S3776", "java:S1874"})
     public void execute() throws MojoExecutionException {
+        if (skip) {
+            getLog().info("Code generation is skipped.");
+            return;
+        }
+
         File inputSpecFile = new File(inputSpec);
         addCompileSourceRootIfConfigured();
 
         try {
-            if (skip) {
-                getLog().info("Code generation is skipped.");
-                return;
-            }
-
             if (buildContext != null && buildContext.isIncremental() && inputSpec != null && inputSpecFile.exists()
                 && !buildContext.hasDelta(inputSpecFile)) {
                 getLog().info(
@@ -557,13 +556,18 @@ public class GenerateMojo extends AbstractMojo {
             }
 
             if (isNotEmpty(generatorName)) {
-                if ("spring".equals(generatorName)) {
-                    configurator.setGeneratorName("spring-boat");
-                }else if ("html2".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.StaticHtml2Generator.class.getName());
-                } else {
-                    configurator.setGeneratorName(generatorName);
+                switch (generatorName) {
+                    case "java":
+                    case "spring":
+                        generatorName = "boat-" + generatorName;
+                        break;
+
+                    default:
+                        // use the original generator
                 }
+
+                configurator.setGeneratorName(generatorName);
+
 
                 // check if generatorName & language are set together, inform user this needs to be updated to prevent future issues.
                 if (isNotEmpty(language)) {
