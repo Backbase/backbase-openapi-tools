@@ -22,6 +22,7 @@
         <module>raml-2-openapi-generate-spring-boot-embedded</module>
         <module>raml-2-openapi-generate-webclient-embedded</module>
         <module>raml-2-openapi-generate-doc</module>
+        <module>raml-2-openapi-generate-yard</module>
     </modules>
 
 
