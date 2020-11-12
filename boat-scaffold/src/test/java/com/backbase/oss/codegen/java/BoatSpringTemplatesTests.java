@@ -1,10 +1,11 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.java;
 
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 
+import com.backbase.oss.codegen.java.BoatSpringCodeGen;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
