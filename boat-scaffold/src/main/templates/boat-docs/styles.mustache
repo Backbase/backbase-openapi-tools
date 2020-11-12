@@ -2,12 +2,16 @@
 * Content
 * ------------------------------------------------------------------------------------------ */
 
+body {
+  font-family: "Roboto", sans-serif;
+}
+
 * {
-  font-family: "Roboto", sans-serif !important;
+      box-sizing: border-box;
 }
 
 #methodsubtable > tbody > tr > td:first-child {
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
   font-size: 14px;
   padding: 2px 4px;
   white-space: nowrap;
@@ -37,7 +41,7 @@ li {
 
 td.code {
   font-size: 14px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
   font-style: normal;
   font-weight: 400;
 }
@@ -254,7 +258,7 @@ td {
 * pre / code
 * ------------------------------------------------------------------------------------------ */
 pre {
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace !important;
   background-color: #292b36;
   color: #ffffff;
   padding: 10px;
@@ -342,7 +346,7 @@ pre.language-api .pun {
 pre code {
   display: block;
   font-size: 14px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace !important;
   font-style: normal;
   font-weight: 400;
 }
@@ -511,7 +515,7 @@ json-schema-view[json-schema-view-dark] .title {
 }
 .json-schema-view,
 json-schema-view {
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
   font-size: 0;
   display: table-cell;
 }
@@ -579,13 +583,13 @@ json-schema-view .property > * {
 .json-schema-view .name,
 json-schema-view .name {
   color: #00f;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
   display: table-cell;
   vertical-align: top;
 }
 .json-schema-view .type,
 json-schema-view .type {
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
 }
 .json-schema-view .type-any,
 json-schema-view .type-any {
@@ -615,7 +619,7 @@ json-schema-view.collapsed .toggle-handle {
 }
 .json-schema-view.json-schema-view-dark,
 json-schema-view[json-schema-view-dark] {
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Courier", monospace;
   font-size: 0;
   display: table-cell;
 }
@@ -721,6 +725,7 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
+  min-height: 20px;
 }
 .exampleStyle .tab-pane {
   padding: 30px;
@@ -729,9 +734,17 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 .exampleStyle > .json-schema-view > .object > .title {
   margin-bottom: 16px;
 }
+/exampleStyle .placeholder {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
 .examples-wrapper {
   display: flex;
 }
+
 .dropdown-examples {
   flex: 0 40%;
   color: rgb(255, 255, 255);
@@ -744,11 +757,8 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 }
 
 .dropdown-examples label span {
-  position: absolute;
-  top: -11px;
   font-size: 12px;
   font-weight: 100;
-  left: 4px;
 }
 .dropdown-examples .example-dropdown-select {
   border-color: rgba(255, 255, 255, 0.2);

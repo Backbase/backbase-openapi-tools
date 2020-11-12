@@ -1,68 +1,62 @@
-<tr>
-    <td style="width:150px;">
-        <span>{{baseName}}</span>{{^required}}{{/required}}
-        {{#required}}
-            <div class="inner required">*</div>
-        {{/required}}
-    </td>
-    <td>
-        <div>
-            <span class="datatype">{{dataTypeDisplayName}} <span class="format">{{format}}</span> </span>
+<div class="fake property">
+    <span class="name">{{baseName}}</span>
+    <div class="json-schema-view">
+        <div class="primitive">
+            <span class="type">{{dataTypeDisplayName}}</span>
+            {{#required}}
+                <span class="required">*</span>
+            {{/required}}
+            <span class="format">{{format}}</span> 
+            
+            {{#hasDefaultValue}}
+                <span class="default">
+                    default: {{defaultValue}}
+                </span>
+            {{/hasDefaultValue}}
+
             {{#pattern}}
                 <span>pattern:</span> pattern: <span class="pattern">{{.}}</span>
             {{/pattern}}
 
             {{#minLength}}
-                <span>&lt;&equals; {{.}} characters</span>
+                <span class="range minLength">minLength:{{.}}</span>
             {{/minLength}}
             {{#maxLength}}
-                <span>&lt;&equals; {{.}} characters</span>
+                <span class="range maxLength">maxLength:{{.}}</span>
             {{/maxLength}}
             {{#exclusiveMaximum}}
-                <span>exclusive maximum {{.}}</span>
+                <span class="range">exclusive maximum {{.}}</span>
             {{/exclusiveMaximum}}
             {{#exclusiveMinimum}}
-                <span>exclusive minimum {{.}}</span>
+                <span class="range">exclusive minimum {{.}}</span>
             {{/exclusiveMinimum}}
+
             {{#isRange}}
                 <span class="range">minimum: {{mininum}} maximum: {{maximum}}</span>
             {{/isRange}}
+            
+            <div class="inner description">{{description}}</div>
 
+            {{#isEnum}}
+                <div>Enum: {{#allowableValues}}
+                    {{#enumVars}}
+                        <code>{{name}}</code>
+                    {{/enumVars}}
+                {{/allowableValues}}
+                </div>
+            {{/isEnum}}
         </div>
-        {{#isEnum}}
-            <div>Items Enum: {{#allowableValues}}
-                {{#enumVars}}
-                    <code>{{name}}</code>
-                {{/enumVars}}
-            {{/allowableValues}}
-            </div>
-        {{/isEnum}}
-
         {{#hasExamples}}
-            <ul class="nav nav-tabs">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-                       aria-haspopup="true" aria-expanded="false">Examples</a>
-                    <div class="dropdown-menu">
-                        {{#examples}}
-                            <a class="dropdown-item" href="#">{{name}}</a>
-                        {{/examples}}
-                    </div>
-                </li>
-            </ul>
+            <div class="examples">
+                <h3><b>Examples</b></h3>
+                {{#examples}}
+                    {{#example}}
+                    <div class="inner json-formatter-string">{{value}}</div>
+                    {{/example}}
+                {{/examples}}         
+            </div>
         {{/hasExamples}}
-        {{#hasSingleExample}}
-            <div>
-                Example: <code>{{example}}</code>
-            </div>
-        {{/hasSingleExample}}
-        {{#hasDefaultValue}}
-            <div>
-                Default: <code>{{defaultValue}}</code>
-            </div>
-        {{/hasDefaultValue}}
+    </div>
 
-        <p>{{description}}</p>
-    </td>
 
-</tr>
+</div>
