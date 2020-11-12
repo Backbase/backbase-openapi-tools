@@ -24,9 +24,9 @@ public class OpenAPILoader {
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlatten(flatten);
         parseOptions.setResolve(resolveFully);
-//        parseOptions.setResolveCombinators(false);
         parseOptions.setResolveFully(resolveFully);
-//        parseOptions.setSkipMatches(true);
+        parseOptions.setFlattenComposedSchemas(true);
+        parseOptions.setResolveCombinators(true);
         SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(file.toURI().toString(), null, parseOptions);
 
 

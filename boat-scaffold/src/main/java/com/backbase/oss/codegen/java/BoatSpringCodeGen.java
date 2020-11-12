@@ -1,4 +1,4 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.java;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
