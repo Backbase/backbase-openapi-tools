@@ -154,11 +154,10 @@
   </script>
   <style type="text/css">
     {{>fonts}}
-
     {{>css_bootstrap}}
     {{>css_prettify}}
-      {{>css_json_schema_view}}
-
+    {{>css_json_schema_view}}
+    {{>css_response}}
     {{>styles}}
   </style>
 </head>
@@ -252,14 +251,8 @@
                   {{#operation}}
                     <div id="api-{{baseName}}-{{nickname}}">
                       <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                          <div class="pull-left">
                               {{#summary}}<h1>{{.}}</h1>{{/summary}}
                               {{#description}}<p>{{description}}</p>{{/description}}
-
-                          </div>
-
-                          <div class="pull-right"></div>
-                        <div class="clearfix"></div>
                         <p class="marked">{{notes}}</p>
                           <br/>
                           {{#vendorExtensions}}
@@ -270,7 +263,7 @@
                                   {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
                               </div>
                           {{/vendorExtensions}}
-                          <pre class="prettyprint language-html prettyprinted" data-type="{{httpMethod}}"><code><span class="pln">{{path}}</span></code></pre>
+                          <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
 
                           {{#hasAuthMethods}}
                               <h2>Scopes</h2>
@@ -285,39 +278,39 @@
                           {{/hasAuthMethods}}
 
                           {{#hasPathParams}}
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Path parameters</h2>
+                            <div class="json-schema-view">
                                 {{#pathParams}}
                                   {{>param}}
                                 {{/pathParams}}
-                            </table>
+                            </div>
                           {{/hasPathParams}}
 
                           {{#hasHeaderParams}}
-                            <div class="methodsubtabletitle">Header parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Header parameters</h2>
+                            <div class="json-schema-view">
                               {{#headerParams}}
                                   {{>param}}
                               {{/headerParams}}
-                            </table>
+                            </div>
                           {{/hasHeaderParams}}
 
                           {{#hasFormParams}}
-                            <div class="methodsubtabletitle">Form parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Form parameters</h2>
+                            <div class="json-schema-view">
                               {{#formParams}}
                                   {{>param}}
                               {{/formParams}}
-                            </table>
+                            </div>
                           {{/hasFormParams}}
 
                           {{#hasQueryParams}}
-                            <div class="methodsubtabletitle">Query parameters</div>
-                            <table id="methodsubtable">
+                            <h2>Query parameters</h2>
+                            <div class="json-schema-view">
                               {{#queryParams}}
                                 {{>param}}
                               {{/queryParams}}
-                            </table>
+                            </div>
                           {{/hasQueryParams}}
 
                           {{#hasBodyParam}}
@@ -331,156 +324,7 @@
 
                           <h2>Responses</h2>
                           {{#responses}}
-                            <h3 id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
-                            <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
-                            <script>
-                              var response{{baseName}}{{code}}_description = `{{{message}}}`;
-                              var response{{baseName}}{{code}}_description_break = response{{baseName}}{{code}}_description.indexOf('\n');
-                              if (response{{baseName}}{{code}}_description_break == -1) {
-                                $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").text("Status: {{code}} - " + response{{baseName}}{{code}}_description);
-                              } else {
-                                $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").text("Status: {{code}} - " + response{{baseName}}{{code}}_description.substring(0, response{{baseName}}{{code}}_description_break));
-                                $("#examples-{{baseName}}-{{nickname}}-description-{{code}}").html(response{{baseName}}{{code}}_description.substring(response{{baseName}}{{code}}_description_break));
-                              }
-                            </script>
-
-
-                            <ul id="responses-detail-{{baseName}}-{{nickname}}-{{code}}" class="nav nav-tabs nav-tabs-examples" >
-                              {{#schema}}
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-{{baseName}}-{{nickname}}-{{code}}-schema">Schema</a>
-                                </li>
-
-                                {{#examples}}
-                                  <li class="">
-                                    <a data-toggle="tab" href="#responses-{{baseName}}-{{nickname}}-{{code}}-example">Response Example</a>
-                                  </li>
-                                {{/examples}}
-
-                              {{/schema}}
-
-                              {{#hasHeaders}}
-                                <li class="">
-                                  <a data-toggle="tab" href="#responses-{{nickname}}-{{code}}-headers">Headers</a>
-                                </li>
-                              {{/hasHeaders}}
-
-                              {{#vendorExtensions}}
-                                {{#x-shared-errors}}
-                                  <script>
-                                    $(document).ready(function()
-                                    {
-                                      var errRef = "{{{$ref}}}";
-                                      var errorID = errRef.substring(errRef.lastIndexOf("/") + 1);
-                                      var errorDef = errs[errorID];
-                                      var tabID = 'responses-detail-{{baseName}}-{{nickname}}-{{code}}-' + errorID;
-                                      var contentID = tabID + "-content";
-
-                                      $('#responses-detail-{{baseName}}-{{nickname}}-{{code}}').append("<li><a href='#" + tabID + "' data-toggle='tab'>" + errorID + "</a></li>");
-                                      var contentWrapper = $('#responses-{{baseName}}-{{nickname}}-{{code}}-wrapper');
-                                      contentWrapper.append('<div class="tab-pane" id="' + tabID + '"><div id="' + contentID + '" class="exampleStyle"></div></div>');
-                                      var contentPane = $('#' + contentID);
-
-                                      contentPane.append('<p>' + errorDef.message + '</p>');
-                                      if (errorDef.variables)
-                                      {
-                                        contentPane.append('<h4>Variables</h4>');
-                                        var lVars = $('<ol></ol>').appendTo(contentPane);
-                                        for (lii = 0; lii < errorDef.variables.length; lii++)
-                                        {
-                                          $("<li></li>").appendTo(lVars).text(errorDef.variables[lii]);
-                                        }
-                                      }
-                                    });
-                                  </script>
-                                {{/x-shared-errors}}
-                              {{/vendorExtensions}}
-                            </ul>
-
-
-                            <div class="tab-content exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
-                              {{#schema}}
-                                <div class="tab-pane active " id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
-                                  <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {{{jsonSchema}}};
-                                        var schema = findNode('schema', schemaWrapper.content).schema;
-
-                                        if (!schema) {
-                                          schema = schemaWrapper.schema;
-                                        }
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                          if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                                              schema.items = defsParser.$refs.get(schema.items.$ref);
-
-
-                                          }
-                                        }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                                          schema.items = defsParser.$refs.get(schema.items.$ref);
-                                        } else {
-                                          schemaWrapper.definitions = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                         if (schema && schema.allOf) {
-                                            schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                                            schema = mergeAllOf(schema,  {
-                                              resolvers: {
-                                                defaultResolver: mergeAllOf.options.resolvers.title
-                                              }
-                                            });
-                                          }
-
-                                         if (schema.items && schema.items.allOf) {
-                                            schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                                            schema.items = mergeAllOf(schema.items,  {
-                                              resolvers: {
-                                                defaultResolver: mergeAllOf.options.resolvers.title
-                                              }
-                                            });
-                                          }
-
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-{{baseName}}-{{nickname}}-schema-{{code}}');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
-                                </div>
-                                {{#examples}}
-                                  <div class="tab-pane" id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-                                    <pre class="prettyprint"><code class="json">{{example}}</code></pre>
-                                  </div>
-                                {{/examples}}
-                              {{/schema}}
-                              {{#hasHeaders}}
-                                  <div class="tab-pane" id="responses-{{nickname}}-{{code}}-headers">
-                                      <table>
-                                          <tr>
-                                              <th width="150px">Name</th>
-                                              <th width="100px">Type</th>
-                                              <th width="100px">Format</th>
-                                              <th>Description</th>
-                                          </tr>
-                                          {{#headers}}
-                                              <tr>
-                                                  <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
-                                                  <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
-                                                  <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
-                                                  <td>{{#description}}{{description}}{{/description}}</td>
-                                              </tr>
-                                          {{/headers}}
-                                      </table>
-                                  </div>
-                              {{/hasHeaders}}
-                            </div>
+                           {{>response}}
                           {{/responses}}
                         </article>
                       </div>
@@ -550,5 +394,13 @@
           });
        });
     </script>
+<script>
+      $(".response-header-tab").click(function() {
+        const id = $(this).attr('id');
+        $(`#${id}-content`).slideToggle();
+      });
+</script>
 </body>
 </html>
+
+
