@@ -146,7 +146,7 @@ public class BoatCodegenParameter extends CodegenParameter {
             if (output.dataType != null && output.dataType.startsWith("array")) {
                 output.dataTypeDisplayName = "array of " + output.baseType.toLowerCase() + "s";
             } else {
-                output.dataTypeDisplayName = output.dataType;
+                output.dataTypeDisplayName = output.dataType.toLowerCase();
             }
         }
 
