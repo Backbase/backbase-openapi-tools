@@ -1,4 +1,4 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.doc;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
@@ -93,6 +93,7 @@ public class BoatDocsTest {
         codegenConfig.setOutputDir(new File("target/docs/").toString());
 
         File output = new File(codegenConfig.getOutputDir());
+        output.mkdirs();
 
 
 
