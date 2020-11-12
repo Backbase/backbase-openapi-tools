@@ -135,6 +135,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     public CodegenModel fromModel(String name, Schema schema) {
         CodegenModel codegenModel = super.fromModel(name, schema);
         log.info("Created CodegenModel for name: {}, schema: {} resulting in: {}", name, schema.getName(), codegenModel.getName());
+        codegenModel.isAlias = false;
         return codegenModel;
     }
 
