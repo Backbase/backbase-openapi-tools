@@ -9,7 +9,7 @@
   {{>js_jquery}}
   {{>js_prettify}}
   {{>js_bootstrap}}
-  {{>marked}}
+  {{>js_marked}}
   <script>
 
       if (!library)
@@ -157,19 +157,21 @@
 
     {{>css_bootstrap}}
     {{>css_prettify}}
+      {{>css_json_schema_view}}
 
     {{>styles}}
   </style>
 </head>
 <body>
+
+
+
   <script>
     // Script section to load models into a JS Var
     var defs = {}
     {{#models}}
     {{#model}}
     <!-- Sometimes classname is referred.. -->
-    defs["{{classname}}"] = {{{modelJson}}};
-    <!-- Sometimes name is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
     <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
@@ -205,9 +207,14 @@
                   <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
                   {{#operation}}
                     <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                        <a href="#api-{{baseName}}-{{nickname}}">
+                        <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
                             <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
-                            {{nickname}}
+                            {{#summary}}
+                                {{summary}}
+                            {{/summary}}
+                            {{^summary}}
+                                {{nickname}}
+                            {{/summary}}
                         </a>
                     </li>
                   {{/operation}}
@@ -215,20 +222,22 @@
               {{/apis}}
             {{/apiInfo}}
           </ul>
+
         </nav>
+
       </div>
       <div id="content">
         <div id="project">
           <div class="pull-left">
             <h1>{{{appName}}}</h1>
+              {{#version}}
+                  <div class="app-desc">Version: {{{version}}}</div>
+              {{/version}}
           </div>
           <div class="clearfix"></div>
         </div>
         <div id="header">
           <div id="api-_">
-            {{#version}}
-              <div class="app-desc">Version: {{{version}}}</div>
-            {{/version}}
             <div id="app-description" class="app-desc">
                 {{{appDescription}}}
             </div>
@@ -243,11 +252,11 @@
                   {{#operation}}
                     <div id="api-{{baseName}}-{{nickname}}">
                       <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                        <div class="pull-left">
-                            {{#summary}}<h1>{{.}}</h1>{{/summary}}
-                            {{#description}}<p>{{description}}</p>{{/description}}
+                          <div class="pull-left">
+                              {{#summary}}<h1>{{.}}</h1>{{/summary}}
+                              {{#description}}<p>{{description}}</p>{{/description}}
 
-                        </div>
+                          </div>
 
                           <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -314,6 +323,7 @@
                           {{#hasBodyParam}}
                               <h2>Request Body Schema</h2>
                               {{#bodyParams}}
+
                                   {{>paramB}}
                               {{/bodyParams}}
 
@@ -388,10 +398,10 @@
                             </ul>
 
 
-                            <div class="tab-content" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
                               {{#schema}}
-                                <div class="tab-pane active" id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
-                                  <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}" class="exampleStyle">
+                                <div class="tab-pane active " id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
+                                  <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {{{jsonSchema}}};
@@ -461,7 +471,7 @@
                                           </tr>
                                           {{#headers}}
                                               <tr>
-                                                  <td>{{#name}}{{name}}{{/name}}</td>
+                                                  <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
                                                   <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
                                                   <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
                                                   <td>{{#description}}{{description}}{{/description}}</td>
@@ -527,5 +537,18 @@
     $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
   });
   </script>
+  <script>
+
+       // To handle the examples
+       $(document).ready(function() {
+          $('.dropdown-examples').each(function() {
+            $(this).find('.example-dropdown-value:first').show();
+          });
+          $('.example-dropdown-select').change(function() {
+            $(this).parent().parent().find('.example-dropdown-value').hide();
+            $(`.dropdown-examples div${this.value}`).show();
+          });
+       });
+    </script>
 </body>
 </html>

@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.backbase.oss.codegen.BoatJavaCodeGen;
-import com.backbase.oss.codegen.BoatSpringCodeGen;
+import com.backbase.oss.codegen.java.BoatJavaCodeGen;
+import com.backbase.oss.codegen.java.BoatSpringCodeGen;
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
