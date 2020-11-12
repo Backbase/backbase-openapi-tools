@@ -1,14 +1,16 @@
 <tr>
     <td style="width:150px;">
-        <span>{{baseName}}</span>{{^required}}{{/required}}{{#required}}<div class="inner required">
-        Required
-    </div>{{/required}}</td>
+        <span>{{baseName}}</span>{{^required}}{{/required}}
+        {{#required}}
+            <div class="inner required">*</div>
+        {{/required}}
+    </td>
     <td>
         <div>
-        <span class="format">{{dataTypeDisplayName}}</span>
-        {{#maxLength}}
-            <span>&lt;&equals; {{.}} characters</span>
-        {{/maxLength}}
+            <span class="format">{{dataTypeDisplayName}}</span>
+            {{#maxLength}}
+                <span>&lt;&equals; {{.}} characters</span>
+            {{/maxLength}}
         </div>
         {{#isEnum}}
             <div>Items Enum: {{#allowableValues}}
@@ -16,14 +18,15 @@
                     <code>{{name}}</code>
                 {{/enumVars}}
 
-                {{/allowableValues}}
+            {{/allowableValues}}
             </div>
         {{/isEnum}}
 
         {{#hasExamples}}
             <ul class="nav nav-tabs">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"  aria-haspopup="true" aria-expanded="false">Examples</a>
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">Examples</a>
                     <div class="dropdown-menu">
                         {{#examples}}
                             <a class="dropdown-item" href="#">{{name}}</a>
@@ -34,13 +37,13 @@
         {{/hasExamples}}
         {{#hasSingleExample}}
             <div>
-            Example: <code>{{example}}</code>
+                Example: <code>{{example}}</code>
             </div>
         {{/hasSingleExample}}
         {{#hasDefaultValue}}
-        <div>
-            Default: <code>{{defaultValue}}</code>
-        </div>
+            <div>
+                Default: <code>{{defaultValue}}</code>
+            </div>
         {{/hasDefaultValue}}
 
         <p>{{description}}</p>
