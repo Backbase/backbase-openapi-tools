@@ -40,6 +40,10 @@ public class BoatCodegenParameter extends CodegenParameter {
         return examples != null && !examples.isEmpty();
     }
 
+    public boolean isRange() {
+        return minimum != null && maximum != null;
+    }
+
     public BoatCodegenParameter() {
         super();
     }
