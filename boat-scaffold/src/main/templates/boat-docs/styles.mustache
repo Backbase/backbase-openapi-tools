@@ -288,14 +288,12 @@ pre.language-json {
 }
 
 pre.language-html {
-  margin: 68px 0 20px 0;
+  margin: 48px 0 20px 0;
 }
 
-pre.language-html:before {
+pre.language-html .http-method {
   content: attr(data-type);
-  position: absolute;
-  top: -30px;
-  left: 0;
+  margin-right: 8px;
   font-family: "Roboto", sans-serif;
   font-weight: 600;
   font-size: 15px;
@@ -307,27 +305,27 @@ pre.language-html:before {
   color: #ffffff;
 }
 
-pre.language-html[data-type="get"]:before,
+pre.language-html .http-method[data-type="get"],
 span.language-html[data-type="get"] {
   background-color: green;
 }
 
-pre.language-html[data-type="put"]:before,
+pre.language-html .http-method[data-type="put"],
 span.language-html[data-type="put"] {
   background-color: #e5c500;
 }
 
-pre.language-html[data-type="post"]:before,
+pre.language-html .http-method[data-type="post"],
 span.language-html[data-type="post"] {
   background-color: #4070ec;
 }
 
-pre.language-html[data-type="delete"]:before,
+pre.language-html .http-method[data-type="delete"],
 span.language-html[data-type="delete"] {
   background-color: #ed0039;
 }
 
-pre.language-html[data-type="patch"]:before,
+pre.language-html .http-method[data-type="patch"],
 span.language-html[data-type="patch"] {
   background-color: #3387cc;
 }
