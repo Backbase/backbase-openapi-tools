@@ -1,4 +1,4 @@
-package com.backbase.oss.codegen;
+package com.backbase.oss.codegen.java;
 
 import org.openapitools.codegen.languages.JavaClientCodegen;
 

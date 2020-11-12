@@ -1,3 +1,3 @@
-com.backbase.oss.codegen.BoatSpringCodeGen
-com.backbase.oss.codegen.BoatJavaCodeGen
-com.backbase.oss.codegen.BoatDocsGenerator
+com.backbase.oss.codegen.java.BoatSpringCodeGen
+com.backbase.oss.codegen.java.BoatJavaCodeGen
+com.backbase.oss.codegen.doc.BoatDocsGenerator

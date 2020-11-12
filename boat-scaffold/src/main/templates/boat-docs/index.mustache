@@ -162,14 +162,15 @@
   </style>
 </head>
 <body>
+
+
+
   <script>
     // Script section to load models into a JS Var
     var defs = {}
     {{#models}}
     {{#model}}
     <!-- Sometimes classname is referred.. -->
-    defs["{{classname}}"] = {{{modelJson}}};
-    <!-- Sometimes name is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
     <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
@@ -215,9 +216,18 @@
               {{/apis}}
             {{/apiInfo}}
           </ul>
+
         </nav>
+
       </div>
       <div id="content">
+          <ul>
+              {{#models}}
+                  {{#model}}
+                      <li>name: {{name}} classname: {{classname}}</li>
+                  {{/model}}
+              {{/models}}
+          </ul>
         <div id="project">
           <div class="pull-left">
             <h1>{{{appName}}}</h1>
@@ -314,6 +324,7 @@
                           {{#hasBodyParam}}
                               <h2>Request Body Schema</h2>
                               {{#bodyParams}}
+
                                   {{>paramB}}
                               {{/bodyParams}}
 
