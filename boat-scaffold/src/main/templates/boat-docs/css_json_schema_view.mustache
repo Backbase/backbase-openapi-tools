@@ -62,6 +62,20 @@ json-schema-view .type {
   color: rgba(102, 102, 102, 0.9);
 }
 
+.json-schema-view .default,
+json-schema-view .default {
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 2px;
+  color: #6f6f6f !important;
+  background-color: #f7f7f9;
+  margin: 0px 5px;
+  padding: 0px 5px;
+  border: 1px solid #e1e1e8;
+  font-family: Courier, monospace;
+}
+
 .json-schema-view .format,
 json-schema-view .format {
   display: inline-flex;
@@ -140,7 +154,7 @@ a.title {
 
 .json-formatter-string {
   padding: 2px 4px;
-  color: #999 !important;
+  color: #6f6f6f !important;
   white-space: nowrap;
   background-color: #f7f7f9;
   border: 1px solid #e1e1e8;
@@ -172,4 +186,19 @@ a.title {
 .json-formatter-row .json-formatter-bracket,
 .json-formatter-row .json-formatter-number {
   color: rgba(102, 102, 102, 0.9) !important;
+}
+
+.fake.property .json-schema-view {
+  display: flex;
+  flex-direction: row;
+}
+.fake.property .json-schema-view .primitive {
+  flex: 3;
+}
+.fake.property .examples {
+  flex: 1;
+}
+.fake.property .examples h3 {
+  margin-top: 0;
+  padding-top: 0;
 }
