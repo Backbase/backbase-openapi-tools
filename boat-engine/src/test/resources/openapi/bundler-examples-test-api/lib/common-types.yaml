@@ -1,0 +1,22 @@
+openapi: 3.0.1
+
+info:
+  title: OpenAPI SSDK
+  description: Common items to use in schemas.
+  version: 0.0.1
+
+paths: {}
+
+components:
+  # ------------------------------------------------
+  # Common responses.
+  # ------------------------------------------------
+  responses:
+    400BadRequest:
+      description: If one or more request parameters don't comply with the specification
+      content:
+        application/json:
+          schema:
+            $ref: 'schema/bad-request-error.yaml'
+          example:
+            $ref: 'examples/bad-request-validation-error.json'
