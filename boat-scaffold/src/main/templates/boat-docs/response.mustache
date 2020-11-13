@@ -1,4 +1,4 @@
-<h3 class="response-header-tab" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
+<h3 class="response-header-tab collapsed" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
 <div class="response-content-block" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
   <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
   <ul id="responses-detail-{{baseName}}-{{nickname}}-{{code}}" class="nav nav-tabs nav-tabs-examples" >
@@ -56,7 +56,7 @@
 
   <div class="tab-content exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
     {{#schema}}
-      <div class="tab-pane active " id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
+      <div class="tab-pane active" id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
         <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
           <script>
             $(document).ready(function() {
@@ -118,22 +118,11 @@
     {{/schema}}
     {{#hasHeaders}}
         <div class="tab-pane" id="responses-{{nickname}}-{{code}}-headers">
-            <table>
-                <tr>
-                    <th width="150px">Name</th>
-                    <th width="100px">Type</th>
-                    <th width="100px">Format</th>
-                    <th>Description</th>
-                </tr>
+            <div class="json-schema-view">
                 {{#headers}}
-                    <tr>
-                        <td>{{#baseName}}{{baseName}}{{/baseName}}</td>
-                        <td>{{#datatype}}{{dataType}}{{/datatype}}</td>
-                        <td>{{#dataFormat}}{{dataFormat}}{{/dataFormat}}</td>
-                        <td>{{#description}}{{description}}{{/description}}</td>
-                    </tr>
+                    {{>header}}
                 {{/headers}}
-            </table>
+            </div>
         </div>
     {{/hasHeaders}}
   </div>
@@ -142,9 +131,9 @@
   var response{{baseName}}{{code}}_description = `{{{message}}}`;
   var response{{baseName}}{{code}}_description_break = response{{baseName}}{{code}}_description.indexOf('\n');
   if (response{{baseName}}{{code}}_description_break == -1) {
-    $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").html("- <b>{{code}}</b> " + response{{baseName}}{{code}}_description);
+    $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").html("<span class='response-header-tab-handle'></span> <b>{{code}}</b> " + response{{baseName}}{{code}}_description);
   } else {
-    $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").html("- <b>{{code}}</b> " + response{{baseName}}{{code}}_description.substring(0, response{{baseName}}{{code}}_description_break));
+    $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").html("<span class='response-header-tab-handle'></span> <b>{{code}}</b> " + response{{baseName}}{{code}}_description.substring(0, response{{baseName}}{{code}}_description_break));
     $("#examples-{{baseName}}-{{nickname}}-description-{{code}}").html(response{{baseName}}{{code}}_description.substring(response{{baseName}}{{code}}_description_break));
   }
 </script>
