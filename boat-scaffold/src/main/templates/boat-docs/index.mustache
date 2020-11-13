@@ -395,10 +395,21 @@
        });
     </script>
 <script>
-      $(".response-header-tab").click(function() {
-        const id = $(this).attr('id');
-        $(`#${id}-content`).slideToggle();
-      });
+$(document).ready(function() {
+    $(".response-header-tab").click(function() {
+    const id = $(this).attr('id');
+    const isCollapsed = $(this).hasClass('collapsed')
+    if (isCollapsed){
+       $(`#${id}-content`).slideDown();
+       $(this).removeClass('collapsed');
+    } else {
+       $(`#${id}-content`).slideUp();
+       $(this).addClass('collapsed');
+    }
+    });
+
+     $('.response-header-tab[data-code^="2"]').click();
+});
 </script>
 </body>
 </html>
