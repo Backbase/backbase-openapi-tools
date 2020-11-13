@@ -55,23 +55,34 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
-        log.info("Preprocessing OpenAPI to get rid of wierd states");
-        openAPI.getComponents().getSchemas().forEach((key, schema) -> {
-            if(schema.get$ref() != null && schema.getType() == null) {
-                log.warn("Schema: {} has $ref set to: {} but no type set. Getting type from referred schema", key, schema.get$ref());
-                String ref = schema.get$ref();
-                if(!ref.startsWith("#/components/schemas/"))
-                    throw new RuntimeException("Schema reference: " + ref + " must be in components/schemas!");
-                ref = StringUtils.substringAfterLast(ref, "/");
-                Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
-                if(referredSchema.getType() == null) {
-                    throw new RuntimeException("Cannot get type from schema: " + ref);
-                }
-                // Copy over properties from referred schema
-                schema.setProperties(referredSchema.getProperties());
-                schema.setType(referredSchema.getType());
-            }
-        });
+//        log.info("Preprocessing OpenAPI to get rid of wierd states");
+//        openAPI.getComponents().getSchemas().forEach((key, schema) -> {
+//            if(schema.get$ref() != null && schema.getType() == null) {
+//                log.warn("Schema: {} has $ref set to: {} but no type set. Getting type from referred schema", key, schema.get$ref());
+//                String ref = schema.get$ref();
+////
+////                String type;
+////                while(ref = != null) {
+////
+////                    ref = StringUtils.substringAfterLast(ref, "/");
+////                    Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
+////                    if(referredSchema.getType() == null) {
+////                        throw new RuntimeException("Cannot get type from schema: " + ref);
+////                    }
+////                }
+//
+//                if(!ref.startsWith("#/components/schemas/"))
+//                    throw new RuntimeException("Schema reference: " + ref + " must be in components/schemas!");
+//                ref = StringUtils.substringAfterLast(ref, "/");
+//                Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
+//                if(referredSchema.getType() == null) {
+//                    throw new RuntimeException("Cannot get type from schema: " + ref);
+//                }
+//                // Copy over properties from referred schema
+//                schema.setProperties(referredSchema.getProperties());
+//                schema.setType(referredSchema.getType());
+//            }
+//        });
     }
 
     @Override
@@ -145,22 +156,24 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
         Object example = parameter.getExample();
 
-        switch (parameter.getStyle()) {
-            case FORM:
-                if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
-                    try {
-                        List<String> values = paramReader.readValue((ArrayNode) example);
-                        List<BasicNameValuePair> params = values.stream()
-                            .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
-                            .collect(Collectors.toList());
-                        codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
-                    } catch (IOException e) {
-                        log.warn("Failed to format query string parameter: {}", codegenParameter.example);
+        if(parameter.getStyle() != null) {
+            switch (parameter.getStyle()) {
+                case FORM:
+                    if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
+                        try {
+                            List<String> values = paramReader.readValue((ArrayNode) example);
+                            List<BasicNameValuePair> params = values.stream()
+                                .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
+                                .collect(Collectors.toList());
+                            codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
+                        } catch (IOException e) {
+                            log.warn("Failed to format query string parameter: {}", codegenParameter.example);
+                        }
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
