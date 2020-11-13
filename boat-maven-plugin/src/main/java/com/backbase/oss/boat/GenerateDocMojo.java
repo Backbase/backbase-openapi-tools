@@ -11,6 +11,7 @@ public class GenerateDocMojo  extends GenerateMojo  {
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("Generating Boat Docs");
+        dereferenceComponents = true;
         generatorName = "boat-docs";
         super.execute();
     }
