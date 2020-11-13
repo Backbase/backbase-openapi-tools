@@ -55,34 +55,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
-//        log.info("Preprocessing OpenAPI to get rid of wierd states");
-//        openAPI.getComponents().getSchemas().forEach((key, schema) -> {
-//            if(schema.get$ref() != null && schema.getType() == null) {
-//                log.warn("Schema: {} has $ref set to: {} but no type set. Getting type from referred schema", key, schema.get$ref());
-//                String ref = schema.get$ref();
-////
-////                String type;
-////                while(ref = != null) {
-////
-////                    ref = StringUtils.substringAfterLast(ref, "/");
-////                    Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
-////                    if(referredSchema.getType() == null) {
-////                        throw new RuntimeException("Cannot get type from schema: " + ref);
-////                    }
-////                }
-//
-//                if(!ref.startsWith("#/components/schemas/"))
-//                    throw new RuntimeException("Schema reference: " + ref + " must be in components/schemas!");
-//                ref = StringUtils.substringAfterLast(ref, "/");
-//                Schema referredSchema = openAPI.getComponents().getSchemas().get(ref);
-//                if(referredSchema.getType() == null) {
-//                    throw new RuntimeException("Cannot get type from schema: " + ref);
-//                }
-//                // Copy over properties from referred schema
-//                schema.setProperties(referredSchema.getProperties());
-//                schema.setType(referredSchema.getType());
-//            }
-//        });
     }
 
     @Override
