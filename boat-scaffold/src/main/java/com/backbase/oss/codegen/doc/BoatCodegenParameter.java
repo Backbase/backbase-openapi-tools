@@ -140,13 +140,15 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (codegenParameter instanceof BoatCodegenParameter) {
             output.examples = ((BoatCodegenParameter) codegenParameter).examples;
             output.dataTypeDisplayName = ((BoatCodegenParameter) codegenParameter).dataTypeDisplayName;
-            output.parameter = ((BoatCodegenParameter)codegenParameter).parameter;
+            output.parameter = ((BoatCodegenParameter) codegenParameter).parameter;
             output.setRequestBody(((BoatCodegenParameter) codegenParameter).requestBody);
         } else {
             if (output.dataType != null && output.dataType.startsWith("array")) {
                 output.dataTypeDisplayName = "array of " + output.baseType.toLowerCase() + "s";
             } else {
-                output.dataTypeDisplayName = output.dataType.toLowerCase();
+                if (output.dataType != null) {
+                    output.dataTypeDisplayName = output.dataType.toLowerCase();
+                }
             }
         }
 
@@ -207,15 +209,25 @@ public class BoatCodegenParameter extends CodegenParameter {
             });
         }
         // dereference examples
-        examples.stream().filter(boatExample -> boatExample.getExample().get$ref() != null)
+        examples.stream()
+            .filter(boatExample -> boatExample.getExample().get$ref() != null)
             .forEach(boatExample -> {
-                String ref = StringUtils.substringAfterLast(boatExample.getExample().get$ref(), "/");
-                Example example = openAPI.getComponents().getExamples().get(ref);
-                if (example == null) {
-                    log.warn("Example ref: {} refers to an example that does not exist", ref);
+                String ref = boatExample.getExample().get$ref();
+                if (ref.startsWith("#/components/examples")) {
+                    ref = StringUtils.substringAfterLast(ref, "/");
+                    if (openAPI.getComponents() != null && openAPI.getComponents().getExamples() != null) {
+                        Example example = openAPI.getComponents().getExamples().get(ref);
+                        if (example == null) {
+                            log.warn("Example ref: {}  used in: {}  refers to an example that does not exist", ref, boatCodegenParameter.paramName);
+                        } else {
+                            log.debug("Replacing Example ref: {}  used in: {}  with example from components: {}", ref, boatCodegenParameter.paramName, example);
+                            boatExample.setExample(example);
+                        }
+                    } else {
+                        log.warn("Example ref: {}  used in: {}  refers to an example that does not exist", ref, boatCodegenParameter.paramName);
+                    }
                 } else {
-                    log.debug("Replacing Example ref: {} with example from components: {}", ref, example);
-                    boatExample.setExample(example);
+                    log.warn("Example ref: {} used in: {} refers to an example that does not exist", ref, boatCodegenParameter.paramName);
                 }
             });
         boatCodegenParameter.examples.addAll(examples);
