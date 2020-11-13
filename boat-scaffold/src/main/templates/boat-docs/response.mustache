@@ -1,131 +1,81 @@
 <h3 class="response-header-tab collapsed" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
 <div class="response-content-block" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
-  <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
-  <ul id="responses-detail-{{baseName}}-{{nickname}}-{{code}}" class="nav nav-tabs nav-tabs-examples" >
-    {{#schema}}
-      <li class="active">
-        <a data-toggle="tab" href="#responses-{{baseName}}-{{nickname}}-{{code}}-schema">Schema</a>
-      </li>
-
-      {{#examples}}
-        <li class="">
-          <a data-toggle="tab" href="#responses-{{baseName}}-{{nickname}}-{{code}}-example">Response Example</a>
-        </li>
-      {{/examples}}
-
-    {{/schema}}
-
-    {{#hasHeaders}}
-      <li class="">
-        <a data-toggle="tab" href="#responses-{{nickname}}-{{code}}-headers">Headers</a>
-      </li>
-    {{/hasHeaders}}
-
-    {{#vendorExtensions}}
-      {{#x-shared-errors}}
-        <script>
-          $(document).ready(function()
-          {
-            var errRef = "{{{$ref}}}";
-            var errorID = errRef.substring(errRef.lastIndexOf("/") + 1);
-            var errorDef = errs[errorID];
-            var tabID = 'responses-detail-{{baseName}}-{{nickname}}-{{code}}-' + errorID;
-            var contentID = tabID + "-content";
-
-            $('#responses-detail-{{baseName}}-{{nickname}}-{{code}}').append("<li><a href='#" + tabID + "' data-toggle='tab'>" + errorID + "</a></li>");
-            var contentWrapper = $('#responses-{{baseName}}-{{nickname}}-{{code}}-wrapper');
-            contentWrapper.append('<div class="tab-pane" id="' + tabID + '"><div id="' + contentID + '" class="exampleStyle"></div></div>');
-            var contentPane = $('#' + contentID);
-
-            contentPane.append('<p>' + errorDef.message + '</p>');
-            if (errorDef.variables)
-            {
-              contentPane.append('<h4>Variables</h4>');
-              var lVars = $('<ol></ol>').appendTo(contentPane);
-              for (lii = 0; lii < errorDef.variables.length; lii++)
-              {
-                $("<li></li>").appendTo(lVars).text(errorDef.variables[lii]);
-              }
-            }
-          });
-        </script>
-      {{/x-shared-errors}}
-    {{/vendorExtensions}}
-  </ul>
-
-
-  <div class="tab-content exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
-    {{#schema}}
-      <div class="tab-pane active" id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
-        <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
-          <script>
-            $(document).ready(function() {
-              var schemaWrapper = {{{jsonSchema}}};
-              var schema = findNode('schema', schemaWrapper.content).schema;
-
-              if (!schema) {
-                schema = schemaWrapper.schema;
-              }
-              if (schema.$ref != null) {
-                schema = defsParser.$refs.get(schema.$ref);
-                if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                    schema.items = defsParser.$refs.get(schema.items.$ref);
-
-
-                }
-              }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
-                schema.items = defsParser.$refs.get(schema.items.$ref);
-              } else {
-                schemaWrapper.definitions = Object.assign({}, defs);
-                $RefParser.dereference(schemaWrapper).catch(function(err) {
-                  console.log(err);
-                });
-              }
-
-              if (schema && schema.allOf) {
-                  schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                  schema = mergeAllOf(schema,  {
-                    resolvers: {
-                      defaultResolver: mergeAllOf.options.resolvers.title
-                    }
-                  });
-                }
-
-              if (schema.items && schema.items.allOf) {
-                  schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
-                  schema.items = mergeAllOf(schema.items,  {
-                    resolvers: {
-                      defaultResolver: mergeAllOf.options.resolvers.title
-                    }
-                  });
-                }
-
-              var view = new JSONSchemaView(schema, 3);
-              $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
-              var result = $('#responses-{{baseName}}-{{nickname}}-schema-{{code}}');
-              result.empty();
-              result.append(view.render());
-            });
-          </script>
-        </div>
-        <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
-      </div>
-      {{#examples}}
-        <div class="tab-pane" id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-          <pre class="prettyprint"><code class="json">{{example}}</code></pre>
-        </div>
-      {{/examples}}
-    {{/schema}}
-    {{#hasHeaders}}
-        <div class="tab-pane" id="responses-{{nickname}}-{{code}}-headers">
-            <div class="json-schema-view">
-                {{#headers}}
-                    {{>header}}
-                {{/headers}}
+    <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
+    <div class="exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
+        {{#hasHeaders}}
+            <h3>Headers</h3>
+            <div id="responses-{{nickname}}-{{code}}-headers">
+                <div class="json-schema-view">
+                    {{#headers}}
+                        {{>header}}
+                    {{/headers}}
+                </div>
             </div>
+        {{/hasHeaders}}
+        {{#schema}}
+            <h3>Schema</h3>
+            <div id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
+                <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
+                    <script>
+                        $(document).ready(function() {
+                          var schemaWrapper = {{{jsonSchema}}};
+                          var schema = findNode('schema', schemaWrapper.content).schema;
+
+                          if (!schema) {
+                            schema = schemaWrapper.schema;
+                          }
+                          if (schema.$ref != null) {
+                            schema = defsParser.$refs.get(schema.$ref);
+                            if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                                schema.items = defsParser.$refs.get(schema.items.$ref);
+
+
+                            }
+                          }else if (schema.type === 'array' && schema.items != null && schema.items.$ref != null) {
+                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                          } else {
+                            schemaWrapper.definitions = Object.assign({}, defs);
+                            $RefParser.dereference(schemaWrapper).catch(function(err) {
+                              console.log(err);
+                            });
+                          }
+
+                          if (schema && schema.allOf) {
+                              schema.allOf = schema.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                              schema = mergeAllOf(schema,  {
+                                resolvers: {
+                                  defaultResolver: mergeAllOf.options.resolvers.title
+                                }
+                              });
+                            }
+
+                          if (schema.items && schema.items.allOf) {
+                              schema.items.allOf = schema.items.allOf.map( i =>  i.$ref ? defsParser.$refs.get(i.$ref) : i).filter(Boolean);
+                              schema.items = mergeAllOf(schema.items,  {
+                                resolvers: {
+                                  defaultResolver: mergeAllOf.options.resolvers.title
+                                }
+                              });
+                            }
+
+                          var view = new JSONSchemaView(schema, 3);
+                          $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
+                          var result = $('#responses-{{baseName}}-{{nickname}}-schema-{{code}}');
+                          result.empty();
+                          result.append(view.render());
+                        });
+                </script>
+            </div>
+            <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
         </div>
-    {{/hasHeaders}}
-  </div>
+        {{#examples}}
+            <h3>Examples</h3>
+            <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
+                <pre class="prettyprint"><code class="json">{{example}}</code></pre>
+            </div>
+        {{/examples}}
+        {{/schema}}
+    </div>
 </div>
 <script>
   var response{{baseName}}{{code}}_description = `{{{message}}}`;
