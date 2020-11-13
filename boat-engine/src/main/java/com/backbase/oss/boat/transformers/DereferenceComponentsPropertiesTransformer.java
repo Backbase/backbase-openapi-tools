@@ -1,27 +1,30 @@
 package com.backbase.oss.boat.transformers;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * Dereferences openApi.
  *
  * <p>Goes through all the components/schema and recursively dereferences schemas, including properties for objects,
  * items for arrays. Also merges allOf composites.
- *
  */
+@SuppressWarnings("rawtypes")
 @Slf4j
 public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
     private static final String COMPONENTS_SCHEMAS_PATH = "#/components/schemas/";
+
+    private Map<String, Schema> resolvedShemas = new HashMap<>();
 
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
@@ -30,38 +33,49 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             return;
         }
         // Find all the components referenced from paths.
-        openAPI.getComponents().getSchemas().entrySet().stream()
-            .forEach(e -> deferenceSchema(e.getValue(), openAPI, e.getKey()));
+        openAPI.getComponents().getSchemas().forEach((name, schema) -> {
+            deferenceSchema(schema, openAPI, name);
+        });
     }
 
     private void deferenceSchema(Schema schema, OpenAPI openAPI, String crumb) {
-        log.info(crumb);
-        if (schema instanceof ComposedSchema) {
-            deferenceAllOf((ComposedSchema) schema, openAPI, crumb);
-        }
-        if (schema instanceof ArraySchema) {
-            dereferenceItems((ArraySchema) schema, openAPI, crumb);
-        }
-        if (schema.getProperties() != null) {
-            dereferenceProperties(schema, openAPI, crumb);
+
+
+        log.info("Dereference Schema: {}", crumb);
+        if (!resolvedShemas.containsKey(schema.getName())) {
+            if (schema instanceof ComposedSchema) {
+                deferenceAllOf((ComposedSchema) schema, openAPI, crumb);
+            }
+            if (schema instanceof ArraySchema) {
+                dereferenceItems((ArraySchema) schema, openAPI, crumb);
+            }
+            if (schema.getProperties() != null) {
+                dereferenceProperties(schema, openAPI, crumb);
+            }
+            resolvedShemas.put(crumb, schema);
+        } else {
+            log.info("Already dereferenced: {}", crumb);
         }
     }
 
     private void dereferenceProperties(Schema schema, OpenAPI openAPI, String crumb) {
         Map<String, Schema> replacements = newHashMap();
+
         for (Entry<String, Schema> entry : ((Map<String, Schema>) schema.getProperties()).entrySet()) {
             Schema propertySchema = entry.getValue();
             if (propertySchema.get$ref() != null) {
-                log.info(crumb + " : Replacing property {} with schema {}", entry.getKey(),
-                    propertySchema.get$ref());
-                Schema referencedSchema = getSchemaByInternalReference(propertySchema.get$ref(), openAPI);
-                replacements.put(entry.getKey(), referencedSchema);
-                propertySchema = referencedSchema;
+                if (!resolvedShemas.containsKey(propertySchema.get$ref())) {
+                    log.info(crumb + " : Replacing property {} with schema {}", entry.getKey(),
+                        propertySchema.get$ref());
+                    Schema referencedSchema = getSchemaByInternalReference(propertySchema.get$ref(), openAPI);
+                    replacements.put(entry.getKey(), referencedSchema);
+                    propertySchema = referencedSchema;
+                    resolvedShemas.put(propertySchema.get$ref(), referencedSchema);
+                }
             }
-            // recursively dereference
             deferenceSchema(propertySchema, openAPI, crumb + "/" + entry.getKey());
         }
-        log.info(crumb +  " : Replacing {} properties", replacements.size());
+        log.info(crumb + " : Replacing {} properties", replacements.size());
         schema.getProperties().putAll(replacements);
     }
 
