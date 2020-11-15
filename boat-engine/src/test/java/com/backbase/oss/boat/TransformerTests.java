@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class TransformerTests extends AbstractBoatEngineTests {
         OpenAPIExtractor extractor = new OpenAPIExtractor(openAPI);
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-        new DirectoryExploder(extractor, writer).serializeIntoDirectory("target/explode");
+        new DirectoryExploder(extractor, writer).serializeIntoDirectory(Paths.get("target/explode"));
     }
 
 
