@@ -6,152 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8" />
-  {{>js_jquery}}
-  {{>js_prettify}}
-  {{>js_bootstrap}}
-  {{>js_marked}}
-  <script>
-
-      if (!library)
-          var library = {};
-
-      library.json = {
-          replacer: function(match, pIndent, pKey, pVal, pEnd) {
-              var key = '<span class=json-key>';
-              var val = '<span class=json-value>';
-              var str = '<span class=json-string>';
-              var r = pIndent || '';
-              if (pKey)
-                  r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
-              if (pVal)
-                  r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
-              return r + (pEnd || '');
-          },
-          prettyPrint: function(obj) {
-              var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
-              return JSON.stringify(obj, null, 3)
-                      .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
-                      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                      .replace(jsonLine, library.json.replacer);
-          }
-      };
-
-    $( document ).ready(function() {
-      marked.setOptions({
-        renderer: new marked.Renderer(),
-        gfm: true,
-        tables: true,
-        breaks: false,
-        pedantic: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false
-      });
-
-      var textFile = null;
-
-      /// Function to be used to download a text json schema
-      function makeTextFile(text) {
-
-        var data = new Blob([text], {type: 'text/plain'});
-
-        // If we are replacing a previously generated file we need to
-        // manually revoke the object URL to avoid memory leaks.
-        if (textFile !== null) {
-          window.URL.revokeObjectURL(textFile);
-        }
-
-        textFile = window.URL.createObjectURL(data);
-
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        a.href = textFile;
-        a.download = 'schema.txt';
-        a.click();
-
-        return textFile;
-      };
-
-      /// TODO: Implement resizing for expanding within iframe
-      function callResize() {
-        window.parent.postMessage('resize', "*");
-      }
-
-      function processMarked() {
-        $(".marked").each(function() {
-          $(this).html(marked($(this).html()));
-        });
-      }
-
-      // Bootstrap Scrollspy
-      $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
-
-      // Content-Scroll on Navigation click.
-      $('.sidenav').find('a').on('click', function(e) {
-          e.preventDefault();
-          var id = $(this).attr('href');
-          if ($(id).length > 0)
-              $('html,body').animate({ scrollTop: parseInt($(id).offset().top) }, 400);
-          window.location.hash = $(this).attr('href');
-      });
-
-      // Quickjump on Pageload to hash position.
-      if(window.location.hash) {
-          var id = window.location.hash;
-          if ($(id).length > 0)
-              $('html,body').animate({ scrollTop: parseInt($(id).offset().top) }, 0);
-      }
-
-
-      function initDynamic() {
-        // tabs
-        $('.nav-tabs-examples a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        });
-
-
-        $('.nav-tabs-examples').find('a:first').tab('show');
-
-        // call scrollspy refresh method
-        $(window).scrollspy('refresh');
-      }
-
-      initDynamic();
-
-      // Pre- / Code-Format
-      prettyPrint();
-
-      //Convert elements with "marked" class to markdown
-      processMarked();
-    });
-
-    function findNode(id, currentNode) {
-        return (Object.keys(currentNode)[0] === id) ? currentNode : findNodeInChildren(id, currentNode);
-    }
-
-    function findNodeInChildren(id, currentNode) {
-        for (let prop in currentNode) {
-            if (currentNode.hasOwnProperty(prop)) {
-                let currentChild = currentNode[prop];
-                if (id === prop) {
-                    return currentChild;
-                } else {
-                    // Search in the current child
-                    if (typeof (currentChild) === 'object') {
-                        let result = findNode(id, currentChild);
-                        if (result !== false) {
-                            return result;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-  </script>
   <style type="text/css">
     {{>fonts}}
     {{>css_bootstrap}}
@@ -160,46 +14,17 @@
     {{>css_response}}
     {{>styles}}
   </style>
+    {{>js_jquery}}
+
 </head>
 <body>
-
-
-
-  <script>
-    // Script section to load models into a JS Var
-    var defs = {}
-    {{#models}}
-    {{#model}}
-    <!-- Sometimes classname is referred.. -->
-    defs["{{name}}"] = {{{modelJson}}};
-    <!-- maybe we should just buy some cows and a field... -->
-    {{/model}}
-    {{/models}}
-
-    var errs = {};
-    {{#swagger.vendorExtensions.x-shared-errors}}
-    {
-      let err = {{{.}}};
-      errs[err.errorID] = err;
-    }
-    {{/swagger.vendorExtensions.x-shared-errors}}
-  </script>
   <div class="container-fluid">
     <div class="row-fluid">
       <div id="sidenav" class="span2">
         <nav id="scrollingNav">
           <ul class="sidenav nav nav-list">
-            <!-- Logo Area -->
-<!--              <div style="width: 80%; background-color: #4c8eca; color: white; padding: 20px; text-align: center; margin-bottom: 20px; ">-->
-
-<!--              API Docs 2-->
-
-<!--              </div>-->
-<!--            -->
               <h1 class="nav-header">{{appName}}</h1>
-
               <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
-
             {{#apiInfo}}
               {{#apis}}
                 {{#operations}}
@@ -316,7 +141,6 @@
                           {{#hasBodyParam}}
                               <h2>Request Body Schema</h2>
                               {{#bodyParams}}
-
                                   {{>paramB}}
                               {{/bodyParams}}
 
@@ -335,24 +159,7 @@
               {{/apis}}
             {{/apiInfo}}
           </div>
-          <div id="footer">
-            <div id="api-_footer">
-              <p>Suggestions, contact, support and error reporting;
-                {{#infoUrl}}
-                  <div class="app-desc">Information URL: <a href="{{{infoUrl}}}">{{{infoUrl}}}</a></div>
-                {{/infoUrl}}
-                {{#infoEmail}}
-                  <div class="app-desc">Contact Info: <a href="{{{infoEmail}}}">{{{infoEmail}}}</a></div>
-                {{/infoEmail}}
-              </p>
-              {{#licenseInfo}}
-                <div class="license-info">{{{licenseInfo}}}</div>
-              {{/licenseInfo}}
-              {{#licenseUrl}}
-                <div class="license-url">{{{licenseUrl}}}</div>
-              {{/licenseUrl}}
-            </div>
-          </div>
+
 {{^hideGenerationTimestamp}}          <div id="generator">
             <div class="content">
               Generated {{generatedDate}}
@@ -361,6 +168,161 @@
 {{/hideGenerationTimestamp}}      </div>
     </div>
   </div>
+  {{>js_prettify}}
+  {{>js_bootstrap}}
+  {{>js_marked}}
+  <script>
+
+      if (!library)
+          var library = {};
+
+      library.json = {
+          replacer: function(match, pIndent, pKey, pVal, pEnd) {
+              var key = '<span class=json-key>';
+              var val = '<span class=json-value>';
+              var str = '<span class=json-string>';
+              var r = pIndent || '';
+              if (pKey)
+                  r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+              if (pVal)
+                  r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+              return r + (pEnd || '');
+          },
+          prettyPrint: function(obj) {
+              var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+              return JSON.stringify(obj, null, 3)
+                      .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+                      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                      .replace(jsonLine, library.json.replacer);
+          }
+      };
+
+    $( document ).ready(function() {
+      marked.setOptions({
+        renderer: new marked.Renderer(),
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: false
+      });
+
+      var textFile = null;
+
+      /// Function to be used to download a text json schema
+      function makeTextFile(text) {
+
+        var data = new Blob([text], {type: 'text/plain'});
+
+        // If we are replacing a previously generated file we need to
+        // manually revoke the object URL to avoid memory leaks.
+        if (textFile !== null) {
+          window.URL.revokeObjectURL(textFile);
+        }
+
+        textFile = window.URL.createObjectURL(data);
+
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        a.href = textFile;
+        a.download = 'schema.txt';
+        a.click();
+
+        return textFile;
+      };
+
+      /// TODO: Implement resizing for expanding within iframe
+      function callResize() {
+        window.parent.postMessage('resize', "*");
+      }
+
+      function processMarked() {
+        $(".marked").each(function() {
+          $(this).html(marked($(this).html()));
+        });
+      }
+
+      // Bootstrap Scrollspy
+      $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
+
+      // Content-Scroll on Navigation click.
+      $('.sidenav').find('a').on('click', function(e) {
+          e.preventDefault();
+          var id = $(this).attr('href');
+          if ($(id).length > 0)
+              $('html,body').animate({ scrollTop: parseInt($(id).offset().top) }, 400);
+          window.location.hash = $(this).attr('href');
+      });
+
+      // Quickjump on Pageload to hash position.
+      if(window.location.hash) {
+          var id = window.location.hash;
+          if ($(id).length > 0)
+              $('html,body').animate({ scrollTop: parseInt($(id).offset().top) }, 0);
+      }
+
+
+      function initDynamic() {
+        // call scrollspy refresh method
+        $(window).scrollspy('refresh');
+      }
+
+      initDynamic();
+
+      // Pre- / Code-Format
+      prettyPrint();
+
+      //Convert elements with "marked" class to markdown
+      processMarked();
+    });
+
+    function findNode(id, currentNode) {
+        return (Object.keys(currentNode)[0] === id) ? currentNode : findNodeInChildren(id, currentNode);
+    }
+
+    function findNodeInChildren(id, currentNode) {
+        for (let prop in currentNode) {
+            if (currentNode.hasOwnProperty(prop)) {
+                let currentChild = currentNode[prop];
+                if (id === prop) {
+                    return currentChild;
+                } else {
+                    // Search in the current child
+                    if (typeof (currentChild) === 'object') {
+                        let result = findNode(id, currentChild);
+                        if (result !== false) {
+                            return result;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+  </script>
+  <script>
+    // Script section to load models into a JS Var
+    var defs = {}
+    {{#models}}
+    {{#model}}
+    <!-- Sometimes classname is referred.. -->
+    defs["{{name}}"] = {{{modelJson}}};
+    <!-- maybe we should just buy some cows and a field... -->
+    {{/model}}
+    {{/models}}
+
+    var errs = {};
+    {{#swagger.vendorExtensions.x-shared-errors}}
+    {
+      let err = {{{.}}};
+      errs[err.errorID] = err;
+    }
+    {{/swagger.vendorExtensions.x-shared-errors}}
+  </script>
   {{>js_jsonformatter}}
   {{>js_jsonschemaview}}
   {{>js_json_schema_ref_parser}}
@@ -368,38 +330,40 @@
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
   <script>
-    var $RefParser = JsonSchemaRefParser;
-    var schemaWrapper = { "components": { "schemas" : defs}};
-    defsParser = new $RefParser();
-    defsParser.dereference(schemaWrapper).catch(function(err) {
-      console.log(err);
-    });
-  </script>
-  <script>
+  var $RefParser = JsonSchemaRefParser;
+  var schemaWrapper = { "components": { "schemas" : defs}};
+  defsParser = new $RefParser();
+  defsParser.dereference(schemaWrapper).catch(function(err) {
+    console.log(err);
+  });
+
   $(document).ready(function () {
-    $('.nav-tabs-examples').find('a:first').tab('show');
     $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
+
+    // To handle the examples
+    $('.dropdown-examples').each(function() {
+      $(this).find('.example-dropdown-value:first').show();
+    });
+
+    $('.example-dropdown-select').change(function() {
+      $(this).parent().parent().find('.example-dropdown-value').hide();
+      $(`.dropdown-examples div${this.value}`).show();
+    });
+
+    $(".response-header-tab").click(function() {
+      const id = $(this).attr('id');
+      const isCollapsed = $(this).hasClass('collapsed')
+      if (isCollapsed){
+        $(`#${id}-content`).slideDown();
+        $(this).removeClass('collapsed');
+      } else {
+        $(`#${id}-content`).slideUp();
+        $(this).addClass('collapsed');
+      }
+    });
+    $('.response-header-tab[data-code^="2"]').click();
   });
   </script>
-  <script>
-
-       // To handle the examples
-       $(document).ready(function() {
-          $('.dropdown-examples').each(function() {
-            $(this).find('.example-dropdown-value:first').show();
-          });
-          $('.example-dropdown-select').change(function() {
-            $(this).parent().parent().find('.example-dropdown-value').hide();
-            $(`.dropdown-examples div${this.value}`).show();
-          });
-       });
-    </script>
-<script>
-      $(".response-header-tab").click(function() {
-        const id = $(this).attr('id');
-        $(`#${id}-content`).slideToggle();
-      });
-</script>
 </body>
 </html>
 
