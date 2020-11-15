@@ -1,10 +1,13 @@
 package com.backbase.oss.boat.transformers.bundler;
 
+import static io.swagger.v3.parser.models.RefFormat.RELATIVE;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.ResolverCache;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.models.RefFormat;
+import java.nio.file.Paths;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +39,12 @@ public class BoatCache extends ResolverCache {
         if (result instanceof ApiResponse) {
             // resolve references from here...
             ApiResponse response = (ApiResponse) result;
-            examplesProcessor.processContent(response.getContent());
+
+            String relativePath = null;
+            if (refFormat == RELATIVE) {
+                relativePath = Paths.get(ref.substring(0, ref.indexOf("#"))).getParent().toString();
+            }
+            examplesProcessor.processContent(response.getContent(), relativePath);
         }
         return result;
     }
