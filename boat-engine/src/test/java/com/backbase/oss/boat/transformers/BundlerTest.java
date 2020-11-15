@@ -1,18 +1,18 @@
 package com.backbase.oss.boat.transformers;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,11 +20,17 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+@Slf4j
 public class BundlerTest {
 
     private static final String APPLICATION_JSON = "application/json";
@@ -43,13 +49,15 @@ public class BundlerTest {
 
     @Test
     public void testBundleApi() throws OpenAPILoaderException, IOException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
 
-        File input = new File("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
 
-        System.out.println(SerializerUtils.toYamlString(openAPI));
+
         assertThat("Single inline example is replaced with relative ref",
             singleExampleNode(openAPI, "/users", PathItem::getGet, "200", APPLICATION_JSON).get("$ref").asText(),
             isComponentExample);
@@ -85,21 +93,28 @@ public class BundlerTest {
             nullValue());
         assertThat("Attributes of aliased schema are copied",
             aliasedSchema.getPattern(), is("^[0-9].*$"));
+
+        log.debug(Yaml.pretty(openAPI));
     }
 
     private ObjectNode singleExampleNode(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
-            String response, String contentType) {
+                                         String response, String contentType) {
         return (ObjectNode) singleExample(openAPI, path, operation, response, contentType);
     }
 
     private Map singleExampleMap(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
-        String response, String contentType) {
+                                 String response, String contentType) {
         return (Map) singleExample(openAPI, path, operation, response, contentType);
     }
 
     private Object singleExample(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
-        String response, String contentType) {
-        return operation.apply(openAPI.getPaths().get(path)).getResponses().get(response).getContent().get(contentType)
+                                 String response, String contentType) {
+        Operation apply = operation.apply(openAPI.getPaths().get(path));
+        ApiResponses responses = apply.getResponses();
+        ApiResponse apiResponse = responses.get(response);
+        Content content = apiResponse.getContent();
+        MediaType mediaType = content.get(contentType);
+        return mediaType
             .getExample();
     }
 
