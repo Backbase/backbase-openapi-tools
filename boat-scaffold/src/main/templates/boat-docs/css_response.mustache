@@ -1,8 +1,8 @@
 .response-content-block {
   display: none;
-}
-.response-content-block[data-code^="2"] {
-  display: block;
+  padding: 24px;
+  border: 1px solid #eee;
+  margin-top: -4px;
 }
 
 .response-header-tab {
@@ -19,8 +19,48 @@
   background-color: rgba(29, 129, 39, 0.07);
 }
 
+.response-header-tab-handle {
+  cursor: pointer;
+  margin: auto 0.3em;
+  font-size: 10px;
+  display: inline-block;
+  transform-origin: 50% 20%;
+  transition: transform 150ms ease-in;
+  position: relative;
+  width: 8px;
+  height: 8px;
+}
+
+.response-header-tab-handle:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top: 4px solid rgb(29, 129, 39);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.response-header-tab-handle:after {
+  content: "" !important;
+  position: absolute;
+  left: 2px;
+  top: 0;
+  border-top: 2px solid #fff;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+}
+.response-header-tab.collapsed .response-header-tab-handle {
+  transform: rotate(-90deg);
+}
+
 .response-header-tab[data-code^="4"],
 .response-header-tab[data-code^="5"] {
   color: rgb(212, 31, 28);
   background-color: rgba(212, 31, 28, 0.07);
+}
+
+.response-header-tab[data-code^="4"] .response-header-tab-handle:before,
+.response-header-tab[data-code^="5"] .response-header-tab-handle:before {
+  border-top: 4px solid rgb(212, 31, 28);
 }
