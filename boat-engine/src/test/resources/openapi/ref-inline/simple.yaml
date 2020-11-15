@@ -1,0 +1,52 @@
+openapi: '3.0.3'
+
+info:
+  title: title
+  version: version
+
+paths:
+  /:
+    post:
+      operationId: op-id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                propThree:
+                  $ref: '#/components/schemas/Three'
+      responses:
+        200:
+          description: description
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                  propThree:
+                    $ref: '#/components/schemas/Three'
+
+components:
+  schemas:
+    One:
+      type: object
+      properties:
+        id:
+          type: integer
+        propTwo:
+          $ref: '#/components/schemas/Two'
+        propThree:
+          $ref: '#/components/schemas/Three'
+    Two:
+      type: object
+      properties:
+        id:
+          type: integer
+        propThree:
+          $ref: '#/components/schemas/Three'
+    Three:
+      type: object
+      properties:
+        value:
+          type: integer

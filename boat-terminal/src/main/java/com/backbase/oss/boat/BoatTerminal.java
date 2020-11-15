@@ -3,32 +3,18 @@ package com.backbase.oss.boat;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 import com.backbase.oss.boat.BoatTerminal.VersionProvider;
-import com.backbase.oss.boat.serializer.SerializerUtils;
-import com.backbase.oss.boat.transformers.OpenAPIExtractor;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
-import io.swagger.v3.oas.models.OpenAPI;
-import lombok.extern.slf4j.Slf4j;
-import picocli.AutoComplete.GenerateCompletion;
 import picocli.CommandLine;
-import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.IVersionProvider;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParseResult;
+import picocli.CommandLine.ScopeType;
+import picocli.CommandLine.Spec;
 
 @Command(
     name = "boat-terminal",
@@ -36,8 +22,14 @@ import picocli.CommandLine.Parameters;
     versionProvider = VersionProvider.class,
     usageHelpAutoWidth = true,
     mixinStandardHelpOptions = true,
-    sortOptions = false)
-@Slf4j
+    sortOptions = false,
+    synopsisSubcommandLabel = "COMMAND",
+    subcommands = {
+        BundleCommand.class,
+        ExportCommand.class,
+        RefInlineCommand.class,
+        CompletionCommand.class,
+    })
 public class BoatTerminal implements Runnable {
 
     static class VersionProvider implements IVersionProvider {
@@ -47,121 +39,55 @@ public class BoatTerminal implements Runnable {
         }
     }
 
-    static class Input {
-        @Option(names = {"-f", "--file"}, paramLabel = "<input>",
-            description = "Input RAML 1.0 file (deprecated, use the input as a parameter).")
-        private File inputOpt;
-
-        @Parameters(description = "Input RAML 1.0 file.")
-        private File input;
-
-        File get() {
-            return this.input != null ? this.input : this.inputOpt;
-        }
-    }
-
     public static void main(String[] args) {
-        System.exit(run(args));
+        System.exit(new BoatTerminal().run(args));
     }
 
-    static int run(String[] args) {
-        return new CommandLine(new BoatTerminal())
-            .addSubcommand("completion", new GenerateCompletion())
-            .execute(args);
-    }
+    private static final Logger ROOT = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
 
-    private final Logger root;
+    @Spec
+    private CommandSpec spec;
 
-    public BoatTerminal() {
-        this.root = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
-
-        this.root.setLevel(ch.qos.logback.classic.Level.WARN);
-    }
-
-    @ArgGroup(exclusive = true, multiplicity = "1", order = 10)
-    private Input input;
-
-    @Option(names = {"-o", "--output"}, order = 20,
-        description = "Output OpenAPI file name.")
-    private Path output;
-
-    @Option(names = {"-d", "--directory"}, order = 30,
-        description = "Output OpenAPI directory.")
-    private Path directory;
-
-    @Option(names = {"--convert-examples"}, order = 40,
-        description = "Convert examples to YAML.",
-        defaultValue = "true",
-        arity = "0..1",
-        paramLabel = "true|false",
-        showDefaultValue = Visibility.ALWAYS, fallbackValue = "true")
-    private boolean convertExamples;
-
-    @Option(names = {"-v", "--verbose"}, order = 50,
+    @Option(names = {"-v", "--verbose"}, order = 50, scope = ScopeType.INHERIT,
         description = "Verbose output; multiple -v options increase the verbosity.")
     public void setVerbose(boolean[] verbose) {
         switch (verbose.length) {
             case 1:
-                this.root.setLevel(ch.qos.logback.classic.Level.INFO);
+                ROOT.setLevel(ch.qos.logback.classic.Level.INFO);
                 break;
 
             case 2:
-                this.root.setLevel(ch.qos.logback.classic.Level.DEBUG);
+                ROOT.setLevel(ch.qos.logback.classic.Level.DEBUG);
                 break;
 
             default:
-                this.root.setLevel(ch.qos.logback.classic.Level.TRACE);
+                ROOT.setLevel(ch.qos.logback.classic.Level.TRACE);
                 break;
         }
     }
 
     @Override
     public void run() {
-        try {
-            execute();
-        } catch (final Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(e.getMessage(), e);
-            } else {
-                log.error(e.getMessage());
-            }
-        }
+        final CommandLine cmd = this.spec.commandLine();
+
+        cmd.usage(cmd.getErr());
     }
 
-    private void execute() throws ExportException, IOException {
-        final File inputFile = this.input.get();
 
-        if (!inputFile.exists()) {
-            throw new FileNotFoundException("Not found: " + inputFile.getAbsolutePath());
+    int run(String... args) {
+        return new CommandLine(new BoatTerminal())
+            .setExecutionExceptionHandler(this::handleExecutionException)
+            .execute(args);
+    }
+
+    private int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult)
+        throws Exception {
+        if (ROOT.isDebugEnabled()) {
+            ROOT.debug(commandLine.getCommandName(), ex);
+        } else {
+            ROOT.error("{}: {}", commandLine.getCommandName(), ex.getMessage());
         }
 
-        final ExporterOptions options = new ExporterOptions().convertExamplesToYaml(this.convertExamples);
-        final OpenAPI openApi = Exporter.export(inputFile, options);
-        final String yaml = SerializerUtils.toYamlString(openApi);
-
-        if (this.directory != null) {
-            final OpenAPIExtractor extractor = new OpenAPIExtractor(openApi);
-            final ObjectMapper mapper = new ObjectMapper();
-            final ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-
-            new DirectoryExploder(extractor, writer)
-                .serializeIntoDirectory(this.directory);
-
-            Files.write(this.directory.resolve("openapi.yaml"),
-                yaml.getBytes(Charset.forName("UTF-8")));
-        }
-        if (this.output != null) {
-            final Path parent = this.output.getParent();
-
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
-
-            Files.write(this.output,
-                yaml.getBytes(Charset.forName("UTF-8")));
-        }
-        if (this.output == null && this.directory == null) {
-            System.out.print(yaml);
-        }
+        return 0;
     }
 }

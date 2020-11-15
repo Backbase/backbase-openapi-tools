@@ -1,0 +1,13 @@
+type: object
+properties:
+  id:
+    type: integer
+  propTwo:
+    type: object
+    properties:
+      id:
+        type: integer
+      propThree:
+        $ref: '../nested-with-files.yaml#/components/schemas/Three'
+  propThree:
+    $ref: '../nested-with-files.yaml#/components/schemas/Three'

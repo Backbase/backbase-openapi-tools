@@ -9,6 +9,6 @@ public class BoatTerminalTest {
 
     @Test
     public void testCLI() {
-        assertThat(BoatTerminal.run(new String[] {"-V"}), is(0));
+        assertThat(new BoatTerminal().run("-V"), is(0));
     }
 }

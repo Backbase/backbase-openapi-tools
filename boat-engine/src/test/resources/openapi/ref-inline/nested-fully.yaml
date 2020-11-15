@@ -1,0 +1,30 @@
+openapi: '3.0.3'
+
+info:
+  title: title
+  version: version
+
+paths: {}
+
+components:
+  schemas:
+    One:
+      type: object
+      properties:
+        id:
+          type: integer
+        propTwo:
+          type: object
+          properties:
+            id:
+              type: integer
+            propThree:
+              type: object
+              properties:
+                id:
+                  type: integer
+                propFour:
+                  type: object
+                  properties:
+                    id:
+                      type: integer

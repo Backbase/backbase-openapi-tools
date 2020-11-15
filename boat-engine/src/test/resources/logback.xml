@@ -4,7 +4,7 @@
             <pattern>%highlight([%level]) [%logger{10}] %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
+    <root level="ALL">
         <appender-ref ref="COLOR"/>
     </root>
     <logger name="org.raml" level="INFO"/>
