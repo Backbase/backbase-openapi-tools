@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
@@ -16,6 +17,8 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServ
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
+import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
+import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
@@ -395,13 +398,13 @@ public class GenerateMojo extends AbstractMojo {
      * Skip the execution.
      */
     @Parameter(name = "skip", property = "codegen.skip", required = false, defaultValue = "false")
-    protected Boolean skip;
+    protected boolean skip;
 
     /**
      * Skip the execution if the source file is older than the output folder.
      */
     @Parameter(name = "skipIfSpecIsUnchanged", property = "codegen.skipIfSpecIsUnchanged", required = false, defaultValue = "false")
-    protected Boolean skipIfSpecIsUnchanged;
+    protected boolean skipIfSpecIsUnchanged;
 
     /**
      * Add the output directory to the project as a source root, so that the generated java types
@@ -416,7 +419,7 @@ public class GenerateMojo extends AbstractMojo {
      * {@link #addCompileSourceRoot}.
      */
     @Parameter(defaultValue = "false", property = "openapi.generator.maven.plugin.addTestCompileSourceRoot")
-    private boolean addTestCompileSourceRoot = false;
+    protected boolean addTestCompileSourceRoot;
 
     @Parameter
     protected Map<String, String> environmentVariables = new HashMap<>();
@@ -426,6 +429,19 @@ public class GenerateMojo extends AbstractMojo {
 
     @Parameter(property = "codegen.configHelp")
     protected boolean configHelp = false;
+
+    /**
+     * Inline referenced simple type schemas. Simple type extensions are ignored during documentation generation.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.unAlias")
+    protected boolean unAlias;
+
+    /**
+     * Deference components/schemas properties. html2 document generator does not like.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.dereferenceComponents")
+    protected boolean dereferenceComponents;
+
 
     /**
      * The project being built.
@@ -440,15 +456,15 @@ public class GenerateMojo extends AbstractMojo {
     @Override
     @SuppressWarnings({"java:S3776", "java:S1874"})
     public void execute() throws MojoExecutionException {
+        if (skip) {
+            getLog().info("Code generation is skipped.");
+            return;
+        }
+
         File inputSpecFile = new File(inputSpec);
         addCompileSourceRootIfConfigured();
 
         try {
-            if (skip) {
-                getLog().info("Code generation is skipped.");
-                return;
-            }
-
             if (buildContext != null && buildContext.isIncremental() && inputSpec != null && inputSpecFile.exists()
                 && !buildContext.hasDelta(inputSpecFile)) {
                 getLog().info(
@@ -460,7 +476,8 @@ public class GenerateMojo extends AbstractMojo {
                 File storedInputSpecHashFile = getHashFile(inputSpecFile);
                 if (storedInputSpecHashFile.exists()) {
                     String inputSpecHash = calculateInputSpecHash(inputSpecFile);
-                    String storedInputSpecHash = Files.asCharSource(storedInputSpecHashFile, StandardCharsets.UTF_8).read();
+                    String storedInputSpecHash = Files.asCharSource(storedInputSpecHashFile, StandardCharsets.UTF_8)
+                        .read();
                     if (inputSpecHash.equals(storedInputSpecHash)) {
                         getLog().info(
                             "Code generation is skipped because input was unchanged");
@@ -469,8 +486,8 @@ public class GenerateMojo extends AbstractMojo {
                 }
             }
 
-             // Copy openapi input spec to location.
-            if(inputSpecFile.exists() && copyTo != null) {
+            // Copy openapi input spec to location.
+            if (inputSpecFile.exists() && copyTo != null) {
                 getLog().info("Copying input spec to: " + copyTo);
                 copyTo.mkdirs();
                 java.nio.file.Files.copy(inputSpecFile.toPath(), copyTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -534,20 +551,28 @@ public class GenerateMojo extends AbstractMojo {
                 configurator.setEnablePostProcessFile(enablePostProcessFile);
             }
 
-            if (generateAliasAsModel  != null) {
+            if (generateAliasAsModel != null) {
                 configurator.setGenerateAliasAsModel(generateAliasAsModel);
             }
 
             if (isNotEmpty(generatorName)) {
-                if ("spring".equals(generatorName)) {
-                    configurator.setGeneratorName(com.backbase.oss.codegen.SpringCodeGen.class.getName());
-                } else {
-                    configurator.setGeneratorName(generatorName);
+                switch (generatorName) {
+                    case "java":
+                    case "spring":
+                        generatorName = "boat-" + generatorName;
+                        break;
+
+                    default:
+                        // use the original generator
                 }
+
+                configurator.setGeneratorName(generatorName);
+
 
                 // check if generatorName & language are set together, inform user this needs to be updated to prevent future issues.
                 if (isNotEmpty(language)) {
-                    log.warn("The 'language' option is deprecated and was replaced by 'generatorName'. Both can not be set together");
+                    log.warn(
+                        "The 'language' option is deprecated and was replaced by 'generatorName'. Both can not be set together");
                     throw new MojoExecutionException(
                         "Illegal configuration: 'language' and  'generatorName' can not be set both, remove 'language' from your configuration");
                 }
@@ -557,7 +582,8 @@ public class GenerateMojo extends AbstractMojo {
                 configurator.setGeneratorName(language);
             } else {
                 log.error("A generator name (generatorName) is required.");
-                throw new MojoExecutionException("The generator requires 'generatorName'. Refer to documentation for a list of options.");
+                throw new MojoExecutionException(
+                    "The generator requires 'generatorName'. Refer to documentation for a list of options.");
             }
 
             configurator.setOutputDir(output.getAbsolutePath());
@@ -725,7 +751,7 @@ public class GenerateMojo extends AbstractMojo {
 
             if (environmentVariables != null) {
 
-                for (Entry<String,String> entry : environmentVariables.entrySet()) {
+                for (Entry<String, String> entry : environmentVariables.entrySet()) {
                     String key = entry.getKey();
                     originalEnvironmentVariables.put(key, GlobalSettings.getProperty(key));
                     String value = environmentVariables.get(key);
@@ -759,6 +785,13 @@ public class GenerateMojo extends AbstractMojo {
                 return;
             }
             adjustAdditionalProperties(config);
+
+            if (unAlias) {
+                new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
+            }
+            if (dereferenceComponents) {
+                new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
+            }
             new DefaultGenerator().opts(input).generate();
 
             if (buildContext != null) {

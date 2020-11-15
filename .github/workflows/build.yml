@@ -1,4 +1,4 @@
-name: Backbase OpenApi Tools
+name: BOAT
 on:
   push:
     branches:
