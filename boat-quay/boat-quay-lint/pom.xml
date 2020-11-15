@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-quay-rules</artifactId>
-            <version>0.2.8</version>
+            <version>0.7.0</version>
         </dependency>
 
         <dependency>
