@@ -1,10 +1,11 @@
 package com.backbase.oss.boat.transformers.bundler;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Stream.of;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -25,12 +26,20 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Stream.of;
+
 @Slf4j
 public class ExamplesProcessor {
+
+    ObjectMapper yamlObjectMapper = new ObjectMapper(YAMLFactory.builder().build());
+    ObjectMapper jsonObjectMapper = new ObjectMapper();
 
     private final OpenAPI openAPI;
     private final Path rootDir;
@@ -58,7 +67,7 @@ public class ExamplesProcessor {
     }
 
     public void processContent(Content content, String relativePath) {
-        streamContentExamples(content).forEach(example ->  fixInlineExamples(example, relativePath));
+        streamContentExamples(content).forEach(example -> fixInlineExamples(example, relativePath));
     }
 
     private Map<String, Example> getComponentExamplesFromOpenAPI() {
@@ -130,21 +139,59 @@ public class ExamplesProcessor {
             return;
         }
         Path path;
+        Optional<String> fragment;
+        if (refPath.contains("#")) {
+            fragment = Optional.of(StringUtils.substringAfter(refPath, "#"));
+            refPath = StringUtils.strip(StringUtils.substringBefore(refPath, "#"), "./");
+        } else {
+            fragment = Optional.empty();
+        }
+
+
+        path = resolvePath(relativePath, refPath);
+        try {
+            String content = StringUtils.strip(StringUtils.replaceEach(
+                new String(Files.readAllBytes(path)),
+                new String[]{"\t"},
+                new String[]{"  "}));
+
+            if (fragment.isPresent()) {
+                // resolve fragment from json node
+                JsonNode jsonNode = yamlObjectMapper.readTree(content);
+                JsonPointer jsonPointer = JsonPointer.compile(fragment.get());
+                JsonNode exampleNode = jsonNode.at(jsonPointer);
+
+                if(exampleNode.has("$ref")) {
+                    refPath = exampleNode.get("$ref").asText();
+                    path = resolvePath(relativePath, refPath);
+                    resolvePath(relativePath, refPath);
+                    content = StringUtils.strip(StringUtils.replaceEach(
+                        new String(Files.readAllBytes(path)),
+                        new String[]{"\t"},
+                        new String[]{"  "}));
+                    exampleHolder.setContent(content);
+                } else {
+                    exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
+                }
+            } else {
+                exampleHolder.setContent(content);
+            }
+
+
+            dereferenceExample(exampleHolder);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path resolvePath(String relativePath, String refPath) {
+        Path path;
         if (relativePath == null) {
             path = rootDir.resolve(StringUtils.strip(refPath, "./"));
         } else {
             path = Paths.get(rootDir.toString(), relativePath, refPath);
         }
-        try {
-            String content = StringUtils.strip(StringUtils.replaceEach(
-                new String(Files.readAllBytes(path)),
-                new String[] {"\t"},
-                new String[] {"  "}));
-            exampleHolder.setContent(content);
-            dereferenceExample(exampleHolder);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return path;
     }
 
     private void dereferenceExample(ExampleHolder exampleHolder) {
