@@ -9,8 +9,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,6 +27,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /*
   Bundles all references in the OpenAPI specification into one file.
  */
+@Getter
+@Setter
 public class BundleMojo extends AbstractMojo {
 
     @Parameter(name = "input", required = true)
@@ -32,13 +37,27 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "output", required = true)
     private File output;
 
+    @Parameter(name = "versionFileName", required = false)
+    private boolean versionFileName = true;
+
+    /**
+     * Skip the execution.
+     */
+    @Parameter(name = "skip", property = "bundle.skip", defaultValue = "false", alias = "codegen.skip")
+    private boolean skip;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Skipping OpenAPI bundle.");
+
+            return;
+        }
+
         log.info("Bundling OpenAPI: {} to: {}", input, output);
 
         if (input.isDirectory() && output.getName().endsWith(".yaml")) {
-            throw new MojoFailureException("Both input and output need to be either a directory or a file.");
+            throw new MojoExecutionException("Both input and output need to be either a directory or a file.");
         }
 
         File[] inputFiles;
@@ -75,9 +94,29 @@ public class BundleMojo extends AbstractMojo {
             if (!directory.exists()) {
                 directory.mkdirs();
             }
+            if (versionFileName) {
+                String versionedFileName = versionFileName(outputFile.getAbsolutePath(), openAPI);
+                outputFile = Paths.get(versionedFileName).toFile();
+
+            }
             Files.write(outputFile.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
         } catch (OpenAPILoaderException | IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: {}" + inputFile, e);
         }
     }
+
+    String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
+        String version = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
+        if (version == null) {
+            throw new MojoExecutionException("Configured to use version in filename, but no version set.");
+        }
+        String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
+        String majorFromVersion = version.substring(0, version.indexOf("."));
+        if (!majorFromFileName.equals(majorFromVersion)) {
+            throw new MojoExecutionException("Invalid version " + version + " in file " + originalFileName);
+        }
+        // payment-order-client-api-v2.yaml
+        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + version + "$3");
+    }
+
 }

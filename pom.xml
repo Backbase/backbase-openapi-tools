@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.2.8</version>
+    <version>0.7.0</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
@@ -65,27 +65,17 @@
         <guava-version>28.1-android</guava-version>
 
         <slf4j.version>1.7.30</slf4j.version>
-
-        <swagger-core.v1.version>1.6.2</swagger-core.v1.version>
-        <swagger-core.v3.version>2.1.5</swagger-core.v3.version>
-
-        <swagger-parser.version>2.0.22</swagger-parser.version>
+        <swagger-core.version>2.1.5</swagger-core.version>
+        <swagger-parser.version>2.0.23</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-
-        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
-        <openapi-diff-version>2.0.0-beta.6</openapi-diff-version>
     </properties>
 
     <modules>
-        <module>boat-trail-resources</module>
-
         <module>boat-engine</module>
         <module>boat-scaffold</module>
         <module>boat-terminal</module>
         <module>boat-maven-plugin</module>
-
-        <module>boat-quay</module>
         <!-- Code Coverage Project -->
         <module>tests</module>
     </modules>
@@ -113,20 +103,12 @@
             </dependency>
 
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>1.7.30</version>
-            </dependency>
-
-
-            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.3</version>
             </dependency>
 
 
-            <!-- Jackson Dependencies -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -170,33 +152,12 @@
             </dependency>
 
             <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jsonSchema</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-parameter-names</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
-
-            <!-- Joda -->
-            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>2.10.5</version>
                 <scope>compile</scope>
             </dependency>
 
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-
-            <!-- Maven Dependenceis -->
             <dependency>
                 <groupId>org.apache.maven.shared</groupId>
                 <artifactId>maven-common-artifact-filters</artifactId>
@@ -253,49 +214,35 @@
                 <version>${guava-version}</version>
             </dependency>
 
-            <!-- Swagger Dependencies -->
-
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-core</artifactId>
-                <version>${swagger-core.v1.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-core.v1.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger-core.v1.version}</version>
+                <version>1.6.2</version>
             </dependency>
 
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-core</artifactId>
-                <version>${swagger-core.v3.version}</version>
-            </dependency>
+                <version>${swagger-core.version}</version>
 
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger-core.v3.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-core.v3.version}</version>
-                <scope>compile</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
                 <artifactId>swagger-parser</artifactId>
                 <version>${swagger-parser.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>2.0.2</version>
             </dependency>
 
             <dependency>
@@ -321,7 +268,7 @@
             <dependency>
                 <groupId>com.github.java-json-tools</groupId>
                 <artifactId>json-schema-validator</artifactId>
-                <version>2.2.14</version>
+                <version>2.2.13</version>
             </dependency>
 
             <dependency>
@@ -343,18 +290,68 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>2.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.3.3</version>
+                <scope>test</scope>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
+        <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-invoker-plugin</artifactId>
+                    <version>3.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
@@ -372,7 +369,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -481,11 +477,10 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Surefire plugin - for running unit tests-->
+                    <!-- Surefire plugin - for running unit tests -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.22.2</version>
                         <configuration>
                             <skipTests>${skipTests}</skipTests>
                             <!-- Excludes integration tests when unit tests are run. -->
@@ -498,7 +493,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco-maven-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>
@@ -519,7 +513,6 @@
                     <plugin>
                         <groupId>org.sonarsource.scanner.maven</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
-                        <version>3.7.0.1746</version>
                     </plugin>
 
                 </plugins>
