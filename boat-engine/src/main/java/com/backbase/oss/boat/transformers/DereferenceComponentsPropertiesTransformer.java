@@ -42,7 +42,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
 
         log.info("Dereference Schema: {}", crumb);
-        if (!resolvedShemas.containsKey(schema.getName())) {
+        if (!resolvedShemas.containsKey(crumb)) {
             if (schema instanceof ComposedSchema) {
                 deferenceAllOf((ComposedSchema) schema, openAPI, crumb);
             }
