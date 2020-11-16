@@ -68,12 +68,14 @@
             </div>
             <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
         </div>
-        {{#examples}}
+        {{#hasExamples}}
             <h3>Examples</h3>
-            <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-                <pre class="prettyprint"><code class="json">{{example}}</code></pre>
-            </div>
-        {{/examples}}
+            {{#examples}}
+                <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
+                    <pre class="prettyprint"><code class="json">{{example}}</code></pre>
+                </div>
+            {{/examples}}
+        {{/hasExamples}}
         {{/schema}}
     </div>
 </div>
