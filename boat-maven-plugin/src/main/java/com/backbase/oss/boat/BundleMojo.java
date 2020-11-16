@@ -1,9 +1,13 @@
 package com.backbase.oss.boat;
 
+import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
+import com.backbase.oss.boat.transformers.SpecVersionTransformer;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.FileFilter;
@@ -36,6 +40,9 @@ public class BundleMojo extends AbstractMojo {
 
     @Parameter(name = "output", required = true)
     private File output;
+
+    @Parameter(name = "version", required = false)
+    private String version;
 
     @Parameter(name = "versionFileName", required = false)
     private boolean versionFileName = true;
@@ -88,6 +95,11 @@ public class BundleMojo extends AbstractMojo {
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
         try {
             OpenAPI openAPI = OpenAPILoader.load(inputFile);
+
+            if (isNotBlank(version)) {
+                new SpecVersionTransformer(version).transform(openAPI, emptyMap());
+            }
+
             new Bundler(inputFile).transform(openAPI, Collections.emptyMap());
 
             File directory = outputFile.getParentFile();

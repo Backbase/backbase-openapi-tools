@@ -19,11 +19,17 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.8.1
+
+* *Maven Plugin*
+  * Added `version` parameter to `bundle` goal.
+
 ## 0.7.0
 * Render multiple requests and examples in boat-docs
 * Created HTML templates for boat-docs
 * Pretty Print JSON Examples
 * Added boat:doc mojo for generating beautiful HTML2 docs
+
 * * Spring Generator*
   * Restored `HttpServletRequest` parameter (regression).
 * Added boat:yard to create static website based on a collection of specs
