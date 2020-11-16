@@ -45,10 +45,6 @@ public class BoatLinterTests {
 
         rulesManager.getRules().forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
-
-
         });
-
     }
-
 }

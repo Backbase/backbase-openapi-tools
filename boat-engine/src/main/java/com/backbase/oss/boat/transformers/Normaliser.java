@@ -30,14 +30,14 @@ public class Normaliser implements Transformer {
 
     private void normalizeResponse(String s, ApiResponse apiResponse) {
         if (apiResponse != null && apiResponse.getContent() != null) {
-            log.info("Normalizing Response Examples in: {}", s);
+            log.debug("Normalizing Response Examples in: {}", s);
             apiResponse.getContent().forEach((key, value) -> normalizeExampleNames(value));
         }
     }
 
     private void normalizeRequest(String s, RequestBody requestBody) {
         if (requestBody != null && requestBody.getContent() != null) {
-            log.info("Normalizing Request Examples in: {}", s);
+            log.debug("Normalizing Request Examples in: {}", s);
             requestBody.getContent().forEach((key, value) -> normalizeExampleNames(value));
         }
     }
@@ -49,7 +49,7 @@ public class Normaliser implements Transformer {
             examples.forEach((name, example) -> {
 
                 String normalizedName = Utils.normalizeSchemaName(name);
-                log.info("Normalizing name: {} to: {}", name, normalizedName);
+                log.debug("Normalizing name: {} to: {}", name, normalizedName);
                 normalizedExamples.put(normalizedName, example);
             });
             mediaType.setExamples(normalizedExamples);
