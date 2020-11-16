@@ -1,13 +1,13 @@
 package com.backbase.oss.codegen.doc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @Slf4j
@@ -19,12 +19,14 @@ public class BoatExample {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    private String key;
     private String name;
     private String contentType;
     private Example example;
 
     public BoatExample(String key, String contentType, Example value) {
-        this.name = key;
+        this.key = key;
+        this.name = StringUtils.replace(key, " ", "-");
         this.contentType = contentType;
         this.example = value;
     }

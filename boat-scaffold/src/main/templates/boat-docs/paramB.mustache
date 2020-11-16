@@ -2,13 +2,8 @@
     <p class="marked">{{description}}</p>
     <div class="requests-wrapper">
         <div class="examples-tab-wrapper">
-            <ul id="requests-detail-{{baseName}}-{{nickname}}-{{code}}" class="nav nav-tabs nav-tabs-examples">
-                <li class="active">
-                    <a data-toggle="tab" href="#requests-{{baseName}}-{{nickname}}-{{code}}-schema">Schema</a>
-                </li>
-            </ul>
             <div class="tab-content exampleStyle">
-                <div class="tab-pane active" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema">
+                <div class="tab-pane active" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema" style="flex: 1;" >
                     <div id="requests-{{baseName}}-{{nickname}}-{{code}}-schema-data">
                         <script>
                             $(document).ready(function() {
@@ -74,14 +69,14 @@
                             <select class="example-dropdown-select">
                                 {{#examples}}
                                     <option data-toggle="tab"
-                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example">{{name}}</option>
+                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}}</option>
                                 {{/examples}}
                             </select>
                         </label>
                         {{#examples}}
                             <div class="example-dropdown-value"
-                                 id="requests-{{baseName}}-{{nickname}}-{{code}}-example">
-                                <pre class="prettyprint"><code class="json">{{{prettyPrintValue}}}</code></pre>
+                                 id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
+                                <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
                             </div>
                         {{/examples}}
 
