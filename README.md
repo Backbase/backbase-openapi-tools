@@ -12,7 +12,7 @@ It currently consists of
 * Decompose Transformer to remove Composed Schemas from OpenAPI specs to aid in code generators
 * Case Transformer to see how your API looks like when going from camelCase to snake_case  (transforms examples too)
 * [Code Generator](boat-maven-plugin/README.md) based on [openapi-generator.tech](https://openapi-generator.tech/) with optimized templates and fixes.
- 
+* Lint mojo based on Zalando Zally API Guidelines
 
 The project is very much Work In Progress and will be published on maven central when considered ready enough. 
 
@@ -20,22 +20,22 @@ The project is very much Work In Progress and will be published on maven central
 BOAT is still under development and subject to change.
 
 ## 0.8.1
-* Always add single examples to examples list. 
-* Add version parameter to boat:bundle mojo
+* *Maven Plugin*
+  * Added `version` parameter to `bundle` goal.
 * Modernised BOAT Terminal
-* Improved BOAT:Docs
+* Improved BOAT:Docs Templates
 
 ## 0.8.0
 * Improved styling HTML docs
 * preview BOAT:QUAY linting mojo for linting OpenAPI specs.
 * Avoid circular references when derefenencing OpenAPI specs
 
-
 ## 0.7.0
 * Render multiple requests and examples in boat-docs
 * Created HTML templates for boat-docs
 * Pretty Print JSON Examples
 * Added boat:doc mojo for generating beautiful HTML2 docs
+
 * * Spring Generator*
   * Restored `HttpServletRequest` parameter (regression).
 * Added boat:yard to create static website based on a collection of specs
