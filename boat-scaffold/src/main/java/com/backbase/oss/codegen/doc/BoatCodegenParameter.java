@@ -164,11 +164,26 @@ public class BoatCodegenParameter extends CodegenParameter {
     static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
         boatCodegenParameter.parameter = parameter;
+
+        if (boatCodegenParameter.examples == null) {
+            boatCodegenParameter.examples = new ArrayList<>();
+        }
         // Copy Parameter Examples if applicable
+        if (parameter.getExample() != null) {
+            Object example = parameter.getExample();
+            BoatExample boatExample = new BoatExample("example", codegenParameter.baseType, new Example().value(example));
+            if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
+                boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
+            }
+            boatCodegenParameter.examples.add(boatExample);
+        }
+
         if (parameter.getExamples() != null) {
-            boatCodegenParameter.examples = parameter.getExamples().entrySet().stream()
-                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(), null, stringExampleEntry.getValue()))
-                .collect(Collectors.toList());
+            boatCodegenParameter.examples.addAll(parameter.getExamples().entrySet().stream()
+                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(),
+                    codegenParameter.baseType, stringExampleEntry.getValue()))
+                .collect(Collectors.toList()));
+
         }
 
         if (parameter.getContent() != null) {
