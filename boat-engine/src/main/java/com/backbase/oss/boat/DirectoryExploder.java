@@ -49,18 +49,17 @@ public class DirectoryExploder {
      * Writes the examples into the examples/ directory of {@code outputDir}.
      * Cleans any existing content inside {@code outputDir} if present, but not that directory itself.
      *
-     * @param outputDir the directory which will contain the exploded examples in the examples/ subdirectory.
+     * @param outputPath the directory which will contain the exploded examples in the examples/ subdirectory.
      *                  Can contain multiple directories, as in my-dir1/my-dir2/my-dir3.
      *                  Using the correct file separator (/ or \) for the current file system is the responsibility of the caller.
-     * @throws IOException if the existing content of the {@code outputDir} cannot be deleted, or if {@code outputDir} cannot be created.
+     * @throws IOException if the existing content of the {@code outputDir} cannot be deleted, or if {@code outputPath} cannot be created.
      */
-    public void serializeIntoDirectory(@NotNull String outputDir) throws IOException {
+    public void serializeIntoDirectory(@NotNull Path outputPath) throws IOException {
         List<NamedExample> examples = openAPIExtractor.extractInlineExamples();
-        Path outputPath = Paths.get(outputDir);
         if (Files.exists(outputPath)) {
             FileUtils.cleanDirectory(outputPath.toFile());
         }
-        Path examplesPath = Paths.get(outputDir, EXAMPLES_DIR);
+        Path examplesPath = outputPath.resolve(EXAMPLES_DIR);
         Files.createDirectories(examplesPath);
         examples.forEach(namedExample -> {
             String title = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, namedExample.getName());
