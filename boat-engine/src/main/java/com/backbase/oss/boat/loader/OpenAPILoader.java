@@ -15,7 +15,7 @@ public class OpenAPILoader {
     }
 
     public static OpenAPI load(File file, boolean resolveFully) throws OpenAPILoaderException {
-        return load(file, false, false);
+        return load(file, resolveFully, false);
     }
 
     public static OpenAPI load(File file, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
