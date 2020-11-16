@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.zalando.zally.core.ApiValidator;
 import org.zalando.zally.core.DefaultContextFactory;
 import org.zalando.zally.core.Result;
+import org.zalando.zally.core.RuleDetails;
 import org.zalando.zally.core.RulesManager;
 
 public class BoatLinterTests {
@@ -35,16 +37,18 @@ public class BoatLinterTests {
 
         for (Result result : lint) {
             System.out.println(result.toString());
-
         }
-
+        Assert.assertFalse(lint.isEmpty());
     }
 
     @Test
     public void ruleManager() {
 
-        rulesManager.getRules().forEach(ruleDetails -> {
+        List<RuleDetails> rules = rulesManager.getRules();
+        rules.forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });
+
+        Assert.assertFalse(rules.isEmpty());
     }
 }
