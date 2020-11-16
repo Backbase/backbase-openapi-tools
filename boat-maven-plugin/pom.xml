@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-quay-lint</artifactId>
-            <version>0.2.8</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Maven Dependencies -->
