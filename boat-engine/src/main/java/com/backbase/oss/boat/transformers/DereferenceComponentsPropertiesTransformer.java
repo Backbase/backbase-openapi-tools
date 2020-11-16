@@ -18,13 +18,13 @@ import static com.google.common.collect.Maps.newHashMap;
  * <p>Goes through all the components/schema and recursively dereferences schemas, including properties for objects,
  * items for arrays. Also merges allOf composites.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings("rawtypes")
 @Slf4j
 public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
     private static final String COMPONENTS_SCHEMAS_PATH = "#/components/schemas/";
 
-    private final Map<String, Schema> resolvedShemas = new HashMap<>();
+    private Map<String, Schema> resolvedShemas = new HashMap<>();
 
     @Override
     public void transform(OpenAPI openAPI, Map<String, Object> options) {
@@ -39,13 +39,10 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
     }
 
     private void deferenceSchema(Schema schema, OpenAPI openAPI, String crumb) {
-        log.info("Dereference Schema: {}", crumb);
-        String name = schema.getName();
-        if(name == null) {
-            name = crumb;
-        }
 
-        if (!resolvedShemas.containsKey(name)) {
+
+        log.info("Dereference Schema: {}", crumb);
+        if (!resolvedShemas.containsKey(crumb)) {
             if (schema instanceof ComposedSchema) {
                 deferenceAllOf((ComposedSchema) schema, openAPI, crumb);
             }
@@ -55,7 +52,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             if (schema.getProperties() != null) {
                 dereferenceProperties(schema, openAPI, crumb);
             }
-            resolvedShemas.put(name, schema);
+            resolvedShemas.put(crumb, schema);
         } else {
             log.info("Already dereferenced: {}", crumb);
         }
