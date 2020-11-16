@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import kotlin.ranges.IntRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zalando.zally.core.ApiValidator;
 import org.zalando.zally.core.Result;
 import org.zalando.zally.core.RulesPolicy;
@@ -15,7 +13,6 @@ import org.zalando.zally.rule.api.Severity;
 
 public class BoatLinter {
 
-    private final Logger log = LoggerFactory.getLogger(BoatLinter.class);
     private final ApiValidator validator;
 
     private final URI documentationBaseUrl = URI.create("https://backbase.github.io/backbase-openapi-tools/rules.md");

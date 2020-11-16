@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.raml.v2.api.loader.DefaultResourceLoader;
 import org.raml.v2.api.loader.ResourceLoaderExtended;
 import org.raml.v2.api.loader.ResourceUriCallback;
 
