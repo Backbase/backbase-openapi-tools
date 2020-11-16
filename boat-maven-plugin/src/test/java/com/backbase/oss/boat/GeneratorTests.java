@@ -23,6 +23,31 @@ public class GeneratorTests {
     }
 
     @Test
+    public void testHtml2() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.generatorName = "html2";
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.execute();
+    }
+
+    @Test
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
