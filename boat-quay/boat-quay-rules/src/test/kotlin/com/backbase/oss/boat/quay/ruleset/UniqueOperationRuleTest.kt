@@ -91,7 +91,7 @@ class UniqueOperationRuleTest {
 
         ZallyAssertions
                 .assertThat(violations)
-                .isEmpty()
+                .isNotEmpty()
     }
 
 
