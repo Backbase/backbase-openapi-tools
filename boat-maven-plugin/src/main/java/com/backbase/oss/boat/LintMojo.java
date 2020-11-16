@@ -21,6 +21,7 @@ import org.zalando.zally.core.DefaultContextFactory;
 import org.zalando.zally.core.Result;
 import org.zalando.zally.core.RulesManager;
 
+@SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
 /*
@@ -28,28 +29,29 @@ import org.zalando.zally.core.RulesManager;
  */
 public class LintMojo extends AbstractMojo {
 
-    @Parameter(name = "input", required = true)
-    private File input;
+    @Parameter(name = "inputSpec", property = "inputSpec",  required = true)
+    private File inputSpec;
 
     @Parameter(name = "failOnWarning", defaultValue = "false")
     private boolean failOnWarning;
 
+    @Parameter(name = "ignoreRules")
+    private String[] ignoreRules = new String[]{"219", "105", "M008", " M009", " M010", " M011", " H001", " H002", " S005", " S006", " S007"};
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        log.info("Linting OpenAPI: {}", input);
+        log.info("Linting OpenAPI: {}", inputSpec);
 
         File[] inputFiles;
-        if (input.isDirectory()) {
-            inputFiles = input.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
+        if (inputSpec.isDirectory()) {
+            inputFiles = inputSpec.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
             if (inputFiles == null) {
-                throw new MojoExecutionException("No OpenAPI specs found in: " + input);
+                throw new MojoExecutionException("No OpenAPI specs found in: " + inputSpec);
             }
             log.info("Found " + inputFiles.length + " specs to lint.");
-            if (failOnWarning) {
-                throw new MojoExecutionException("Linting fialed for input files: " + inputFiles);
-            }
         } else {
-            inputFiles = new File[]{input};
+            inputFiles = new File[]{inputSpec};
         }
 
         for (File inputFile : inputFiles) {
@@ -62,7 +64,7 @@ public class LintMojo extends AbstractMojo {
         try {
             BoatLinter boatLinter = getBoatLinter();
             String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
-            List<Result> lint = boatLinter.lint(contents);
+            List<Result> lint = boatLinter.lint(contents, ignoreRules);
             if (!lint.isEmpty()) {
                 log.warn("OpenAPI is not adhering to the rules!");
                 lint.forEach(result -> {
@@ -70,6 +72,10 @@ public class LintMojo extends AbstractMojo {
                 });
             } else {
                 log.info("OpenAPI: {}, is valid!", inputFile);
+            }
+
+            if (failOnWarning) {
+                throw new MojoExecutionException("Linting failed for input file: " + inputFile);
             }
 
         } catch (IOException e) {
@@ -87,7 +93,7 @@ public class LintMojo extends AbstractMojo {
     }
 
     public void setInput(File input) {
-        this.input = input;
+        this.inputSpec = input;
     }
 
     public void setFailOnWarning(boolean failOnWarning) {
