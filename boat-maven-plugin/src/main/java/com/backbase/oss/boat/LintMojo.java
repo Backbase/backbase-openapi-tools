@@ -29,7 +29,7 @@ import org.zalando.zally.core.RulesManager;
  */
 public class LintMojo extends AbstractMojo {
 
-    @Parameter(name = "inputSpec", property = "inputSpec",  required = true)
+    @Parameter(name = "inputSpec", property = "inputSpec", required = true)
     private File inputSpec;
 
     @Parameter(name = "failOnWarning", defaultValue = "false")
@@ -66,10 +66,8 @@ public class LintMojo extends AbstractMojo {
             String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
             List<Result> lint = boatLinter.lint(contents, ignoreRules);
             if (!lint.isEmpty()) {
-                log.warn("OpenAPI is not adhering to the rules!");
-                lint.forEach(result -> {
-                    log.warn("{}", result.toString());
-                });
+                log.warn("OpenAPI: {} has Linting issues: ", inputFile);
+                lint.forEach(result -> log.warn("{}", result.toString()));
             } else {
                 log.info("OpenAPI: {}, is valid!", inputFile);
             }
