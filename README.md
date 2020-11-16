@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.8.1
+* Always add single examples to examples list. 
+* Add version parameter to boat:bundle mojo
+* Modernised BOAT Terminal
+* Improved BOAT:Docs
+
 ## 0.8.0
 * Improved styling HTML docs
 * preview BOAT:QUAY linting mojo for linting OpenAPI specs.
