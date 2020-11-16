@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.8.0
+* Improved styling HTML docs
+* preview BOAT:QUAY linting mojo for linting OpenAPI specs.
+* Avoid circular references when derefenencing OpenAPI specs
+
+
 ## 0.7.0
 * Render multiple requests and examples in boat-docs
 * Created HTML templates for boat-docs
