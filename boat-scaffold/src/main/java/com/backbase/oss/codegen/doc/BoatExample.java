@@ -25,8 +25,8 @@ public class BoatExample {
     private Example example;
 
     public BoatExample(String key, String contentType, Example value) {
-        this.key = key;
-        this.name = StringUtils.replace(key, " ", "-");
+        this.key = StringUtils.replace(key, " ", "-");
+        this.name = key;
         this.contentType = contentType;
         this.example = value;
     }
