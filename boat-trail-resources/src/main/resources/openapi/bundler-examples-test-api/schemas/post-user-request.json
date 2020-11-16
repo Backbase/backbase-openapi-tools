@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "this models a simple item.",
+  "properties": {
+    "name": {
+      "name": "string"
+    },
+    "description": {
+      "role": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -454,7 +454,7 @@ public class Exporter {
         PathItem pathItem = new PathItem();
         pathItem.summary(getDisplayName(resource.displayName()));
         pathItem.description(getDescription(resource));
-        log.info("Mapping RAML resource: {}", pathItem.getSummary());
+        log.debug("Mapping RAML resource: {}", pathItem.getSummary());
         mapUriParameters(resource, pathItem, components);
         mapMethods(resource, pathItem, components, jsonSchemaToOpenApi, operations);
         return pathItem;
