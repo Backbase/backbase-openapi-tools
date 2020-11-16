@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.7.0</version>
+        <version>0.8.1-SNAPSHOT</version>
     </parent>
     <artifactId>boat-quay-rules</artifactId>
     <packaging>jar</packaging>
@@ -35,11 +35,6 @@
                 <artifactId>kotlin-reflect</artifactId>
                 <version>${kotlin.version}</version>
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>io.github.config4k</groupId>-->
-            <!--                <artifactId>config4k</artifactId>-->
-            <!--                <version>0.4.2</version>-->
-            <!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
