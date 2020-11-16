@@ -46,7 +46,13 @@
         <dependency>
             <groupId>org.raml</groupId>
             <artifactId>raml-parser-2</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.51</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.fge</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
