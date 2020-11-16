@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.raml.v2.api.loader.DefaultResourceLoader;
 import org.raml.v2.api.loader.ResourceLoaderExtended;
 import org.raml.v2.api.loader.ResourceUriCallback;
 
@@ -26,10 +25,6 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
     private Map<String, ContentItem> contentToName = new HashMap<>();
     private ResourceLoaderExtended resourceLoader;
     private ObjectMapper jsonMapper = new ObjectMapper();
-
-    public CachingResourceLoader() {
-        this(new DefaultResourceLoader());
-    }
 
     public CachingResourceLoader(ResourceLoaderExtended resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -78,17 +73,6 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
     }
 
     /**
-     * Reverse lookup resource name based on the schema content.
-     */
-    public String getResourceName(String content) {
-        ContentItem contentItem = contentToName.get(content);
-        if (contentItem == null) {
-            return null;
-        }
-        return contentItem.getResourceName();
-    }
-
-    /**
      * Make all $ref properties in the JSON absolute and normalised.
      *
      * @param foundUri     the URI for the resource
@@ -116,5 +100,9 @@ public class CachingResourceLoader implements ResourceLoaderExtended {
         } catch (IOException e) {
             throw new RamlLoaderException("Failed to normalize json references", e);
         }
+    }
+
+    public URI getUriCallBackParam() {
+        return this.resourceLoader != null ? this.resourceLoader.getUriCallBackParam() : null;
     }
 }
