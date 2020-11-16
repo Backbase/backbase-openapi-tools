@@ -69,13 +69,13 @@
                             <select class="example-dropdown-select">
                                 {{#examples}}
                                     <option data-toggle="tab"
-                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example">{{name}}</option>
+                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}}</option>
                                 {{/examples}}
                             </select>
                         </label>
                         {{#examples}}
                             <div class="example-dropdown-value"
-                                 id="requests-{{baseName}}-{{nickname}}-{{code}}-example">
+                                 id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
                                 <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
                             </div>
                         {{/examples}}
