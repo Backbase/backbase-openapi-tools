@@ -18,14 +18,18 @@ public class BoatLinter {
     private final Logger log = LoggerFactory.getLogger(BoatLinter.class);
     private final ApiValidator validator;
 
-    private URI documentationBaseUrl = URI.create("https://backbase.github.io/backbase-openapi-tools/rules.md");
+    private final URI documentationBaseUrl = URI.create("https://backbase.github.io/backbase-openapi-tools/rules.md");
 
     public BoatLinter(ApiValidator validator) {
         this.validator = validator;
     }
 
     public List<Result> lint(String openApiContent) {
-        RulesPolicy rulesPolicy = new RulesPolicy(Arrays.asList("219", "105","M008", " M009", " M010", " M011", " H001", " H002", " S005", " S006", " S007"));
+        return lint(openApiContent, "219", "105", "M008", " M009", " M010", " M011", " H001", " H002", " S005", " S006", " S007");
+    }
+
+    public List<Result> lint(String openApiContent, String... ignoreRules) {
+        RulesPolicy rulesPolicy = new RulesPolicy(Arrays.asList(ignoreRules));
         List<Result> validate = validator.validate(openApiContent, rulesPolicy, null);
 
         return validate.stream().map(this::transformResult).collect(Collectors.toList());
@@ -40,13 +44,14 @@ public class BoatLinter {
         JsonPointer pointer = result.getPointer();
         IntRange lines = result.getLines();
 
-        String heading= id + ":" + title;
-        String ref = heading.toLowerCase().replaceAll("[^a-z0-9]+","-");
+        String heading = id + ":" + title;
+        String ref = heading.toLowerCase().replaceAll("[^a-z0-9]+", "-");
 
         URI resolve = documentationBaseUrl.resolve("#" + ref);
 
         return new Result(id, resolve, title, description, violationType, pointer, lines);
 
     }
+
 
 }
