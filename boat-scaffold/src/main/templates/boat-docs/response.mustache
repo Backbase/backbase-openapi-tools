@@ -71,8 +71,9 @@
         {{#hasExamples}}
             <h3>Examples</h3>
             {{#examples}}
-                <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example">
-                    <pre class="prettyprint"><code class="json">{{example}}</code></pre>
+                <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
+                    <label>{{name}}</label>
+                    <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
                 </div>
             {{/examples}}
         {{/hasExamples}}
