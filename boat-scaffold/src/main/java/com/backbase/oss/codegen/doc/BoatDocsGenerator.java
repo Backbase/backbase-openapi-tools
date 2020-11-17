@@ -51,7 +51,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     }
 
 
-
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
@@ -60,7 +59,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public String toModelName(String name) {
         String modelName = super.toModelName(name);
-        if(!name.equals(modelName)) {
+        if (!name.equals(modelName)) {
             log.debug("NOT converting toModelName: {} to: {}", name, modelName);
         }
         return name;
@@ -69,7 +68,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public String toVarName(String name) {
         String varName = super.toVarName(name);
-        if(!name.equals(varName)) {
+        if (!name.equals(varName)) {
             log.debug("NOT converting varName: {} to: {}", name, varName);
         }
         return name;
@@ -86,7 +85,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
     @Override
     public String toParamName(String name) {
-        String paramName =  super.toParamName(name);
+        String paramName = super.toParamName(name);
         if (!name.equals(paramName)) {
             log.debug("NOT converting apiVarName: {} to: {}", name, paramName);
         }
@@ -111,7 +110,8 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
         CodegenResponse r = super.fromResponse(responseCode, response);
         r.message = StringUtils.replace(r.message, "`", "\\`");
-        return r;
+
+        return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
         Object example = parameter.getExample();
 
-        if(parameter.getStyle() != null) {
+        if (parameter.getStyle() != null) {
             switch (parameter.getStyle()) {
                 case FORM:
                     if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
