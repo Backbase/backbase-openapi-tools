@@ -22,7 +22,6 @@ public class Bundler implements Transformer {
         // Use the BoatOpenApiResolver...
         BoatOpenAPIResolver openAPIResolver = new BoatOpenAPIResolver(openAPI, null, inputFile.toURI().toString());
         openAPIResolver.resolve();
-        new UnAliasTransformer().transform(openAPI, Collections.emptyMap());
     }
 
 }
