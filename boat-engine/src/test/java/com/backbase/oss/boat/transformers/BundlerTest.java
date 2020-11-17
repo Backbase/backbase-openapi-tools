@@ -48,6 +48,17 @@ public class BundlerTest {
     };
 
     @Test
+    public void testBundleExamples() throws OpenAPILoaderException, IOException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+
+        new Bundler(input).transform(openAPI, Collections.emptyMap());
+        log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+    }
+
+    @Test
     public void testBundleApi() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);

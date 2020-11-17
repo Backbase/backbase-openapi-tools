@@ -1,11 +1,13 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
 import java.io.File;
@@ -22,6 +24,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -442,6 +445,13 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "openapi.generator.maven.plugin.dereferenceComponents")
     protected boolean dereferenceComponents;
 
+    /**
+     * Deference components/schemas properties. html2 document generator does not like.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.bundlesSpecs")
+    protected boolean bundleSpecs;
+
+
 
     /**
      * The project being built.
@@ -789,10 +799,19 @@ public class GenerateMojo extends AbstractMojo {
 
             if (unAlias) {
                 new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
+                java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
             }
             if (dereferenceComponents) {
                 new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
+                java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
             }
+
+            if(bundleSpecs) {
+                new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
+                java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+            }
+
+
             new DefaultGenerator().opts(input).generate();
 
             if (buildContext != null) {
