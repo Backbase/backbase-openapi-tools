@@ -42,7 +42,7 @@ public class BundleMojoTest {
         mojo.setInput(new File(getClass().getResource("/bundler/folder/one-client-api-v1.yaml").getFile())
             .getParentFile());
         mojo.setOutput(new File("target/test-bundle-folder"));
-
+        mojo.setVersionFileName(true);
         mojo.execute();
 
         Assert.assertTrue(new File("target/test-bundle-folder/one-client-api-v1.3.5.yaml").exists());
