@@ -1,6 +1,8 @@
 package com.backbase.oss.boat.transformers.bundler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -21,22 +23,25 @@ public abstract class ExampleHolder<T> {
 
     private static class ExampleExampleHolder extends ExampleHolder<Example> {
         private final boolean componentExample;
+
         private ExampleExampleHolder(String name, Example example, boolean componentExample) {
             super(name, example);
             this.componentExample = componentExample;
             if (example.get$ref() == null
                 && example.getValue() instanceof ObjectNode
-                && ((ObjectNode)example.getValue()).get(REF_KEY) != null) {
-                String ref = ((ObjectNode)example.getValue()).get(REF_KEY).asText();
+                && ((ObjectNode) example.getValue()).get(REF_KEY) != null) {
+                String ref = ((ObjectNode) example.getValue()).get(REF_KEY).asText();
                 log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, name, ref));
                 example.set$ref(ref);
                 example.setValue(null);
             }
         }
+
         @Override
         String getRef() {
             return example().get$ref();
         }
+
         @Override
         void replaceRef(String ref) {
             if (componentExample) {
@@ -45,11 +50,13 @@ public abstract class ExampleHolder<T> {
                 example().set$ref(ref);
             }
         }
+
     }
 
-    private static class ObjectNodeExampleHolder extends ExampleHolder<ObjectNode> {
-        private ObjectNodeExampleHolder(ObjectNode objectNode) {
-            super(null, objectNode);
+
+    public static class ObjectNodeExampleHolder extends ExampleHolder<ObjectNode> {
+        private ObjectNodeExampleHolder(String name, ObjectNode objectNode) {
+            super(name, objectNode);
             if (objectNode.get(REF_KEY) == null
                 && objectNode.get("value") != null
                 && objectNode.get("value").get(REF_KEY) != null) {
@@ -60,10 +67,12 @@ public abstract class ExampleHolder<T> {
             }
 
         }
+
         @Override
         String getRef() {
             return example().get(REF_KEY).asText();
         }
+
         @Override
         void replaceRef(String ref) {
             example().put(REF_KEY, ref);
@@ -72,8 +81,8 @@ public abstract class ExampleHolder<T> {
 
     private static class MapExampleHolder extends ExampleHolder<Map> {
 
-        private MapExampleHolder(Map map) {
-            super(null, map);
+        private MapExampleHolder(String name, Map map) {
+            super(name, map);
         }
 
         @Override
@@ -88,7 +97,10 @@ public abstract class ExampleHolder<T> {
     }
 
     private final String name;
-    private final T example;
+
+    private String exampleName;
+
+    private T example;
     private String content;
 
     private ExampleHolder(String name, T example) {
@@ -97,38 +109,57 @@ public abstract class ExampleHolder<T> {
         this.example = example;
     }
 
-    protected T example() {
+    public T example() {
         return example;
     }
 
+    public void setExample(T example) {
+        this.example = example;
+    }
+
+    public void setExampleName(String exampleName) {
+        this.exampleName = exampleName;
+    }
+
     abstract String getRef();
+
     abstract void replaceRef(String ref);
 
     public static ExampleHolder<Example> of(String name, Example example, boolean isComponentExample) {
         return new ExampleExampleHolder(name, example, isComponentExample);
     }
-    public static ExampleHolder<? extends Object> of(Object o) {
+
+    public static ExampleHolder<? extends Object> of(String name, Object o) {
         if (o instanceof ObjectNode) {
-            return new ObjectNodeExampleHolder((ObjectNode) o);
+            return new ObjectNodeExampleHolder(name, (ObjectNode) o);
         } else if (o instanceof Map) {
-            return new MapExampleHolder((Map) o);
+            return new MapExampleHolder(name, (Map) o);
+        } else if (o instanceof Example) {
+            boolean isComponentSection = ((Example) o).get$ref() != null && ((Example) o).get$ref().startsWith("#/components");
+            try {
+                String s = Json.mapper().writeValueAsString(o);
+                return new ObjectNodeExampleHolder(name, (ObjectNode) Json.mapper().readTree(s));
+            } catch (JsonProcessingException e) {
+                return new ExampleExampleHolder(name, (Example) o, isComponentSection);
+            }
+        } else {
+            throw new RuntimeException("Unknown type backing example " + o.getClass().getName());
         }
-        else throw new RuntimeException("Unknown type backing example " + o.getClass().getName());
     }
 
     @Override
     public String toString() {
         return "ExampleHolder{"
             + "name='" + name + '\''
-            + ", example=" + example
+            + ", ref=" + getRef()
             + '}';
     }
 
     public String getExampleName() {
         return name != null ? name
             : StringUtils.replaceEach(getRef(),
-                new String[] {"./", "examples/", ".json", ".", "/"},
-                new String[]{"", "", "", "", "-"});
+            new String[]{"./", "examples/", ".json", ".", "/"},
+            new String[]{"", "", "", "", "-"});
     }
 
     public String getContent() {
