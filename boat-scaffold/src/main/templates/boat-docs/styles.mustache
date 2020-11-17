@@ -4,6 +4,59 @@
 
 body {
   font-family: "Roboto", sans-serif;
+  min-width: 980px;
+  background-color: #fff;
+  color: #333;
+  display: grid;
+  grid-template-areas: "navbar content";
+  grid-template-columns: 300px 1fr;
+
+}
+
+#sidenav {
+    grid-area: navbar;
+}
+
+#content {
+  grid-area: content;
+  display: grid;
+  grid-template-areas:
+    "project example-area"
+    "header example-area"
+    "main example-area";
+  grid-template-columns: 60% 40%;
+}
+
+#header{
+grid-area: header;
+}
+#project {
+grid-area: project;
+margin-left: 16px;
+}
+
+#sections {
+  grid-area: main;
+  grid-column-end: example-area;
+}
+
+#example-area {
+  grid-area: example-area;
+  background-color: rgb(38, 50, 56);
+  height: 100%;
+  width: 100%;
+}
+
+article {
+  display: grid;
+}
+
+article > * {
+  width: calc(60% - 16px)!important;
+  box-sizing: border-box;
+}
+
+article > .response-content-block {
 }
 
 * {
@@ -15,11 +68,6 @@ body {
   font-size: 14px;
   padding: 2px 4px;
   white-space: nowrap;
-}
-
-body {
-  min-width: 980px;
-  background-color: #eee;
 }
 
 .app-desc {
@@ -46,12 +94,6 @@ td.code {
   font-weight: 400;
 }
 
-#content {
-  padding-top: 16px;
-  z-index: -1;
-  margin-left: 300px;
-}
-
 h1 {
   font-family: "Roboto Semibold", sans-serif;
   font-weight: normal;
@@ -76,10 +118,8 @@ h2 {
 }
 
 #header {
-  padding: 16px 32px;
-  background-color: white;
+  padding: 16px;
   margin-bottom: 32px;
-  border-radius: 6px;
 }
 
 div.secured-by {
@@ -120,10 +160,8 @@ div.secured-by > pre:last-child {
 }
 
 section {
-  padding: 16px 32px;
-  background-color: white;
+  padding: 16px 0 16px 16px;
   margin-bottom: 32px;
-  border-radius: 6px;
 }
 
 section h1 {
@@ -266,6 +304,10 @@ pre {
   border-radius: 6px;
   position: relative;
   margin: 10px 0 20px 0;
+}
+
+.dropdown-examples pre {
+ background-color: rgb(17, 23, 26);
 }
 
 span.language-html {
@@ -744,11 +786,21 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   display: flex;
 }
 
+.request-body {
+width: 100%!important;
+}
+
+.tab-content {
+overflow: initial;
+}
+
 .dropdown-examples {
-  flex: 0 40%;
+  width: 40%;
+  z-index: 2;
   color: rgb(255, 255, 255);
   padding: 0px 40px;
   background-color: rgb(38, 50, 56);
+  margin-top: -79px;
 }
 
 .dropdown-examples label {
