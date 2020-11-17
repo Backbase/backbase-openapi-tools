@@ -19,11 +19,13 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
-## 0.8.1
+## 0.9.0
 * *Maven Plugin*
   * Added `version` parameter to `bundle` goal.
+  * Added `bundleSpecs` parameter to `generate` goal to automatically bundle specs into single file
 * Modernised BOAT Terminal
 * Improved BOAT:Docs Templates
+* Properly dereference examples
 
 ## 0.8.0
 * Improved styling HTML docs
