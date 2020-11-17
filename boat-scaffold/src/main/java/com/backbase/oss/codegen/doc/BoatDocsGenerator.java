@@ -11,11 +11,8 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -114,21 +111,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
         CodegenResponse r = super.fromResponse(responseCode, response);
         r.message = StringUtils.replace(r.message, "`", "\\`");
 
-        List<BoatExample> examples = new ArrayList<>();
-        if(response.getContent() != null) {
-            response.getContent().forEach((contentType, mediaType) -> {
-                log.info("Derefenencing again....");
-
-                BoatExampleUtils.convertExamples(mediaType, contentType, examples);
-            });
-            BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
-            r.examples = examples.stream().map(boatExample -> {
-                Map<String, Object> example = new LinkedHashMap<>();
-                example.put(boatExample.getKey(), boatExample.getPrettyPrintValue());
-                return example;
-            }).collect(Collectors.toList());
-        }
-        return r;
+        return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
 
     @Override
