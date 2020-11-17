@@ -68,6 +68,7 @@ public class BundlerTest {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
 
+        log.info(Yaml.pretty(openAPI));
 
         assertThat("Single inline example is replaced with relative ref",
             singleExampleNode(openAPI, "/users", PathItem::getGet, "200", APPLICATION_JSON).get("$ref").asText(),
@@ -75,9 +76,11 @@ public class BundlerTest {
         assertThat("Component example without ref is left alone.",
             openAPI.getComponents().getExamples().get("example-in-components-1").getSummary(),
             is("component-examples with example - should be left alone"));
+
+
         assertThat("Component example that duplicates a inline example, is left alone. But the summary is removed",
-            openAPI.getComponents().getExamples().get("example-number-one").getSummary(),
-            is("example-number-one"));
+            openAPI.getComponents().getExamples().get("example-number-one").getSummary(), nullValue());
+
 
         assertThat("Deep linked examples are dereferenced.",
             singleExampleMap(openAPI, "/users", PathItem::getPost, "400", APPLICATION_JSON).get("$ref").toString(),

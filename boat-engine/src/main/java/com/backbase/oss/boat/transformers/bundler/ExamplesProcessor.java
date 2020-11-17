@@ -10,6 +10,7 @@ import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.parser.models.RefFormat;
 import io.swagger.v3.parser.util.PathUtils;
@@ -60,7 +61,7 @@ public class ExamplesProcessor {
                     if (operation.getRequestBody() != null) {
                         operation.getRequestBody().getContent().forEach((contentType, mediaType) -> {
                             log.info("Processing Request Body examples for Content Type: {}", contentType);
-                            processMediaType(mediaType);
+                            processMediaType(mediaType, null, false);
                         });
                     }
                     operation.getResponses().forEach((responseCode, apiResponse) -> {
@@ -68,7 +69,7 @@ public class ExamplesProcessor {
                         if (apiResponse.getContent() != null) {
                             apiResponse.getContent().forEach((contentType, mediaType) -> {
                                 log.info("Processing Response Body Examples for Content Type: {}", contentType);
-                                processMediaType(mediaType);
+                                processMediaType(mediaType, null, false);
                             });
                         }
                     });
@@ -76,12 +77,22 @@ public class ExamplesProcessor {
             });
     }
 
-    public void processMediaType(MediaType mediaType) {
+    public void processContent(Content content, String relativePath) {
+
+        content.forEach((s, mediaType) -> {
+            log.info("Processing Consent for: {} with relative path: {}", s, relativePath);
+            processMediaType(mediaType, relativePath, true);
+        });
+
+
+    }
+
+    public void processMediaType(MediaType mediaType, String relativePath, boolean  derefenceExamples) {
         if (mediaType.getExamples() != null) {
             mediaType.getExamples().forEach(((key, example) -> {
                 log.info("Processing Example: {} with value: {} and ref: {} ", key, example.getValue(), example.get$ref());
                 ExampleHolder<?> exampleHolder = ExampleHolder.of(key, example);
-                fixInlineExamples(exampleHolder, null, false);
+                fixInlineExamples(exampleHolder, relativePath, derefenceExamples);
                 if(exampleHolder.getRef()!=null) {
                     example.set$ref(exampleHolder.getRef());
                 } else {
@@ -93,7 +104,7 @@ public class ExamplesProcessor {
         if (mediaType.getExample() != null) {
             log.info("Processing Example: {} ", mediaType.getExample());
             ExampleHolder<?> exampleHolder = ExampleHolder.of(null, mediaType.getExample());
-            fixInlineExamples(exampleHolder, null, false);
+            fixInlineExamples(exampleHolder, relativePath, false);
             log.info("Finished Processing Example: {}", exampleHolder);
         }
     }
@@ -114,7 +125,7 @@ public class ExamplesProcessor {
     }
 
     private void fixInlineExamples(ExampleHolder exampleHolder, String relativePath, boolean derefenceExamples) {
-        log.debug("fixInlineExamples: '{}', relative path '{}'", exampleHolder, relativePath);
+        log.info("fixInlineExamples: '{}', relative path '{}'", exampleHolder, relativePath);
 
         if (exampleHolder.getRef() == null) {
             log.info("not fixing (ref not found): {}", exampleHolder);
@@ -239,5 +250,6 @@ public class ExamplesProcessor {
     private String makeCountedName(String s, int count) {
         return count == 0 ? s : s + "-" + count;
     }
+
 
 }
