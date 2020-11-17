@@ -5,7 +5,6 @@
 .json-schema-view,
 json-schema-view {
   display: flex !important;
-  width: 100% !important;
 }
 
 .json-schema-view {
@@ -114,6 +113,8 @@ json-schema-view .inner {
 json-schema-view .description {
   margin-bottom: 12px;
   font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .json-schema-view .toggle-handle,
@@ -158,6 +159,8 @@ a.title {
   background-color: #f7f7f9;
   border: 1px solid #e1e1e8;
   border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .json-formatter-toggler-link {
@@ -193,6 +196,7 @@ a.title {
 }
 .fake.property .json-schema-view .primitive {
   flex: 3;
+  padding-right: 16px;
 }
 .fake.property .examples {
   flex: 1;

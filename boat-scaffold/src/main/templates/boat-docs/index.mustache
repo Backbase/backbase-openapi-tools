@@ -18,155 +18,150 @@
 
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div id="sidenav" class="span2">
-        <nav id="scrollingNav">
-          <ul class="sidenav nav nav-list">
-              <h1 class="nav-header">{{appName}}</h1>
-              <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
-            {{#apiInfo}}
-              {{#apis}}
-                {{#operations}}
-                  <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
-                  {{#operation}}
-                    <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                        <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
-                            <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
-                            {{#summary}}
-                                {{summary}}
-                            {{/summary}}
-                            {{^summary}}
-                                {{nickname}}
-                            {{/summary}}
-                        </a>
-                    </li>
-                  {{/operation}}
-                {{/operations}}
-              {{/apis}}
-            {{/apiInfo}}
-          </ul>
+  <div id="sidenav">
+    <nav id="scrollingNav">
+      <ul class="sidenav nav nav-list">
+          <h1 class="nav-header">{{appName}}</h1>
+          <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
+        {{#apiInfo}}
+          {{#apis}}
+            {{#operations}}
+              <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
+              {{#operation}}
+                <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
+                    <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
+                        <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
+                        {{#summary}}
+                            {{summary}}
+                        {{/summary}}
+                        {{^summary}}
+                            {{nickname}}
+                        {{/summary}}
+                    </a>
+                </li>
+              {{/operation}}
+            {{/operations}}
+          {{/apis}}
+        {{/apiInfo}}
+      </ul>
 
-        </nav>
-
-      </div>
-      <div id="content">
-        <div id="project">
-          <div class="pull-left">
-            <h1>{{{appName}}}</h1>
-              {{#version}}
-                  <div class="app-desc">Version: {{{version}}}</div>
-              {{/version}}
-          </div>
-          <div class="clearfix"></div>
-        </div>
-        <div id="header">
-          <div id="api-_">
-            <div id="app-description" class="app-desc">
-                {{{appDescription}}}
-            </div>
-          </div>
-        </div>
-        <div id="sections">
-          {{#apiInfo}}
-            {{#apis}}
-              {{#operations}}
-                <section id="api-{{baseName}}">
-                  <h1>{{baseName}}</h1>
-                  {{#operation}}
-                    <div id="api-{{baseName}}-{{nickname}}">
-                      <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                              {{#summary}}<h1>{{.}}</h1>{{/summary}}
-                              {{#description}}<p>{{description}}</p>{{/description}}
-                        <p class="marked">{{notes}}</p>
-                          <br/>
-                          {{#vendorExtensions}}
-                              <div class="secured-by">
-                                  <h2>Secured by Backbase Access Control</h2>
-                                  {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
-                                  {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
-                                  {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
-                              </div>
-                          {{/vendorExtensions}}
-                          <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
-
-                          {{#hasAuthMethods}}
-                              <h2>Scopes</h2>
-                              <table>
-                                {{#authMethods}}{{#scopes}}
-                                  <tr>
-                                    <td>{{scope}}</td>
-                                    <td>{{description}}</td>
-                                  </tr>
-                                {{/scopes}}{{/authMethods}}
-                              </table>
-                          {{/hasAuthMethods}}
-
-                          {{#hasPathParams}}
-                            <h2>Path parameters</h2>
-                            <div class="json-schema-view">
-                                {{#pathParams}}
-                                  {{>param}}
-                                {{/pathParams}}
-                            </div>
-                          {{/hasPathParams}}
-
-                          {{#hasHeaderParams}}
-                            <h2>Header parameters</h2>
-                            <div class="json-schema-view">
-                              {{#headerParams}}
-                                  {{>param}}
-                              {{/headerParams}}
-                            </div>
-                          {{/hasHeaderParams}}
-
-                          {{#hasFormParams}}
-                            <h2>Form parameters</h2>
-                            <div class="json-schema-view">
-                              {{#formParams}}
-                                  {{>param}}
-                              {{/formParams}}
-                            </div>
-                          {{/hasFormParams}}
-
-                          {{#hasQueryParams}}
-                            <h2>Query parameters</h2>
-                            <div class="json-schema-view">
-                              {{#queryParams}}
-                                {{>param}}
-                              {{/queryParams}}
-                            </div>
-                          {{/hasQueryParams}}
-
-                          {{#hasBodyParam}}
-                              <h2>Request Body Schema</h2>
-                              {{#bodyParams}}
-                                  {{>paramB}}
-                              {{/bodyParams}}
-
-                          {{/hasBodyParam}}
-
-                          <h2>Responses</h2>
-                          {{#responses}}
-                           {{>response}}
-                          {{/responses}}
-                        </article>
-                      </div>
-                      <hr>
-                    {{/operation}}
-                  </section>
-                {{/operations}}
-              {{/apis}}
-            {{/apiInfo}}
-          </div>
-
-{{^hideGenerationTimestamp}}          <div id="generator">
-            <div class="content">
-              Generated {{generatedDate}}
-            </div>
-          </div>
-{{/hideGenerationTimestamp}}      </div>
+    </nav>
+  </div>
+  <div id="content">
+    <div id="project">
+        <h1>{{{appName}}}</h1>
+          {{#version}}
+              <div class="app-desc">Version: {{{version}}}</div>
+          {{/version}}
     </div>
+    <div id="header">
+      <div id="api-_">
+        <div id="app-description" class="app-desc">
+            {{{appDescription}}}
+        </div>
+      </div>
+    </div>
+    <div id="sections">
+      {{#apiInfo}}
+        {{#apis}}
+          {{#operations}}
+            <section id="api-{{baseName}}">
+              <h1>{{baseName}}</h1>
+              {{#operation}}
+                <div id="api-{{baseName}}-{{nickname}}">
+                  <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
+                          {{#summary}}<h1>{{.}}</h1>{{/summary}}
+                          {{#description}}<p>{{description}}</p>{{/description}}
+                    <p class="marked">{{notes}}</p>
+                      <br/>
+                      {{#vendorExtensions}}
+                          <div class="secured-by">
+                              <h2>Secured by Backbase Access Control</h2>
+                              {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
+                              {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
+                              {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
+                          </div>
+                      {{/vendorExtensions}}
+                      <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
+
+                      {{#hasAuthMethods}}
+                          <h2>Scopes</h2>
+                          <table>
+                            {{#authMethods}}{{#scopes}}
+                              <tr>
+                                <td>{{scope}}</td>
+                                <td>{{description}}</td>
+                              </tr>
+                            {{/scopes}}{{/authMethods}}
+                          </table>
+                      {{/hasAuthMethods}}
+
+                      {{#hasPathParams}}
+                        <h2>Path parameters</h2>
+                        <div class="json-schema-view">
+                            {{#pathParams}}
+                              {{>param}}
+                            {{/pathParams}}
+                        </div>
+                      {{/hasPathParams}}
+
+                      {{#hasHeaderParams}}
+                        <h2>Header parameters</h2>
+                        <div class="json-schema-view">
+                          {{#headerParams}}
+                              {{>param}}
+                          {{/headerParams}}
+                        </div>
+                      {{/hasHeaderParams}}
+
+                      {{#hasFormParams}}
+                        <h2>Form parameters</h2>
+                        <div class="json-schema-view">
+                          {{#formParams}}
+                              {{>param}}
+                          {{/formParams}}
+                        </div>
+                      {{/hasFormParams}}
+
+                      {{#hasQueryParams}}
+                        <h2>Query parameters</h2>
+                        <div class="json-schema-view">
+                          {{#queryParams}}
+                            {{>param}}
+                          {{/queryParams}}
+                        </div>
+                      {{/hasQueryParams}}
+
+                      {{#hasBodyParam}}
+                          <h2>Request Body Schema</h2>
+                          {{#bodyParams}}
+                              {{>paramB}}
+                          {{/bodyParams}}
+
+                      {{/hasBodyParam}}
+
+                      <h2>Responses</h2>
+                      {{#responses}}
+                       {{>response}}
+                      {{/responses}}
+                    </article>
+                  </div>
+                {{/operation}}
+              </section>
+            {{/operations}}
+          {{/apis}}
+        {{/apiInfo}}
+      </div>
+      <div id="example-area"></div>
+
+{{^hideGenerationTimestamp}}
+<div id="generator">
+        <div class="content">
+          Generated {{generatedDate}}
+        </div>
+      </div>
+{{/hideGenerationTimestamp}}
+
   </div>
   {{>js_prettify}}
   {{>js_bootstrap}}
