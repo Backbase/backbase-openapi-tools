@@ -44,7 +44,7 @@ public class BoatCache extends ResolverCache {
             if (refFormat == RELATIVE) {
                 relativePath = Paths.get(ref.substring(0, ref.indexOf("#"))).getParent().toString();
             }
-            examplesProcessor.processContent(response.getContent(), relativePath);
+//            examplesProcessor.processContent(response.getContent(), relativePath);
         }
         return result;
     }
