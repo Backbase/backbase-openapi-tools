@@ -76,8 +76,6 @@ public class BoatCodegenResponse extends CodegenResponse {
         List<BoatExample> examples = new ArrayList<>();
         if (response.getContent() != null) {
             response.getContent().forEach((contentType, mediaType) -> {
-                log.info("Derefenencing again....");
-
                 BoatExampleUtils.convertExamples(mediaType, contentType, examples);
             });
             BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
