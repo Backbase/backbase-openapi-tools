@@ -86,14 +86,6 @@ public class BundlerTest {
             openAPI.getPaths().get("/users").getPut().getResponses().get("403").getContent().get(APPLICATION_JSON)
                 .getExample(), notNullValue());
 
-        Schema aliasedSchema = openAPI.getPaths().get("/users").getPut().getResponses().get("404").getContent().get(
-            APPLICATION_JSON).getSchema();
-        assertThat("Schema referring to aliased simple type is un-aliased",
-            aliasedSchema.get$ref(),
-            nullValue());
-        assertThat("Attributes of aliased schema are copied",
-            aliasedSchema.getPattern(), is("^[0-9].*$"));
-
         log.debug(Yaml.pretty(openAPI));
     }
 
