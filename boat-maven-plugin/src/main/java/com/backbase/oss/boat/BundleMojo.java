@@ -45,7 +45,7 @@ public class BundleMojo extends AbstractMojo {
     private String version;
 
     @Parameter(name = "versionFileName", required = false)
-    private boolean versionFileName = true;
+    private boolean versionFileName = false;
 
     /**
      * Skip the execution.

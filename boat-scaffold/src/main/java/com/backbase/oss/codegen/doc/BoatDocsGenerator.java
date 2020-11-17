@@ -11,8 +11,11 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +54,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     }
 
 
-
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
@@ -60,7 +62,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public String toModelName(String name) {
         String modelName = super.toModelName(name);
-        if(!name.equals(modelName)) {
+        if (!name.equals(modelName)) {
             log.debug("NOT converting toModelName: {} to: {}", name, modelName);
         }
         return name;
@@ -69,7 +71,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public String toVarName(String name) {
         String varName = super.toVarName(name);
-        if(!name.equals(varName)) {
+        if (!name.equals(varName)) {
             log.debug("NOT converting varName: {} to: {}", name, varName);
         }
         return name;
@@ -86,7 +88,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
     @Override
     public String toParamName(String name) {
-        String paramName =  super.toParamName(name);
+        String paramName = super.toParamName(name);
         if (!name.equals(paramName)) {
             log.debug("NOT converting apiVarName: {} to: {}", name, paramName);
         }
@@ -111,6 +113,21 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
         CodegenResponse r = super.fromResponse(responseCode, response);
         r.message = StringUtils.replace(r.message, "`", "\\`");
+
+        List<BoatExample> examples = new ArrayList<>();
+        if(response.getContent() != null) {
+            response.getContent().forEach((contentType, mediaType) -> {
+                log.info("Derefenencing again....");
+
+                BoatExampleUtils.convertExamples(mediaType, contentType, examples);
+            });
+            BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
+            r.examples = examples.stream().map(boatExample -> {
+                Map<String, Object> example = new LinkedHashMap<>();
+                example.put(boatExample.getKey(), boatExample.getPrettyPrintValue());
+                return example;
+            }).collect(Collectors.toList());
+        }
         return r;
     }
 
@@ -128,7 +145,7 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
         Object example = parameter.getExample();
 
-        if(parameter.getStyle() != null) {
+        if (parameter.getStyle() != null) {
             switch (parameter.getStyle()) {
                 case FORM:
                     if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
