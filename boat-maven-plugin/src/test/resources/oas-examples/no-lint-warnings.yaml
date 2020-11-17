@@ -1,0 +1,77 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  description: An API
+  x-api-id: provider
+  contact:
+    name: John
+    url: https://john.no
+    email: john@john.no
+servers:
+  - url: http://petstore.swagger.io/
+tags:
+  - name: pets
+    description: Pets tags
+paths:
+  /pets:
+    get:
+      summary: List all pets
+      operationId: listPets
+      tags:
+        - pets
+      responses:
+        '200':
+          description: A paged array of pets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PetsResponse"
+        default:
+          description: unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: int64
+          minLength: 1
+          maxLength: 64
+        name:
+          type: string
+          minLength: 0
+          maxLength: 64
+        tag:
+          type: string
+          minLength: 0
+          maxLength: 12
+    PetsResponse:
+      type: object
+      properties:
+        pets:
+          items:
+            $ref: '#/components/schemas/Pet'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 12
+        message:
+          type: string
+          minLength: 0
+          maxLength: 64
