@@ -50,7 +50,7 @@ public class UnAliasTransformer implements Transformer {
     }
 
     private static void unAlias(Schema schema, Schema alias) {
-        log.info("{} refers to alias type {}", schema.getName(), schema.get$ref());
+        log.debug("{} refers to alias type {}", schema.getName(), schema.get$ref());
         schema.set$ref(null);
         schema.setType(alias.getType());
         dontOverride(schema::getName, schema::setName, alias::getName);
