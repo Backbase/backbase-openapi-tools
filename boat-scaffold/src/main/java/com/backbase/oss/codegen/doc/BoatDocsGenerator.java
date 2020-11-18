@@ -66,6 +66,12 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
             additionalProperties.put("responses", openAPI.getComponents().getResponses().entrySet().stream()
                 .map(codeResponse -> {
                     String responseCode = codeResponse.getKey();
+                    // try to resolve response code from key. otherwise use default
+                    responseCode = responseCode.replaceAll("\\D+","");
+                    if(responseCode.length()!=3) {
+                        responseCode = "default";
+                    }
+
                     ApiResponse response = codeResponse.getValue();
                     return fromResponse(responseCode, response);
                 }).collect(Collectors.toList()));
