@@ -48,14 +48,12 @@ body {
 
 article {
   display: grid;
+  padding: 16px 32px !important;
 }
 
 article > * {
-  width: calc(60% - 45px) !important;
+  width: calc(60% - 32px) !important;
   box-sizing: border-box;
-}
-
-article > .response-content-block {
 }
 
 * {
@@ -159,8 +157,11 @@ div.secured-by > pre:last-child {
 }
 
 section {
-  padding: 16px 0 16px 32px;
+  padding: 16px 0 16px 0;
   margin-bottom: 32px;
+}
+section > h1 {
+  margin-left: 32px !important;
 }
 
 section h1 {
@@ -387,8 +388,8 @@ pre.language-api .pun {
 
 pre code {
   display: block;
-  font-size: 14px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 13px;
+  font-family: monospace !important;
   font-style: normal;
   font-weight: 400;
 }
@@ -422,7 +423,7 @@ pre code.sample-request-response-json {
 }
 
 .sidenav > li > a {
-  display: inline-flex!important;
+  display: inline-flex !important;
   margin: 0;
   padding: 8px 8px;
   font-family: "Roboto", sans-serif;
@@ -434,21 +435,21 @@ pre code.sample-request-response-json {
   height: 100%;
   line-height: 26px;
   vertical-align: middle;
-align-items: center;
-width: 100%;
+  align-items: center;
+  width: 100%;
 }
 
 .sidenav > li > a .text {
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .sidenav > li.nav-header > a {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
-  color: rgb(133, 139, 165);;
+  color: rgb(133, 139, 165);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -477,7 +478,7 @@ min-width: 0;
 .nav-list > .active > a:focus {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
   color: #121212;
-  background-color: rgba(38, 50, 56,0.1);
+  background-color: rgba(38, 50, 56, 0.1);
   border-radius: 6px;
   font-weight: bold;
 }
@@ -768,8 +769,7 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   transform: rotate(-90deg);
 }
 
-.requests-wrapper.
-.responses-wrapper {
+.requests-wrapper .responses-wrapper {
   display: flex;
 }
 
@@ -780,8 +780,10 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 .examples-tab-wrapper {
   flex: 1;
 }
+
 .exampleStyle {
   flex: 1;
+  display: flex;
   min-height: 20px;
 }
 
@@ -800,8 +802,8 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 }
 
 .request-body,
-.response-body{
-width: 100%!important;
+.response-body {
+  width: 100% !important;
 }
 
 .tab-content {
@@ -809,12 +811,14 @@ width: 100%!important;
 }
 
 .dropdown-examples {
-  width: 40%;
+  width: calc((100% + 64px) * 0.4 - 64px);
   z-index: 2;
   color: rgb(255, 255, 255);
   padding: 0px 40px;
-  background-color: rgb(38, 50, 56);
-  margin-top: -79px;
+  background: rgb(17, 23, 26);
+  margin-top: -55px;
+  margin-left: 32px;
+  border-radius: 6px;
 }
 
 .dropdown-examples label {
@@ -832,6 +836,16 @@ width: 100%!important;
   margin-bottom: 16px;
   margin-right: 0;
   width: 100%;
+  padding: 0.9em;
+  background-color: rgba(38, 50, 56, 0.4);
+  margin: 0px 0px 10px;
+  display: block;
+  font-size: 0.929em;
+  line-height: 1.5em;
+  color: #fff;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  border: none;
 }
 
 .dropdown-examples .example-dropdown-value {
