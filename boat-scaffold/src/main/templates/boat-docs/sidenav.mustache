@@ -1,0 +1,31 @@
+<div id="sidenav">
+    <nav id="scrollingNav">
+        <ul class="sidenav nav nav-list">
+            <h1 class="nav-header">{{appName}}</h1>
+            <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
+            {{#apiInfo}}
+                {{#apis}}
+                    {{#operations}}
+                        <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
+                        {{#operation}}
+                            <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
+                                <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}" data-deprecated="{{isDeprecated}}">
+                                    <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
+                                    <span class="text">
+                                    {{#summary}}
+                                        {{summary}}
+                                    {{/summary}}
+                                    {{^summary}}
+                                        {{nickname}}
+                                    {{/summary}}
+                                    </span>
+                                </a>
+                            </li>
+                        {{/operation}}
+                    {{/operations}}
+                {{/apis}}
+            {{/apiInfo}}
+        </ul>
+
+    </nav>
+</div>
