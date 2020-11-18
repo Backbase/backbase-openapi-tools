@@ -34,6 +34,8 @@ jobs:
           java-version: 11
 
       - name: Get version from POM
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tr "." "\n"))
           echo "::set-env name=MAJOR::${VERSION_PARTS[0]}"
@@ -42,12 +44,16 @@ jobs:
 
       - name: Setup release version
         if: contains(github.ref, 'master')
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           NEW_VERSION="$((MAJOR)).$((MINOR+1)).0"
           echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
 
       - name: Setup PR version
         if: contains(github.ref, '/pull/')
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}-PR-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')"
           echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
