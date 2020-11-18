@@ -23,7 +23,7 @@ public class ExportDependencyMojoTests {
         ExportDependenciesMojo mojo = new ExportDependenciesMojo();
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
 
         String groupId = "test.groupId";
         String artifactId = "artifact-spec";
@@ -89,7 +89,7 @@ public class ExportDependencyMojoTests {
         ExportDependenciesMojo mojo = new ExportDependenciesMojo();
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
 
         Dependency specDependency = new Dependency();
         specDependency.setGroupId(groupId);

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0</version>
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
@@ -44,6 +44,12 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-scaffold</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-quay-lint</artifactId>
             <version>${project.version}</version>
         </dependency>
 
