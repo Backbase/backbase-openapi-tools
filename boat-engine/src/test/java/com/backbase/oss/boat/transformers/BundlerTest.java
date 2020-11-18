@@ -68,7 +68,7 @@ public class BundlerTest {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
 
-        log.info(Yaml.pretty(openAPI));
+        log.debug(Yaml.pretty(openAPI));
 
         assertThat("Single inline example is replaced with relative ref (get)",
             singleExampleNode(openAPI, "/users", PathItem::getGet, "200", APPLICATION_JSON).get("$ref").asText(),
@@ -116,7 +116,6 @@ public class BundlerTest {
             is("#/components/examples/example-number-three"));
         assertThat("value.$ref is cleaned up", exampleNoThree.getValue(), nullValue());
 
-        log.debug(Yaml.pretty(openAPI));
     }
 
     private ObjectNode singleExampleNode(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
