@@ -132,6 +132,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kdoc-maven-plugin</artifactId>
+                <version>0.12.1230</version>
+                <configuration>
+                    <title>API documentation for ${project.artifactId} ${project.version}</title>
+                    <sources>
+                        <source>${project.basedir}/src/main/kotlin</source>
+                    </sources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>apidoc</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>apidoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
