@@ -1,7 +1,8 @@
-<h3 class="response-header-tab collapsed" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
-<div class="response-content-block" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
+<h3 class="response-header-tab {{^is2xx}}collapsed{{/is2xx}}" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
+<div class="response-content-block {{^is2xx}}collapsed{{/is2xx}}" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
     <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
     <div class="exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
+    <div class="left-side">
         {{#hasHeaders}}
             <h3>Headers</h3>
             <div id="responses-{{nickname}}-{{code}}-headers">
@@ -14,7 +15,7 @@
         {{/hasHeaders}}
         {{#schema}}
             <h3>Schema</h3>
-            <div id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
+            <div class="schema-block" id="responses-{{baseName}}-{{nickname}}-{{code}}-schema">
                 <div id="responses-{{baseName}}-{{nickname}}-schema-{{code}}">
                     <script>
                         $(document).ready(function() {
@@ -65,18 +66,33 @@
                           result.append(view.render());
                         });
                 </script>
-            </div>
-            <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
-        </div>
-        {{#hasExamples}}
-            <h3>Examples</h3>
-            {{#examples}}
-                <div id="examples-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
-                    <label>{{name}} - {{contentType}}</label>
-                    <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
                 </div>
-            {{/examples}}
-        {{/hasExamples}}
+                <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
+            </div>
+        {{/schema}}
+    </div>
+        {{#schema}}
+            {{#hasExamples}}
+                <div class="dropdown-examples">
+                    <h2>Response examples</h2>
+                    <label>
+                        <span>Example</span>
+                        <select class="example-dropdown-select">
+                            {{#examples}}
+                                <option data-toggle="tab"
+                                        value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}} - {{contentType}}</option>
+                            {{/examples}}
+                        </select>
+                    </label>
+                    {{#examples}}
+                        <div class="example-dropdown-value"
+                             id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
+                            <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
+                        </div>
+                    {{/examples}}
+
+                </div>
+            {{/hasExamples}}
         {{/schema}}
     </div>
 </div>
