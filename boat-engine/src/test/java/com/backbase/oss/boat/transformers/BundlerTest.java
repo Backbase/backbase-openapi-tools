@@ -77,8 +77,9 @@ public class BundlerTest {
             is("component-examples with example - should be left alone"));
 
 
+        // actual input is not valid... when there is a ref no other properties should be set - still allow it.
         assertThat("Component example that duplicates a inline example, is left alone. But the summary is removed",
-            openAPI.getComponents().getExamples().get("example-number-one").getSummary(), nullValue());
+            openAPI.getComponents().getExamples().get("example-number-one").getSummary(), is("example-number-one"));
 
 
         assertThat("Deep linked examples are dereferenced.",
