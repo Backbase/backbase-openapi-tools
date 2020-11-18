@@ -70,8 +70,17 @@ public class BundlerTest {
 
         log.info(Yaml.pretty(openAPI));
 
-        assertThat("Single inline example is replaced with relative ref",
+        assertThat("Single inline example is replaced with relative ref (get)",
             singleExampleNode(openAPI, "/users", PathItem::getGet, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (put)",
+            singleExampleNode(openAPI, "/users", PathItem::getPut, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (post)",
+            singleExampleNode(openAPI, "/users", PathItem::getPost, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (patch)",
+            singleExampleNode(openAPI, "/users", PathItem::getPatch, "200", APPLICATION_JSON).get("$ref").asText(),
             isComponentExample);
         assertThat("Component example without ref is left alone.",
             openAPI.getComponents().getExamples().get("example-in-components-1").getSummary(),
