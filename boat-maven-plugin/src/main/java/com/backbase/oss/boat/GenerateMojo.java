@@ -1,28 +1,13 @@
 package com.backbase.oss.boat;
 
-import static java.util.Collections.emptyMap;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
-
+import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
 import java.io.File;
@@ -39,6 +24,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +48,27 @@ import org.openapitools.codegen.config.GlobalSettings;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
+
 /**
  * Generates client/server code from an OpenAPI json/yaml definition.
  */
-@SuppressWarnings({"DefaultAnnotationParam","java:S3776","java:S5411"})
+@SuppressWarnings({"DefaultAnnotationParam", "java:S3776", "java:S5411"})
 @Mojo(name = "generate", threadSafe = true)
 @Slf4j
 public class GenerateMojo extends AbstractMojo {
@@ -150,7 +153,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * The name of templating engine to use, "mustache" (default) or "handlebars" (beta).
      */
-    @Parameter(name = "engine", defaultValue = "mustache", property="openapi.generator.maven.plugin.engine")
+    @Parameter(name = "engine", defaultValue = "mustache", property = "openapi.generator.maven.plugin.engine")
     protected String engine;
 
     /**
@@ -442,6 +445,14 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "openapi.generator.maven.plugin.dereferenceComponents")
     protected boolean dereferenceComponents;
 
+    /**
+     * Deference components/schemas properties. html2 document generator does not like.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.bundlesSpecs")
+    protected boolean bundleSpecs;
+
+    @Parameter(name = "writeDebugFiles")
+    protected boolean writeDebugFiles = false;
 
     /**
      * The project being built.
@@ -561,7 +572,8 @@ public class GenerateMojo extends AbstractMojo {
                     case "spring":
                         generatorName = "boat-" + generatorName;
                         break;
-
+                    case "html2":
+                        generatorName = "boat-docs";
                     default:
                         // use the original generator
                 }
@@ -788,10 +800,26 @@ public class GenerateMojo extends AbstractMojo {
 
             if (unAlias) {
                 new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
             }
             if (dereferenceComponents) {
                 new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
             }
+
+            if(bundleSpecs) {
+                new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
+
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
+            }
+
+
             new DefaultGenerator().opts(input).generate();
 
             if (buildContext != null) {
@@ -825,7 +853,7 @@ public class GenerateMojo extends AbstractMojo {
      * Calculate openapi specification file hash. If specification is hosted on remote resource it is downloaded first
      *
      * @param inputSpecFile - Openapi specification input file to calculate it's hash.
-     *                        Does not taken into account if input spec is hosted on remote resource
+     *                      Does not taken into account if input spec is hosted on remote resource
      * @return openapi specification file hash
      * @throws IOException When cannot read the file
      */
@@ -848,7 +876,7 @@ public class GenerateMojo extends AbstractMojo {
             }
             ReadableByteChannel readableByteChannel = Channels.newChannel(conn.getInputStream());
 
-            try(FileOutputStream fileOutputStream = new FileOutputStream(inputSpecTempFile)) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(inputSpecTempFile)) {
                 FileChannel fileChannel = fileOutputStream.getChannel();
                 fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             } catch (FileNotFoundException e) {
@@ -861,7 +889,7 @@ public class GenerateMojo extends AbstractMojo {
             inputSpecTempFile.exists()
                 ? Files.asByteSource(inputSpecTempFile)
                 : CharSource
-                    .wrap(ClasspathHelper.loadFileFromClasspath(inputSpecTempFile.toString().replaceAll("\\\\","/")))
+                .wrap(ClasspathHelper.loadFileFromClasspath(inputSpecTempFile.toString().replaceAll("\\\\", "/")))
                 .asByteSource(StandardCharsets.UTF_8);
 
         return inputSpecByteSource.hash(Hashing.sha256()).toString();
@@ -869,9 +897,10 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Try to parse inputSpec setting string into URL.
+     *
      * @return A valid URL or null if inputSpec is not a valid URL
      */
-    private URL inputSpecRemoteUrl(){
+    private URL inputSpecRemoteUrl() {
         try {
             return new URI(inputSpec).toURL();
         } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
@@ -881,8 +910,9 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Get specification hash file.
+     *
      * @param inputSpecFile - Openapi specification input file to calculate it's hash.
-     *                        Does not taken into account if input spec is hosted on remote resource
+     *                      Does not taken into account if input spec is hosted on remote resource
      * @return a file with previously calculated hash
      */
     private File getHashFile(File inputSpecFile) {
@@ -933,6 +963,7 @@ public class GenerateMojo extends AbstractMojo {
             }
         }
     }
+
     /**
      * This method enables conversion of true/false strings in
      * config.additionalProperties (configuration/configOptions) to proper booleans.

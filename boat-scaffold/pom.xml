@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0</version>
     </parent>
     <artifactId>boat-scaffold</artifactId>
 
@@ -94,6 +94,15 @@
                         <phase>verify</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                <systemProperties>
+                    <BoatSpringTemplatesTests.fast>true</BoatSpringTemplatesTests.fast>
+                </systemProperties>
+                </configuration>
             </plugin>
 
             <plugin>

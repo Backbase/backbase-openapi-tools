@@ -15,7 +15,7 @@
             {{/hasDefaultValue}}
 
             {{#pattern}}
-                <span>pattern:</span> pattern: <span class="pattern">{{.}}</span>
+                <span class="pattern">{{.}}</span>
             {{/pattern}}
 
             {{#minLength}}
@@ -38,11 +38,21 @@
             <div class="inner description">{{description}}</div>
 
             {{#isEnum}}
-                <div>Enum: {{#allowableValues}}
-                    {{#enumVars}}
-                        <code>{{name}}</code>
-                    {{/enumVars}}
-                {{/allowableValues}}
+                <div class="inner enums">
+                    <b>Enum</b>
+                    <div class="json-formatter-row json-formatter-open inner">
+                        <div class="json-formatter-children json-formatter-object json-formatter-array">
+                            {{#allowableValues}}
+                                {{#enumVars}}
+                                    <div class="json-formatter-row">
+                                        <div class="json-formatter-toggler-link">
+                                            <span class="json-formatter-string">{{name}}</span>
+                                        </div>
+                                    </div>
+                                {{/enumVars}}
+                            {{/allowableValues}}
+                        </div>
+                    </div>
                 </div>
             {{/isEnum}}
         </div>
@@ -53,10 +63,8 @@
                     {{#example}}
                     <div class="inner json-formatter-string">{{value}}</div>
                     {{/example}}
-                {{/examples}}         
+                {{/examples}}
             </div>
         {{/hasExamples}}
     </div>
-
-
 </div>

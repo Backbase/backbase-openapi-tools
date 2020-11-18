@@ -164,11 +164,26 @@ public class BoatCodegenParameter extends CodegenParameter {
     static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
         boatCodegenParameter.parameter = parameter;
+
+        if (boatCodegenParameter.examples == null) {
+            boatCodegenParameter.examples = new ArrayList<>();
+        }
         // Copy Parameter Examples if applicable
+        if (parameter.getExample() != null) {
+            Object example = parameter.getExample();
+            BoatExample boatExample = new BoatExample("example", codegenParameter.baseType, new Example().value(example));
+            if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
+                boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
+            }
+            boatCodegenParameter.examples.add(boatExample);
+        }
+
         if (parameter.getExamples() != null) {
-            boatCodegenParameter.examples = parameter.getExamples().entrySet().stream()
-                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(), null, stringExampleEntry.getValue()))
-                .collect(Collectors.toList());
+            boatCodegenParameter.examples.addAll(parameter.getExamples().entrySet().stream()
+                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(),
+                    codegenParameter.baseType, stringExampleEntry.getValue()))
+                .collect(Collectors.toList()));
+
         }
 
         if (parameter.getContent() != null) {
@@ -192,45 +207,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (boatCodegenParameter.examples == null) {
             boatCodegenParameter.examples = new ArrayList<>();
         }
-        List<BoatExample> examples = new ArrayList<>();
-
-        if (mediaType.getExample() != null) {
-            Object example = mediaType.getExample();
-            BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example));
-            if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
-                boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
-            }
-            examples.add(boatExample);
-        }
-        if (mediaType.getExamples() != null) {
-            mediaType.getExamples().forEach((key, example) -> {
-                BoatExample boatExample = new BoatExample(key, contentType, example);
-                examples.add(boatExample);
-            });
-        }
-        // dereference examples
-        examples.stream()
-            .filter(boatExample -> boatExample.getExample().get$ref() != null)
-            .forEach(boatExample -> {
-                String ref = boatExample.getExample().get$ref();
-                if (ref.startsWith("#/components/examples")) {
-                    ref = StringUtils.substringAfterLast(ref, "/");
-                    if (openAPI.getComponents() != null && openAPI.getComponents().getExamples() != null) {
-                        Example example = openAPI.getComponents().getExamples().get(ref);
-                        if (example == null) {
-                            log.warn("Example ref: {}  used in: {}  refers to an example that does not exist", ref, boatCodegenParameter.paramName);
-                        } else {
-                            log.debug("Replacing Example ref: {}  used in: {}  with example from components: {}", ref, boatCodegenParameter.paramName, example);
-                            boatExample.setExample(example);
-                        }
-                    } else {
-                        log.warn("Example ref: {}  used in: {}  refers to an example that does not exist", ref, boatCodegenParameter.paramName);
-                    }
-                } else {
-                    log.warn("Example ref: {} used in: {} refers to an example that does not exist", ref, boatCodegenParameter.paramName);
-                }
-            });
-        boatCodegenParameter.examples.addAll(examples);
+        BoatExampleUtils.convertExamples(mediaType,contentType, boatCodegenParameter.examples);
+        BoatExampleUtils.inlineExamples(boatCodegenParameter.paramName, boatCodegenParameter.examples, openAPI);
     }
 
 }

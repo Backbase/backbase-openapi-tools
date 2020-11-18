@@ -6,12 +6,15 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+@Slf4j
 public class GeneratorTests {
 
     @Test
@@ -23,9 +26,37 @@ public class GeneratorTests {
     }
 
     @Test
+    public void testHtml2() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.generatorName = "html2";
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.execute();
+    }
+
+    @Test
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
         GenerateDocMojo mojo = new GenerateDocMojo();
         File input = new File(spec);
         File output = new File("target/boat-docs");
@@ -43,6 +74,44 @@ public class GeneratorTests {
         mojo.output = output;
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.execute();
+    }
+
+    @Test
+    public void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+
+        BundleMojo bundleMojo = new BundleMojo();
+        bundleMojo.setInput(new File(spec));
+        File dereferenced = new File("target/boat-docs-bundled/dereferenced-openapi.yml");
+        bundleMojo.setOutput(dereferenced);
+        bundleMojo.execute();
+
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File output = new File("target/boat-docs-bundled/");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = dereferenced.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = false;
+        mojo.dereferenceComponents = false;
         mojo.execute();
     }
 
