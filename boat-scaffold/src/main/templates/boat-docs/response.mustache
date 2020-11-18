@@ -87,7 +87,15 @@
                     {{#examples}}
                         <div class="example-dropdown-value"
                              id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
-                            <div class="json-viewer language-json">{{{prettyPrintValue}}}</div>
+                            {{#isJson}}
+                                <div class="buttons-wrapper">
+                                    <button data-action="copy"> Copy </button> <button data-action="expand"> Expand all </button><button data-action="collapse"> Collapse all </button>
+                                </div>
+                                <div class="json-viewer ">{{{prettyPrintValue}}}</div>
+                            {{/isJson}}
+                            {{^isJson}}
+                                <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
+                            {{/isJson}}
                         </div>
                     {{/examples}}
 
