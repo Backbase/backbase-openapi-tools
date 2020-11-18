@@ -6,7 +6,163 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8" />
-  {{>js_jquery}}
+  <style type="text/css">
+    {{>fonts}}
+    {{>css_bootstrap}}
+    {{>css_prettify}}
+    {{>css_json_schema_view}}
+    {{>css_response}}
+    {{>styles}}
+  </style>
+    {{>js_jquery}}
+
+</head>
+<body>
+  <div id="sidenav">
+    <nav id="scrollingNav">
+      <ul class="sidenav nav nav-list">
+          <h1 class="nav-header">{{appName}}</h1>
+          <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
+        {{#apiInfo}}
+          {{#apis}}
+            {{#operations}}
+              <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
+              {{#operation}}
+                <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
+                    <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
+                        <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
+                        {{#summary}}
+                            {{summary}}
+                        {{/summary}}
+                        {{^summary}}
+                            {{nickname}}
+                        {{/summary}}
+                    </a>
+                </li>
+              {{/operation}}
+            {{/operations}}
+          {{/apis}}
+        {{/apiInfo}}
+      </ul>
+
+    </nav>
+  </div>
+  <div id="content">
+    <div id="project">
+        <h1>{{{appName}}}</h1>
+          {{#version}}
+              <div class="app-desc">Version: {{{version}}}</div>
+          {{/version}}
+    </div>
+    <div id="header">
+      <div id="api-_">
+        <div id="app-description" class="app-desc">
+            {{{appDescription}}}
+        </div>
+      </div>
+    </div>
+    <div id="sections">
+      {{#apiInfo}}
+        {{#apis}}
+          {{#operations}}
+            <section id="api-{{baseName}}">
+              <h1>{{baseName}}</h1>
+              {{#operation}}
+                <div id="api-{{baseName}}-{{nickname}}">
+                  <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
+                          {{#summary}}<h1>{{.}}</h1>{{/summary}}
+                          {{#description}}<p>{{description}}</p>{{/description}}
+                    <p class="marked">{{notes}}</p>
+                      <br/>
+                      {{#vendorExtensions}}
+                          <div class="secured-by">
+                              <h2>Secured by Backbase Access Control</h2>
+                              {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
+                              {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
+                              {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
+                          </div>
+                      {{/vendorExtensions}}
+                      <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
+
+                      {{#hasAuthMethods}}
+                          <h2>Scopes</h2>
+                          <table>
+                            {{#authMethods}}{{#scopes}}
+                              <tr>
+                                <td>{{scope}}</td>
+                                <td>{{description}}</td>
+                              </tr>
+                            {{/scopes}}{{/authMethods}}
+                          </table>
+                      {{/hasAuthMethods}}
+
+                      {{#hasPathParams}}
+                        <h2>Path parameters</h2>
+                        <div class="json-schema-view">
+                            {{#pathParams}}
+                              {{>param}}
+                            {{/pathParams}}
+                        </div>
+                      {{/hasPathParams}}
+
+                      {{#hasHeaderParams}}
+                        <h2>Header parameters</h2>
+                        <div class="json-schema-view">
+                          {{#headerParams}}
+                              {{>param}}
+                          {{/headerParams}}
+                        </div>
+                      {{/hasHeaderParams}}
+
+                      {{#hasFormParams}}
+                        <h2>Form parameters</h2>
+                        <div class="json-schema-view">
+                          {{#formParams}}
+                              {{>param}}
+                          {{/formParams}}
+                        </div>
+                      {{/hasFormParams}}
+
+                      {{#hasQueryParams}}
+                        <h2>Query parameters</h2>
+                        <div class="json-schema-view">
+                          {{#queryParams}}
+                            {{>param}}
+                          {{/queryParams}}
+                        </div>
+                      {{/hasQueryParams}}
+
+                      {{#hasBodyParam}}
+                          <h2>Request Body Schema</h2>
+                          {{#bodyParams}}
+                              {{>paramB}}
+                          {{/bodyParams}}
+
+                      {{/hasBodyParam}}
+
+                      <h2>Responses</h2>
+                      {{#responses}}
+                       {{>response}}
+                      {{/responses}}
+                    </article>
+                  </div>
+                {{/operation}}
+              </section>
+            {{/operations}}
+          {{/apis}}
+        {{/apiInfo}}
+      </div>
+      <div id="example-area"></div>
+
+{{^hideGenerationTimestamp}}
+<div id="generator">
+        <div class="content">
+          Generated {{generatedDate}}
+        </div>
+      </div>
+{{/hideGenerationTimestamp}}
+
+  </div>
   {{>js_prettify}}
   {{>js_bootstrap}}
   {{>js_marked}}
@@ -105,15 +261,6 @@
 
 
       function initDynamic() {
-        // tabs
-        $('.nav-tabs-examples a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        });
-
-
-        $('.nav-tabs-examples').find('a:first').tab('show');
-
         // call scrollspy refresh method
         $(window).scrollspy('refresh');
       }
@@ -152,19 +299,6 @@
     }
 
   </script>
-  <style type="text/css">
-    {{>fonts}}
-    {{>css_bootstrap}}
-    {{>css_prettify}}
-    {{>css_json_schema_view}}
-    {{>css_response}}
-    {{>styles}}
-  </style>
-</head>
-<body>
-
-
-
   <script>
     // Script section to load models into a JS Var
     var defs = {}
@@ -184,183 +318,6 @@
     }
     {{/swagger.vendorExtensions.x-shared-errors}}
   </script>
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div id="sidenav" class="span2">
-        <nav id="scrollingNav">
-          <ul class="sidenav nav nav-list">
-            <!-- Logo Area -->
-<!--              <div style="width: 80%; background-color: #4c8eca; color: white; padding: 20px; text-align: center; margin-bottom: 20px; ">-->
-
-<!--              API Docs 2-->
-
-<!--              </div>-->
-<!--            -->
-              <h1 class="nav-header">{{appName}}</h1>
-
-              <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
-
-            {{#apiInfo}}
-              {{#apis}}
-                {{#operations}}
-                  <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
-                  {{#operation}}
-                    <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                        <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
-                            <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
-                            {{#summary}}
-                                {{summary}}
-                            {{/summary}}
-                            {{^summary}}
-                                {{nickname}}
-                            {{/summary}}
-                        </a>
-                    </li>
-                  {{/operation}}
-                {{/operations}}
-              {{/apis}}
-            {{/apiInfo}}
-          </ul>
-
-        </nav>
-
-      </div>
-      <div id="content">
-        <div id="project">
-          <div class="pull-left">
-            <h1>{{{appName}}}</h1>
-              {{#version}}
-                  <div class="app-desc">Version: {{{version}}}</div>
-              {{/version}}
-          </div>
-          <div class="clearfix"></div>
-        </div>
-        <div id="header">
-          <div id="api-_">
-            <div id="app-description" class="app-desc">
-                {{{appDescription}}}
-            </div>
-          </div>
-        </div>
-        <div id="sections">
-          {{#apiInfo}}
-            {{#apis}}
-              {{#operations}}
-                <section id="api-{{baseName}}">
-                  <h1>{{baseName}}</h1>
-                  {{#operation}}
-                    <div id="api-{{baseName}}-{{nickname}}">
-                      <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                              {{#summary}}<h1>{{.}}</h1>{{/summary}}
-                              {{#description}}<p>{{description}}</p>{{/description}}
-                        <p class="marked">{{notes}}</p>
-                          <br/>
-                          {{#vendorExtensions}}
-                              <div class="secured-by">
-                                  <h2>Secured by Backbase Access Control</h2>
-                                  {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
-                                  {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
-                                  {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
-                              </div>
-                          {{/vendorExtensions}}
-                          <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
-
-                          {{#hasAuthMethods}}
-                              <h2>Scopes</h2>
-                              <table>
-                                {{#authMethods}}{{#scopes}}
-                                  <tr>
-                                    <td>{{scope}}</td>
-                                    <td>{{description}}</td>
-                                  </tr>
-                                {{/scopes}}{{/authMethods}}
-                              </table>
-                          {{/hasAuthMethods}}
-
-                          {{#hasPathParams}}
-                            <h2>Path parameters</h2>
-                            <div class="json-schema-view">
-                                {{#pathParams}}
-                                  {{>param}}
-                                {{/pathParams}}
-                            </div>
-                          {{/hasPathParams}}
-
-                          {{#hasHeaderParams}}
-                            <h2>Header parameters</h2>
-                            <div class="json-schema-view">
-                              {{#headerParams}}
-                                  {{>param}}
-                              {{/headerParams}}
-                            </div>
-                          {{/hasHeaderParams}}
-
-                          {{#hasFormParams}}
-                            <h2>Form parameters</h2>
-                            <div class="json-schema-view">
-                              {{#formParams}}
-                                  {{>param}}
-                              {{/formParams}}
-                            </div>
-                          {{/hasFormParams}}
-
-                          {{#hasQueryParams}}
-                            <h2>Query parameters</h2>
-                            <div class="json-schema-view">
-                              {{#queryParams}}
-                                {{>param}}
-                              {{/queryParams}}
-                            </div>
-                          {{/hasQueryParams}}
-
-                          {{#hasBodyParam}}
-                              <h2>Request Body Schema</h2>
-                              {{#bodyParams}}
-
-                                  {{>paramB}}
-                              {{/bodyParams}}
-
-                          {{/hasBodyParam}}
-
-                          <h2>Responses</h2>
-                          {{#responses}}
-                           {{>response}}
-                          {{/responses}}
-                        </article>
-                      </div>
-                      <hr>
-                    {{/operation}}
-                  </section>
-                {{/operations}}
-              {{/apis}}
-            {{/apiInfo}}
-          </div>
-          <div id="footer">
-            <div id="api-_footer">
-              <p>Suggestions, contact, support and error reporting;
-                {{#infoUrl}}
-                  <div class="app-desc">Information URL: <a href="{{{infoUrl}}}">{{{infoUrl}}}</a></div>
-                {{/infoUrl}}
-                {{#infoEmail}}
-                  <div class="app-desc">Contact Info: <a href="{{{infoEmail}}}">{{{infoEmail}}}</a></div>
-                {{/infoEmail}}
-              </p>
-              {{#licenseInfo}}
-                <div class="license-info">{{{licenseInfo}}}</div>
-              {{/licenseInfo}}
-              {{#licenseUrl}}
-                <div class="license-url">{{{licenseUrl}}}</div>
-              {{/licenseUrl}}
-            </div>
-          </div>
-{{^hideGenerationTimestamp}}          <div id="generator">
-            <div class="content">
-              Generated {{generatedDate}}
-            </div>
-          </div>
-{{/hideGenerationTimestamp}}      </div>
-    </div>
-  </div>
   {{>js_jsonformatter}}
   {{>js_jsonschemaview}}
   {{>js_json_schema_ref_parser}}
@@ -368,38 +325,40 @@
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
   <script>
-    var $RefParser = JsonSchemaRefParser;
-    var schemaWrapper = { "components": { "schemas" : defs}};
-    defsParser = new $RefParser();
-    defsParser.dereference(schemaWrapper).catch(function(err) {
-      console.log(err);
-    });
-  </script>
-  <script>
+  var $RefParser = JsonSchemaRefParser;
+  var schemaWrapper = { "components": { "schemas" : defs}};
+  defsParser = new $RefParser();
+  defsParser.dereference(schemaWrapper).catch(function(err) {
+    console.log(err);
+  });
+
   $(document).ready(function () {
-    $('.nav-tabs-examples').find('a:first').tab('show');
     $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
+
+    // To handle the examples
+    $('.dropdown-examples').each(function() {
+      $(this).find('.example-dropdown-value:first').show();
+    });
+
+    $('.example-dropdown-select').change(function() {
+      $(this).parent().parent().find('.example-dropdown-value').hide();
+      $(`.dropdown-examples div${this.value}`).show();
+    });
+
+    $(".response-header-tab").click(function() {
+      const id = $(this).attr('id');
+      const isCollapsed = $(this).hasClass('collapsed')
+      if (isCollapsed){
+        $(`#${id}-content`).slideDown();
+        $(this).removeClass('collapsed');
+      } else {
+        $(`#${id}-content`).slideUp();
+        $(this).addClass('collapsed');
+      }
+    });
+    $('.response-header-tab[data-code^="2"]').click();
   });
   </script>
-  <script>
-
-       // To handle the examples
-       $(document).ready(function() {
-          $('.dropdown-examples').each(function() {
-            $(this).find('.example-dropdown-value:first').show();
-          });
-          $('.example-dropdown-select').change(function() {
-            $(this).parent().parent().find('.example-dropdown-value').hide();
-            $(`.dropdown-examples div${this.value}`).show();
-          });
-       });
-    </script>
-<script>
-      $(".response-header-tab").click(function() {
-        const id = $(this).attr('id');
-        $(`#${id}-content`).slideToggle();
-      });
-</script>
 </body>
 </html>
 

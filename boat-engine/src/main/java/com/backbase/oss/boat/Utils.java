@@ -191,7 +191,7 @@ public class Utils {
         return name;
     }
 
-    protected static String normalizeDisplayName(String name) {
+    public static String normalizeDisplayName(String name) {
         name = name.replaceAll("[^A-Za-z0-9]", "");
         return name;
     }

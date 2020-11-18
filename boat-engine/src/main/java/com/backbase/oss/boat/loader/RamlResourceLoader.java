@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URI;
 import javax.annotation.Nullable;
 import org.raml.v2.api.loader.DefaultResourceLoader;
 import org.raml.v2.api.loader.ResourceLoader;
@@ -75,5 +76,9 @@ public class RamlResourceLoader implements ResourceLoaderExtended {
     @Override
     public InputStream fetchResource(String resourceName) {
         return fetchResource(resourceName, null);
+    }
+
+    public URI getUriCallBackParam() {
+        return this.fallBackResourceLoader instanceof ResourceLoaderExtended ? ((ResourceLoaderExtended)this.fallBackResourceLoader).getUriCallBackParam() : null;
     }
 }

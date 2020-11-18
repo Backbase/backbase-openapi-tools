@@ -1,0 +1,74 @@
+extends: spectral:oas
+rules:
+  openapi-spec-version:
+    description: "OpenAPI specification version must be 3.0.3."
+    severity: error
+    given: "$"
+    then:
+      field: openapi
+      function: pattern
+      functionOptions:
+        match: "3.0.3"
+  no-license-allowed:
+    description: "No license information allowed because it's covered by the License Agreement we already negotiate with customers."
+    given: "$.info"
+    severity: error
+    then:
+      field: license
+      function: falsy
+  api-servers:
+    description: "OpenAPI `servers` must be present and non-empty array."
+    severity: error
+    formats: ["oas3"]
+    given: "$"
+    then:
+      field: servers
+      function: schema
+      functionOptions:
+        schema:
+          items:
+            type: object
+          minItems: 1
+          type: array
+  mock-api-server:
+    description: "Mock API server must be the first one so that Postman import uses it."
+    severity: error
+    formats: ["oas3"]
+    given: "$.servers[0].url"
+    then:
+      function: pattern
+      functionOptions:
+        match: "http://localhost:4010"
+  camel-case-operationId:
+    description: "OperationId must be camelCase in order to generate good method names"
+    severity: error
+    given: "$.paths.*.*.operationId"
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[a-z]+((\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?$'
+  content-references-reusable-components:
+    description: "response and requestBody content schema $ref may only point to elements in the components section of openapi.yaml to generate good class names"
+    severity: error
+    resolved: false
+    given:
+      - '$..responses.*.content..*.schema.$ref'
+      - '$..requestBody.content..*.schema.$ref'
+    then:
+      function: pattern
+      functionOptions:
+        match: '#/components/'
+  examples-responses-are-valid:
+    message: "{{error}}"
+    severity: error
+    given: "$..responses..[?(@property !== 'properties' && @.examples)]"
+    then:
+      function: schemaPath
+      functionOptions:
+        field: "$.examples.*.value"
+        schemaPath: "$.schema"
+  info-contact: false
+  example-value-or-externalValue: false
+  openapi-tags-alphabetical: error
+  oas3-server-not-example.com: error
+  oas3-parameter-description: error
