@@ -13,6 +13,7 @@ import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -99,6 +100,12 @@ public class BundlerTest {
         assertThat("Relative path works",
             openAPI.getPaths().get("/users").getPut().getResponses().get("403").getContent().get(APPLICATION_JSON)
                 .getExample(), notNullValue());
+
+        Example exampleNoThree = openAPI.getPaths().get("/multi-users").getPost().getRequestBody().getContent()
+            .get(APPLICATION_JSON).getExamples().get("example-number-three");
+        assertThat("value.$ref is cleaned up", exampleNoThree.get$ref(),
+            is("#/components/examples/example-number-three"));
+        assertThat("value.$ref is cleaned up", exampleNoThree.getValue(), nullValue());
 
         log.debug(Yaml.pretty(openAPI));
     }
