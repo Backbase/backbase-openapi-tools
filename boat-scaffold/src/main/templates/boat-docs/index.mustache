@@ -12,7 +12,9 @@
     {{>css_prettify}}
     {{>css_json_schema_view}}
     {{>css_response}}
-    {{>styles}}
+      {{>css_jsontreeviewer}}
+
+      {{>styles}}
   </style>
     {{>js_jquery}}
 
@@ -42,7 +44,7 @@
               {{#operation}}
                 <div id="api-{{baseName}}-{{nickname}}">
                   <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                          {{#summary}}<h1>{{.}} {{#isDeprecated}}<span class="deprecated">Deprecated</span> {{/isDeprecated}}</h1>{{/summary}}
+                          <h1>{{#summary}}{{.}}{{/summary}}{{^summary}}{{nickname}}{{/summary}}{{#isDeprecated}}<span class="deprecated">Deprecated</span> {{/isDeprecated}}</h1>
                           {{#description}}<p>{{description}}</p>{{/description}}
                     <p class="marked">{{notes}}</p>
                       <br/>
@@ -305,6 +307,7 @@
   {{>js_jsonschemamergeallof}}
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
+  {{>js_jsontreeviewer}}
   <script>
   var $RefParser = JsonSchemaRefParser;
   var schemaWrapper = {
@@ -345,6 +348,48 @@
         $(this).addClass('collapsed');
       }
     });
+
+    // Turns json into jsonviewer and makes sure the buttons work
+    (function() {
+
+      var copyToClipboard = function($btn, secretInfo) {
+       $btn.html("Copying..");
+        var $body = document.getElementsByTagName('body')[0];
+        var $tempInput = document.createElement('INPUT');
+        $body.appendChild($tempInput);
+        $tempInput.setAttribute('value', secretInfo)
+        $tempInput.select();
+        document.execCommand('copy');
+        $body.removeChild($tempInput);
+        $btn.html("Copied");
+        setTimeout(function() { $btn.html("Copy"); }, 1000)
+      }
+
+        $(".json-viewer").each(function() {
+           const data = JSON.parse($(this).text());
+           $(this).empty();
+           const tree = jsonTree.create(data, this);
+           this.getViewerInstance = () => tree;
+        });
+
+        $('.example-dropdown-value button[data-action="collapse"]').click(function() {
+            const viewer  = $(this).parent().siblings('.json-viewer')[0];
+            if (viewer.getViewerInstance) viewer.getViewerInstance().collapse();
+        });
+
+        $('.example-dropdown-value button[data-action="expand"]').click(function() {
+            const viewer  = $(this).parent().siblings('.json-viewer')[0];
+            if (viewer.getViewerInstance) viewer.getViewerInstance().expand();
+        });
+
+        $('.example-dropdown-value button[data-action="copy"]').click(function() {
+            const viewer  = $(this).parent().siblings('.json-viewer')[0];
+            if (viewer.getViewerInstance){
+                copyToClipboard($(this), viewer.getViewerInstance().toSourceJSON());
+            }
+        });
+
+    }())
   });
   </script>
 </body>
