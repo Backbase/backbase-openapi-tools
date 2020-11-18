@@ -4,6 +4,7 @@ import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.assertj.core.util.Arrays;
 import org.junit.Test;
 
 @Slf4j
@@ -31,6 +32,15 @@ public class LintMojoTests {
     public void testFailOnWarning() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
+        lintMojo.setFailOnWarning(true);
+        lintMojo.execute();
+    }
+
+    @Test
+    public void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151"));
+        lintMojo.setInput(getFile("/oas-examples/no-lint-warnings.yaml"));
         lintMojo.setFailOnWarning(true);
         lintMojo.execute();
     }
