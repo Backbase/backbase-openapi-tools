@@ -1,6 +1,8 @@
 package com.backbase.oss.boat.transformers.bundler;
 
 
+import static com.google.common.collect.Maps.newHashMap;
+
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,8 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 @Slf4j
 public class ExamplesProcessor {
@@ -93,7 +93,7 @@ public class ExamplesProcessor {
                 log.debug("Processing Example: {} with value: {} and ref: {} ", key, example.getValue(), example.get$ref());
                 ExampleHolder<?> exampleHolder = ExampleHolder.of(key, example);
                 fixInlineExamples(exampleHolder, relativePath, derefenceExamples);
-                if(exampleHolder.getRef()!=null) {
+                if (exampleHolder.getRef() != null) {
                     example.set$ref(exampleHolder.getRef());
                 } else {
                     example.setValue(exampleHolder.example());
@@ -107,6 +107,10 @@ public class ExamplesProcessor {
             fixInlineExamples(exampleHolder, relativePath, false);
             log.debug("Finished Processing Example: {}", exampleHolder);
         }
+    }
+
+    private void putComponentExample(String key, Example example) {
+        getComponentExamplesFromOpenAPI().put(key, example);
     }
 
     private Map<String, Example> getComponentExamplesFromOpenAPI() {
@@ -180,7 +184,8 @@ public class ExamplesProcessor {
                         // Check whether example is already dereferenced
                     } else {
                         log.debug("Adding Example: {} to components/examples", exampleName);
-                        getComponentExamplesFromOpenAPI().put(exampleName, new Example().value(convertExampleContent(exampleHolder, refPath)));
+                        putComponentExample(exampleName,
+                            new Example().value(convertExampleContent(exampleHolder, refPath)));
                     }
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
@@ -227,9 +232,7 @@ public class ExamplesProcessor {
         Object content = convertExampleContent(exampleHolder, exampleHolder.getRef());
         cache.put(exampleName, exampleHolder);
         exampleHolder.replaceRef("#/components/examples/" + exampleName);
-        getComponentExamplesFromOpenAPI().put(exampleName, new Example()
-            .value(content)
-            .summary(exampleName));
+        putComponentExample(exampleName, new Example().value(content).summary(exampleName));
     }
 
     private Object convertExampleContent(ExampleHolder exampleHolder, String refPath) {
