@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -11,8 +12,11 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +58,36 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
+
+        // Add responses to additonal properties
+        // Should process responses and requests to convert them into code gen models.
+        if(openAPI.getComponents().getResponses()!=null) {
+
+            additionalProperties.put("responses", openAPI.getComponents().getResponses().entrySet().stream()
+                .map(codeResponse -> {
+                    String responseCode = codeResponse.getKey();
+                    // try to resolve response code from key. otherwise use default
+                    responseCode = responseCode.replaceAll("\\D+","");
+                    if(responseCode.length()!=3) {
+                        responseCode = "default";
+                    }
+
+                    ApiResponse response = codeResponse.getValue();
+                    return fromResponse(responseCode, response);
+                }).collect(Collectors.toList()));
+        }
+
+        if(openAPI.getComponents().getParameters()!=null) {
+            Set<String> imports = new HashSet<>();
+            additionalProperties.put("parameters", openAPI.getComponents().getParameters().entrySet().stream()
+            .map(nameParameter -> {
+                String name = nameParameter.getKey();
+                Parameter parameter = nameParameter.getValue();
+                return fromParameter(parameter, imports);
+            }).collect(Collectors.toList()));
+        }
     }
+
 
     @Override
     public String toModelName(String name) {
