@@ -19,7 +19,7 @@ public class OpenAPILoader {
     }
 
     public static OpenAPI load(File file, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
-        log.info("Reading OpenAPI from: {} resolveFully: {}", file, resolveFully);
+        log.debug("Reading OpenAPI from: {} resolveFully: {}", file, resolveFully);
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlatten(flatten);
