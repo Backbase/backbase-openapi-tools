@@ -1,6 +1,5 @@
 .response-content-block {
   display: block;
-  padding: 24px;
   margin-top: -4px;
   width: 100%!important;
 }
@@ -13,8 +12,6 @@ display: none;
 .response-content-block .schema-block {
 width: 100%;
 flex: 1;
-padding-right: 41px;
-
 }
 
 .response-content-block .exampleStyle {
@@ -23,8 +20,8 @@ display: flex;
 }
 
 
-.response-content-block .exampleStyle .left-side{
-width: 60%;
+.exampleStyle .left-side{
+width: calc((100% + 64px) * 0.6 - 32px)
 }
 
 .response-header-tab {
