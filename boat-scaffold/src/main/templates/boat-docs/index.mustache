@@ -18,35 +18,7 @@
 
 </head>
 <body>
-  <div id="sidenav">
-    <nav id="scrollingNav">
-      <ul class="sidenav nav nav-list">
-          <h1 class="nav-header">{{appName}}</h1>
-          <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">Summary</a></li>
-        {{#apiInfo}}
-          {{#apis}}
-            {{#operations}}
-              <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">API Methods - {{baseName}}</a></li>
-              {{#operation}}
-                <li data-group="{{baseName}}" data-name="{{nickname}}" class="">
-                    <a href="#api-{{baseName}}-{{nickname}}" title="{{summary}}">
-                        <span class="prettyprint language-html" data-type="{{httpMethod}}">{{httpMethod}}</span>
-                        {{#summary}}
-                            {{summary}}
-                        {{/summary}}
-                        {{^summary}}
-                            {{nickname}}
-                        {{/summary}}
-                    </a>
-                </li>
-              {{/operation}}
-            {{/operations}}
-          {{/apis}}
-        {{/apiInfo}}
-      </ul>
-
-    </nav>
-  </div>
+  {{>sidenav}}
   <div id="content">
     <div id="project">
         <h1>{{{appName}}}</h1>
@@ -70,7 +42,7 @@
               {{#operation}}
                 <div id="api-{{baseName}}-{{nickname}}">
                   <article id="api-{{baseName}}-{{nickname}}-0" data-group="User" data-name="{{nickname}}" data-version="0">
-                          {{#summary}}<h1>{{.}}</h1>{{/summary}}
+                          {{#summary}}<h1>{{.}} {{#isDeprecated}}<span class="deprecated">Deprecated</span> {{/isDeprecated}}</h1>{{/summary}}
                           {{#description}}<p>{{description}}</p>{{/description}}
                     <p class="marked">{{notes}}</p>
                       <br/>
@@ -241,7 +213,7 @@
       }
 
       // Bootstrap Scrollspy
-      $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
+      $('body').scrollspy({ target: '#scrollingNav', offset: 18 });
 
       // Content-Scroll on Navigation click.
       $('.sidenav').find('a').on('click', function(e) {
@@ -262,7 +234,7 @@
 
       function initDynamic() {
         // call scrollspy refresh method
-        $(window).scrollspy('refresh');
+        $('body').scrollspy('refresh');
       }
 
       initDynamic();
@@ -333,30 +305,31 @@
   });
 
   $(document).ready(function () {
-    $(this).scrollspy({ target: '#scrollingNav', offset: 18 });
+    $('body').scrollspy({ target: '#scrollingNav', offset: 18 });
 
     // To handle the examples
     $('.dropdown-examples').each(function() {
       $(this).find('.example-dropdown-value:first').show();
+      $('body').scrollspy('refresh');
     });
 
     $('.example-dropdown-select').change(function() {
       $(this).parent().parent().find('.example-dropdown-value').hide();
       $(`.dropdown-examples div${this.value}`).show();
+      $('body').scrollspy('refresh');
     });
 
     $(".response-header-tab").click(function() {
       const id = $(this).attr('id');
       const isCollapsed = $(this).hasClass('collapsed')
       if (isCollapsed){
-        $(`#${id}-content`).slideDown();
+        $(`#${id}-content`).slideDown(200, function() { $('body').scrollspy('refresh');});
         $(this).removeClass('collapsed');
       } else {
-        $(`#${id}-content`).slideUp();
+        $(`#${id}-content`).slideUp(200, function() { $('body').scrollspy('refresh');});
         $(this).addClass('collapsed');
       }
     });
-    $('.response-header-tab[data-code^="2"]').click();
   });
   </script>
 </body>
