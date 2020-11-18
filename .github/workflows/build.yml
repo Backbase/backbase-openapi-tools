@@ -33,35 +33,35 @@ jobs:
         with:
           java-version: 11
 
-      - name: Get version from POM
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        run: |
-          VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tr "." "\n"))
-          echo "::set-env name=MAJOR::${VERSION_PARTS[0]}"
-          echo "::set-env name=MINOR::${VERSION_PARTS[1]}"
-          echo "::set-env name=PATCH::${VERSION_PARTS[2]}"
-
-      - name: Setup release version
-        if: contains(github.ref, 'master')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        run: |
-          NEW_VERSION="$((MAJOR)).$((MINOR+1)).0"
-          echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
-
-      - name: Setup PR version
-        if: contains(github.ref, '/pull/')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        run: |
-          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}-PR-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')"
-          echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
-
-      - name: Update POM Version
-        run: |
-          echo "New version  is: $NEW_VERSION"
-          mvn versions:set versions:update-child-modules -DnewVersion=${NEW_VERSION} -DprocessAllModules -DgenerateBackupPoms=false
+#      - name: Get version from POM
+#        env:
+#          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+#        run: |
+#          VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tr "." "\n"))
+#          echo "::set-env name=MAJOR::${VERSION_PARTS[0]}"
+#          echo "::set-env name=MINOR::${VERSION_PARTS[1]}"
+#          echo "::set-env name=PATCH::${VERSION_PARTS[2]}"
+#
+#      - name: Setup release version
+#        if: contains(github.ref, 'master')
+#        env:
+#          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+#        run: |
+#          NEW_VERSION="$((MAJOR)).$((MINOR+1)).0"
+#          echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
+#
+#      - name: Setup PR version
+#        if: contains(github.ref, '/pull/')
+#        env:
+#          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+#        run: |
+#          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}-PR-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')"
+#          echo "::set-env name=NEW_VERSION::${NEW_VERSION}"
+#
+#      - name: Update POM Version
+#        run: |
+#          echo "New version  is: $NEW_VERSION"
+#          mvn versions:set versions:update-child-modules -DnewVersion=${NEW_VERSION} -DprocessAllModules -DgenerateBackupPoms=false
 
       - name: Build and analyze
         env:
@@ -78,16 +78,16 @@ jobs:
           nexus_username: ${{ secrets.nexus_username }}
           nexus_password: ${{ secrets.nexus_password }}
 
-      - name: Commit files
-        if: contains(github.ref, 'master')
-        run: |
-         git config --local user.email "action@github.com"
-         git config --local user.name "GitHub Action"
-         git commit -m "[version bump]" -a
-         git tag -a $NEW_VERSION -m "[version bump]"
-
-      - name: Push changes
-        if: contains(github.ref, 'master')
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Commit files
+#        if: contains(github.ref, 'master')
+#        run: |
+#         git config --local user.email "action@github.com"
+#         git config --local user.name "GitHub Action"
+#         git commit -m "[version bump]" -a
+#         git tag -a $NEW_VERSION -m "[version bump]"
+#
+#      - name: Push changes
+#        if: contains(github.ref, 'master')
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
