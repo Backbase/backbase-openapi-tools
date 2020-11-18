@@ -25,6 +25,23 @@
         <module>raml-2-openapi-generate-yard</module>
     </modules>
 
+   <build>
+       <pluginManagement>
+           <plugins>
+               <plugin>
+                   <groupId>com.backbase.oss</groupId>
+                   <artifactId>boat-maven-plugin</artifactId>
+                   <version>@pom.version@</version>
+               </plugin>
+           </plugins>
+       </pluginManagement>
+       <plugins>
+           <plugin>
+               <groupId>com.backbase.oss</groupId>
+               <artifactId>boat-maven-plugin</artifactId>
+           </plugin>
+       </plugins>
+   </build>
 
 
 </project>

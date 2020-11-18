@@ -4,10 +4,63 @@
 
 body {
   font-family: "Roboto", sans-serif;
+  min-width: 980px;
+  background-color: #fff;
+  color: #333;
+  display: grid;
+  grid-template-areas: "navbar content";
+  grid-template-columns: 300px 1fr;
+
+}
+
+#sidenav {
+    grid-area: navbar;
+}
+
+#content {
+  grid-area: content;
+  display: grid;
+  grid-template-areas:
+    "project example-area"
+    "header example-area"
+    "main example-area";
+  grid-template-columns: 60% 40%;
+}
+
+#header{
+grid-area: header;
+}
+#project {
+grid-area: project;
+margin-left: 16px;
+}
+
+#sections {
+  grid-area: main;
+  grid-column-end: example-area;
+}
+
+#example-area {
+  grid-area: example-area;
+  background-color: rgb(38, 50, 56);
+  height: 100%;
+  width: 100%;
+}
+
+article {
+  display: grid;
+}
+
+article > * {
+  width: calc(60% - 16px)!important;
+  box-sizing: border-box;
+}
+
+article > .response-content-block {
 }
 
 * {
-      box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 #methodsubtable > tbody > tr > td:first-child {
@@ -15,11 +68,6 @@ body {
   font-size: 14px;
   padding: 2px 4px;
   white-space: nowrap;
-}
-
-body {
-  min-width: 980px;
-  background-color: #eee;
 }
 
 .app-desc {
@@ -46,12 +94,6 @@ td.code {
   font-weight: 400;
 }
 
-#content {
-  padding-top: 16px;
-  z-index: -1;
-  margin-left: 350px;
-}
-
 h1 {
   font-family: "Roboto Semibold", sans-serif;
   font-weight: normal;
@@ -76,10 +118,8 @@ h2 {
 }
 
 #header {
-  padding: 16px 32px;
-  background-color: white;
+  padding: 16px;
   margin-bottom: 32px;
-  border-radius: 6px;
 }
 
 div.secured-by {
@@ -120,10 +160,8 @@ div.secured-by > pre:last-child {
 }
 
 section {
-  padding: 16px 32px;
-  background-color: white;
+  padding: 16px 0 16px 16px;
   margin-bottom: 32px;
-  border-radius: 6px;
 }
 
 section h1 {
@@ -137,7 +175,7 @@ section h1 {
 }
 
 article {
-  padding: 14px 0 30px 0;
+  padding: 0 0 15px 0;
 }
 
 article h1 {
@@ -145,7 +183,7 @@ article h1 {
   font-weight: 500;
   font-size: 24px;
   line-height: 26px;
-  padding-top: 30px;
+  padding-top: 20px;
   margin-bottom: 10px;
 }
 
@@ -154,7 +192,7 @@ article h2 {
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
-  padding-top: 30px;
+  padding-top: 20px;
   margin-bottom: 10px;
 }
 
@@ -163,7 +201,7 @@ article h3 {
   font-weight: 500;
   font-size: 16px;
   line-height: 18px;
-  padding-top: 30px;
+  padding-top: 20px;
   margin-bottom: 10px;
 }
 
@@ -172,12 +210,13 @@ article h4 {
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;
-  padding-top: 30px;
+  padding-top: 20px;
   margin-bottom: 10px;
 }
 
 article h1,
-article h2 {
+article h2,
+article h3 {
   border-bottom: 1px solid #e3e3e3;
   padding-bottom: 8px;
   margin-bottom: 16px;
@@ -267,17 +306,20 @@ pre {
   margin: 10px 0 20px 0;
 }
 
+.dropdown-examples pre {
+ background-color: rgb(17, 23, 26);
+}
+
 span.language-html {
-  margin-right: 16px;
+  margin-right: 8px;
   display: inline-flex;
-  width: 36px;
-  height: 16px;
+  width: 46px;
+  height: 20px;
   align-items: center;
   justify-content: center;
   font-family: "Roboto", sans-serif;
   font-weight: 600;
   font-size: 10px;
-  padding: 2px 5px;
   border-radius: 6px;
   text-transform: uppercase;
   color: #ffffff;
@@ -382,7 +424,7 @@ pre code.sample-request-response-json {
 .sidenav > li > a {
   display: block;
   margin: 0;
-  padding: 8px 11px;
+  padding: 8px 0;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -442,6 +484,15 @@ pre code.sample-request-response-json {
 * ------------------------------------------------------------------------------------------ */
 ul.nav-tabs {
   margin: 0;
+}
+
+.nav-tabs > li > a {
+  color: #666;
+}
+
+.nav-tabs > li > a:hover,
+.nav-tabs > li > a.active {
+  color: #333 !important;
 }
 
 /* ------------------------------------------------------------------------------------------
@@ -599,10 +650,6 @@ json-schema-view .type-any {
 json-schema-view .required {
   color: #ed0039;
 }
-.json-schema-view .inner,
-json-schema-view .inner {
-  padding-left: 18px;
-}
 .json-schema-view.collapsed .description,
 .json-schema-view.collapsed .property,
 json-schema-view.collapsed .description,
@@ -710,11 +757,13 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   transform: rotate(-90deg);
 }
 
-.requests-wrapper {
+.requests-wrapper.
+.responses-wrapper {
   display: flex;
 }
 
-.requests-wrapper .tab-content {
+.requests-wrapper .tab-content,
+.responses-wrapper .tab-content {
   display: flex;
 }
 .examples-tab-wrapper {
@@ -722,20 +771,14 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 }
 .exampleStyle {
   flex: 1;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   min-height: 20px;
 }
-.exampleStyle .tab-pane {
-  padding: 30px;
-  flex: 1;
-}
+
 .exampleStyle > .json-schema-view > .object > .title {
   margin-bottom: 16px;
 }
-/exampleStyle .placeholder {
-  display:flex;
+.exampleStyle .placeholder {
+  display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -745,11 +788,22 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   display: flex;
 }
 
+.request-body,
+.response-body{
+width: 100%!important;
+}
+
+.tab-content {
+overflow: initial;
+}
+
 .dropdown-examples {
-  flex: 0 40%;
+  width: 40%;
+  z-index: 2;
   color: rgb(255, 255, 255);
   padding: 0px 40px;
   background-color: rgb(38, 50, 56);
+  margin-top: -79px;
 }
 
 .dropdown-examples label {
@@ -761,9 +815,6 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
   font-weight: 100;
 }
 .dropdown-examples .example-dropdown-select {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
   padding: 8px;
   display: flex;
   height: auto;

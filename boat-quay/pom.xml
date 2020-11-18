@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss</groupId>
+        <artifactId>backbase-openapi-tools</artifactId>
+        <version>0.9.0</version>
+    </parent>
+
+
+    <artifactId>boat-quay</artifactId>
+    <packaging>pom</packaging>
+
+    <description>Backbase Open Api Tools QUAlitY module</description>
+
+    <name>BOAT :: Quay</name>
+
+    <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <kotlin.version>1.3.61</kotlin.version>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
+        <auto-service.version>1.0-rc7</auto-service.version>
+    </properties>
+
+    <modules>
+        <module>boat-quay-rules</module>
+        <module>boat-quay-lint</module>
+
+    </modules>
+
+</project>

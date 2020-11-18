@@ -27,15 +27,15 @@ public class BoatOpenAPIResolver {
     private final ExamplesProcessor examplesProcessor;
 
     public BoatOpenAPIResolver(OpenAPI openApi) {
-        this(openApi, (List)null, (String)null, (OpenAPIResolver.Settings)null);
+        this(openApi, null, null, null);
     }
 
     public BoatOpenAPIResolver(OpenAPI openApi, List<AuthorizationValue> auths) {
-        this(openApi, auths, (String)null, (OpenAPIResolver.Settings)null);
+        this(openApi, auths, null, null);
     }
 
     public BoatOpenAPIResolver(OpenAPI openApi, List<AuthorizationValue> auths, String parentFileLocation) {
-        this(openApi, auths, parentFileLocation, (OpenAPIResolver.Settings)null);
+        this(openApi, auths, parentFileLocation, null);
     }
 
     public BoatOpenAPIResolver(OpenAPI openApi, List<AuthorizationValue> auths, String parentFileLocation, OpenAPIResolver.Settings settings) {
@@ -53,32 +53,36 @@ public class BoatOpenAPIResolver {
         if (this.openApi == null) {
             return null;
         } else {
-            this.examplesProcessor.processExamples(openApi);
-            this.pathProcessor.processPaths();
-            this.componentsProcessor.processComponents();
-            if (this.openApi.getPaths() != null) {
-                Iterator var1 = this.openApi.getPaths().keySet().iterator();
+            examplesProcessor.processExamples(this.openApi);
+            processOpenAPI();
+            return this.openApi;
+        }
+    }
 
-                while(true) {
-                    PathItem pathItem;
-                    do {
-                        if (!var1.hasNext()) {
-                            return this.openApi;
-                        }
+    private void processOpenAPI() {
+        this.pathProcessor.processPaths();
+        this.componentsProcessor.processComponents();
+        if (this.openApi.getPaths() == null) {
+            return;
+        }
+        Iterator var1 = this.openApi.getPaths().keySet().iterator();
 
-                        String pathname = (String)var1.next();
-                        pathItem = (PathItem)this.openApi.getPaths().get(pathname);
-                    } while(pathItem.readOperations() == null);
-
-                    Iterator var4 = pathItem.readOperations().iterator();
-
-                    while(var4.hasNext()) {
-                        Operation operation = (Operation)var4.next();
-                        this.operationsProcessor.processOperation(operation);
-                    }
+        while(true) {
+            PathItem pathItem;
+            do {
+                if (!var1.hasNext()) {
+                    return;
                 }
-            } else {
-                return this.openApi;
+
+                String pathname = (String)var1.next();
+                pathItem = (PathItem)this.openApi.getPaths().get(pathname);
+            } while(pathItem.readOperations() == null);
+
+            Iterator var4 = pathItem.readOperations().iterator();
+
+            while(var4.hasNext()) {
+                Operation operation = (Operation)var4.next();
+                this.operationsProcessor.processOperation(operation);
             }
         }
     }
