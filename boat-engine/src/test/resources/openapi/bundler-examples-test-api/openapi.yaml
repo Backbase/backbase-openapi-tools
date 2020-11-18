@@ -119,6 +119,9 @@ paths:
                 $ref: ./examples/user-post-request.json
               example-number-two:
                 $ref: ./examples/user-post-request-2.json
+              example-number-three:
+                value:
+                  $ref: ./examples/user-post-request-3.json
       responses:
         '200':
           description: A user object.

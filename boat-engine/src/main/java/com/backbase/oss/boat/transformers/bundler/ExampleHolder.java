@@ -65,7 +65,7 @@ public abstract class ExampleHolder<T> {
                 String ref = objectNode.get("value").get(REF_KEY).asText();
                 log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, "?", ref));
                 objectNode.set(REF_KEY, objectNode.get("value").get(REF_KEY));
-                objectNode.set("value", null);
+                objectNode.remove("value");
             }
 
         }
