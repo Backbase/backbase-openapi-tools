@@ -95,6 +95,7 @@ public class ExamplesProcessor {
                 fixInlineExamples(exampleHolder, relativePath, derefenceExamples);
                 if (exampleHolder.getRef() != null) {
                     example.set$ref(exampleHolder.getRef());
+                    example.setValue(null);
                 } else {
                     example.setValue(exampleHolder.example());
                 }
