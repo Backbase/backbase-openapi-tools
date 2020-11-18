@@ -48,10 +48,11 @@ body {
 
 article {
   display: grid;
+  padding: 16px 32px!important;
 }
 
 article > * {
-  width: calc(60% - 45px) !important;
+  width: calc(60% - 32px)!important;
   box-sizing: border-box;
 }
 
@@ -159,7 +160,7 @@ div.secured-by > pre:last-child {
 }
 
 section {
-  padding: 16px 0 16px 32px;
+  padding: 16px 0 16px 0;
   margin-bottom: 32px;
 }
 
@@ -780,8 +781,10 @@ json-schema-view[json-schema-view-dark].collapsed .toggle-handle {
 .examples-tab-wrapper {
   flex: 1;
 }
+
 .exampleStyle {
   flex: 1;
+  display: flex;
   min-height: 20px;
 }
 
@@ -809,12 +812,13 @@ width: 100%!important;
 }
 
 .dropdown-examples {
-  width: 40%;
+  flex: 40%;
   z-index: 2;
   color: rgb(255, 255, 255);
   padding: 0px 40px;
-  background-color: rgb(38, 50, 56);
-  margin-top: -79px;
+  background: rgb(17, 23, 26);
+  margin-top: -55px;
+  margin-left: 32px;
 }
 
 .dropdown-examples label {
