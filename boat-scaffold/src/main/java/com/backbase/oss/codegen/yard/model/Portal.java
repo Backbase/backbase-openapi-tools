@@ -18,6 +18,9 @@ public class Portal {
 
     private List<Capability> capabilities;
 
+    private List<LintRule> lintRules;
+
     private String defaultSpecUrl;
+
 
 }
