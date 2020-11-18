@@ -13,6 +13,7 @@ import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -67,10 +68,19 @@ public class BundlerTest {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
 
-        log.info(Yaml.pretty(openAPI));
+        log.debug(Yaml.pretty(openAPI));
 
-        assertThat("Single inline example is replaced with relative ref",
+        assertThat("Single inline example is replaced with relative ref (get)",
             singleExampleNode(openAPI, "/users", PathItem::getGet, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (put)",
+            singleExampleNode(openAPI, "/users", PathItem::getPut, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (post)",
+            singleExampleNode(openAPI, "/users", PathItem::getPost, "200", APPLICATION_JSON).get("$ref").asText(),
+            isComponentExample);
+        assertThat("Single inline example is replaced with relative ref (patch)",
+            singleExampleNode(openAPI, "/users", PathItem::getPatch, "200", APPLICATION_JSON).get("$ref").asText(),
             isComponentExample);
         assertThat("Component example without ref is left alone.",
             openAPI.getComponents().getExamples().get("example-in-components-1").getSummary(),
@@ -100,7 +110,12 @@ public class BundlerTest {
             openAPI.getPaths().get("/users").getPut().getResponses().get("403").getContent().get(APPLICATION_JSON)
                 .getExample(), notNullValue());
 
-        log.debug(Yaml.pretty(openAPI));
+        Example exampleNoThree = openAPI.getPaths().get("/multi-users").getPost().getRequestBody().getContent()
+            .get(APPLICATION_JSON).getExamples().get("example-number-three");
+        assertThat("value.$ref is cleaned up", exampleNoThree.get$ref(),
+            is("#/components/examples/example-number-three"));
+        assertThat("value.$ref is cleaned up", exampleNoThree.getValue(), nullValue());
+
     }
 
     private ObjectNode singleExampleNode(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
