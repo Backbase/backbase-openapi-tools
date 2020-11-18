@@ -1,6 +1,8 @@
 package com.backbase.oss.boat.transformers.bundler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
@@ -70,12 +72,32 @@ public abstract class ExampleHolder<T> {
 
         @Override
         String getRef() {
-            return example().get(REF_KEY).asText();
+            JsonNode jsonNode = example().get(REF_KEY);
+            if(jsonNode != null) {
+                return jsonNode.asText();
+            }
+            return null;
         }
 
         @Override
         void replaceRef(String ref) {
             example().put(REF_KEY, ref);
+        }
+    }
+
+    public static class ArrayNodeExampleHolder extends ExampleHolder<ArrayNode> {
+        private ArrayNodeExampleHolder(String name, ArrayNode arrayNode) {
+            super(name, arrayNode);
+        }
+
+        @Override
+        String getRef() {
+            return null;
+        }
+
+        @Override
+        void replaceRef(String ref) {
+            // not applicable
         }
     }
 
@@ -142,6 +164,8 @@ public abstract class ExampleHolder<T> {
             } catch (JsonProcessingException e) {
                 return new ExampleExampleHolder(name, (Example) o, isComponentSection);
             }
+        } else if( o instanceof ArrayNode) {
+            return new ArrayNodeExampleHolder(name, (ArrayNode) o);
         } else {
             throw new RuntimeException("Unknown type backing example " + o.getClass().getName());
         }
