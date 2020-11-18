@@ -1,5 +1,5 @@
-<h3 class="response-header-tab collapsed" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
-<div class="response-content-block" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
+<h3 class="response-header-tab {{^is2xx}}collapsed{{/is2xx}}" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}"></h3>
+<div class="response-content-block {{^is2xx}}collapsed{{/is2xx}}" data-code="{{code}}" id="examples-{{baseName}}-{{nickname}}-title-{{code}}-content">
     <p id="examples-{{baseName}}-{{nickname}}-description-{{code}}" class="marked"></p>
     <div class="exampleStyle" id="responses-{{baseName}}-{{nickname}}-{{code}}-wrapper" style='margin-bottom: 10px;'>
     <div class="left-side">
@@ -84,7 +84,6 @@
                             {{/examples}}
                         </select>
                     </label>
-                    {{examples}}
                     {{#examples}}
                         <div class="example-dropdown-value"
                              id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
