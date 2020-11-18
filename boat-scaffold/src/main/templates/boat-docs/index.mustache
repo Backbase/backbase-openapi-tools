@@ -276,11 +276,20 @@
     var defs = {}
     {{#models}}
     {{#model}}
-    <!-- Sometimes classname is referred.. -->
     defs["{{name}}"] = {{{modelJson}}};
-    <!-- maybe we should just buy some cows and a field... -->
     {{/model}}
     {{/models}}
+
+    var responses = {};
+    {{#responses}}
+    responses["{{code}}"] = {{{jsonSchema}}};
+    {{/responses}}
+
+    var parameters = {};
+    {{#parameters}}
+    parameters["{{paramName}}"] = {{{jsonSchema}}};
+    {{/parameters}}
+
 
     var errs = {};
     {{#swagger.vendorExtensions.x-shared-errors}}
@@ -298,7 +307,13 @@
   {{>js_webfontloader}}
   <script>
   var $RefParser = JsonSchemaRefParser;
-  var schemaWrapper = { "components": { "schemas" : defs}};
+  var schemaWrapper = {
+      "components": {
+          "schemas" : defs,
+          "responses": responses,
+          "parameters": parameters,
+
+      }};
   defsParser = new $RefParser();
   defsParser.dereference(schemaWrapper).catch(function(err) {
     console.log(err);
