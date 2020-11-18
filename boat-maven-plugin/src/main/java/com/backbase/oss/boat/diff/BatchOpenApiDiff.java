@@ -66,7 +66,7 @@ public class BatchOpenApiDiff {
                 newOpenAPI.addExtension(X_CHANGELOG, changeLog);
                 success.put(newOpenAPIPath.toFile(), newOpenAPI);
 
-            log.info("Including Changelog for: {} with version: {}", newOpenAPI.getInfo().getTitle(), newOpenAPI.getInfo().getVersion());
+            log.debug("Including Changelog for: {} with version: {}", newOpenAPI.getInfo().getTitle(), newOpenAPI.getInfo().getVersion());
 
             } catch (Exception e) {
                 failed.put(newOpenAPI.toString(), e.getMessage());
