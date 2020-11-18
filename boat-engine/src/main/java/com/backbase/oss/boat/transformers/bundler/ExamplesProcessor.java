@@ -1,6 +1,8 @@
 package com.backbase.oss.boat.transformers.bundler;
 
 
+import static com.google.common.collect.Maps.newHashMap;
+
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +12,7 @@ import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.parser.models.RefFormat;
 import io.swagger.v3.parser.util.PathUtils;
@@ -24,8 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 @Slf4j
 public class ExamplesProcessor {
@@ -45,7 +46,7 @@ public class ExamplesProcessor {
 
     public void processExamples(OpenAPI openAPI) {
 
-        log.info("Processing examples in Components");
+        log.debug("Processing examples in Components");
         // dereference the /component/examples first...
         getComponentExamplesFromOpenAPI().entrySet().stream()
             .map(e -> ExampleHolder.of(e.getKey(), e.getValue(), true))
@@ -54,21 +55,21 @@ public class ExamplesProcessor {
 
         openAPI.getPaths()
             .forEach((path, pathItem) -> {
-                log.info("Processing examples in Path: {}", path);
+                log.debug("Processing examples in Path: {}", path);
                 pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
-                    log.info("Processing examples in Operation: {}", httpMethod);
+                    log.debug("Processing examples in Operation: {}", httpMethod);
                     if (operation.getRequestBody() != null) {
                         operation.getRequestBody().getContent().forEach((contentType, mediaType) -> {
-                            log.info("Processing Request Body examples for Content Type: {}", contentType);
-                            processMediaType(mediaType);
+                            log.debug("Processing Request Body examples for Content Type: {}", contentType);
+                            processMediaType(mediaType, null, false);
                         });
                     }
                     operation.getResponses().forEach((responseCode, apiResponse) -> {
-                        log.info("Processing Response Body Examples for Response Code: {}", responseCode);
+                        log.debug("Processing Response Body Examples for Response Code: {}", responseCode);
                         if (apiResponse.getContent() != null) {
                             apiResponse.getContent().forEach((contentType, mediaType) -> {
-                                log.info("Processing Response Body Examples for Content Type: {}", contentType);
-                                processMediaType(mediaType);
+                                log.debug("Processing Response Body Examples for Content Type: {}", contentType);
+                                processMediaType(mediaType, null, false);
                             });
                         }
                     });
@@ -76,26 +77,40 @@ public class ExamplesProcessor {
             });
     }
 
-    public void processMediaType(MediaType mediaType) {
+    public void processContent(Content content, String relativePath) {
+
+        content.forEach((s, mediaType) -> {
+            log.debug("Processing Consent for: {} with relative path: {}", s, relativePath);
+            processMediaType(mediaType, relativePath, true);
+        });
+
+
+    }
+
+    public void processMediaType(MediaType mediaType, String relativePath, boolean  derefenceExamples) {
         if (mediaType.getExamples() != null) {
             mediaType.getExamples().forEach(((key, example) -> {
-                log.info("Processing Example: {} with value: {} and ref: {} ", key, example.getValue(), example.get$ref());
+                log.debug("Processing Example: {} with value: {} and ref: {} ", key, example.getValue(), example.get$ref());
                 ExampleHolder<?> exampleHolder = ExampleHolder.of(key, example);
-                fixInlineExamples(exampleHolder, null, false);
-                if(exampleHolder.getRef()!=null) {
+                fixInlineExamples(exampleHolder, relativePath, derefenceExamples);
+                if (exampleHolder.getRef() != null) {
                     example.set$ref(exampleHolder.getRef());
                 } else {
                     example.setValue(exampleHolder.example());
                 }
-                log.info("Finished Processing Example: {} with value: {}", key, exampleHolder);
+                log.debug("Finished Processing Example: {} with value: {}", key, exampleHolder);
             }));
         }
         if (mediaType.getExample() != null) {
-            log.info("Processing Example: {} ", mediaType.getExample());
+            log.debug("Processing Example: {} ", mediaType.getExample());
             ExampleHolder<?> exampleHolder = ExampleHolder.of(null, mediaType.getExample());
-            fixInlineExamples(exampleHolder, null, false);
-            log.info("Finished Processing Example: {}", exampleHolder);
+            fixInlineExamples(exampleHolder, relativePath, false);
+            log.debug("Finished Processing Example: {}", exampleHolder);
         }
+    }
+
+    private void putComponentExample(String key, Example example) {
+        getComponentExamplesFromOpenAPI().put(key, example);
     }
 
     private Map<String, Example> getComponentExamplesFromOpenAPI() {
@@ -117,17 +132,17 @@ public class ExamplesProcessor {
         log.debug("fixInlineExamples: '{}', relative path '{}'", exampleHolder, relativePath);
 
         if (exampleHolder.getRef() == null) {
-            log.info("not fixing (ref not found): {}", exampleHolder);
+            log.debug("not fixing (ref not found): {}", exampleHolder);
             return;
         }
         String refPath = exampleHolder.getRef();
         if (RefUtils.computeRefFormat(refPath) != RefFormat.RELATIVE) {
-            log.info("not fixing (not relative ref): '{}'", exampleHolder);
+            log.debug("not fixing (not relative ref): '{}'", exampleHolder);
             return;
         }
 
         if(refPath.startsWith("#/components/examples/")) {
-            log.info("Ref path already points to examples. Leave it as it is");
+            log.debug("Ref path already points to examples. Leave it as it is");
             return;
         }
 
@@ -165,11 +180,12 @@ public class ExamplesProcessor {
                     }
 
                     if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
-                        log.info("Updating example: {} in components/examples", exampleName);
+                        log.debug("Updating example: {} in components/examples", exampleName);
                         // Check whether example is already dereferenced
                     } else {
-                        log.info("Adding Example: {} to components/examples", exampleName);
-                        getComponentExamplesFromOpenAPI().put(exampleName, new Example().value(convertExampleContent(exampleHolder, refPath)));
+                        log.debug("Adding Example: {} to components/examples", exampleName);
+                        putComponentExample(exampleName,
+                            new Example().value(convertExampleContent(exampleHolder, refPath)));
                     }
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
@@ -216,9 +232,7 @@ public class ExamplesProcessor {
         Object content = convertExampleContent(exampleHolder, exampleHolder.getRef());
         cache.put(exampleName, exampleHolder);
         exampleHolder.replaceRef("#/components/examples/" + exampleName);
-        getComponentExamplesFromOpenAPI().put(exampleName, new Example()
-            .value(content)
-            .summary(exampleName));
+        putComponentExample(exampleName, new Example().value(content).summary(exampleName));
     }
 
     private Object convertExampleContent(ExampleHolder exampleHolder, String refPath) {
@@ -239,5 +253,6 @@ public class ExamplesProcessor {
     private String makeCountedName(String s, int count) {
         return count == 0 ? s : s + "-" + count;
     }
+
 
 }

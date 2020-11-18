@@ -451,7 +451,8 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "openapi.generator.maven.plugin.bundlesSpecs")
     protected boolean bundleSpecs;
 
-
+    @Parameter(name = "writeDebugFiles")
+    protected boolean writeDebugFiles = false;
 
     /**
      * The project being built.
@@ -799,16 +800,23 @@ public class GenerateMojo extends AbstractMojo {
 
             if (unAlias) {
                 new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
-                java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
             }
             if (dereferenceComponents) {
                 new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
-                java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
             }
 
             if(bundleSpecs) {
                 new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
-                java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+
+                if(writeDebugFiles) {
+                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                }
             }
 
 

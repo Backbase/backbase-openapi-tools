@@ -65,13 +65,13 @@ public class LintMojo extends AbstractMojo {
             BoatLinter boatLinter = getBoatLinter();
             String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
             List<Result> lint = boatLinter.lint(contents, ignoreRules);
-            if (!lint.isEmpty()) {
-                log.warn("OpenAPI: {} has Linting issues: ", inputFile);
-                lint.forEach(result -> log.warn("{}", result.toString()));
-            } else {
-                log.info("OpenAPI: {}, is valid!", inputFile);
+            if (lint.isEmpty()) {
+                log.info("OpenAPI: {}, is valid! No warnings!", inputFile);
+                return;
             }
 
+            log.warn("OpenAPI: {} has Linting issues: ", inputFile);
+            lint.forEach(result -> log.warn("{}", result.toString()));
             if (failOnWarning) {
                 throw new MojoExecutionException("Linting failed for input file: " + inputFile);
             }
@@ -96,5 +96,9 @@ public class LintMojo extends AbstractMojo {
 
     public void setFailOnWarning(boolean failOnWarning) {
         this.failOnWarning = failOnWarning;
+    }
+
+    public void setIgnoreRules(String[] ignoreRules) {
+        this.ignoreRules = ignoreRules;
     }
 }

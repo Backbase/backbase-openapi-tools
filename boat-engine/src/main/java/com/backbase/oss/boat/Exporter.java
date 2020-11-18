@@ -128,7 +128,7 @@ public class Exporter {
             .findFirst()
             .ifPresent(s -> serviceName.set(s.replace("-spec", "-service")));
 
-        log.info("Export: {} with options: {}", inputFile, options);
+        log.debug("Export: {} with options: {}", inputFile, options);
         return new Exporter(options).export(serviceName.get(), inputFile);
     }
 
