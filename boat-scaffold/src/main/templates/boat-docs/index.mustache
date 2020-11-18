@@ -12,7 +12,9 @@
     {{>css_prettify}}
     {{>css_json_schema_view}}
     {{>css_response}}
-    {{>styles}}
+      {{>css_jsontreeviewer}}
+
+      {{>styles}}
   </style>
     {{>js_jquery}}
 
@@ -296,6 +298,7 @@
   {{>js_jsonschemamergeallof}}
   {{>js_json_stringify_safe}}
   {{>js_webfontloader}}
+  {{>js_jsontreeviewer}}
   <script>
   var $RefParser = JsonSchemaRefParser;
   var schemaWrapper = { "components": { "schemas" : defs}};
@@ -330,6 +333,16 @@
         $(this).addClass('collapsed');
       }
     });
+
+    // Turns json into jsonviewer
+    (function() {
+    $(".json-viewer").each(function() {
+       const data = JSON.parse($(this).text());
+       $(this).empty();
+       const tree = jsonTree.create(data, this);
+    });
+
+    }())
   });
   </script>
 </body>
