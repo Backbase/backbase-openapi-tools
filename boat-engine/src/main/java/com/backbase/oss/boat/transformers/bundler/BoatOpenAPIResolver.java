@@ -53,38 +53,37 @@ public class BoatOpenAPIResolver {
         if (this.openApi == null) {
             return null;
         } else {
-            OpenAPI openAPI = processOpenAPI();
-            examplesProcessor.processExamples(openAPI);
-            return openAPI;
+            examplesProcessor.processExamples(this.openApi);
+            processOpenAPI();
+            return this.openApi;
         }
     }
 
-    private OpenAPI processOpenAPI() {
+    private void processOpenAPI() {
         this.pathProcessor.processPaths();
         this.componentsProcessor.processComponents();
-        if (this.openApi.getPaths() != null) {
-            Iterator var1 = this.openApi.getPaths().keySet().iterator();
+        if (this.openApi.getPaths() == null) {
+            return;
+        }
+        Iterator var1 = this.openApi.getPaths().keySet().iterator();
 
-            while(true) {
-                PathItem pathItem;
-                do {
-                    if (!var1.hasNext()) {
-                        return this.openApi;
-                    }
-
-                    String pathname = (String)var1.next();
-                    pathItem = (PathItem)this.openApi.getPaths().get(pathname);
-                } while(pathItem.readOperations() == null);
-
-                Iterator var4 = pathItem.readOperations().iterator();
-
-                while(var4.hasNext()) {
-                    Operation operation = (Operation)var4.next();
-                    this.operationsProcessor.processOperation(operation);
+        while(true) {
+            PathItem pathItem;
+            do {
+                if (!var1.hasNext()) {
+                    return;
                 }
+
+                String pathname = (String)var1.next();
+                pathItem = (PathItem)this.openApi.getPaths().get(pathname);
+            } while(pathItem.readOperations() == null);
+
+            Iterator var4 = pathItem.readOperations().iterator();
+
+            while(var4.hasNext()) {
+                Operation operation = (Operation)var4.next();
+                this.operationsProcessor.processOperation(operation);
             }
-        } else {
-            return this.openApi;
         }
     }
 
