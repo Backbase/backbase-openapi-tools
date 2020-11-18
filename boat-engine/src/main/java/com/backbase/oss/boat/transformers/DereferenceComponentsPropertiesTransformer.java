@@ -41,7 +41,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
     private void deferenceSchema(Schema schema, OpenAPI openAPI, String crumb) {
 
 
-        log.info("Dereference Schema: {}", crumb);
+        log.debug("Dereference Schema: {}", crumb);
         if (!resolvedShemas.containsKey(crumb)) {
             if (schema instanceof ComposedSchema) {
                 deferenceAllOf((ComposedSchema) schema, openAPI, crumb);
@@ -54,7 +54,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             }
             resolvedShemas.put(crumb, schema);
         } else {
-            log.info("Already dereferenced: {}", crumb);
+            log.debug("Already dereferenced: {}", crumb);
         }
     }
 
@@ -65,7 +65,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             Schema propertySchema = entry.getValue();
             if (propertySchema.get$ref() != null) {
                 if (!resolvedShemas.containsKey(propertySchema.get$ref())) {
-                    log.info(crumb + " : Replacing property {} with schema {}", entry.getKey(),
+                    log.debug(crumb + " : Replacing property {} with schema {}", entry.getKey(),
                         propertySchema.get$ref());
                     Schema referencedSchema = getSchemaByInternalReference(propertySchema.get$ref(), openAPI);
                     replacements.put(entry.getKey(), referencedSchema);
@@ -75,14 +75,14 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             }
             deferenceSchema(propertySchema, openAPI, crumb + "/" + entry.getKey());
         }
-        log.info(crumb + " : Replacing {} properties", replacements.size());
+        log.debug(crumb + " : Replacing {} properties", replacements.size());
         schema.getProperties().putAll(replacements);
     }
 
     private void dereferenceItems(ArraySchema schema, OpenAPI openAPI, String crumb) {
         ArraySchema arraySchema = schema;
         if (arraySchema.getItems().get$ref() != null) {
-            log.info(crumb + " : Replacing items with schema {}", arraySchema.getItems().get$ref());
+            log.debug(crumb + " : Replacing items with schema {}", arraySchema.getItems().get$ref());
             Schema referencedSchema = getSchemaByInternalReference(arraySchema.getItems().get$ref(), openAPI);
             arraySchema.setItems(referencedSchema);
         }

@@ -80,7 +80,7 @@
                         <select class="example-dropdown-select">
                             {{#examples}}
                                 <option data-toggle="tab"
-                                        value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{key}}</option>
+                                        value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}} - {{contentType}}</option>
                             {{/examples}}
                         </select>
                     </label>
@@ -88,7 +88,7 @@
                     {{#examples}}
                         <div class="example-dropdown-value"
                              id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
-                            <pre class="prettyprint language-json"><code class="json">{{{example}}}</code></pre>
+                            <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
                         </div>
                     {{/examples}}
 
