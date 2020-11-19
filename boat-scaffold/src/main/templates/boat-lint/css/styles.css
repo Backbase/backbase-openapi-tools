@@ -1,6 +1,66 @@
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1em;
+}
+
+
+.content {
+  background: #f7f7f7;
+  margin-top: 20px;
+  margin-left: 50px;
+  margin-right: 50px;
+
+  padding: 1.8rem 1.2rem;
+  position: relative;
+  height: 100%;
+}
+
+.violations {
+  position: absolute;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.lint-report {
+  position: absolute;
+  height: 100%;
+  overflow-y: scroll;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.editor {
+  border: 1px solid #dadada;
+  height: 100%;
+  margin-bottom: 1.2rem;
+}
+
 .ace_editor {
   border: 1px solid lightgray;
   margin: auto;
   height: 100%;
-  width: 100%;
+}
+
+body, html {
+  margin: 0;
+  height:100%;
+}
+
+body{
+  overflow: hidden;
+}
+
+.container-fluid, .parent{
+  height: 100%;
+}
+
+#left, #right{
+  position: relative;
+  float: left;
+  height: calc(100% - 2rem);
+  overflow-y: auto;
 }

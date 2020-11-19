@@ -68,7 +68,7 @@ public class BoatLinter {
     private BoatViolation transformResult(Result result) {
 
         BoatViolation violation = new BoatViolation();
-        violation.setLintRule(availableRules.get(result.getId()));
+        violation.setRule(availableRules.get(result.getId()));
         violation.setDescription(result.getDescription());
         violation.setPointer(result.getPointer());
         violation.setLines(result.getLines());
