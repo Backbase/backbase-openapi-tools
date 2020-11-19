@@ -48,14 +48,14 @@
                                 }
 
                                 var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-                                $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
+                                $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-data-input').val(JSON.stringify(schema));
                                 var result = $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema');
                                 result.empty();
                                 result.append(view.render());
                             });
                         </script>
                     </div>
-                    <input id='requests-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''/>
+                    <input id='requests-{{baseName}}-{{nickname}}-{{code}}-schema-data-input' type='hidden' value=''/>
                 </div>
 
                 {{#hasExamples}}
