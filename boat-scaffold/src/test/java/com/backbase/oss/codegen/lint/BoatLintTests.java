@@ -18,7 +18,7 @@ public class BoatLintTests {
         config.setInputSpec(input.getAbsolutePath());
         config.setOutputDir(output.getAbsolutePath());
 
-        config.setTemplateDir("boat-yard");
+        config.setTemplateDir("boat-lint");
 
         new BoatLintGenerator(config).generate();
     }
