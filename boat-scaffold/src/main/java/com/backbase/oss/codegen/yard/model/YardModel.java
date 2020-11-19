@@ -8,4 +8,7 @@ public class YardModel {
 
     private List<Portal> portals;
 
+    private boolean enableLinting;
+    private List<LintRule> globalLntRules;
+
 }

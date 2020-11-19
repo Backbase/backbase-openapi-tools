@@ -1,17 +1,22 @@
-package com.backbase.oss.codegen.yard;
+package com.backbase.oss.codegen.lint;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.codegen.doc.BoatDocsGenerator;
-import com.backbase.oss.codegen.yard.model.YardModel;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import com.backbase.oss.boat.quay.BoatLinter;
+import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
+import com.backbase.oss.codegen.yard.model.LintRuleReport;
 import com.backbase.oss.codegen.yard.model.Portal;
-import com.backbase.oss.codegen.yard.model.Spec;
+import com.backbase.oss.codegen.yard.model.YardModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -27,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.AbstractGenerator;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.Generator;
 import org.openapitools.codegen.GlobalSupportingFile;
 import org.openapitools.codegen.SupportingFile;
@@ -37,13 +40,17 @@ import org.openapitools.codegen.ignore.CodegenIgnoreProcessor;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.zalando.zally.core.ApiValidator;
+import org.zalando.zally.core.DefaultContextFactory;
+import org.zalando.zally.core.Result;
+import org.zalando.zally.core.RulesManager;
 
 
 @Slf4j
-public class BoatYardGenerator extends AbstractGenerator implements Generator {
+public class BoatLintGenerator extends AbstractGenerator implements Generator {
 
-    private final BoatYardConfig config;
-    private final String input;
+    private final BoatLintConfig config;
+    private final String inputSpec;
     private final String output;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -52,9 +59,9 @@ public class BoatYardGenerator extends AbstractGenerator implements Generator {
     private final TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
     private YardModel yardModel;
 
-    public BoatYardGenerator(BoatYardConfig config) {
+    public BoatLintGenerator(BoatLintConfig config) {
         this.config = config;
-        this.input = config.getInputSpec();
+        this.inputSpec = config.getInputSpec();
         this.output = config.getOutputDir();
         if (this.ignoreProcessor == null) {
             this.ignoreProcessor = new CodegenIgnoreProcessor(this.config.getOutputDir());
@@ -68,76 +75,55 @@ public class BoatYardGenerator extends AbstractGenerator implements Generator {
     }
 
     public List<File> generate() {
-        return getMarinaModel().getPortals().stream()
-            .flatMap(portal -> generate(portal).stream())
-            .collect(Collectors.toList());
 
+
+        RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
+        Config config = rulesValidatorConfiguration.config("boat.conf");
+        RulesManager rulesManager = rulesValidatorConfiguration.rulesManager(config);
+        ApiValidator apiValidator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
+        BoatLinter boatLinter = new BoatLinter((apiValidator));
+
+        File input = new File(inputSpec);
+        if(!input.exists()) {
+            throw new IllegalArgumentException("Input " + input + " does not exist");
+        }
+
+        try {
+            String openApiAsString = new String(Files.readAllBytes(input.toPath()));
+            OpenAPI openAPI = OpenAPILoader.load(input);
+
+            List<Result> results = boatLinter.lint(openApiAsString);
+
+            LintRuleReport lintRuleReport = new LintRuleReport();
+            lintRuleReport.setOpenApi(openApiAsString);
+            lintRuleReport.setResults(results);
+            Info info = openAPI.getInfo();
+            if(info != null) {
+                lintRuleReport.setTitle(info.getTitle());
+                lintRuleReport.setVersion(info.getVersion());
+            }
+
+            return generate(lintRuleReport);
+        } catch (OpenAPILoaderException | IOException e) {
+            throw new IllegalArgumentException("Cannot read file: " + inputSpec, e);
+        }
     }
 
     @SneakyThrows
-    private List<File> generate(Portal portal) {
-        log.info("Generating BOAT Yard for portal: {}", portal.getTitle());
+    private List<File> generate(LintRuleReport lintRuleReport) {
+        log.info("Generating BOAT Lint Report for: {}", lintRuleReport.getTitle());
 
-        portal.getCapabilities().forEach(
-            capability -> {
-                String capabilityKey = capability.getKey();
-                capability.getServices().forEach(service -> {
-                    String serviceKey = service.getKey();
-
-                    service.getSpecs().forEach(spec -> {
-
-                        String boatDocOutput = capabilityKey + "/" + serviceKey + "/" + spec.getKey();
-                        String boatDocUrl = boatDocOutput + "/index.html";
-
-                        spec.setBoatDocUrl(boatDocUrl);
-
-                        generateBoatDoc(spec, boatDocOutput, config);
-                        if (portal.getDefaultSpecUrl() == null) {
-                            portal.setDefaultSpecUrl(boatDocUrl);
-                        }
-
-
-                        spec.setBoatDocUrl(boatDocUrl);
-
-                    });
-                });
-            }
-        );
         // After processing our model, convert it into a map;
-        Map<String, Object> bundle = covertPortalToBundle(portal);
+        Map<String, Object> bundle = covertPortalToBundle(lintRuleReport);
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Yard for portal: {}", portal.getTitle());
+        log.info("Finished creating BOAT Yard for portal: {}", lintRuleReport.getTitle());
 
         return files;
     }
 
-    @SneakyThrows
-    private void generateBoatDoc(Spec spec, String boatDocOutput, BoatYardConfig config) {
-        log.info("Generating Boat Doc for spec: {} in: {}", spec.getTitle(), boatDocOutput);
-        BoatDocsGenerator codegenConfig = new BoatDocsGenerator();
-
-        codegenConfig.setOutputDir(new File(config.getOutputDir(), boatDocOutput).toString());
-        codegenConfig.setSkipOverwrite(false);
-        codegenConfig.setInputSpec(spec.getOpenApiUrl());
-
-        File specBaseDir = config.getSpecsBaseDir();
-        if (specBaseDir == null) {
-            specBaseDir = new File(config.getInputSpec()).getParentFile();
-        }
-
-        File file = new File(specBaseDir, spec.getOpenApiUrl());
-        log.info("Generating OpenAPI Doc for: {}", file);
-        OpenAPI openAPI = OpenAPILoader.load(file);
-
-        ClientOptInput input = new ClientOptInput();
-        input.config(codegenConfig);
-        input.openAPI(openAPI);
-        new DefaultGenerator().opts(input).generate();
-    }
-
     @SuppressWarnings("unchecked")
-    private Map<String, Object> covertPortalToBundle(Portal portal) throws JsonProcessingException {
-        String model = objectMapper.writeValueAsString(portal);
+    private Map<String, Object> covertPortalToBundle(LintRuleReport lintRuleReport) throws JsonProcessingException {
+        String model = objectMapper.writeValueAsString(lintRuleReport);
         return objectMapper.readValue(model, Map.class);
     }
 
@@ -248,9 +234,9 @@ public class BoatYardGenerator extends AbstractGenerator implements Generator {
 
         Yaml yaml = new Yaml(constructor);
         try {
-            yardModel = yaml.loadAs(new FileInputStream(input), YardModel.class);
+            yardModel = yaml.loadAs(new FileInputStream(inputSpec), YardModel.class);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot create BOAT Yard from input: " + input, e);
+            throw new RuntimeException("Cannot create BOAT Yard from input: " + inputSpec, e);
         }
         this.yardModel = yardModel;
         return yardModel;
