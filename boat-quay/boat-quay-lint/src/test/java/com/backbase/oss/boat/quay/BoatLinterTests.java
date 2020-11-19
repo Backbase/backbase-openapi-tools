@@ -33,7 +33,6 @@ public class BoatLinterTests {
 
     @Test
     public void ruleManager() {
-
         boatLinter.getAvailableRules().forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });

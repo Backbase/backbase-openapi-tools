@@ -8,7 +8,7 @@ import org.zalando.zally.rule.api.Severity;
 @Data
 public class BoatViolation {
 
-    private BoatLintRule lintRule;
+    private BoatLintRule rule;
     private String description;
     private Severity severity;
     private IntRange lines;
@@ -16,7 +16,7 @@ public class BoatViolation {
 
 
     public String displayString() {
-        return "[" + lintRule.getId() + "] " + severity + " - " + lintRule.getTitle() + ": " + description;
+        return "[" + rule.getId() + "] " + severity + " - " + rule.getTitle() + ": " + description;
     }
 
 }
