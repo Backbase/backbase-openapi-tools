@@ -55,27 +55,30 @@
                 {{#each violations}}
                     <div class="result" id="{{rule.id}}">
                         <h2>{{severity}} - {{rule.title}}</h2>
+                        <p>Rule Origin: {{rule.ruleSet}}</p>
                         <p>{{description}}</p>
-                        <p>Lines: {{lines.start}} to: {{lines.last}}</p>
+                        <a href="{{rule.url}}">More information</a>
+                        <p>Location: {{pointer}}  Lines: {{lines.start}} to: {{lines.last}}</p>
                         <button class="highlight" data-lines-first="{{lines.first}}" data-lines-last="{{lines.last}}"
                                 data-lines-start="{{lines.start}}">Highlight
                         </button>
                     </div>
                 {{/each}}
+                <h2>Available Rules</h2>
+                <div class="row">
+                    {{#each availableRules}}
+                        <div class="rule row">
+                            <h2>{{id}} - {{severity}} - {{title}}</h2>
+                            <p>
+                            <a href="{{url}}">Reference</a>
+                            </p>
+                        </div>
+                    {{/each}}
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-    <div class="container available-rules" style="display: none">
-        <h1>Available Rules</h1>
-        {{#each availableRules}}
-            <div class="rule row">
-                <h2>{{severity}} - {{title}}</h2>
-                <a href="{{url}}">Reference</a>
-            </div>
-        {{/each}}
-    </div>
 
 
 <script src="js/ace.js"></script>
