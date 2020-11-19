@@ -282,6 +282,11 @@
     {{/model}}
     {{/models}}
 
+    var requestBodies = {};
+    {{#requestBodies}}
+    requestBodies["name"] = {{{jsonSchema}}};
+    {{/requestBodies}}
+
     var responses = {};
     {{#responses}}
     responses["{{code}}"] = {{{jsonSchema}}};
