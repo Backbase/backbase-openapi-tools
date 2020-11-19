@@ -1,21 +1,99 @@
-<html lang="en" xml:lang="en" xmlns= "http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="en">
 <head>
-    <title>{{navTitle}}</title>
-    <meta charset="UTF-8" />
+    <title>BOAT Lint Report - {{title}}</title>
+    <meta charset="UTF-8"/>
     <meta name="google" content="notranslate">
-    <meta http-equiv="Content-Language" content="en" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <meta http-equiv="Content-Language" content="en"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="css/styles.css"/>
     <script src="js/index.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
     </style>
 </head>
 <body>
-<div id="nav">
-    <img src="backbase-logo.svg" alt="backbase logo" />
-    <h1>{{title}}</h1>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">BOAT::Lint</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Lint Report<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Available Rules</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container lint-report">
+    <div class="row">
+        <div class="col-md-6">
+            <pre id="openApi">{{{openApi}}}</pre>
+        </div>
+        <div class="col-md-6">
+            {{#each results}}
+                <div class="result" id="{{id}}"
+                    <h2>{{id}} - {{title}}</h2>
+                    <div class="severity">{{violationType}}</div>
+                    <p>{{description}}</p>
+            <p>Lines: {{lines.start}} to: {{lines.last}}</p>
+                    <button class="highlight" data-lines-first="{{lines.first}}" data-lines-last="{{lines.last}}" data-lines-start="{{lines.start}}">Highlight</button>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+
+<div class="container available-rules">
+
+        <h1>Available Rules</h1>
+        {{#each availableRules}}
+        <div class="rule row">
+            <h2>{{severity}} - {{rule.title}}</h2>
+            <a href="{{url}}">Reference</a>
+        </div>
+        {{/each}}
+    </div>
 
 </div>
-<iframe src="{{defaultSpecUrl}}" id="iframe" name="myFrame"></iframe>
+
+<script src="js/ace.js"></script>
+<script src="js/ext-static_highlight.js"></script>
+<script src="js/mode-yaml.js"></script>
+<script src="js/theme-twilight.js"></script>
+
+<script>
+    var highlight = ace.require("ace/ext/static_highlight")
+    var editor = ace.edit("openApi");
+    // editor.setTheme("ace/theme/twilight");
+    editor.setReadOnly(true);
+    editor.getSession().setMode("ace/mode/yaml");
+    var Range = ace.require('ace/range').Range
+    marker = null;
+    $("button.highlight").on("click", function() {
+
+        var $this = $(this);
+
+        var first = $($this).data("lines-first");
+        var last = $($this).data("lines-last");
+        if(marker != null) {
+            editor.getSession().removeMarker(marker);
+        }
+        marker = editor.getSession().addMarker(new Range(first, 0, last, 0), "ace_active-line", "fullLine");
+    });
+
+
+</script>
+
 </body>
 </html>
