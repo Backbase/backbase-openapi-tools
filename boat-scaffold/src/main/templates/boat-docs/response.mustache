@@ -60,14 +60,14 @@
                             }
 
                           var view = new JSONSchemaView(schema, 3);
-                          $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
+                          $('#responses-{{baseName}}-{{nickname}}-{{code}}-schema-data-input').val(JSON.stringify(schema));
                           var result = $('#responses-{{baseName}}-{{nickname}}-schema-{{code}}');
                           result.empty();
                           result.append(view.render());
                         });
                 </script>
                 </div>
-                <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''></input>
+                <input id='responses-{{baseName}}-{{nickname}}-{{code}}-schema-data-input' type='hidden' value=''></input>
             </div>
         {{/schema}}
     </div>
