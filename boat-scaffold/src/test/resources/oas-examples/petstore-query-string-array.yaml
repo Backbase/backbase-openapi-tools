@@ -27,7 +27,8 @@ paths:
           required: false
           schema:
             type: array
-            format: string
+            items:
+              type: string
           example:
             - dog
             - cat
