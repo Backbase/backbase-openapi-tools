@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class Portal {
 
+
     private String key;
     private String title;
     private String subTitle;
@@ -21,6 +22,8 @@ public class Portal {
     private List<LintRule> lintRules;
 
     private String defaultSpecUrl;
+
+    private boolean enableLinting;
 
 
 }
