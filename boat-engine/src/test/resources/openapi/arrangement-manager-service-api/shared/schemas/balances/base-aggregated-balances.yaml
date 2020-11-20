@@ -1,0 +1,23 @@
+allOf:
+  - $ref: '../../../openapi.yaml#/components/schemas/AdditionalProperties'
+
+description: Aggregated balances of instance which can be identified by id
+type: object
+properties:
+  id:
+    type: string
+    description: A unique identifier of instance from the grouped by parameter
+  productKindName:
+    type: string
+    description: Localized product kind name that will be filled when aggregations
+      are grouped by product kind.
+    maxLength: 50
+  balanceType:
+    type: string
+    description: Balance type for the aggregated balances.
+    maxLength: 50
+  numberOfArrangements:
+    type: integer
+    description: Number of arrangements that are aggregated for this group.
+  aggregatedBalances:
+    $ref: '../../../openapi.yaml#/components/schemas/AccountAggregatedBalanceCurrencies'

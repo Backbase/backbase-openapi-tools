@@ -1,0 +1,8 @@
+name: productKindName
+in: query
+description: Product Kind Name
+required: false
+schema:
+  type: string
+example:
+  Current Account

@@ -1,0 +1,8 @@
+name: Content-Language
+in: header
+description: Defines the translation natural language as specified in ISO
+  639-1, and territory two-letter form of ISO 3166.
+required: false
+schema:
+  type: string
+example: en_GB

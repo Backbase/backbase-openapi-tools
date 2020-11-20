@@ -1,0 +1,8 @@
+title: ApiError
+type: object
+x-abstract: true
+properties:
+  message:
+    type: string
+required:
+  - message

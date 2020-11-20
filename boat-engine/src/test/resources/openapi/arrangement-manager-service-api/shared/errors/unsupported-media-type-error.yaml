@@ -1,0 +1,6 @@
+title: UnsupportedMediaTypeError
+type: object
+allOf:
+  - $ref: error-aware-api.yaml
+example:
+  $ref: unsupported-media-type-error.json

@@ -1,0 +1,16 @@
+[
+    {
+        "id": "id-1",
+        "arrangementId": "arrangement-id-1",
+        "externalArrangementId": "external-arrangement-id-1",
+        "balance": 123.123,
+        "date": "2016-02-28T16:41:41.090Z"
+    },
+    {
+        "id": "id-2",
+        "arrangementId": "arrangement-id-2",
+        "externalArrangementId": "external-arrangement-id-2",
+        "balance": 3.1416,
+        "date": "2017-02-28T16:41:41.090Z"
+    }
+]

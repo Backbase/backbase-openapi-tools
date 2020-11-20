@@ -1,0 +1,8 @@
+name: arrangementId
+in: query
+description: The external arrangement id.
+required: true
+schema:
+  type: string
+example:
+  1cdb2224-8926-4b4d-a99f-1c9dfbbb4699

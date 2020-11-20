@@ -1,0 +1,6 @@
+name: externalTransferAllowed
+in: query
+description: Privilege for external transfers
+required: false
+schema:
+  type: boolean

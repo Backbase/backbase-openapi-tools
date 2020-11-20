@@ -1,0 +1,6 @@
+title: NotFoundError
+type: object
+allOf:
+  - $ref: error-aware-api.yaml
+example:
+  $ref: not-found-error.json

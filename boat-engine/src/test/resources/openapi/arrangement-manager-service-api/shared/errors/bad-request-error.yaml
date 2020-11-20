@@ -1,0 +1,6 @@
+title: BadRequestError
+type: object
+allOf:
+  - $ref: error-aware-api.yaml
+example:
+  $ref: bad-request-error.json

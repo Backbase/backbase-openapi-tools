@@ -1,0 +1,6 @@
+allOf:
+- $ref: '../../../openapi.yaml#/components/schemas/ExternalProductKindItem'
+
+type: object
+required:
+  - id

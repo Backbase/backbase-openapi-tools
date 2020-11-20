@@ -1,0 +1,36 @@
+summary: GetRecipientArrangements
+description: Get a list of arrangement ids the user can make payments to
+get:
+  tags:
+  - accounts
+  description: Get a list of arrangement ids the user can make payments to
+  operationId: getGetRecipientArrangements
+  parameters:
+  - name: arrangementId
+    in: query
+    description: Internal arrangementId of the FROM account
+    required: true
+    schema:
+      maxLength: 36
+      minLength: 1
+      type: string
+    examples:
+      example:
+        summary: example
+        value: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+  responses:
+    200:
+      description:  Recipient arrangements. Returns a list of Arrangements that are eligible to be recipients of a payment.
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountRecipientArrangements'
+          example:
+            $ref: '../../examples/accounts/recipient-arrangements-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+

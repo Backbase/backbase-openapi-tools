@@ -1,0 +1,8 @@
+name: privilege
+in: query
+description: Privilege for the arrangements
+required: true
+schema:
+  type: string
+example:
+  view

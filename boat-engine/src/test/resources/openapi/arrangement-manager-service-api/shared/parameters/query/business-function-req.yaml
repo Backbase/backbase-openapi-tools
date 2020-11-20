@@ -1,0 +1,8 @@
+name: businessFunction
+in: query
+description: Provide comma separated contexts for retrieving arrangements
+required: true
+schema:
+  type: string
+example:
+  Product Summary

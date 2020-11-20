@@ -1,0 +1,8 @@
+name: searchTerm
+in: query
+description: Full text search
+required: false
+schema:
+  maxLength: 256
+  type: string
+example: Account X

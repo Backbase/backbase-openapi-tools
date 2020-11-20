@@ -1,0 +1,10 @@
+[
+  {
+    "arrangementId": "A02",
+    "bookedBalance": 2000.2,
+    "availableBalance": 200000.2,
+    "creditLimit": 65453.14,
+    "outstandingPrincipalAmount": 104.3,
+    "currentInvestmentValue": 300.5
+  }
+]

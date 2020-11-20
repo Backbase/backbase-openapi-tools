@@ -1,0 +1,8 @@
+name: dateFrom
+in: query
+description: Bottom value of date range
+required: false
+schema:
+  type: string
+  format: date-time
+example: 2016-01-28T16:41:41.090Z

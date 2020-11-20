@@ -1,0 +1,13 @@
+title: StateItem
+type: object
+allOf:
+  - $ref: additional-properties.yaml
+properties:
+  externalStateId:
+    maxLength: 50
+    type: string
+    description: An external unique identifier for the arrangement state object.
+  state:
+    maxLength: 50
+    type: string
+    description: Name that describes the specific arrangement state.

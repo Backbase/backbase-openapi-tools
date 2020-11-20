@@ -1,0 +1,15 @@
+name: size
+in: query
+description: |
+  Limit the number of elements on the response. When used in combination with cursor, the value
+  is allowed to be a negative number to indicate requesting records upwards from the starting point indicated
+  by the cursor.
+required: false
+schema:
+  type: integer
+  format: int32
+  default: 10
+examples:
+  example:
+    summary: example
+    value: 80

@@ -1,0 +1,8 @@
+name: arrangementIds
+in: path
+description: comma separated arrangement ids
+required: true
+schema:
+  type: string
+example:
+  ja12u49303-29202028hdu822-28ckqewer,69f55f5e-e5a8-491f-945a-402004609fe1

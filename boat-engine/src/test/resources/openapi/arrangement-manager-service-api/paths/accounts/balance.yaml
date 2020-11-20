@@ -1,0 +1,35 @@
+summary: Balance
+description: Retrieve balance by the following parameter
+get:
+  tags:
+  - accounts
+  description: 'Retrieve balance by the following parameter: arrangementIds -
+    external'
+  operationId: getBalance
+  parameters:
+  - name: arrangementIds
+    in: query
+    description: external arrangement ids
+    required: false
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699,kjh4567-asd1-11e7-b114-b2f933d50000
+  responses:
+    200:
+      description: Balance items. Balance retrieved from the banks for the provided arrangement id
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountBalanceItems'
+          example:
+            $ref: '../../examples/accounts/balance-item-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+

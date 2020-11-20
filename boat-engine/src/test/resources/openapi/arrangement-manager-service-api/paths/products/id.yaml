@@ -1,0 +1,33 @@
+summary: ProductById
+description: No description available
+parameters:
+  - name: id
+    in: path
+    description: product id
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: oiuoi6464223500oi3
+get:
+  tags:
+  - products
+  description: Retrieve a single product.
+  operationId: getProductById
+  responses:
+    200:
+      description: Get Product by Id. Single Products retrieved from DBS by id
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountProductItem'
+          example:
+            $ref: '../../examples/products/product-item-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

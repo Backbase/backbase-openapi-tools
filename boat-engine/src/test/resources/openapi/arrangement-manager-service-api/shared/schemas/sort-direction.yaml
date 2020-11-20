@@ -1,0 +1,7 @@
+title: SortDirection
+type: string
+description: Whether to sort results in ascendent or descendent order.
+enum:
+  - ASC
+  - DESC
+default: DESC

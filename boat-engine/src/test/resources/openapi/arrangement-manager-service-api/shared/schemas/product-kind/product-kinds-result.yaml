@@ -1,0 +1,11 @@
+allOf:
+- $ref: '../../../openapi.yaml#/components/schemas/AdditionalProperties'
+
+type: object
+properties:
+  productKinds:
+    type: array
+    items:
+      $ref: '../../../openapi.yaml#/components/schemas/ProductKindItem'
+required:
+  - productKinds

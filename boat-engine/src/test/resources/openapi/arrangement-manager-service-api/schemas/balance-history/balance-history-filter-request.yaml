@@ -1,0 +1,32 @@
+title: BalanceHistoryFilterRequest
+type: object
+properties:
+  arrangementIds:
+    type: array
+    description: A list of arrangements ids for querying database
+    uniqueItems: true
+    items:
+      maxLength: 36
+      minLength: 1
+      type: string
+  dateFrom:
+    type: string
+    format: date-time
+  dateTo:
+    type: string
+    format: date-time
+  from:
+    type: integer
+    description: Page Number. Skip over pages of elements by specifying a start
+      value for the query
+    format: int32
+  size:
+    type: integer
+    description: Page Number. Skip over pages of elements by specifying a start
+      value for the query. If this parameter is missing then no pagination is
+        assumed.
+    format: int32
+required:
+- arrangementIds
+- dateFrom
+- dateTo

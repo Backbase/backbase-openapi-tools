@@ -1,0 +1,6 @@
+title: UnauthorizedError
+type: object
+allOf:
+  - $ref: error-aware-api.yaml
+example:
+  $ref: unauthorized-error.json

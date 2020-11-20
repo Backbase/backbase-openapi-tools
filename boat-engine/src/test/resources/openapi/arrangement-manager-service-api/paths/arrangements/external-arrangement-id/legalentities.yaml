@@ -1,0 +1,57 @@
+summary: ArrangementLegalEntities
+description: No description available
+parameters:
+  - name: externalArrangementId
+    in: path
+    description: external arrangement id
+    required: true
+    schema:
+      type: string
+
+post:
+  tags:
+  - arrangements
+  description: Delegates & transforms call (external ids are replaced by internal) from integration to pandp for adding legal entity to an existing arrangement. In the process if no legal entity or arrangement is found for the specified ids it will result in appropriate 'not found' exception. Additionally, all validation constraints will be checked here and they will result in appropriate 'bad request'.
+  operationId: postArrangementLegalEntities
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../openapi.yaml#/components/schemas/AccountExternalLegalEntityIds'
+        example:
+          $ref: '../../../examples/arrangements/external-legalentities-ids-ex.json'
+  responses:
+    204:
+      description: Indicates successful addition of legal entities ids related
+        to a specific arrangement.
+    400:
+      $ref: '../../../openapi.yaml#/components/responses/400'
+    403:
+      $ref: '../../../openapi.yaml#/components/responses/403'
+    404:
+      $ref: '../../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../../openapi.yaml#/components/responses/500'
+
+delete:
+  tags:
+  - arrangements
+  description: 'Delegates & transforms call (external ids are replaced by
+    internal) from integration to pandp for removing legal entity from an existing
+    arrangement. In the process if no legal entity or arrangement is found for
+    the specified ids it will result in appropriate ''not found'' exception. Additionally,
+    all validation constraints will be checked here and they will result in appropriate
+    ''bad request''.'
+  operationId: deleteArrangementLegalEntities
+  responses:
+    204:
+      description: Indicates successful removal of legal entities ids related
+        to a specific arrangement.
+    400:
+      $ref: '../../../openapi.yaml#/components/responses/400'
+    403:
+      $ref: '../../../openapi.yaml#/components/responses/403'
+    404:
+      $ref: '../../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../../openapi.yaml#/components/responses/500'

@@ -1,0 +1,76 @@
+header:
+  accept:
+    $ref: parameters/header/accept.yaml
+  content-language:
+    $ref: parameters/header/content-language.yaml
+
+path:
+  arrangement-ids-concat:
+    $ref: parameters/path/arrangement-ids-concat.yaml
+  arrangement-id:
+    $ref: parameters/path/arrangement-id.yaml
+  external-arrangement-id:
+    $ref: parameters/path/external-arrangement-id.yaml
+
+query:
+  arrangement-id-req:
+    $ref: parameters/query/arrangement-id-req.yaml
+  arrangement-ids-concat-req:
+    $ref: parameters/query/arrangement-ids-concat-req.yaml
+  arrangement-ids:
+    $ref: parameters/query/arrangement-ids.yaml
+  business-function-req:
+    $ref: parameters/query/business-function-req.yaml
+  credit-account:
+    $ref: parameters/query/credit-account.yaml
+  cursor:
+    $ref: parameters/query/cursor.yaml
+  custom-order:
+    $ref: parameters/query/custom-order.yaml
+  date-from:
+    $ref: parameters/query/date-from.yaml
+  date-to:
+    $ref: parameters/query/date-to.yaml
+  debit-account:
+    $ref: parameters/query/debit-account.yaml
+  external-transfer-allowed:
+    $ref: parameters/query/external-transfer-allowed.yaml
+  favorite-first:
+    $ref: parameters/query/favorite-first.yaml
+  favorite:
+    $ref: parameters/query/favorite.yaml
+  favourite-first:
+    $ref: parameters/query/favourite-first.yaml
+  from:
+    $ref: parameters/query/from.yaml
+  ignored-arrangement-ids:
+    $ref: parameters/query/ignored-arrangement-ids.yaml
+  legal-entity-ids-req:
+    $ref: parameters/query/legal-entity-ids-req.yaml
+  legal-entity-ids:
+    $ref: parameters/query/legal-entity-ids.yaml
+  mask-indicator:
+    $ref: parameters/query/mask-indicator.yaml
+  order-by:
+    $ref: parameters/query/order-by.yaml
+  privilege:
+    $ref: parameters/query/privilege.yaml
+  product-kind-name:
+    $ref: parameters/query/product-kind-name.yaml
+  resource-name-req:
+    $ref: parameters/query/resource-name-req.yaml
+  search-term:
+    $ref: parameters/query/search-term.yaml
+  size:
+    $ref: parameters/query/size.yaml
+  sort-direction:
+    $ref: parameters/query/sort-direction.yaml
+  source-id:
+    $ref: parameters/query/source-id.yaml
+  time-period:
+    $ref: parameters/query/time-period.yaml
+  time-unit:
+    $ref: parameters/query/time-unit.yaml
+  with-latest-balance:
+    $ref: parameters/query/with-latest-balance.yaml
+

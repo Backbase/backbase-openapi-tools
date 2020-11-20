@@ -20,6 +20,18 @@ components:
               type: integer
             propThree:
               $ref: '#/components/schemas/Three'
+            array:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+            enums:
+              type: array
+              items:
+                type: string
+                enum: [a, b, c]
         propThree:
           $ref: '#/components/schemas/Three'
     Three:

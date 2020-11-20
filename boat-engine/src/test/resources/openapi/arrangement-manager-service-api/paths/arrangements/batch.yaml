@@ -1,0 +1,29 @@
+summary: BatchUpsertArrangements
+description: No description available
+post:
+  tags:
+  - arrangements
+  description: Butch insert or update on arrangement by an arrangement id.
+  operationId: postBatchUpsertArrangements
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/AccountBatchUpsertArrangement'
+        example:
+          $ref: '../../examples/arrangements/arrangement-item-list.json'
+  responses:
+    207:
+      description: multiStatusExtended
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountBatchUpsertArrangementsPostResponseBody'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    403:
+      $ref: '../../openapi.yaml#/components/responses/403'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

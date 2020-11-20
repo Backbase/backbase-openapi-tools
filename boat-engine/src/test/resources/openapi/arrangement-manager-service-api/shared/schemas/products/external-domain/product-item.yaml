@@ -1,0 +1,21 @@
+allOf:
+- $ref: '../../../../openapi.yaml#/components/schemas/AdditionalProperties'
+
+type: object
+properties:
+  externalId:
+    type: string
+    maxLength: 50
+    description: 'A unique identifier for the product that the arrangement applies
+      to '
+  externalTypeId:
+    type: string
+    maxLength: 50
+    description: The ID that is used by the Bank to identify the specific Product
+      type - External reference to the product Type.
+  typeName:
+    type: string
+    maxLength: 50
+    description: The label/name that is used to label a specific product type.
+  productKind:
+    $ref: '../../../../openapi.yaml#/components/schemas/ExternalProductKindItem'

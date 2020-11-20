@@ -1,0 +1,10 @@
+name: ignoredArrangementIds
+in: query
+description: No description available
+required: false
+schema:
+  type: array
+  items:
+    type: string
+example:
+  - 2ab5b5c8-a4bc-4f25-bfb6-4aed7dc9882e

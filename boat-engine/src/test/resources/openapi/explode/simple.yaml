@@ -13,19 +13,28 @@ paths:
           application/json:
             schema:
               properties:
-                propThree:
-                  $ref: '#/components/schemas/Three'
+                value:
+                  $ref: '#/components/schemas/One'
+                complex:
+                  properties:
+                    x:
+                      type: number
+                    i:
+                      type: number
+                    
+
       responses:
         200:
           description: description
           content:
             application/json:
               schema:
+                title: PostOpIdResult
                 properties:
                   id:
                     type: integer
-                  propThree:
-                    $ref: '#/components/schemas/Three'
+                  value:
+                    $ref: '#/components/schemas/Two'
 
 components:
   schemas:
@@ -50,3 +59,8 @@ components:
       properties:
         value:
           type: integer
+
+    Values:
+      type: string
+      enum: [a, b, c]
+

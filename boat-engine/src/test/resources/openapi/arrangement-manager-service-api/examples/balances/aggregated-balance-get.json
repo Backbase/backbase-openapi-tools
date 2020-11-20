@@ -1,0 +1,16 @@
+[
+  {
+    "aggregatedBalances": [
+      {
+        "currencyCode": "EUR",
+        "amount": "3289.0",
+        "numberOfArrangements": 3
+      },
+      {
+        "currencyCode": "USD",
+        "amount": "2500.0",
+        "numberOfArrangements": 10
+      }
+    ]
+  }
+]

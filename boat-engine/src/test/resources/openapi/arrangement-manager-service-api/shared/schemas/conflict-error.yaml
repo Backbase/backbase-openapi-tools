@@ -1,0 +1,6 @@
+title: ConflictError
+allOf:
+  - $ref: ../errors/error-aware-api.yaml
+description: Represents a 409 *Conflict* HTTP error.
+example:
+  $ref: ../../lib/examples/conflict-error.json

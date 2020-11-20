@@ -1,0 +1,10 @@
+name: Accept
+in: header
+description: Media type that is acceptable for the response.
+required: false
+schema:
+  type: string
+examples:
+  example:
+    summary: example
+    value: application/json

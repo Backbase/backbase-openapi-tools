@@ -1,0 +1,82 @@
+summary: UserPreferences
+description: User defined preferences which are only utilized by front end
+get:
+  tags:
+  - arrangements
+  description: Retrieve user defined preferences for arrangement id
+  operationId: getUserPreferences
+  parameters:
+  - name: arrangementId
+    in: query
+    description: No description available
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: 1cdb2224-8926-4b4d-a99f-1c9dfbbb4699
+  - name: userId
+    in: query
+    description: No description available
+    required: false
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: bb1ICGg353832IH3CAWFYXAA36
+  - name: favorite
+    in: query
+    description: Favorite flag
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: true
+  responses:
+    200:
+      description: |-
+        The following user preferences for an arrangement have been retrieved from persistence layer:
+        * favorite
+        * bankAlias
+        * visible
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountUserPreferencesItem'
+          example:
+            $ref: '../../examples/arrangements/user-preferences-item-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+  x-bb-access-control-resource: Product Summary
+  x-bb-access-control-function: Product Summary
+  x-bb-access-control-privilege: view
+
+put:
+  tags:
+  - arrangements
+  description: Endpoint for updating the user preferences of the arrangement
+  operationId: putUserPreferences
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/AccountUserPreferencesItemPut'
+        example:
+          $ref: '../../examples/arrangements/user-preferences-item-put-ex.json'
+  responses:
+    204:
+      description: User preferences are updated successfully
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

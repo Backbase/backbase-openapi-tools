@@ -1,0 +1,6 @@
+title: InternalServerError
+type: object
+allOf:
+  - $ref: api-error.yaml
+example:
+  $ref: internal-server-error.json

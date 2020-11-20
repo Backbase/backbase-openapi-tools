@@ -1,0 +1,33 @@
+summary: InternalId
+description: No description available
+parameters:
+  - name: externalId
+    in: path
+    description: external id
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: 69f55f5e-e5a8-491f-945a-402004609fe1
+
+get:
+  tags:
+  - arrangements
+  summary: Retrieve Internal Arrangement Id for External Id.
+  description: Retrieve Internal Arrangement Id for External Id.
+  operationId: getInternalId
+  responses:
+    200:
+      description: Initial call to retrieve a internal id from the backbase platform by External Id of the arrangement.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../openapi.yaml#/components/schemas/AccountInternalIdGetResponseBody'
+    400:
+      $ref: '../../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../../openapi.yaml#/components/responses/500'

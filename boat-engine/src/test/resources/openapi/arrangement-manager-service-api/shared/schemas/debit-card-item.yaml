@@ -1,0 +1,32 @@
+title: DebitCardItem
+type: object
+allOf:
+  - $ref: additional-properties.yaml
+description: Debit Card item
+properties:
+  number:
+    type: string
+    maxLength: 36
+    description: First 6 and/or last 4 digits of a Payment card. All other digits
+      will/to be masked. Be aware that using card number differently is potential
+      PCI risk
+  expiryDate:
+    type: string
+    maxLength: 32
+    description: Expiration date of a credit card, after which is no longer valid
+  cardId:
+    type: string
+    maxLength: 32
+    description: External ID of the card
+  cardholderName:
+    type: string
+    maxLength: 64
+    description: First Name and Last Name of card holder.
+  cardType:
+    type: string
+    maxLength: 32
+    description: Card type to change card image based on it, ex. Maestro Gold
+  cardStatus:
+    type: string
+    maxLength: 32
+    description: Status of the card ex. Active, Expired etc

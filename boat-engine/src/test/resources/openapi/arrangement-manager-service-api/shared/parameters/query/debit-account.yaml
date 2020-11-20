@@ -1,0 +1,6 @@
+name: debitAccount
+in: query
+description: Type of account
+required: false
+schema:
+  type: boolean

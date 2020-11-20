@@ -1,0 +1,21 @@
+title: ProductItem
+type: object
+allOf:
+  - $ref: ../additional-properties.yaml
+properties:
+  externalId:
+    maxLength: 50
+    type: string
+    description: 'A unique identifier for the product that the arrangement applies
+          to '
+  externalTypeId:
+    maxLength: 50
+    type: string
+    description: The ID that is used by the Bank to identify the specific Product
+      type - External reference to the product Type.
+  typeName:
+    maxLength: 50
+    type: string
+    description: The label/name that is used to label a specific product type.
+  productKind:
+    $ref: summary-product-kind-item.yaml

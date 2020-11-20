@@ -1,0 +1,56 @@
+{
+  "productKinds": [
+    {
+      "id": 1,
+      "externalKindId": "123123-123f",
+      "kindName": "Current Account",
+      "kindUri": "current-account",
+      "translations": [
+        {
+          "locale": "de_DE",
+          "localeTranslations": [
+            {
+              "fieldName": "kind_name",
+              "fieldValue": "Aktuelles Konto"
+            }
+          ]
+        },
+        {
+          "locale":"ar_JO",
+          "localeTranslations": [
+            {
+              "fieldName": "kind_name",
+              "fieldValue": "الحساب الحالي"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "externalKindId": "asdads67-asd",
+      "kindName": "Savings Account",
+      "kindUri": "savings-account",
+      "translations": [
+        {
+          "locale": "de_DE",
+          "localeTranslations": [
+            {
+              "fieldName": "kind_name",
+              "fieldValue": "Sparkonto"
+            }
+          ]
+        },
+        {
+          "locale":"ar_JO",
+          "localeTranslations": [
+            {
+              "fieldName": "kind_name",
+              "fieldValue": "حساب التوفير"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

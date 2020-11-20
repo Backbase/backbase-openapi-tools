@@ -1,0 +1,7 @@
+title: TimeUnit
+type: string
+enum:
+  - D
+  - W
+  - M
+  - Y

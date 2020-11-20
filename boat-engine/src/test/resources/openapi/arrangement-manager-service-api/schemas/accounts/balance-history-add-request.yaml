@@ -1,0 +1,22 @@
+title: BalanceHistoryAddRequest
+type: object
+allOf:
+  - $ref: ../../shared/schemas/additional-properties.yaml
+properties:
+  externalArrangementId:
+    maxLength: 50
+    minLength: 1
+    type: string
+    description: Externally used unique identification of the balance item.
+  balance:
+    type: number
+    description: The value of the balance item.
+  updatedDate:
+    type: string
+    description: Date and time when the balance item was updated.
+    format: date-time
+description: Object that defines the balance item.
+required:
+- balance
+- externalArrangementId
+- updatedDate

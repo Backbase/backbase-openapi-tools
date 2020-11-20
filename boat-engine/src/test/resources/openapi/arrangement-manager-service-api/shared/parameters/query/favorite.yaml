@@ -1,0 +1,7 @@
+name: favorite
+in: query
+description: Indicates whether an arrangement is favorite for a user or not
+required: false
+schema:
+  type: boolean
+  default: false

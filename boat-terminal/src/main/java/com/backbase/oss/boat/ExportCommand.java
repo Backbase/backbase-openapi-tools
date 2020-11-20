@@ -6,13 +6,10 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
@@ -24,21 +21,8 @@ import picocli.CommandLine.Parameters;
 public class ExportCommand implements Callable<Integer> {
     static public final String NAME = "export";
 
-    static class Input {
-        @Option(names = {"-f", "--file"}, paramLabel = "<input>",
-            description = "Input RAML 1.0 file (deprecated, use the input as a parameter).")
-        private Path inputOpt;
-
-        @Parameters(description = "Input RAML 1.0 file.")
-        private Path input;
-
-        Path get() {
-            return this.input != null ? this.input : this.inputOpt;
-        }
-    }
-
-    @ArgGroup(exclusive = true, multiplicity = "1", order = 10)
-    private Input input;
+    @Parameters(description = "Input RAML 1.0 file.", converter = ExistingPath.class)
+    private Path input;
 
     @Option(names = {"-o", "--output"}, order = 20,
         description = "Output OpenAPI file name.")
@@ -58,14 +42,8 @@ public class ExportCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        final File file = this.input.get().toFile();
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("Not found: " + file.getAbsolutePath());
-        }
-
         final ExporterOptions options = new ExporterOptions().convertExamplesToYaml(this.convertExamples);
-        final OpenAPI openApi = Exporter.export(file, options);
+        final OpenAPI openApi = Exporter.export(this.input.toFile(), options);
         final String yaml = SerializerUtils.toYamlString(openApi);
 
         if (this.directory != null) {

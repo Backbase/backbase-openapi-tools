@@ -1,0 +1,13 @@
+title: ApiErrorExt
+type: object
+allOf:
+  - $ref: api-error.yaml
+x-abstract: true
+properties:
+  errors:
+    description: Detailed error information
+    type: array
+    items:
+      $ref: '../../openapi.yaml#/components/schemas/ErrorItem'
+required:
+  - errors

@@ -1,0 +1,12 @@
+name: legalEntityIds
+in: query
+description: legal entity ids
+required: true
+schema:
+  type: array
+  items:
+    type: string
+example:
+  - 0e4c1c09-fcf4-42fe-ae57-342603d8ef82
+  - 53f023cd-c016-4d19-bdf1-8d83f98c11e1
+  - c0a20cc4-5e15-42d4-94a6-1101ed6c1c37

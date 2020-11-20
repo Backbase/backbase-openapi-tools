@@ -1,0 +1,102 @@
+summary: Products
+description: Endpoint for accessing products for the current context.
+get:
+  tags:
+  - products
+  description: Get a list of product
+  operationId: getProducts
+  parameters:
+  - name: externalProductsIds
+    in: query
+    description: An array of external products ids
+    required: false
+    schema:
+      minimum: 1
+      type: array
+      items:
+        type: string
+    example:
+      - 'oiuoi6464223500oi3893oweroji241112985023lelw12k1ra'
+      - '86740390819729071072646422350015892880623494111947'
+  - name: productKindName
+    in: query
+    description: Product kind name
+    required: false
+    schema:
+      maxLength: 50
+      minLength: 1
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Money market accounts
+  responses:
+    200:
+      description: Initial call to retrieve the catalogue list.
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/AccountProductsGet'
+          example:
+            $ref: '../examples/products/products-get-ex.json'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+put:
+  tags:
+  - products
+  description: " Product \n\n    This JMS EndPoint allows updating of Business/Retail\
+    \ banking products\n    Acceptable values for productKindName are:\n     \
+    \   \"Current Account\",\n        \"Credit Card\",\n        \"Debit Card\"\
+    ,\n        \"Loan\",\n        \"Savings Account\",\n        \"Investment Account\"\
+    ,\n        \"Term Deposit\""
+  operationId: putProducts
+  requestBody:
+    description: Update product
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/AccountProductItem'
+        example:
+          $ref: '../examples/products/product-item-ex.json'
+  responses:
+    204:
+      description: Indicates successful update of a product
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+post:
+  tags:
+  - products
+  description: Create product
+  operationId: postProducts
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/AccountProductItem'
+        example:
+          $ref: '../examples/products/product-item-ex.json'
+  responses:
+    201:
+      description: New Product created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/AccountProductId'
+          example:
+            $ref: '../examples/products/id-ex.json'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'

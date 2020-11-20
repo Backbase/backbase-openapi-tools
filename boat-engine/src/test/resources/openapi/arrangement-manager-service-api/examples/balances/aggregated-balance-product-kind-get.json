@@ -1,0 +1,31 @@
+[
+  {
+    "id": "871283172971234",
+    "productKindName": "Savings Account",
+    "balanceType": "Booked Balance",
+    "aggregatedBalances": [
+      {
+        "currencyCode": "EUR",
+        "amount": "3289.0",
+        "numberOfArrangements": 3
+      },
+      {
+        "currencyCode": "USD",
+        "amount": "2500.0",
+        "numberOfArrangements": 10
+      }
+    ]
+  },
+  {
+    "id": "85342342387123",
+    "productKindName": "Term Deposit",
+    "balanceType": "Outstanding Principal Amount",
+    "aggregatedBalances": [
+      {
+        "currencyCode": "USD",
+        "amount": "3543.0",
+        "numberOfArrangements": 4
+      }
+    ]
+  }
+]

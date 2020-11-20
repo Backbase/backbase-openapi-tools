@@ -1,0 +1,2108 @@
+openapi: 3.0.3
+
+info:
+  title: Arrangement Manager Service API
+  description: This API allows other DBS services to operate on products
+  version: '@spec.version@'
+servers:
+- url: 'http://localhost:4010'
+  description: Arrangement manager mock server
+tags:
+- name: accounts
+- name: arrangement-state
+- name: arrangements
+- name: balance-history
+- name: balances
+- name: product-kinds
+- name: product-summary
+- name: products
+paths:
+  /service-api/v2/productsummary/context/arrangements:
+    $ref: paths/productsummary/context/arrangements.yaml
+  /service-api/v2/arrangements:
+    $ref: paths/arrangements.yaml
+  /service-api/v2/arrangements/filter:
+    $ref: paths/arrangements/filter.yaml
+  /service-api/v2/arrangements/batch:
+    $ref: paths/arrangements/batch.yaml
+  /service-api/v2/arrangements/legalentities:
+    $ref: paths/arrangements/legalentities.yaml
+  /service-api/v2/arrangements/{externalArrangementId}/legalentities:
+    $ref: paths/arrangements/external-arrangement-id/legalentities.yaml
+  /service-api/v2/arrangements/internal/{externalId}:
+    $ref: paths/arrangements/internal/external-id.yaml
+  /service-api/v2/arrangements/{id}:
+    $ref: paths/arrangements/id.yaml
+  /service-api/v2/arrangements/withLiveBalances:
+    $ref: paths/arrangements/with-live-balances.yaml
+  /service-api/v2/arrangements/user-preferences:
+    $ref: paths/arrangements/user-preferences.yaml
+  /service-api/v2/arrangements/delete:
+    $ref: paths/arrangements/delete.yaml
+  /service-api/v2/accounts/balance:
+    $ref: paths/accounts/balance.yaml
+  /service-api/v2/accounts/balance-history:
+    $ref: paths/accounts/balance-history.yaml
+  /service-api/v2/accounts/recipientArrangementIds:
+    $ref: paths/accounts/recipient-arrangement-ids.yaml
+  /service-api/v2/products:
+    $ref: paths/products.yaml
+  /service-api/v2/products/{id}:
+    $ref: paths/products/id.yaml
+  /service-api/v2/product-kinds:
+    $ref: paths/product-kinds.yaml
+  /service-api/v2/arrangement-state:
+    $ref: paths/arrangement-state.yaml
+  /service-api/v2/balances/aggregations:
+    $ref: paths/balances/aggregations.yaml
+  /service-api/v2/balance-history/filter:
+    $ref: paths/balance-history/filter.yaml
+
+components:
+  schemas:
+    AccountAggregatedBalanceGet:
+      $ref: shared/schemas/balances/aggregated-balances-get.yaml
+    AccountAggregatedBalances:
+      allOf:
+        - $ref: '#/components/schemas/AggregatedBalances'
+      deprecated: true
+      description: DEPRECATED. To be removed in 2.21.0. Please use AggregatedBalances type.
+      type: object
+    AccountAggregatedBalancesCurrencies:
+      type: array
+      description: DEPRECATED. To be removed in 2.21.0. Please use AccountAggregatedBalanceCurrencies type.
+      deprecated: true
+      items:
+        $ref: '#/components/schemas/AccountAggregatedBalanceCurrency'
+    AccountAggregatedBalanceCurrency:
+      allOf:
+        - $ref: '#/components/schemas/AggregatedBalance'
+      type: object
+      deprecated: true
+      description: DEPRECATED. To be removed in 2.21.0. Please use AggregatedBalance type.
+    AccountArrangementItemBase:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - currency
+      - externalArrangementId
+      type: object
+      properties:
+        externalArrangementId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique external identifier for the arrangement
+        name:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label a arrangement
+        bookedBalance:
+          type: number
+          description: Amount of money available before any adjustments have been
+            made for deposits in transit, checks that have not yet been cleared, reserve
+            requirements and interest received
+        availableBalance:
+          type: number
+          description: The amount that is available for transactions
+        creditLimit:
+          type: number
+          description: The maximum amount of credit that the financial institution
+            will extend to the account holder for this arrangement
+        IBAN:
+          maxLength: 34
+          pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+          type: string
+          description: Specifying the IBAN - IBAN is short for International Bank
+            Account Number of the account
+        BBAN:
+          maxLength: 50
+          type: string
+          description: Specifying the BBAN of the account - BBAN is short for Basic
+            Bank Account Number. It represents a country-specific bank account number
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+            that qualifies the amount
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed
+        urgentTransferAllowed:
+          type: boolean
+          description: Defines if urgent transfer is allowed
+        accruedInterest:
+          type: number
+          description: The interest that is earned (credit interest) or due (debit
+            interest) but not settled yet
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits
+            will/to be masked. Be aware that using card number differently is potential
+            PCI risk.
+        principalAmount:
+          type: number
+          description: 'The amount that was (originally) contracted for the respective
+            product. This is mainly used in the context of loans and deposits. '
+        currentInvestmentValue:
+          type: number
+          description: The total current value of all the securities kept in the account
+        productNumber:
+          maxLength: 36
+          type: string
+          description: A unique identifier(number) assigned to identify the contract
+            for the product
+        BIC:
+          maxLength: 11
+          type: string
+          description: Bank Identifier Code - international bank code that identifies
+            particular banks worldwide
+        bankBranchCode:
+          maxLength: 20
+          type: string
+          description: This is to accommodate additional country specific fields like
+            Sort Code in UK
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system
+          format: date-time
+        accountInterestRate:
+          type: number
+          description: The annualized cost of credit or debt-capital computed as the
+            percentage ratio of interest to the principal.
+        valueDateBalance:
+          type: number
+          description: The balance of the account on a specific date that needs to
+            be used for the calculation of interest. NB! If no date is specified (like
+            for the book date balance) the current date can be assumed.
+        creditLimitUsage:
+          type: number
+          description: Monetary amount of the used overdraft
+        creditLimitInterestRate:
+          type: number
+          description: Overdraft Interest is an interest applied to the account for
+            any time throughout the month when the account is overdrawn
+        creditLimitExpiryDate:
+          type: string
+          description: The date after which overdraft will no longer be available
+            to the account (renewed automatically or cancelled)
+          format: date-time
+        startDate:
+          type: string
+          description: The date on which the credit card becomes active
+          format: date-time
+        termUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        termNumber:
+          type: number
+          description: Number for the Term Unit for the product arranged between Bank
+            and customer
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        interestPaymentFrequencyNumber:
+          type: number
+          description: Number of times per year when the accumulated interest is settled
+            to the account on a regular basis. The frequency could be yearly, half-yearly,
+            quarterly, monthly, weekly, daily (or not at all, until maturity).
+        maturityDate:
+          type: string
+          description: End term of a holding period
+          format: date-time
+        maturityAmount:
+          type: number
+          description: Amount payable at the end of a holding period of a product
+            (maturity date). For deposit all of the interest is usualy paid at maturity
+            date (IF the term is shorter then one year).
+        autoRenewalIndicator:
+          type: boolean
+          description: Indicates whether or not an arrangement is to be continued
+            after maturity automatically. Usually the product is renewed using the
+            same principal and term unless renegotiation has taken place prior to
+            expiration.
+        interestSettlementAccount:
+          maxLength: 32
+          type: string
+          description: Account for settlement of accumulated interest on a regular
+            basis / Account that provides quick access to accumulated cash to facilitate
+            daily settlements with other businesses
+        outstandingPrincipalAmount:
+          type: number
+          description: The remaining portion of the original loan amount, plus any
+            interest that has been capitalized, that is still owed. Interest accrues
+            on the outstanding principal balance / The value date balance of the arrangement
+        monthlyInstalmentAmount:
+          type: number
+          description: A fixed payment amount paid by a borrower to the bank at a
+            specified date each calendar month.
+        amountInArrear:
+          type: number
+          description: The part of a debt that is overdue after missing one or more
+            required payments. The amount of the arrears is the amount accrued from
+            the date on which the first missed payment was due.
+        minimumRequiredBalance:
+          type: number
+          description: Minimum amount that a customer must have in an account in order
+            to receive some sort of service, such as keeping the account open or receive
+            interest
+        creditCardAccountNumber:
+          maxLength: 32
+          type: string
+          description: The number of the account the credit card transactions settle
+            on (so actually the reference to the settlement account of the card)
+        validThru:
+          type: string
+          description: Expiration date of a credit card, after which is no longer
+            valid
+          format: date-time
+        applicableInterestRate:
+          type: number
+          description: The interest rate or rates which would be used for a particular
+            arrangement
+        remainingCredit:
+          type: number
+          description: Amount of money the user is available to use from the Credit
+            limit of the account
+        outstandingPayment:
+          type: number
+          description: Outstanding payment refers to the outstanding [unpaid] balance,
+            i.e., the current amount due
+        minimumPayment:
+          type: number
+          description: The minimum payment set a percentage of balance, or a fixed
+            cash amount
+        minimumPaymentDueDate:
+          type: string
+          description: Minimum Payment Due Date shown on your monthly statement to
+            remain in good standing
+          format: date-time
+        totalInvestmentValue:
+          type: number
+          description: The value of an asset to its owner, depending on his or her
+            expectations
+        debitCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        accountHolderAddressLine1:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderAddressLine2:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderStreetName:
+          maxLength: 70
+          type: string
+          description: Street name of the Payer/Payee - Alternate street name for
+            the account.
+        town:
+          maxLength: 35
+          type: string
+          description: Town of the Payer/Payee - Alternate town for the account
+        postCode:
+          maxLength: 16
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate post code for the
+            account
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate country sub division
+            for the account
+        accountHolderName:
+          maxLength: 256
+          type: string
+          description: This field is deprecated from 2.17.1 version. It will be removed
+            in 2.19.0 and will be replaced with 'accountHolderNames'
+          deprecated: true
+        accountHolderNames:
+          maxLength: 256
+          type: string
+          description: Party(s) with a relationship to the account.
+        accountHolderCountry:
+          pattern: ^[A-Z]{2}$
+          type: string
+          description: Country of the account holder
+        creditAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as credit account - account to transfer TO
+        debitAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as debit account - account to transfer FROM
+        lastUpdateDate:
+          type: string
+          description: Last date of balance (or other parameter) update for the given
+            arrangement
+          format: date-time
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the customer to label the
+            arrangement
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        productId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+            This is an external product id
+        externalStateId:
+          maxLength: 50
+          type: string
+          description: External reference to the arrangement state
+        externalParentId:
+          maxLength: 50
+          type: string
+          description: Indicate if the account has parent child relationship with
+            another account
+      x-type-name: ArrangementBaseItem
+    AccountArrangementAddedResponse:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internally used unique identification
+      description: Object that defines the reponse of added arrangement.
+    AccountArrangementItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - externalLegalEntityId
+      - externalProductId
+      - id
+      - legalEntityIds
+      - productId
+      - currency
+      - externalArrangementId
+      properties:
+        id:
+          maxLength: 36
+          type: string
+          description: A unique identifier for the Arrangement object that is generated
+            and used Internally in DBS
+        productKindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The label/name that is used for the respective product kind
+            ex. Current Account, Savings Account
+        visible:
+          type: boolean
+          description: DEPRECATED 2.12.2 AND REPLACED BY `userPreferences.visible`.
+            Indicator whether to show or hide the arrangement on the widget
+        legalEntityIds:
+          type: array
+          description: References to the legal entities that is are owners of the
+            arrangement.
+          items:
+            maxLength: 36
+            type: string
+        productId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+            This is an external product id
+        productTypeName:
+          maxLength: 50
+          type: string
+          description: The label/name that is used to label a specific product type
+        externalLegalEntityId:
+          maxLength: 50
+          type: string
+          description: A unique identifier for the legal entity for which the arrangement
+            is assigned to (this property is being deprecated and its being replaced
+            by legalEntityIds).
+          deprecated: true
+        externalProductId:
+          maxLength: 50
+          type: string
+          description: A unique identifier for the product that the arrangement applies
+            to
+        userPreferences:
+          $ref: '#/components/schemas/AccountUserPreferencesItem'
+        product:
+          $ref: '#/components/schemas/AccountPresentationProductItem'
+        state:
+          $ref: '#/components/schemas/AccountPresentationStateItem'
+        parentId:
+          maxLength: 36
+          type: string
+          description: Indicate if the account has parent child relationship with
+            another account
+        externalArrangementId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique external identifier for the arrangement
+        name:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label a arrangement
+        bookedBalance:
+          type: number
+          description: Amount of money available before any adjustments have been
+            made for deposits in transit, checks that have not yet been cleared, reserve
+            requirements and interest received
+        availableBalance:
+          type: number
+          description: The amount that is available for transactions
+        creditLimit:
+          type: number
+          description: The maximum amount of credit that the financial institution
+            will extend to the account holder for this arrangement
+        IBAN:
+          maxLength: 34
+          pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+          type: string
+          description: Specifying the IBAN - IBAN is short for International Bank
+            Account Number of the account
+        BBAN:
+          maxLength: 50
+          type: string
+          description: Specifying the BBAN of the account - BBAN is short for Basic
+            Bank Account Number. It represents a country-specific bank account number
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+            that qualifies the amount
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed
+        urgentTransferAllowed:
+          type: boolean
+          description: Defines if urgent transfer is allowed
+        accruedInterest:
+          type: number
+          description: The interest that is earned (credit interest) or due (debit
+            interest) but not settled yet
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits
+            will/to be masked. Be aware that using card number differently is potential
+            PCI risk.
+        principalAmount:
+          type: number
+          description: 'The amount that was (originally) contracted for the respective
+            product. This is mainly used in the context of loans and deposits. '
+        currentInvestmentValue:
+          type: number
+          description: The total current value of all the securities kept in the account
+        productNumber:
+          maxLength: 36
+          type: string
+          description: A unique identifier(number) assigned to identify the contract
+            for the product
+        BIC:
+          maxLength: 11
+          type: string
+          description: Bank Identifier Code - international bank code that identifies
+            particular banks worldwide
+        bankBranchCode:
+          maxLength: 20
+          type: string
+          description: This is to accommodate additional country specific fields like
+            Sort Code in UK
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system
+          format: date-time
+        accountInterestRate:
+          type: number
+          description: The annualized cost of credit or debt-capital computed as the
+            percentage ratio of interest to the principal.
+        valueDateBalance:
+          type: number
+          description: The balance of the account on a specific date that needs to
+            be used for the calculation of interest. NB! If no date is specified (like
+            for the book date balance) the current date can be assumed.
+        creditLimitUsage:
+          type: number
+          description: Monetary amount of the used overdraft
+        creditLimitInterestRate:
+          type: number
+          description: Overdraft Interest is an interest applied to the account for
+            any time throughout the month when the account is overdrawn
+        creditLimitExpiryDate:
+          type: string
+          description: The date after which overdraft will no longer be available
+            to the account (renewed automatically or cancelled)
+          format: date-time
+        startDate:
+          type: string
+          description: The date on which the credit card becomes active
+          format: date-time
+        termUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        termNumber:
+          type: number
+          description: Number for the Term Unit for the product arranged between Bank
+            and customer
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        interestPaymentFrequencyNumber:
+          type: number
+          description: Number of times per year when the accumulated interest is settled
+            to the account on a regular basis. The frequency could be yearly, half-yearly,
+            quarterly, monthly, weekly, daily (or not at all, until maturity).
+        maturityDate:
+          type: string
+          description: End term of a holding period
+          format: date-time
+        maturityAmount:
+          type: number
+          description: Amount payable at the end of a holding period of a product
+            (maturity date). For deposit all of the interest is usualy paid at maturity
+            date (IF the term is shorter then one year).
+        autoRenewalIndicator:
+          type: boolean
+          description: Indicates whether or not an arrangement is to be continued
+            after maturity automatically. Usually the product is renewed using the
+            same principal and term unless renegotiation has taken place prior to
+            expiration.
+        interestSettlementAccount:
+          maxLength: 32
+          type: string
+          description: Account for settlement of accumulated interest on a regular
+            basis / Account that provides quick access to accumulated cash to facilitate
+            daily settlements with other businesses
+        outstandingPrincipalAmount:
+          type: number
+          description: The remaining portion of the original loan amount, plus any
+            interest that has been capitalized, that is still owed. Interest accrues
+            on the outstanding principal balance / The value date balance of the arrangement
+        monthlyInstalmentAmount:
+          type: number
+          description: A fixed payment amount paid by a borrower to the bank at a
+            specified date each calendar month.
+        amountInArrear:
+          type: number
+          description: The part of a debt that is overdue after missing one or more
+            required payments. The amount of the arrears is the amount accrued from
+            the date on which the first missed payment was due.
+        minimumRequiredBalance:
+          type: number
+          description: Minimum amount that a customer must have in an account in order
+            to receive some sort of service, such as keeping the account open or receive
+            interest
+        creditCardAccountNumber:
+          maxLength: 32
+          type: string
+          description: The number of the account the credit card transactions settle
+            on (so actually the reference to the settlement account of the card)
+        validThru:
+          type: string
+          description: Expiration date of a credit card, after which is no longer
+            valid
+          format: date-time
+        applicableInterestRate:
+          type: number
+          description: The interest rate or rates which would be used for a particular
+            arrangement
+        remainingCredit:
+          type: number
+          description: Amount of money the user is available to use from the Credit
+            limit of the account
+        outstandingPayment:
+          type: number
+          description: Outstanding payment refers to the outstanding [unpaid] balance,
+            i.e., the current amount due
+        minimumPayment:
+          type: number
+          description: The minimum payment set a percentage of balance, or a fixed
+            cash amount
+        minimumPaymentDueDate:
+          type: string
+          description: Minimum Payment Due Date shown on your monthly statement to
+            remain in good standing
+          format: date-time
+        totalInvestmentValue:
+          type: number
+          description: The value of an asset to its owner, depending on his or her
+            expectations
+        debitCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        accountHolderAddressLine1:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderAddressLine2:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderStreetName:
+          maxLength: 70
+          type: string
+          description: Street name of the Payer/Payee - Alternate street name for
+            the account.
+        town:
+          maxLength: 35
+          type: string
+          description: Town of the Payer/Payee - Alternate town for the account
+        postCode:
+          maxLength: 16
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate post code for the
+            account
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate country sub division
+            for the account
+        accountHolderName:
+          maxLength: 256
+          type: string
+          description: This field is deprecated from 2.17.1 version. It will be removed
+            in 2.19.0 and will be replaced with 'accountHolderNames'
+          deprecated: true
+        accountHolderNames:
+          maxLength: 256
+          type: string
+          description: Party(s) with a relationship to the account.
+        accountHolderCountry:
+          pattern: ^[A-Z]{2}$
+          type: string
+          description: Country of the account holder
+        creditAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as credit account - account to transfer TO
+        debitAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as debit account - account to transfer FROM
+        lastUpdateDate:
+          type: string
+          description: Last date of balance (or other parameter) update for the given
+            arrangement
+          format: date-time
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the customer to label the
+            arrangement
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        externalStateId:
+          maxLength: 50
+          type: string
+          description: External reference to the arrangement state
+        externalParentId:
+          maxLength: 50
+          type: string
+          description: Indicate if the account has parent child relationship with
+            another account
+      x-type-name: ArrangementItem
+    AccountArrangementItemPost:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - externalProductId
+      - currency
+      - externalArrangementId
+      properties:
+        externalLegalEntityIds:
+          type: array
+          items:
+            maxLength: 50
+            minLength: 1
+            type: string
+            description: An external unique identifier for the Legal Entity object.
+        legalEntityIds:
+          type: array
+          items:
+            maxLength: 36
+            minLength: 1
+            type: string
+            description: An internal unique identifier for the Legal Entity object.
+        externalProductId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique identifier for the product that the arrangement applies
+            to
+        externalStateId:
+          maxLength: 50
+          type: string
+          description: External reference to the arrangement state
+        alias:
+          maxLength: 50
+          type: string
+          description: DEPRECATED 2.12.2 AND REPLACED BY `userPreferences`. The name
+            that can be assigned by the bank to label the arrangement.
+        productId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+            This is an external product id
+        externalArrangementId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: A unique external identifier for the arrangement
+        name:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label a arrangement
+        bookedBalance:
+          type: number
+          description: Amount of money available before any adjustments have been
+            made for deposits in transit, checks that have not yet been cleared, reserve
+            requirements and interest received
+        availableBalance:
+          type: number
+          description: The amount that is available for transactions
+        creditLimit:
+          type: number
+          description: The maximum amount of credit that the financial institution
+            will extend to the account holder for this arrangement
+        IBAN:
+          maxLength: 34
+          pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+          type: string
+          description: Specifying the IBAN - IBAN is short for International Bank
+            Account Number of the account
+        BBAN:
+          maxLength: 50
+          type: string
+          description: Specifying the BBAN of the account - BBAN is short for Basic
+            Bank Account Number. It represents a country-specific bank account number
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+            that qualifies the amount
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed
+        urgentTransferAllowed:
+          type: boolean
+          description: Defines if urgent transfer is allowed
+        accruedInterest:
+          type: number
+          description: The interest that is earned (credit interest) or due (debit
+            interest) but not settled yet
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits
+            will/to be masked. Be aware that using card number differently is potential
+            PCI risk.
+        principalAmount:
+          type: number
+          description: 'The amount that was (originally) contracted for the respective
+            product. This is mainly used in the context of loans and deposits. '
+        currentInvestmentValue:
+          type: number
+          description: The total current value of all the securities kept in the account
+        productNumber:
+          maxLength: 36
+          type: string
+          description: A unique identifier(number) assigned to identify the contract
+            for the product
+        BIC:
+          maxLength: 11
+          type: string
+          description: Bank Identifier Code - international bank code that identifies
+            particular banks worldwide
+        bankBranchCode:
+          maxLength: 20
+          type: string
+          description: This is to accommodate additional country specific fields like
+            Sort Code in UK
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system
+          format: date-time
+        accountInterestRate:
+          type: number
+          description: The annualized cost of credit or debt-capital computed as the
+            percentage ratio of interest to the principal.
+        valueDateBalance:
+          type: number
+          description: The balance of the account on a specific date that needs to
+            be used for the calculation of interest. NB! If no date is specified (like
+            for the book date balance) the current date can be assumed.
+        creditLimitUsage:
+          type: number
+          description: Monetary amount of the used overdraft
+        creditLimitInterestRate:
+          type: number
+          description: Overdraft Interest is an interest applied to the account for
+            any time throughout the month when the account is overdrawn
+        creditLimitExpiryDate:
+          type: string
+          description: The date after which overdraft will no longer be available
+            to the account (renewed automatically or cancelled)
+          format: date-time
+        startDate:
+          type: string
+          description: The date on which the credit card becomes active
+          format: date-time
+        termUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        termNumber:
+          type: number
+          description: Number for the Term Unit for the product arranged between Bank
+            and customer
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        interestPaymentFrequencyNumber:
+          type: number
+          description: Number of times per year when the accumulated interest is settled
+            to the account on a regular basis. The frequency could be yearly, half-yearly,
+            quarterly, monthly, weekly, daily (or not at all, until maturity).
+        maturityDate:
+          type: string
+          description: End term of a holding period
+          format: date-time
+        maturityAmount:
+          type: number
+          description: Amount payable at the end of a holding period of a product
+            (maturity date). For deposit all of the interest is usualy paid at maturity
+            date (IF the term is shorter then one year).
+        autoRenewalIndicator:
+          type: boolean
+          description: Indicates whether or not an arrangement is to be continued
+            after maturity automatically. Usually the product is renewed using the
+            same principal and term unless renegotiation has taken place prior to
+            expiration.
+        interestSettlementAccount:
+          maxLength: 32
+          type: string
+          description: Account for settlement of accumulated interest on a regular
+            basis / Account that provides quick access to accumulated cash to facilitate
+            daily settlements with other businesses
+        outstandingPrincipalAmount:
+          type: number
+          description: The remaining portion of the original loan amount, plus any
+            interest that has been capitalized, that is still owed. Interest accrues
+            on the outstanding principal balance / The value date balance of the arrangement
+        monthlyInstalmentAmount:
+          type: number
+          description: A fixed payment amount paid by a borrower to the bank at a
+            specified date each calendar month.
+        amountInArrear:
+          type: number
+          description: The part of a debt that is overdue after missing one or more
+            required payments. The amount of the arrears is the amount accrued from
+            the date on which the first missed payment was due.
+        minimumRequiredBalance:
+          type: number
+          description: Minimum amount that a customer must have in an account in order
+            to receive some sort of service, such as keeping the account open or receive
+            interest
+        creditCardAccountNumber:
+          maxLength: 32
+          type: string
+          description: The number of the account the credit card transactions settle
+            on (so actually the reference to the settlement account of the card)
+        validThru:
+          type: string
+          description: Expiration date of a credit card, after which is no longer
+            valid
+          format: date-time
+        applicableInterestRate:
+          type: number
+          description: The interest rate or rates which would be used for a particular
+            arrangement
+        remainingCredit:
+          type: number
+          description: Amount of money the user is available to use from the Credit
+            limit of the account
+        outstandingPayment:
+          type: number
+          description: Outstanding payment refers to the outstanding [unpaid] balance,
+            i.e., the current amount due
+        minimumPayment:
+          type: number
+          description: The minimum payment set a percentage of balance, or a fixed
+            cash amount
+        minimumPaymentDueDate:
+          type: string
+          description: Minimum Payment Due Date shown on your monthly statement to
+            remain in good standing
+          format: date-time
+        totalInvestmentValue:
+          type: number
+          description: The value of an asset to its owner, depending on his or her
+            expectations
+        debitCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        accountHolderAddressLine1:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderAddressLine2:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account
+        accountHolderStreetName:
+          maxLength: 70
+          type: string
+          description: Street name of the Payer/Payee - Alternate street name for
+            the account.
+        town:
+          maxLength: 35
+          type: string
+          description: Town of the Payer/Payee - Alternate town for the account
+        postCode:
+          maxLength: 16
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate post code for the
+            account
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Post Code of the Payer/Payee - - Alternate country sub division
+            for the account
+        accountHolderName:
+          maxLength: 256
+          type: string
+          description: This field is deprecated from 2.17.1 version. It will be removed
+            in 2.19.0 and will be replaced with 'accountHolderNames'
+          deprecated: true
+        accountHolderNames:
+          maxLength: 256
+          type: string
+          description: Party(s) with a relationship to the account.
+        accountHolderCountry:
+          pattern: ^[A-Z]{2}$
+          type: string
+          description: Country of the account holder
+        creditAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as credit account - account to transfer TO
+        debitAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as debit account - account to transfer FROM
+        lastUpdateDate:
+          type: string
+          description: Last date of balance (or other parameter) update for the given
+            arrangement
+          format: date-time
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the customer to label the
+            arrangement
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        externalParentId:
+          maxLength: 50
+          type: string
+          description: Indicate if the account has parent child relationship with
+            another account
+      x-type-name: ArrangementsPostRequestBody
+    AccountArrangementItems:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - arrangementElements
+      - totalElements
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: total number of elements matching the query
+        arrangementElements:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountArrangementItem'
+    AccountArrangementPutItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      type: object
+      properties:
+        name:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the bank to label a arrangement.
+        bankAlias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the customer to label the
+            arrangement.
+        bookedBalance:
+          type: number
+          description: Amount of money available before any adjustments have been
+            made for deposits in transit, checks that have not yet been cleared, reserve
+            requirements and interest received.
+        availableBalance:
+          type: number
+          description: The amount that is available for transactions.
+        creditLimit:
+          type: number
+          description: The maximum amount of credit that the financial institution
+            will extend to the account holder for this arrangement.
+        IBAN:
+          maxLength: 34
+          pattern: ^(AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW).*
+          type: string
+          description: Specifying the IBAN - IBAN is short for International Bank
+            Account Number of the account
+        BBAN:
+          maxLength: 50
+          type: string
+          description: Specifying the BBAN of the account - BBAN is short for Basic
+            Bank Account Number. It represents a country-specific bank account number
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: The alpha-3 code (complying with ISO 4217) of the currency
+            that qualifies the amount
+        externalTransferAllowed:
+          type: boolean
+          description: Defines if transfer to another party is allowed.
+        urgentTransferAllowed:
+          type: boolean
+          description: Defines if urgent transfer is allowed.
+        accruedInterest:
+          type: number
+          description: The interest that is earned (credit interest) or due (debit
+            interest) but not settled yet.
+        number:
+          maxLength: 36
+          type: string
+          description: First 6 and/or last 4 digits of a Payment card. All other digits
+            will/to be masked. Be aware that using card number differently is potential
+            PCI risk.
+        principalAmount:
+          type: number
+          description: The amount that was (originally) contracted for the respective
+            product. This is mainly used in the context of loans and deposits.
+        currentInvestmentValue:
+          type: number
+          description: The total current value of all the securities kept in the account.
+        productNumber:
+          maxLength: 36
+          type: string
+          description: A unique identifier(number) assigned to identify the contract
+            for the product
+        BIC:
+          maxLength: 11
+          type: string
+          description: Bank Identifier Code - international bank code that identifies
+            particular banks worldwide
+        bankBranchCode:
+          maxLength: 20
+          type: string
+          description: (This is to accommodate additional country specific fields
+            like Sort Code in UK)
+        accountOpeningDate:
+          type: string
+          description: The date of activation of the account in the bank's system.
+          format: date-time
+        accountInterestRate:
+          type: number
+          description: The annualized cost of credit or debt-capital computed as the
+            percentage ratio of interest to the principal.
+        valueDateBalance:
+          type: number
+          description: The balance of the account on a specific date that needs to
+            be used for the calculation of interest. NB! If no date is specified (like
+            for the book date balance) the current date can be assumed.
+        creditLimitUsage:
+          type: number
+          description: Monetary amount of the used overdraft.
+        creditLimitInterestRate:
+          type: number
+          description: Overdraft Interest is an interest applied to the account for
+            any time throughout the month when the account is overdrawn.
+        creditLimitExpiryDate:
+          type: string
+          description: The date after which overdraft will no longer be available
+            to the account (renewed automatically or cancelled).
+          format: date-time
+        debitCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitCardItem'
+        startDate:
+          type: string
+          description: The date on which the credit card becames active
+          format: date-time
+        termUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        termNumber:
+          type: number
+          description: Number for the Term Unit for the product arranged between Bank
+            and customer
+        maturityDate:
+          type: string
+          description: End term of a holding period.
+          format: date-time
+        maturityAmount:
+          type: number
+          description: Amount payable at the end of a holding period of a product
+            (maturity date). For deposit all of the interest is usualy paid at maturity
+            date (IF the term is shorter then one year).
+        autoRenewalIndicator:
+          type: boolean
+          description: Indicates whether or not an arrangement is to be continued
+            after maturity automatically. Usually the product is renewed using the
+            same principal and term unless renegotiation has taken place prior to
+            expiration.
+        interestPaymentFrequencyUnit:
+          $ref: '#/components/schemas/TimeUnit'
+        interestPaymentFrequencyNumber:
+          type: number
+          description: Number of times per year when the accumulated interest is settled
+            to the account on a regular basis. The frequency could be yearly, half-yearly,
+            quarterly, monthly, weekly, daily (or not at all, until maturity)
+        interestSettlementAccount:
+          maxLength: 32
+          type: string
+          description: Account for settlement of accumulated interest on a regular
+            basis / Account that provides quick access to accumulated cash to facilitate
+            daily settlements with other businesses
+        outstandingPrincipalAmount:
+          type: number
+          description: The remaining portion of the original loan amount, plus any
+            interest that has been capitalized, that is still owed. Interest accrues
+            on the outstanding principal balance / The value date balance of the arrangement
+        monthlyInstalmentAmount:
+          type: number
+          description: A fixed payment amount paid by a borrower to the bank at a
+            specified date each calendar month.
+        amountInArrear:
+          type: number
+          description: The part of a debt that is overdue after missing one or more
+            required payments. The amount of the arrears is the amount accrued from
+            the date on which the first missed payment was due.
+        minimumRequiredBalance:
+          type: number
+          description: Minimum amount that a customer must have in an account in order
+            to receive some sort of service, such as keeping the account open or receive
+            interest.
+        creditCardAccountNumber:
+          maxLength: 32
+          type: string
+          description: The number of the account the credit card transactions settle
+            on (so actually the reference to the settlement account of the card)?
+        validThru:
+          type: string
+          description: Expiration date of a credit card, after which is no longer
+            valid.
+          format: date-time
+        applicableInterestRate:
+          type: number
+          description: The interest rate or rates which would be used for a particular
+            arrangement.
+        remainingCredit:
+          type: number
+          description: Amount of money the user is available to use from the Credit
+            limit of the account
+        outstandingPayment:
+          type: number
+          description: Outstanding payment refers to the outstanding [unpaid] balance,
+            i.e., the current amount due.
+        minimumPayment:
+          type: number
+          description: The minimum payment set a percentage of balance, or a fixed
+            cash amount.
+        minimumPaymentDueDate:
+          type: string
+          description: Minimum Payment Due Date shown on your monthly statement to
+            remain in good standing.
+          format: date-time
+        totalInvestmentValue:
+          type: number
+          description: The value of an asset to its owner, depending on his or her
+            expectations
+        accountHolderAddressLine1:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account.
+        accountHolderAddressLine2:
+          maxLength: 70
+          type: string
+          description: Address of the Payer/Payee - Alternate address line for the
+            account.
+        accountHolderStreetName:
+          maxLength: 70
+          type: string
+          description: Street name of the Payer/Payee - Alternate street name for
+            the account.
+        town:
+          maxLength: 35
+          type: string
+          description: Town of the Payer/Payee - Alternate town for the account.
+        postCode:
+          maxLength: 16
+          type: string
+          description: Post Code of the Payer/Payee
+        countrySubDivision:
+          maxLength: 35
+          type: string
+          description: Country SubDivision of the Payer/Payee
+        accountHolderName:
+          maxLength: 256
+          type: string
+          description: This field is deprecated from 2.17.1 version. It will be removed
+            in 2.19.0 and will be replaced with 'accountHolderNames'
+          deprecated: true
+        accountHolderNames:
+          maxLength: 256
+          type: string
+          description: Party(s) with a relationship to the account.
+        accountHolderCountry:
+          pattern: ^[A-Z]{2}$
+          type: string
+          description: Country of the account holder
+        creditAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as credit account - account to transfer TO
+        debitAccount:
+          type: boolean
+          description: Indicator whether or not the arrangement can be used in payment
+            orders as debit account - account to transfer FROM
+        lastUpdateDate:
+          type: string
+          description: Last date of balance (or other) parameter update for the particular
+            arrangement
+          format: date-time
+        sourceId:
+          maxLength: 11
+          type: string
+          description: Indicate if the account is regular or external
+        stateId:
+          type: integer
+          description: Internal reference to the arrangement state.
+          format: int32
+        parentId:
+          maxLength: 36
+          type: string
+          description: Indicate if the account is regular or external
+        externalParentId:
+          maxLength: 50
+          type: string
+          description: Indicate if the account is regular or external
+        productId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Reference to the product of which the arrangement is an instantiation.
+    AccountArrangementsDelete:
+      type: array
+      description: List of delete items used to identify the arrangements to be deleted
+      items:
+        $ref: '#/components/schemas/AccountArrangementsDeleteItem'
+    AccountArrangementsDeleteItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - selector
+      - value
+      type: object
+      properties:
+        selector:
+          type: string
+          description: Selector used to identify the arrangement
+          enum:
+          - ID
+          - EXTERNAL_ID
+        value:
+          minLength: 1
+          type: string
+          description: Value of the selector
+      description: Item used to identify an arrangement
+    AccountArrangementsDeleteResponse:
+      type: array
+      description: List of delete items used to identify the arrangements to be deleted
+      items:
+        $ref: '#/components/schemas/AccountArrangementsDeleteResponseItem'
+    AccountArrangementsDeleteResponseItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - status
+      - selector
+      - value
+      properties:
+        status:
+          $ref: '#/components/schemas/BatchResponseStatusCode'
+        errors:
+          type: array
+          description: List of error messages
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+        selector:
+          type: string
+          description: Selector used to identify the arrangement
+          enum:
+          - ID
+          - EXTERNAL_ID
+        value:
+          minLength: 1
+          type: string
+          description: Value of the selector
+    AccountArrangementsFilter:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      type: object
+      properties:
+        arrangementIds:
+          type: array
+          description: A list of arrangements ids for querying database
+          items:
+            maxLength: 36
+            type: string
+        ignoreArrangementIds:
+          type: array
+          description: ' A list of arrangements ids to ignore when querying database'
+          items:
+            maxLength: 36
+            type: string
+        bbans:
+          type: array
+          description: A list of BBAN identifiers for querying database
+          items:
+            maxLength: 50
+            type: string
+        bankBranchCodes:
+          type: array
+          description: A list of bank branch codes for querying database
+          items:
+            maxLength: 36
+            type: string
+        iban:
+          maxLength: 34
+          minLength: 5
+          type: string
+          description: IBAN (internationally agreed system of identifying bank accounts
+            across national borders) for querying database
+        externalArrangementIds:
+          type: array
+          description: A list of external arrangements ids for querying database
+          items:
+            maxLength: 50
+            type: string
+        externalTransferAllowed:
+          type: boolean
+          description: External transfer allowed flag
+        creditAccount:
+          type: boolean
+          description: Credit account flag
+        debitAccount:
+          type: boolean
+          description: Debit account flag
+        parentIds:
+          type: array
+          description: A list of parent arrangements ids for querying database. Use
+            to find child arrangements
+          items:
+            maxLength: 36
+            type: string
+        externalParentIds:
+          type: array
+          description: A list of external arrangements ids for querying database.
+            Use to find child arrangements
+          items:
+            maxLength: 50
+            type: string
+        productKindIds:
+          type: array
+          description: An array of product kind ids
+          items:
+            type: integer
+            format: int32
+        productKindName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Product kind name
+        searchTerm:
+          maxLength: 256
+          type: string
+          description: 'Full text search for the following arrangement attributes
+            name,bankAlias,number,BBAN,IBAN,BIC,bankBranchCode and product attributes:
+            productKindName, productTypeName'
+        legalEntityIds:
+          type: array
+          description: An array of legal Entities internal ids to filter by
+          items:
+            maxLength: 50
+            type: string
+        userId:
+          maxLength: 36
+          type: string
+          description: The user identifier
+        favorite:
+          type: boolean
+          description: Favorite flag
+        subEntitiesFetches:
+          type: array
+          description: 'an array of sub entities to fetch along with the root arrangement
+            object: legalEntities, userFavoriteArrangements'
+          items:
+            type: string
+            enum:
+            - legalEntities
+            - userFavoriteArrangements
+            x-type-name: ArrangementFilterParamsSubEntitiesFetches
+        customOrder:
+          type: boolean
+          description: Parameter that identifies weather the returned list should
+            be ordered by custom order/grouping
+        favoriteFirst:
+          type: boolean
+          description: Parameter that sets favorite arrangements on top when true
+        sourceId:
+          maxLength: 11
+          type: string
+          description: The source ID
+        locale:
+          maxLength: 8
+          minLength: 2
+          type: string
+          description: The locale used for searchTerm (e.g. nl_NL)
+        from:
+          type: integer
+          description: Page Number. Skip over pages of elements by specifying a start
+            value for the query
+          format: int32
+        size:
+          type: integer
+          description: Page Number. Skip over pages of elements by specifying a start
+            value for the query. If this parameter is missing then no pagination is
+            assumed.
+          format: int32
+        orderBy:
+          type: array
+          items:
+            type: string
+            enum:
+            - name
+            - bankAlias
+            - bookedBalance
+            - availableBalance
+            - creditLimit
+            - IBAN
+            - BBAN
+            - currency
+            - externalTransferAllowed
+            - urgentTransferAllowed
+            - accruedInterest
+            - Number
+            - principalAmount
+            - currentInvestmentValue
+            - legalEntityId
+            - productId
+            - productNumber
+            - accountOpeningDate
+            - accountInterestRate
+            - valueDateBalance
+            - creditLimitUsage
+            - creditLimitInterestRate
+            - creditLimitExpiryDate
+            - debitCards
+            - startDate
+            - termUnit
+            - termNumber
+            - maturityDate
+            - maturityAmount
+            - autoRenewalIndicator
+            - interestPaymentFrequencyUnit
+            - interestPaymentFrequencyNumber
+            - interestSettlementAccount
+            - outstandingPrincipalAmount
+            - monthlyInstalmentAmount
+            - amountInArrear
+            - minimumRequiredBalance
+            - creditCardAccountNumber
+            - validThru
+            - applicableInterestRate
+            - remainingCredit
+            - outstandingPayment
+            - minimumPayment
+            - minimumPaymentDueDate
+            - totalInvestmentValue
+            - accountHolderAddressLine1
+            - accountHolderAddressLine2
+            - accountHolderStreetName
+            - postCode
+            - town
+            - countrySubDivision
+            - accountHolderCountry
+            - creditAccount
+            - debitAccount
+            - productKindName
+            - sourceId
+            - BIC
+            - productTypeName
+            x-type-name: ArrangementFilterParamsOrderBy
+        direction:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          x-type-name: ArrangementFilterParamsDirection
+      x-type-name: ArrangementFilterParams
+    AccountArrangementsLegalEntities:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - arrangementsLegalEntities
+      type: object
+      properties:
+        arrangementsLegalEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountPresentationArrangementLegalEntityIds'
+      description: Container for a list of unique internal Arrangement identifiers.
+      x-type-name: PresentationArrangementsLegalEntitiesBody
+
+    BalanceHistoryFilterRequest:
+      $ref: schemas/balance-history/balance-history-filter-request.yaml
+    BalanceHistoryFilterResponse:
+      $ref: schemas/balance-history/balance-history-filter-response.yaml
+    BalanceHistoryAddRequest:
+      $ref: schemas/accounts/balance-history-add-request.yaml
+    BalanceHistoryAddResponse:
+      $ref: schemas/accounts/balance-history-add-response.yaml
+    AccountBalanceItems:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountBalanceItem'
+    AccountBalanceItem:
+      required:
+      - arrangementId
+      - availableBalance
+      - bookedBalance
+      type: object
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      properties:
+        arrangementId:
+          type: string
+          description: A unique identifier for the Arrangement object that is generated
+            and used Internally in DBS
+        bookedBalance:
+          type: number
+          description: Amount of money available before any adjustments have been
+            made for deposits in transit, checks that have not yet been cleared, reserve
+            requirements and interest received
+        availableBalance:
+          type: number
+          description: The amount that is available for transactions
+        creditLimit:
+          type: number
+          description: The maximum amount of credit that the financial institution
+            will extend to the account holder for this arrangement
+        outstandingPrincipalAmount:
+          type: number
+          description: ' The value date balance of the arrangement'
+        currentInvestmentValue:
+          type: number
+          description: The total current value of all the securities kept in the account
+    AccountBatchResponseItemExtended:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - resourceId
+      - status
+      properties:
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: Arrangement id
+        action:
+          $ref: '#/components/schemas/AccountPersistenceAction'
+        resourceId:
+          minLength: 1
+          type: string
+          description: Id of the resource
+        status:
+          $ref: '#/components/schemas/BatchResponseStatusCode'
+        errors:
+          type: array
+          description: List of error messages
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      x-type-name: BatchResponseItemExtended
+    AccountBatchUpsertArrangement:
+      type: array
+      description: List of arrangements post used to create or update arrangements
+      items:
+        $ref: '#/components/schemas/AccountArrangementItemPost'
+    AccountBatchUpsertArrangementsPostResponseBody:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountBatchResponseItemExtended'
+    AccountExternalLegalEntityIds:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            maxLength: 50
+            type: string
+            description: A unique identifier for the Legal Entity object coming from
+              the core banking system.
+      description: Container for a list of external unique identifiers for the Legal
+        Entities related to the arrangement.
+      x-type-name: ExternalLegalEntitiesIdsBody
+    AccountInternalIdGetResponseBody:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - internalId
+      type: object
+      properties:
+        internalId:
+          type: string
+    AccountPersistenceAction:
+      type: string
+      description: Persistence action
+      enum:
+      - add
+      - remove
+      - update
+      x-type-name: PersistenceAction
+      x-java-enum-names:
+        present: true
+    AccountPresentationArrangementLegalEntityIds:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - arrangementId
+      - legalEntityIds
+      type: object
+      properties:
+        arrangementId:
+          maxLength: 36
+          type: string
+          description: A unique identifier for the arrangement.
+        legalEntityIds:
+          type: array
+          items:
+            maxLength: 36
+            type: string
+      x-type-name: PresentationArrangementLegalEntityIds
+    AccountPresentationProductItem:
+      allOf:
+        - $ref: '#/components/schemas/ExternalProductItem'
+      type: object
+      properties:
+        id:
+          maxLength: 50
+          type: string
+          description: A unique identifier for the product.
+        translations:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/TranslationItem'
+    ExternalProductKindItemExtended:
+      $ref: schemas/product-kind/product-kind-item-extended.yaml
+    ExternalProductKindItemPut:
+      $ref: schemas/product-kind/product-kind-item-put.yaml
+    AccountPresentationStateItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      type: object
+      properties:
+        externalStateId:
+          maxLength: 50
+          type: string
+          description: An external unique identifier for the arrangement state object.
+        state:
+          maxLength: 50
+          type: string
+          description: Name that describes the specific arrangement state.
+      x-type-name: PresentationStateItem
+    AccountProductId:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internally used unique identification
+      description: Object that defines an id attribute only.
+    AccountProductKindId:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: A unique identifier for an object that is generated and used
+            Internally in DBS.
+          format: int32
+      description: Object that defines an id attribute only.
+      x-type-name: PresentationProductKindId
+    AccountRecipientArrangements:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountArrangementItem'
+    AccountStateItem:
+      required:
+      - externalStateId
+      - state
+      type: object
+      properties:
+        externalStateId:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: unique external identifier for the state
+        state:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: 'unique identifier for the state. Example: Active'
+        description:
+          maxLength: 200
+          type: string
+          description: description of the state
+      x-type-name: PersistenceStateItem
+    AccountStateItemId:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: A unique identifier for an object that is generated and used
+            internally in DBS.
+          format: int32
+      x-type-name: PersistenceStateId
+    AccountStateListResponse:
+      required:
+      - states
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountStateStateItem'
+      x-type-name: PersistenceStateWrapper
+    AccountStateStateItem:
+      required:
+      - externalStateId
+      - id
+      - state
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        externalStateId:
+          maxLength: 50
+          minLength: 1
+          type: string
+        state:
+          maxLength: 50
+          minLength: 1
+          type: string
+        description:
+          maxLength: 200
+          type: string
+    AccountUserPreferencesItem:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - arrangementId
+      type: object
+      properties:
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The unique Arrangement identifier related to these user preferences
+        alias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the user to label the arrangement
+        visible:
+          type: boolean
+          description: User indicator whether to show or hide the arrangement on the
+            front end
+        favorite:
+          type: boolean
+          description: Indication whether an arrangement can be favorable for a user
+      description: 'User defined preferences for a specific arrangement. Note: each
+        user might have different preferences'
+      x-type-name: PresentationUserPreferencesItem
+    AccountUserPreferencesItemPut:
+      allOf:
+        - $ref: shared/schemas/additional-properties.yaml
+      required:
+      - arrangementId
+      - userId
+      type: object
+      properties:
+        arrangementId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The unique Arrangement identifier related to these user preferences
+        userId:
+          maxLength: 36
+          minLength: 1
+          type: string
+          description: The unique User identifier related to these user preferences
+        alias:
+          maxLength: 50
+          type: string
+          description: The name that can be assigned by the user to label the arrangement
+        visible:
+          type: boolean
+          description: User indicator whether to show or hide the arrangement on the
+            front end
+        favorite:
+          type: boolean
+          description: Indication whether an arrangement can be favorable for a user
+      description: 'User defined preferences for a specific arrangement. Note: each
+        user might have different preferences'
+
+    # products
+    AccountProductsGet:
+      $ref: schemas/products/products-get.yaml
+    AccountSchemasProductItem:
+      $ref: schemas/products/product-item.yaml
+    AccountProductItem:
+      $ref: schemas/products/external-domain/product-item-base.yaml
+
+    ### begin commons
+    ApiError:
+      $ref: shared/errors/api-error.yaml
+    BadRequestError:
+      $ref: shared/errors/bad-request-error.yaml
+    ErrorAwareApi:
+      $ref: shared/errors/error-aware-api.yaml
+    ErrorItem:
+      $ref: shared/errors/error-item.yaml
+    ForbiddenError:
+      $ref: shared/errors/forbidden-error.yaml
+    InternalServerError:
+      $ref: shared/errors/internal-server-error.yaml
+    NotAcceptableError:
+      $ref: shared/errors/not-acceptable-error.yaml
+    NotFoundError:
+      $ref: shared/errors/not-found-error.yaml
+    UnauthorizedError:
+      $ref: shared/errors/unauthorized-error.yaml
+    UnsupportedMediaTypeError:
+      $ref: shared/errors/unsupported-media-type-error.yaml
+    AdditionalProperties:
+      $ref: shared/schemas/additional-properties.yaml
+    AggregatedBalance:
+      $ref: shared/schemas/balances/base-aggregated-balance.yaml
+    AggregatedBalances:
+      $ref: shared/schemas/balances/base-aggregated-balances.yaml
+    AccountAggregatedBalanceCurrencies:
+      $ref: shared/schemas/balances/aggregated-balance-currencies.yaml
+    BatchResponseStatusCode:
+      $ref: shared/schemas/batch-response-status-code.yaml
+    ConflictError:
+      $ref: shared/schemas/conflict-error.yaml
+    CurrencyType:
+      $ref: shared/schemas/currency-type.yaml
+    DebitCardItem:
+      $ref: shared/schemas/debit-card-item.yaml
+    ExternalProductItem:
+      $ref: shared/schemas/products/external-domain/product-item.yaml
+    ExternalProductKindItem:
+      $ref: shared/schemas/product-kind/external-domain/external-product-kind-item.yaml
+    LocaleTranslationItem:
+      $ref: shared/schemas/locale-translation-item.yaml
+    OrderByField:
+      $ref: shared/schemas/order-by-field.yaml
+    ProductKindItem:
+      $ref: shared/schemas/product-kind/product-kind-item.yaml
+    ProductKindsResult:
+      $ref: shared/schemas/product-kind/product-kinds-result.yaml
+    SortDirection:
+      $ref: shared/schemas/sort-direction.yaml
+    StateItem:
+      $ref: shared/schemas/state-item.yaml
+    ProductItem:
+      $ref: shared/schemas/summary/product-item.yaml
+    ProductSummaryFlatStructure:
+      $ref: shared/schemas/summary/product-summary-flat-structure.yaml
+    ProductSummaryItem:
+      $ref: shared/schemas/summary/product-summary-item.yaml
+    SummaryProductKindItem:
+      $ref: shared/schemas/summary/summary-product-kind-item.yaml
+    UserPreferences:
+      $ref: shared/schemas/summary/user-preferences.yaml
+    TimePeriod:
+      $ref: shared/schemas/time-period.yaml
+    TimeUnit:
+      $ref: shared/schemas/time-unit.yaml
+    TranslationItem:
+      $ref: shared/schemas/translation-item.yaml
+    ### end commons
+
+  parameters:
+    header-accept:
+      $ref: shared/parameters/header/accept.yaml
+    header-content-language:
+      $ref: shared/parameters/header/content-language.yaml
+    path-arrangement-id:
+      $ref: shared/parameters/path/arrangement-id.yaml
+    query-arrangement-ids:
+      $ref: shared/parameters/query/arrangement-ids.yaml
+    query-business-function-req:
+      $ref: shared/parameters/query/business-function-req.yaml
+    query-credit-account:
+      $ref: shared/parameters/query/credit-account.yaml
+    query-cursor:
+      $ref: shared/parameters/query/cursor.yaml
+    query-custom-order:
+      $ref: shared/parameters/query/custom-order.yaml
+    query-date-from:
+      $ref: shared/parameters/query/date-from.yaml
+    query-date-to:
+      $ref: shared/parameters/query/date-to.yaml
+    query-debit-account:
+      $ref: shared/parameters/query/debit-account.yaml
+    query-external-transfer-allowed:
+      $ref: shared/parameters/query/external-transfer-allowed.yaml
+    query-favorite-first:
+      $ref: shared/parameters/query/favorite-first.yaml
+    query-favorite:
+      $ref: shared/parameters/query/favorite.yaml
+    query-favourite-first:
+      $ref: shared/parameters/query/favourite-first.yaml
+    query-from:
+      $ref: shared/parameters/query/from.yaml
+    query-ignored-arrangement-ids:
+      $ref: shared/parameters/query/ignored-arrangement-ids.yaml
+    query-legal-entity-ids-req:
+      $ref: shared/parameters/query/legal-entity-ids-req.yaml
+    query-legal-entity-ids:
+      $ref: shared/parameters/query/legal-entity-ids.yaml
+    query-mask-indicator:
+      $ref: shared/parameters/query/mask-indicator.yaml
+    query-order-by:
+      $ref: shared/parameters/query/order-by.yaml
+    query-privilege:
+      $ref: shared/parameters/query/privilege.yaml
+    query-product-kind-name:
+      $ref: shared/parameters/query/product-kind-name.yaml
+    query-resource-name-req:
+      $ref: shared/parameters/query/resource-name-req.yaml
+    query-search-term:
+      $ref: shared/parameters/query/search-term.yaml
+    query-size:
+      $ref: shared/parameters/query/size.yaml
+    query-sort-direction:
+      $ref: shared/parameters/query/sort-direction.yaml
+    query-source-id:
+      $ref: shared/parameters/query/source-id.yaml
+    query-time-period:
+      $ref: shared/parameters/query/time-period.yaml
+    query-time-unit:
+      $ref: shared/parameters/query/time-unit.yaml
+    query-with-latest-balance:
+      $ref: shared/parameters/query/with-latest-balance.yaml
+
+  responses:
+    400:
+      description: BadRequest
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+          example:
+            $ref: lib/examples/bad-request-validation-error.json
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            $ref: lib/examples/unauthorized-error.json
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+          example:
+            $ref: lib/examples/forbidden-error.json
+    404:
+      description: NotFound
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+          example:
+            $ref: lib/examples/not-found-error.json
+    406:
+      description: NotAcceptable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAcceptableError'
+          example:
+            $ref: lib/examples/not-acceptable-error.json
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+          example:
+            $ref: lib/examples/conflict-error.json
+    415:
+      description: UnsupportedMediaType
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            $ref: lib/examples/unsupported-media-type-error.json
+    500:
+      description: InternalServerError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+          example:
+            $ref: lib/examples/internal-server-error.json

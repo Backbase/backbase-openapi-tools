@@ -1,0 +1,10 @@
+title: AdditionalProperties
+type: object
+x-implements: com.backbase.buildingblocks.persistence.model.AdditionalPropertiesAware
+x-abstract: true
+properties:
+  additions:
+    type: object
+    additionalProperties:
+      type: string
+description: Additional Properties

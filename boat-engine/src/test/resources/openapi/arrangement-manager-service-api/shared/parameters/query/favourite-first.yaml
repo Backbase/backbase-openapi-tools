@@ -1,0 +1,7 @@
+name: favoriteFirst
+in: query
+description: Parameter that sets favorite arrangements on top when true
+required: false
+schema:
+  type: boolean
+  default: false

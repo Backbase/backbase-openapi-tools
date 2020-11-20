@@ -1,0 +1,19 @@
+title: CurrencyType
+type: object
+allOf:
+  - $ref: additional-properties.yaml
+properties:
+  amount:
+    description: The amount in the specified currency
+    type: string
+    minimum: -1000000000000000000
+    exclusiveMinimum: true
+    maximum: 1000000000000000000
+    exclusiveMaximum: true
+  currencyCode:
+    type: string
+    pattern: ^[A-Z]{3}$
+    description: The alpha-3 code (complying with ISO 4217) of the currency that qualifies the amount.
+required:
+  - amount
+  - currencyCode

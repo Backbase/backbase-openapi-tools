@@ -1,0 +1,10 @@
+name: from
+in: query
+description: Page Number. Skip over pages of elements by specifying a start
+  value for the query
+required: false
+schema:
+  type: integer
+  format: int32
+  default: 0
+example: 20

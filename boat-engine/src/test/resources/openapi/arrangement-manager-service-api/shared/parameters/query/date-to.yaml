@@ -1,0 +1,8 @@
+name: dateTo
+in: query
+description: Top value of date range
+required: false
+schema:
+  type: string
+  format: date-time
+example: 2017-01-28T16:41:41.090Z

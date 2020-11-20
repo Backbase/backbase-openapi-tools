@@ -1,0 +1,8 @@
+name: resourceName
+in: query
+description: Provide the resource for retrieving arrangements
+required: true
+schema:
+  type: string
+example:
+  Product Summary

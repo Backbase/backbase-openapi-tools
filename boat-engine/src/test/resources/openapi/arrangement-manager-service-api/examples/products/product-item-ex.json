@@ -1,0 +1,27 @@
+{
+  "externalProductId": "externalProductId",
+  "externalProductKindId": "externalProductKindId",
+  "productKindName": "Current Account",
+  "externalProductTypeId": "externalProductTypeId",
+  "productTypeName": "Custom Current Account",
+  "translations": [
+    {
+      "locale": "de_DE",
+      "localeTranslations": [
+        {
+          "fieldName": "type_name",
+          "fieldValue": "Benutzerdefiniertes Girokonto"
+        }
+      ]
+    },
+    {
+      "locale":"ar_JO",
+      "localeTranslations": [
+        {
+          "fieldName": "type_name",
+          "fieldValue": "الحساب الجاري المخصص"
+        }
+      ]
+    }
+  ]
+}

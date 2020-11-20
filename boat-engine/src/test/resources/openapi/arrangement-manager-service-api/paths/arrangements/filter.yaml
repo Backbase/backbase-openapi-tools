@@ -1,0 +1,28 @@
+summary: /filter
+description: Filter Arrangements
+post:
+  tags:
+  - arrangements
+  description: 'Arrangements retrieval mechanism with the following features:
+    filters, searching, sorting and pagination.'
+  operationId: postFilter
+  requestBody:
+    description: 'Arrangements retrieval mechanism with the following features:
+      filters, searching, sorting and pagination.'
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/AccountArrangementsFilter'
+  responses:
+    200:
+      description: Filters arrangements by given parameters
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountArrangementItems'
+          example:
+            $ref: '../../examples/arrangements/arrangement-items-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

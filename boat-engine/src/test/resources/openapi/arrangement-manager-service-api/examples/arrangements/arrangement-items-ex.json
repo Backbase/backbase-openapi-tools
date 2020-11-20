@@ -1,0 +1,208 @@
+{
+  "totalElements": 2,
+  "arrangementElements": [
+    {
+      "id": "1cdb2224-8926-4b4d-a99f-1c9dfbbb4699",
+      "externalArrangementId": "d64c31c4-50e4-11e7-b114-b2f933d5fe66",
+      "name": "Spending fee",
+      "bookedBalance": 100.1,
+      "availableBalance": 100.2,
+      "creditLimit": 100.3,
+      "IBAN": "GB29NWBK60161331926819",
+      "BBAN": "BBAN",
+      "currency": "EUR",
+      "bankAlias": "Secret account",
+      "externalTransferAllowed": true,
+      "urgentTransferAllowed": false,
+      "accruedInterest": 3.3,
+      "number": "PANSuffix",
+      "principalAmount": 100.4,
+      "currentInvestmentValue": 100.5,
+      "productNumber": "productNumber",
+      "BIC": "BICExample1",
+      "bankBranchCode": "bankBranchCode1",
+      "accountOpeningDate":"2016-01-28T16:41:41.090Z",
+      "accountInterestRate": 100.2,
+      "valueDateBalance": 100.1,
+      "creditLimitUsage": 100.3,
+      "creditLimitInterestRate": 100.4,
+      "creditLimitExpiryDate": "2019-09-28T16:41:41.090Z",
+      "startDate": "2016-02-28T16:41:41.090Z",
+      "termUnit": "Y",
+      "termNumber": 50,
+      "interestPaymentFrequencyUnit":"M",
+      "interestPaymentFrequencyNumber": 15,
+      "maturityDate": "2017-02-28T16:41:41.090Z",
+      "maturityAmount": 99.5,
+      "autoRenewalIndicator": true,
+      "interestSettlementAccount": "interestSettlementAccount1",
+      "outstandingPrincipalAmount": 100.2,
+      "monthlyInstalmentAmount": 100.1,
+      "amountInArrear": 100.3,
+      "minimumRequiredBalance": 80.4,
+      "creditCardAccountNumber": "123456",
+      "validThru": "2019-02-28T16:41:41.090Z",
+      "applicableInterestRate": 101.2,
+      "remainingCredit": 50,
+      "outstandingPayment": 105.5,
+      "minimumPayment": 51.1,
+      "minimumPaymentDueDate": "2018-02-28T16:41:41.090Z",
+      "totalInvestmentValue": 110.2,
+      "debitCards": [
+        {
+          "number":"4578",
+          "expiryDate":"2020-08-22"
+        },
+        {
+          "number":"3241",
+          "expiryDate":"2019-01-14"
+        }
+      ],
+      "accountHolderAddressLine1": "accountHolderAddressLine11",
+      "accountHolderAddressLine2": "accountHolderAddressLine12",
+      "accountHolderStreetName": "street1",
+      "town": "Amsterdam",
+      "postCode": "5000",
+      "countrySubDivision": "subDivision",
+      "accountHolderName": "Okuneva Spencer",
+      "accountHolderNames": "Okuneva Spencer,Mile Panika",
+      "accountHolderCountry": "AF",
+      "creditAccount": true,
+      "debitAccount": true,
+      "lastUpdateDate": "2019-09-28T16:41:41.090Z",
+      "productId": "productId",
+      "productKindName": "Current Account",
+      "visible": true,
+      "legalEntityIds": [
+        "le1",
+        "le2"
+      ],
+      "productTypeName": "productTypeName",
+      "externalLegalEntityId": "le1",
+      "externalProductId": "externalProductidId",
+      "userPreferences": {
+        "arrangementId": "9aabca5b-63ae-47d9-8d63-c5ed0e831dfa",
+        "alias": "My Bank Account",
+        "visible": true,
+        "favorite": false
+      },
+      "product": {
+        "externalId": "externalProductidId",
+        "externalTypeId": "externalProductTypeId",
+        "typeName": "productTypeName",
+        "productKind": {
+          "externalKindId": "kind1",
+          "kindName": "Current Account",
+          "kindUri": "current-account"
+        }
+      },
+      "sourceId": "LJBASI2XXXX",
+      "state": {
+        "externalStateId": "externalStateId1",
+        "state": "Active"
+      }
+    },
+    {
+      "id": "1cdb2224-8926-4b4d-a99f-1c9dfbbb46aa",
+      "externalArrangementId": "d64c31c4-50e4-11e7-b114-b2f933d5feaa",
+      "name": "Spending fee",
+      "bookedBalance": 100.1,
+      "availableBalance": 100.2,
+      "creditLimit": 100.3,
+      "IBAN": "GB29NWBK60161331926819",
+      "BBAN": "BBAN",
+      "currency": "EUR",
+      "bankAlias": "Secret account",
+      "externalTransferAllowed": true,
+      "urgentTransferAllowed": false,
+      "accruedInterest": 3.3,
+      "number": "PANSuffix",
+      "principalAmount": 100.4,
+      "currentInvestmentValue": 100.5,
+      "productNumber": "productNumber",
+      "BIC": "BICExample1",
+      "bankBranchCode": "bankBranchCode1",
+      "accountOpeningDate":"2016-01-28T16:41:41.090Z",
+      "accountInterestRate": 100.2,
+      "valueDateBalance": 100.1,
+      "creditLimitUsage": 100.3,
+      "creditLimitInterestRate": 100.4,
+      "creditLimitExpiryDate": "2019-09-28T16:41:41.090Z",
+      "startDate": "2016-02-28T16:41:41.090Z",
+      "termUnit": "Y",
+      "termNumber": 50,
+      "interestPaymentFrequencyUnit":"M",
+      "interestPaymentFrequencyNumber": 15,
+      "maturityDate": "2017-02-28T16:41:41.090Z",
+      "maturityAmount": 99.5,
+      "autoRenewalIndicator": true,
+      "interestSettlementAccount": "interestSettlementAccount1",
+      "outstandingPrincipalAmount": 100.2,
+      "monthlyInstalmentAmount": 100.1,
+      "amountInArrear": 100.3,
+      "minimumRequiredBalance": 80.4,
+      "creditCardAccountNumber": "123456",
+      "validThru": "2019-02-28T16:41:41.090Z",
+      "applicableInterestRate": 101.2,
+      "remainingCredit": 50,
+      "outstandingPayment": 105.5,
+      "minimumPayment": 51.1,
+      "minimumPaymentDueDate": "2018-02-28T16:41:41.090Z",
+      "totalInvestmentValue": 110.2,
+      "debitCards": [
+        {
+          "number":"4578",
+          "expiryDate":"2020-08-22"
+        },
+        {
+          "number":"3241",
+          "expiryDate":"2019-01-14"
+        }
+      ],
+      "accountHolderAddressLine1": "accountHolderAddressLine11",
+      "accountHolderAddressLine2": "accountHolderAddressLine12",
+      "accountHolderStreetName": "street1",
+      "town": "Amsterdam",
+      "postCode": "5000",
+      "countrySubDivision": "subDivision",
+      "accountHolderName": "Okuneva Spencer",
+      "accountHolderNames": "Okuneva Spencer,Mile Panika",
+      "accountHolderCountry": "AF",
+      "creditAccount": true,
+      "debitAccount": true,
+      "lastUpdateDate": "2019-09-28T16:41:41.090Z",
+      "productId": "productId",
+      "productKindName": "Current Account",
+      "visible": true,
+      "legalEntityIds": [
+        "le1",
+        "le2"
+      ],
+      "productTypeName": "productTypeName",
+      "externalLegalEntityId": "le1",
+      "externalProductId": "externalProductidId",
+      "userPreferences": {
+        "arrangementId": "9aabca5b-63ae-47d9-8d63-c5ed0e831dfa",
+        "alias": "My Bank Account",
+        "visible": true,
+        "favorite": false
+      },
+      "product": {
+        "externalId": "externalProductidId",
+        "externalTypeId": "externalProductTypeId",
+        "typeName": "productTypeName",
+        "productKind": {
+          "externalKindId": "kind1",
+          "kindName": "Current Account",
+          "kindUri": "current-account"
+        },
+        "state": {
+          "externalStateId": "externalStateId2",
+          "state": "Open"
+        }
+      },
+      "sourceId": "LJBASI2XXXX",
+      "externalParentId": "externalParentId100"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "message": "Value Exceeded. Must be between {min} and {max}.",
+  "key": "common.api.shoesize",
+  "context": {
+    "max": "50",
+    "min": "1"
+  }
+}

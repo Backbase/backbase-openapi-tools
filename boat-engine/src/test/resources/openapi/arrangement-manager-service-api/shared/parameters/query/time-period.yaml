@@ -1,0 +1,6 @@
+name: timePeriod
+in: query
+description: Defined time period for showing graph oscillations
+required: false
+schema:
+  $ref: '../../../openapi.yaml#/components/schemas/TimePeriod'

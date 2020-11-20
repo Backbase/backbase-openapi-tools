@@ -1,0 +1,10 @@
+name: externalArrangementId
+in: path
+description: external arrangement id
+required: true
+schema:
+  type: string
+  minLength: 1
+  maxLength: 50
+example:
+  ja12u49303-29202028hdu822-28ckqewer

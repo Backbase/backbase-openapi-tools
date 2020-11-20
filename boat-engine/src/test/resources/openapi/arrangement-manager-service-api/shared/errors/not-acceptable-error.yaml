@@ -1,0 +1,12 @@
+title: NotAcceptableError
+type: object
+allOf:
+  - $ref: api-error.yaml
+properties:
+  supportedMediaTypes:
+    type: array
+    description: List of supported media types for this endpoint
+    items:
+      type: string
+example:
+  $ref: not-acceptable-error.json

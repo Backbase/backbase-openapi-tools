@@ -1,0 +1,11 @@
+title: BalanceHistoryAddResponse
+description: Object that defines the response of added balance history item.
+type: object
+allOf:
+  - $ref: ../../shared/schemas/additional-properties.yaml
+properties:
+  id:
+    type: string
+    description: Internally used unique identification
+required:
+- id

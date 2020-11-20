@@ -1,0 +1,115 @@
+summary: Arrangements
+description: Arrangements
+get:
+  tags:
+  - arrangements
+  description: 'Get a list of arrangements with a corresponding product from pandp
+    service based on query of provided IBAN (note: only one arrangement is returned
+    for IBAN), an array of arrangements ids or an array of external arrangements
+    ids'
+  operationId: getArrangements
+  parameters:
+  - name: iban
+    in: query
+    description: The IBAN is an internationally agreed system of identifying bank
+      accounts across national borders.
+    required: false
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: FR188388353832IH3CAWFYXAA36
+  - name: arrangementIds
+    in: query
+    description: A list of internal arrangements ids
+    required: false
+    schema:
+      type: array
+      items:
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - oiuoioi-3893ower-oji23-lelw
+        - 13132fds-sfdfdsfd12-dsfsfd-123
+  - name: externalArrangementIds
+    in: query
+    description: A list of external arrangements ids
+    required: false
+    schema:
+      minimum: 1
+      type: array
+      items:
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - b8ldxMET3az82SCCAbb1ICGgKAD1V2vMhps3AwH0GL849pQthY
+        - q7RPHCEhcWtsjSSPbwoFkN5pbRtYPniSKSPU1H9fI2ReWInPHD
+  responses:
+    200:
+      description: List of arrangement items
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/AccountArrangementItems'
+          example:
+            $ref: '../examples/arrangements/arrangement-items-ex.json'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+put:
+  tags:
+  - arrangements
+  description: Update arrangement by an arrangement id
+  operationId: putArrangements
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/AccountArrangementItemBase'
+        example:
+          $ref: '../examples/arrangements/arrangement-item-base-ex.json'
+  responses:
+    204:
+      description: Indicates successful update of an arrangement
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+post:
+  tags:
+  - arrangements
+  description: Create a arrangement with external arrangement id and returns the
+    internal arrangement id
+  operationId: postArrangements
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/AccountArrangementItemPost'
+        example:
+          $ref: '../examples/arrangements/arrangement-item-post-ex.json'
+  responses:
+    201:
+      description: Creating new Arrangement
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/AccountArrangementAddedResponse'
+          example:
+            $ref: '../examples/arrangements/arrangement-added-response-ex.json'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'

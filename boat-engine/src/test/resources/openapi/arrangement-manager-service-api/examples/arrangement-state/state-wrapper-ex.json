@@ -1,0 +1,16 @@
+{
+  "states": [
+    {
+      "id": 1,
+      "externalStateId": "external state id",
+      "state": "Active",
+      "description": "indicates the arrangement is active"
+    },
+    {
+      "id": 2,
+      "externalStateId": "external state id 2",
+      "state": "Open",
+      "description": "indicates the arrangement is open"
+    }
+  ]
+}

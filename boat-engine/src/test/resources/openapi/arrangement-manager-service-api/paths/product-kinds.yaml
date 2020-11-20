@@ -1,0 +1,113 @@
+summary: ProductKinds
+description: Resource for managing product kinds
+get:
+  tags:
+  - product-kinds
+  description: Endpoint for getting a list of product kinds
+  operationId: getProductKinds
+  parameters:
+  - name: externalKindIds
+    in: query
+    description: The external kind ids
+    required: false
+    schema:
+      type: array
+      items:
+        minLength: 1
+        maxLength: 50
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - "1"
+        - "2"
+        - "3"
+  - name: kindName
+    in: query
+    description: The product kind name
+    required: false
+    schema:
+      maxLength: 50
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Current Account
+  - name: kindUri
+    in: query
+    description: The uri path to the specific product kind, which can be used
+      by banks that require it
+    required: false
+    schema:
+      maxLength: 50
+      type: string
+    examples:
+      example:
+        summary: example
+        value: current-account
+  responses:
+    200:
+      description: Get product kinds. Retrieves product kinds from database based on search criteria
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/ProductKindsResult'
+          example:
+            $ref: '../examples/product-kind/product-kinds-wrapper-ex.json'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+put:
+  tags:
+  - product-kinds
+  description: Endpoint for updating product kind into database
+  operationId: putProductKinds
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/ExternalProductKindItemPut'
+        example:
+          $ref: '../examples/product-kind/product-kind-item-put-ex.json'
+  responses:
+    201:
+      description: Product kind updated
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'
+
+post:
+  tags:
+  - product-kinds
+  description: Endpoint for inserting a new product kind into database
+  operationId: postProductKinds
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/ExternalProductKindItemExtended'
+        example:
+          $ref: '../examples/product-kind/product-kind-item-ex.json'
+  responses:
+    201:
+      description: Indication that the Product Kind was created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/AccountProductKindId'
+    400:
+      $ref: '../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../openapi.yaml#/components/responses/500'

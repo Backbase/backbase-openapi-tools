@@ -1,0 +1,6 @@
+name: maskIndicator
+in: query
+description: Masked/Unmasked card number
+required: false
+schema:
+  type: boolean

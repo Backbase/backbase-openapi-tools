@@ -1,0 +1,18 @@
+title: UserPreferences
+type: object
+allOf:
+  - $ref: ../additional-properties.yaml
+description: 'User defined preferences for a specific arrangement. Note: each
+      user might have different preferences'
+properties:
+  alias:
+    maxLength: 50
+    type: string
+    description: The name that can be assigned by the user to label the arrangement
+  visible:
+    type: boolean
+    description: User indicator whether to show or hide the arrangement on the
+      front end
+  favorite:
+    type: boolean
+    description: Indication whether an arrangement can be favorable for a user

@@ -1,0 +1,100 @@
+summary: ArrangementById
+description: No description available
+get:
+  tags:
+  - arrangements
+  description: Retrieve a single arrangement with details.
+  operationId: getArrangementById
+  responses:
+    200:
+      description: Single Arrangement with details retrieved by internal arrangement ID
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountArrangementItem'
+          example:
+            $ref: '../../examples/arrangements/arrangement-item-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+  x-bb-access-control-resource: Product Summary
+  x-bb-access-control-function: Product Summary
+  x-bb-access-control-privilege: view
+  parameters:
+    - name: id
+      in: path
+      description: Internal arrangement id
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 36
+      examples:
+        example:
+          summary: example
+          value: ja12u49303-29202028hdu822-28ckqewer
+
+put:
+  tags:
+  - arrangements
+  description: Update arrangement by an arrangement id.
+  operationId: putArrangementById
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/AccountArrangementPutItem'
+        example:
+          $ref: '../../examples/arrangements/arrangement-put-item-ex.json'
+  responses:
+    204:
+      description: Arrangement updated successfully.
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+  parameters:
+    - name: id
+      in: path
+      description: Arrangement id
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 36
+      examples:
+        example:
+          summary: example
+          value: ja12u49303-29202028hdu822-28ckqewer
+delete:
+  tags:
+    - arrangements
+  description: Delete Arrangement by external arrangement id.
+  operationId: deleteexternalArrangementId
+  responses:
+    204:
+      description: Indicates successful delete on an arrangement.
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'
+  deprecated: true
+  x-bb-api-deprecation-deprecated-from-version: DBS 2.19.0
+  x-bb-api-deprecation-removed-from-version: DBS 2.20.0
+  x-bb-api-deprecation-reason: '| The functionality covered by service endpoint
+    in presentation api.'
+  x-bb-api-deprecation-description: '| From DBS 2.20.0 this endpoint will no longer
+    be exposed. Please use POST /service-api/v2/arrangements/delete endpoint in
+    account-presentation-spec instead.'
+  parameters:
+    - name: id
+      in: path
+      description: External arrangement id
+      required: true
+      schema:
+        type: string

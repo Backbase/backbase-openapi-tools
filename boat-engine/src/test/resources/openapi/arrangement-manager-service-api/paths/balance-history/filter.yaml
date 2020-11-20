@@ -1,0 +1,33 @@
+summary: Balance History Filter
+description: No description available
+post:
+  tags:
+  - balance-history
+  description: Retrieve balance history items.
+  operationId: postBalanceHistoryFilter
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/BalanceHistoryFilterRequest'
+        example:
+          $ref: ../../examples/balance-history/balance-history-filter-request.json
+  responses:
+    200:
+      description: List of balance history
+      content:
+        application/json:
+          schema:
+            description: A list of balance history items.
+            type: array
+            items:
+              $ref: '../../openapi.yaml#/components/schemas/BalanceHistoryFilterResponse'
+          example:
+            $ref: ../../examples/balance-history/balance-history-filter-response.json
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

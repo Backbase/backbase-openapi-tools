@@ -1,0 +1,58 @@
+[
+  {
+    "id": "id0",
+    "externalProductId": "externalProductId",
+    "externalProductKindId": "externalProductKindId",
+    "productKindName": "Current Account",
+    "externalProductTypeId": "externalProductTypeId",
+    "productTypeName": "Custom Current Account",
+    "translations": [
+      {
+        "locale": "de_DE",
+        "localeTranslations": [
+          {
+            "fieldName": "type_name",
+            "fieldValue": "Benutzerdefiniertes Girokonto"
+          }
+        ]
+      },
+      {
+        "locale":"ar_JO",
+        "localeTranslations": [
+          {
+            "fieldName": "type_name",
+            "fieldValue": "الحساب الجاري المخصص"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "id1",
+    "externalProductId": "externalProductId",
+    "externalProductKindId": "externalProductKindId",
+    "productKindName": "Current Account 2",
+    "externalProductTypeId": "externalProductTypeId",
+    "productTypeName": "Custom Current Account 2",
+    "translations": [
+      {
+        "locale": "de_DE",
+        "localeTranslations": [
+          {
+            "fieldName": "type_name",
+            "fieldValue": "Benutzerdefiniertes Girokonto 2"
+          }
+        ]
+      },
+      {
+        "locale":"ar_JO",
+        "localeTranslations": [
+          {
+            "fieldName": "type_name",
+            "fieldValue": "الحساب الجاري المخصص"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,246 @@
+summary: Arrangements by business function
+description: Endpoint for accessing arrangements for the current context.
+get:
+  tags:
+  - product-summary
+  description: Get a list of arrangements according to a given business function
+  operationId: getArrangementsByBusinessFunction
+  parameters:
+  - name: withLatestBalances
+    in: query
+    description: Retrieve a list of arrangements with the latest balances
+    required: false
+    schema:
+      type: boolean
+      default: true
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: maskIndicator
+    in: query
+    description: Masked/Unmasked card number
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: false
+  - name: debitAccount
+    in: query
+    description: Type of account
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: creditAccount
+    in: query
+    description: Type of account
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: businessFunction
+    in: query
+    description: Provide comma separated contexts for retrieving arrangements
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Product Summary
+  - name: resourceName
+    in: query
+    description: Provide the resource for retrieving arrangements
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Product Summary
+  - name: privilege
+    in: query
+    description: Privilege for the arrangements
+    required: true
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: view
+  - name: externalTransferAllowed
+    in: query
+    description: Privilege for external transfers
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: false
+  - name: productKindName
+    in: query
+    description: Product Kind Name
+    required: false
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Current Account
+  - name: legalEntityIds
+    in: query
+    description: A list of legal entities ids to filter by
+    required: false
+    schema:
+      type: array
+      items:
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - 0e4c1c09-fcf4-42fe-ae57-342603d8ef82
+        - 53f023cd-c016-4d19-bdf1-8d83f98c11e1
+        - c0a20cc4-5e15-42d4-94a6-1101ed6c1c37
+  - name: sourceId
+    in: query
+    description: identifies the system, either internal or external, that keeps records of the arrangement.
+    required: false
+    schema:
+      maxLength: 11
+      type: string
+    examples:
+      example:
+        summary: example
+        value: LJBASI2XXXX
+  - name: favorite
+    in: query
+    description: Indicates whether an arrangement is favorite for a user or not
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: searchTerm
+    in: query
+    description: Full text search
+    required: false
+    schema:
+      maxLength: 256
+      type: string
+    examples:
+      example:
+        summary: example
+        value: Account X
+  - name: customOrder
+    in: query
+    description: Parameter that identifies whether the returned list should be
+      ordered by custom order/grouping
+    required: false
+    schema:
+      type: boolean
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: favoriteFirst
+    in: query
+    description: Parameter that sets favorite arrangements on top when true
+    required: false
+    schema:
+      type: boolean
+      default: false
+    examples:
+      example:
+        summary: example
+        value: true
+  - name: from
+    in: query
+    description: Page Number. Skip over pages of elements by specifying a start value for the query
+    required: false
+    schema:
+      type: integer
+      format: int32
+      default: 0
+    examples:
+      example:
+        summary: example
+        value: 20
+  - name: cursor
+    in: query
+    description: Record UUID. As an alternative for specifying 'from' this allows to point to the record to start the selection from.
+    required: false
+    schema:
+      type: string
+      default: ""
+    examples:
+      example:
+        summary: example
+        value: 76d5be8b-e80d-4842-8ce6-ea67519e8f74
+  - name: size
+    in: query
+    description: |
+      Limit the number of elements on the response. When used in combination with cursor, the value
+      is allowed to be a negative number to indicate requesting records upwards from the starting point indicated
+      by the cursor.
+    required: false
+    schema:
+      type: integer
+      format: int32
+      default: 10
+    examples:
+      example:
+        summary: example
+        value: 80
+  - name: orderBy
+    in: query
+    description: |
+      Order by field: "name","bankAlias","bookedBalance","availableBalance","creditLimit","IBAN","BBAN","BIC","currency","externalTransferAllowed","urgentTransferAllowed","accruedInterest","principalAmount","currentInvestmentValue","productNumber","accountOpeningDate","accountInterestRate","valueDateBalance","creditLimitUsage","creditLimitInterestRate","creditLimitExpiryDate","startDate","termUnit","termNumber","maturityDate","maturityAmount","autoRenewalIndicator","interestPaymentFrequencyUnit","interestPaymentFrequencyNumber","interestSettlementAccount","outstandingPrincipalAmount","monthlyInstalmentAmount","amountInArrear","minimumRequiredBalance","creditCardAccountNumber","validThru","applicableInterestRate","remainingCredit","outstandingPayment","minimumPayment","minimumPaymentDueDate","totalInvestmentValue","accountHolderAddressLine1","accountHolderAddressLine2","accountHolderStreetName","postCode","town","countrySubDivision","accountHolderCountry","creditAccount","debitAccount","productKindName","productTypeName"
+    required: false
+    schema:
+      type: string
+    examples:
+      example:
+        summary: example
+        value: name
+  - name: direction
+    in: query
+    description: Direction
+    required: false
+    schema:
+      type: string
+      default: DESC
+      enum:
+      - ASC
+      - DESC
+    examples:
+      example:
+        summary: example
+        value: ASC
+  responses:
+    200:
+      description: Product summary by legal entity id. Initial call to retrieve the paginated list of product summary by legal entity id.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../openapi.yaml#/components/schemas/ProductSummaryFlatStructure'
+          example:
+            $ref: ../../../shared/schemas/summary/product-summary-flat-structure.json
+    400:
+      $ref: '../../../openapi.yaml#/components/responses/400'
+    403:
+      $ref: '../../../openapi.yaml#/components/responses/403'
+    500:
+      $ref: '../../../openapi.yaml#/components/responses/500'

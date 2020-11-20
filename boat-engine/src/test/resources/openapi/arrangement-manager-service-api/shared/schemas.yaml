@@ -1,0 +1,72 @@
+### begin commons
+ApiError:
+  $ref: errors/api-error.yaml
+BadRequestError:
+  $ref: errors/bad-request-error.yaml
+ErrorAwareApi:
+  $ref: errors/error-aware-api.yaml
+ErrorItem:
+  $ref: errors/error-item.yaml
+ForbiddenError:
+  $ref: errors/forbidden-error.yaml
+InternalServerError:
+  $ref: errors/internal-server-error.yaml
+NotAcceptableError:
+  $ref: errors/not-acceptable-error.yaml
+NotFoundError:
+  $ref: errors/not-found-error.yaml
+UnauthorizedError:
+  $ref: errors/unauthorized-error.yaml
+UnsupportedMediaTypeError:
+  $ref: errors/unsupported-media-type-error.yaml
+AggregatedBalance:
+  $ref: schemas/balances/base-aggregated-balance.yaml
+AggregatedBalances:
+  $ref: schemas/balances/base-aggregated-balances.yaml
+AccountAggregatedBalanceCurrencies:
+  $ref: schemas/balances/aggregated-balance-currencies.yaml
+AccountAggregatedBalanceGet:
+  $ref: schemas/balances/aggregated-balances-get.yaml
+AdditionalProperties:
+  $ref: schemas/additional-properties.yaml
+BatchResponseStatusCode:
+  $ref: schemas/batch-response-status-code.yaml
+ConflictError:
+  $ref: schemas/conflict-error.yaml
+CurrencyType:
+  $ref: schemas/currency-type.yaml
+DebitCardItem:
+  $ref: schemas/debit-card-item.yaml
+ExternalProductItem:
+  $ref: schemas/products/external-domain/product-item.yaml
+ExternalProductKindItem:
+  $ref: schemas/product-kind/external-domain/external-product-kind-item.yaml
+LocaleTranslationItem:
+  $ref: schemas/locale-translation-item.yaml
+OrderByField:
+  $ref: schemas/order-by-field.yaml
+ProductKindItem:
+  $ref: schemas/product-kind/product-kind-item.yaml
+ProductKindsResult:
+  $ref: schemas/product-kind/product-kinds-result.yaml
+SortDirection:
+  $ref: schemas/sort-direction.yaml
+StateItem:
+  $ref: schemas/state-item.yaml
+ProductItem:
+  $ref: schemas/summary/product-item.yaml
+ProductSummaryFlatStructure:
+  $ref: schemas/summary/product-summary-flat-structure.yaml
+ProductSummaryItem:
+  $ref: schemas/summary/product-summary-item.yaml
+SummaryProductKindItem:
+  $ref: schemas/summary/summary-product-kind-item.yaml
+UserPreferences:
+  $ref: schemas/summary/user-preferences.yaml
+TimePeriod:
+  $ref: schemas/time-period.yaml
+TimeUnit:
+  $ref: schemas/time-unit.yaml
+TranslationItem:
+  $ref: schemas/translation-item.yaml
+### end commons

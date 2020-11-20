@@ -1,0 +1,13 @@
+name: arrangementIds
+in: query
+description: arrangement ids
+required: false
+schema:
+  type: array
+  items:
+    type: string
+    minLength: 1
+    maxLength: 36
+example:
+  - 6bd1bed8-75b6-4c53-b1d4-0751af5494f2
+  - a0eb0dab-cd05-4423-bdb9-81e838fc9046

@@ -1,0 +1,7 @@
+name: direction
+in: query
+description: Direction
+required: false
+schema:
+  $ref: '../../../openapi.yaml#/components/schemas/SortDirection'
+example: DESC

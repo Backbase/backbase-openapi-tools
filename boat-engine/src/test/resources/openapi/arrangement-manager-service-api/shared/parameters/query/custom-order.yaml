@@ -1,0 +1,7 @@
+name: customOrder
+in: query
+description: Parameter that identifies weather the returned list should be
+  ordered by custom order/grouping
+required: false
+schema:
+  type: boolean

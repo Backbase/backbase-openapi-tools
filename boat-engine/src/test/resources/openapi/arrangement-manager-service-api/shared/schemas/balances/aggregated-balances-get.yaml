@@ -1,0 +1,4 @@
+type: array
+description: Response object that defines list of aggregated balances
+items:
+  $ref: '../../../openapi.yaml#/components/schemas/AggregatedBalances'

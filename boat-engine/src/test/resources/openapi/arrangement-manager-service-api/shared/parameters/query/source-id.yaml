@@ -1,0 +1,11 @@
+name: sourceId
+in: query
+description: No description available
+required: false
+schema:
+  maxLength: 11
+  type: string
+examples:
+  example:
+    summary: example
+    value: LJBASI2XXXX

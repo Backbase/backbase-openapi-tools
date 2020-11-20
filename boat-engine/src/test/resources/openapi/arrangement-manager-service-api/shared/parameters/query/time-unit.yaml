@@ -1,0 +1,6 @@
+name: timeUnit
+in: query
+description: time unit
+required: false
+schema:
+  $ref: '../../../openapi.yaml#/components/schemas/TimeUnit'

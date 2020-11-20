@@ -1,0 +1,51 @@
+summary: ArrangementsLegalEntities
+description: No description available
+get:
+  tags:
+  - arrangements
+  description: Retrieves non deleted arrangement ids with legal entity ids for given legal entity ids and arrangement ids
+  operationId: getArrangementsLegalEntities
+  parameters:
+  - name: arrangementIds
+    in: query
+    description: A list of internal arrangements ids
+    required: true
+    schema:
+      type: array
+      items:
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - oiuoioi-3893ower-oji23-lelw
+        - 13132fds-sfdfdsfd12-dsfsfd-123
+  - name: legalEntityIds
+    in: query
+    description: A list of internal legalEntity ids
+    required: true
+    schema:
+      type: array
+      items:
+        type: string
+    examples:
+      example:
+        summary: example
+        value:
+        - ajfajfa-dasffa-jadaae-supce0a
+        - afawfc-na2v6ecer-k4673aj-kosm98a4ta
+  responses:
+    200:
+      description: Return arrangement ids with legalentity ids
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountArrangementsLegalEntities'
+          example:
+            $ref: '../../examples/arrangements/arrangements-legal-entities-ids-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    404:
+      $ref: '../../openapi.yaml#/components/responses/404'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

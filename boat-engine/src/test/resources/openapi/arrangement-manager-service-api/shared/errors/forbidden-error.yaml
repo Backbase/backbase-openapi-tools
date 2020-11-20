@@ -1,0 +1,6 @@
+title: ForbiddenError
+type: object
+allOf:
+  - $ref: error-aware-api.yaml
+example:
+  $ref: forbidden-error.json

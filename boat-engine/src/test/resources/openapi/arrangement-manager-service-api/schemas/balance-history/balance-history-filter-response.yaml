@@ -1,0 +1,32 @@
+title: BalanceHistoryFilterResponse
+type: object
+description: Object that defines the balance history item.
+properties:
+  id:
+    maxLength: 36
+    minLength: 1
+    type: string
+    description: A unique identifier for the balance history object.
+  arrangementId:
+    maxLength: 36
+    minLength: 1
+    type: string
+    description: Internally used unique identification of arrangement.
+  externalArrangementId:
+    maxLength: 50
+    minLength: 1
+    type: string
+    description: Externally used unique identification of arrangement.
+  balance:
+    type: number
+    description: The value of the balance history item.
+  date:
+    type: string
+    description: Date and time when the balance history item is created.
+    format: date-time
+required:
+  - arrangementId
+  - balance
+  - date
+  - externalArrangementId
+  - id

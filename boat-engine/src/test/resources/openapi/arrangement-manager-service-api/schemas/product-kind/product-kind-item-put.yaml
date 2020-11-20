@@ -1,0 +1,23 @@
+allOf:
+  - $ref: '../../openapi.yaml#/components/schemas/AdditionalProperties'
+required:
+  - externalKindId
+type: object
+properties:
+  externalKindId:
+    maxLength: 50
+    minLength: 1
+    type: string
+  kindName:
+    maxLength: 50
+    minLength: 1
+    type: string
+  kindUri:
+    maxLength: 50
+    minLength: 1
+    pattern: '[a-z\-0-9]*?'
+    type: string
+  translations:
+    type: array
+    items:
+      $ref: '../../openapi.yaml#/components/schemas/TranslationItem'

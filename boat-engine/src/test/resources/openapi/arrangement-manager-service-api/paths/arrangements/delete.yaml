@@ -1,0 +1,29 @@
+summary: /delete
+description: Delete arrangements
+post:
+  tags:
+  - arrangements
+  description: Delete arrangements by internal or external ids
+  operationId: postDelete
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/AccountArrangementsDelete'
+        example:
+          $ref: '../../examples/arrangements/arrangements-delete-ex.json'
+  responses:
+    200:
+      description: List of delete items used to identify the arrangements to be deleted
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/AccountArrangementsDeleteResponse'
+          example:
+            $ref: '../../examples/arrangements/arrangements-delete-response-ex.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    403:
+      $ref: '../../openapi.yaml#/components/responses/403'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

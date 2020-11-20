@@ -1,0 +1,6 @@
+name: orderBy
+in: query
+description: Order by field
+required: false
+schema:
+  $ref: '../../../openapi.yaml#/components/schemas/OrderByField'

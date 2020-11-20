@@ -1,0 +1,10 @@
+allOf:
+  - $ref: '../../openapi.yaml#/components/schemas/AccountProductItem'
+required:
+  - id
+  - externalProductId
+  - externalProductKindId
+properties:
+  id:
+    type: string
+    description: Internally used unique identification

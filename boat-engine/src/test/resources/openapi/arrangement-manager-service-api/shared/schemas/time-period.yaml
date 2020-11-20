@@ -1,0 +1,8 @@
+title: TimePeriod
+type: string
+enum:
+- lastDay
+- lastWeek
+- lastMonth
+- lastYear
+- all

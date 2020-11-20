@@ -27,7 +27,7 @@ import picocli.CommandLine.Spec;
     subcommands = {
         BundleCommand.class,
         ExportCommand.class,
-        RefInlineCommand.class,
+        ExplodeCommand.class,
         CompletionCommand.class,
     })
 public class BoatTerminal implements Runnable {

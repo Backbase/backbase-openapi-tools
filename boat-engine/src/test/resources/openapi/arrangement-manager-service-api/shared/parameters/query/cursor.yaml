@@ -1,0 +1,12 @@
+name: cursor
+in: query
+description: |
+  Record UUID. As an alternative for specifying 'from' this allows to point to the record to start the selection from.
+required: false
+schema:
+  type: string
+  default: ""
+examples:
+  example:
+    summary: example
+    value: 76d5be8b-e80d-4842-8ce6-ea67519e8f74

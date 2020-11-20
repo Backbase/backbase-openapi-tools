@@ -1,0 +1,11 @@
+allOf:
+  - $ref: '../../../openapi.yaml#/components/schemas/CurrencyType'
+
+description: Schema defining aggregated balance amount in given currency and number of arrangements.
+type: object
+properties:
+  numberOfArrangements:
+    type: integer
+    description: Number of arrangements that are aggregated for this currency.
+required:
+  - numberOfArrangements

@@ -1,0 +1,28 @@
+summary: BalanceHistory
+description: Endpoints for managing the balance history of an arrangement
+post:
+  tags:
+  - accounts
+  description: Supplements supplied balance history item with internal arrangement
+    id and sends it to arrangement pandp service.
+  operationId: postBalanceHistory
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../openapi.yaml#/components/schemas/BalanceHistoryAddRequest'
+        example:
+          $ref: '../../examples/accounts/balance-history-add-request.json'
+  responses:
+    201:
+      description: Indication of successful processing of balance history item and successful saving of balance history item
+      content:
+        application/json:
+          schema:
+            $ref: '../../openapi.yaml#/components/schemas/BalanceHistoryAddResponse'
+          example:
+            $ref: '../../examples/accounts/balance-history-add-response.json'
+    400:
+      $ref: '../../openapi.yaml#/components/responses/400'
+    500:
+      $ref: '../../openapi.yaml#/components/responses/500'

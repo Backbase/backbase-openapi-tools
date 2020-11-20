@@ -1,0 +1,7 @@
+name: withLatestBalances
+in: query
+description: Retrieve a list of arrangements with the latest balances
+required: false
+schema:
+  type: boolean
+  default: true

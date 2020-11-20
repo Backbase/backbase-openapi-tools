@@ -1,0 +1,25 @@
+{
+  "externalKindId": "1",
+  "kindName": "Current Account",
+  "kindUri": "current-account",
+  "translations": [
+    {
+      "locale": "de_DE",
+      "localeTranslations": [
+        {
+          "fieldName": "kind_name",
+          "fieldValue": "Aktuelles Konto"
+        }
+      ]
+    },
+    {
+      "locale":"ar_JO",
+      "localeTranslations": [
+        {
+          "fieldName": "kind_name",
+          "fieldValue": "الحساب الحالي"
+        }
+      ]
+    }
+  ]
+}
