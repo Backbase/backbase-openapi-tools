@@ -331,10 +331,9 @@ public class ExplodeTransformer implements Transformer {
         } else {
             this.pu
                 .ifPresent(schema, "properties", (Map<String, Schema> m) -> updateRefs(base, m.values()))
-                .ifPresent(schema, "allOf", (Schema s) -> updateRefs(base, s))
-                .ifPresent(schema, "anyOf", (Schema s) -> updateRefs(base, s))
-                .ifPresent(schema, "oneOf", (Schema s) -> updateRefs(base, s))
-                .ifPresent(schema, "items", (Schema s) -> updateRefs(base, s));
+                .ifPresent(schema, "allOf", (Collection all) -> updateRefs(base, all))
+                .ifPresent(schema, "anyOf", (Collection all) -> updateRefs(base, all))
+                .ifPresent(schema, "oneOf", (Collection all) -> updateRefs(base, all));
         }
     }
 
