@@ -7,13 +7,18 @@ import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
 import com.typesafe.config.Config;
 import io.swagger.v3.oas.models.OpenAPI;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.zalando.zally.core.ApiValidator;
 import org.zalando.zally.core.DefaultContextFactory;
@@ -46,6 +51,15 @@ public class BoatLinter {
         this.availableRules = mapAvailableRules();
     }
 
+    public BoatLintReport lint(File inputFile) throws IOException {
+        String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
+        BoatLintReport boatLintReport = lint(contents);
+        File workingDirectory =  new File(".").getAbsoluteFile();
+        Path relativePath = workingDirectory.toPath().relativize(inputFile.toPath());
+        boatLintReport.setFilePath(relativePath.toString());
+        return boatLintReport;
+    }
+
     public BoatLintReport lint(String openApiContent) {
         List<Result> validate = validator.validate(openApiContent, rulesPolicy, null);
         List<BoatViolation> violations = validate.stream()
@@ -60,10 +74,7 @@ public class BoatLinter {
         boatLintReport.setViolations(violations);
         boatLintReport.setTitle(openAPI.getInfo().getTitle());
         boatLintReport.setVersion(openAPI.getInfo().getVersion());
-
         return boatLintReport;
-
-
     }
 
     private BoatViolation transformResult(Result result) {
@@ -129,4 +140,6 @@ public class BoatLinter {
     public List<BoatLintRule> getAvailableRules() {
         return new ArrayList<>(availableRules.values());
     }
+
+
 }

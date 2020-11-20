@@ -33,13 +33,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.sonarsource.sonarqube</groupId>
-            <artifactId>sonar-plugin-api</artifactId>
-            <version>${sonar.apiVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
