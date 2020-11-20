@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.quay.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 
@@ -12,6 +13,10 @@ public class BoatLintReport {
     private String filePath;
 
     private String openApi;
-    private List<BoatViolation> violations;
-    private List<BoatLintRule> availableRules;
+    private List<BoatViolation> violations = new ArrayList<>();
+    private List<BoatLintRule> availableRules = new ArrayList<>();
+
+    public boolean hasViolations() {
+        return !violations.isEmpty();
+    }
 }
