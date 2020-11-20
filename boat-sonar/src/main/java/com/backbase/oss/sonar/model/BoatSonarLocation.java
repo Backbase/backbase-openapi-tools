@@ -1,8 +1,6 @@
 package com.backbase.oss.sonar.model;
 
 import lombok.Data;
-import org.assertj.core.internal.bytebuddy.asm.Advice;
-import org.sonar.api.batch.fs.TextRange;
 
 @Data
 public class BoatSonarLocation   {

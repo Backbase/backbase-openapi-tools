@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 import kotlin.ranges.IntRange;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.sonar.api.batch.rule.Severity;
-import org.sonar.api.rules.RuleType;
 
 @UtilityClass
 public class SonarReportConvertor {
@@ -56,23 +54,23 @@ public class SonarReportConvertor {
 
     }
 
-    private static RuleType mapType(BoatLintRule.Type type) {
-        return RuleType.valueOf(type.name());
+    private static String mapType(BoatLintRule.Type type) {
+        return type.toString();
     }
 
-    private static Severity mapSeverity(@NonNull org.zalando.zally.rule.api.Severity severity) {
+    private static String mapSeverity(@NonNull org.zalando.zally.rule.api.Severity severity) {
         switch (severity) {
             case MUST: {
-                return Severity.BLOCKER;
+                return "BLOCKER";
             }
             case SHOULD: {
-                return Severity.CRITICAL;
+                return "CRITICAL";
             }
             case MAY: {
-                return Severity.MINOR;
+                return "MINOR";
             }
             case HINT: {
-                return Severity.INFO;
+                return "INFO";
             }
             default:
                 throw new IllegalArgumentException("invalid value: " + severity);
