@@ -1,7 +1,6 @@
 package com.backbase.oss.sonar.model;
 
 import lombok.Data;
-import org.sonar.api.batch.fs.TextRange;
 
 @Data
 public class BoatTextRange {
