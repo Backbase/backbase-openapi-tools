@@ -28,7 +28,7 @@ public class LintMojoTests {
         lintMojo.execute();
     }
 
-    @Test(expected = MojoExecutionException.class)
+    @Test(expected = MojoFailureException.class)
     public void testFailOnWarning() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
