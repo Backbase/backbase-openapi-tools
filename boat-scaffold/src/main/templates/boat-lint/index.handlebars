@@ -42,9 +42,9 @@
 </nav>
 <div class="container-fluid">
     <div class="lint-report">
-        <h1>{{title}}<small>{{version}}</small></h1>
         <div class="row parent">
             <div class="col-md-6" id="left">
+                <h1>{{title}}<small>{{version}}</small></h1>
                 <h2>OpenAPI</h2>
                 <div class="editor">
                     <pre id="openApi">{{{openApi}}}</pre>
@@ -54,27 +54,26 @@
                 <h2>Violations</h2>
                 {{#each violations}}
                     <div class="result" id="{{rule.id}}">
-                        <h2>{{severity}} - {{rule.title}}</h2>
-                        <p>Rule Origin: {{rule.ruleSet}}</p>
-                        <p>{{description}}</p>
-                        <a href="{{rule.url}}">More information</a>
-                        <p>Location: {{pointer}}  Lines: {{lines.start}} to: {{lines.last}}</p>
-                        <button class="highlight" data-lines-first="{{lines.first}}" data-lines-last="{{lines.last}}"
-                                data-lines-start="{{lines.start}}">Highlight
-                        </button>
+                        <h3 class="title"><span class="severity {{severity}}">{{severity}}</span><span>{{rule.title}}</span></h3>
+                        <p class="description">{{description}}</p>
+                        <a class="more" href="{{rule.url}}">More information</a>
+                        <span class="location-handle"><span class="handle"></span>Location</span>
+                        <div class="location-block"><div>{{pointer}}</div>
+                            <span class="location-lines">Lines: {{lines.start}} to: {{lines.last}}</span>
+                            <button class="highlight" data-lines-first="{{lines.first}}" data-lines-last="{{lines.last}}"
+                                    data-lines-start="{{lines.start}}">Highlight
+                            </button>
+                        </div>
+                        <p class="rule-origin">Rule Origin: {{rule.ruleSet}}</p>
                     </div>
                 {{/each}}
                 <h2>Available Rules</h2>
-                <div class="row">
-                    {{#each availableRules}}
-                        <div class="rule row">
-                            <h2>{{id}} - {{severity}} - {{title}}</h2>
-                            <p>
-                            <a href="{{url}}">Reference</a>
-                            </p>
-                        </div>
-                    {{/each}}
-                </div>
+                {{#each availableRules}}
+                    <div class="rule">
+                        <span>{{id}} - {{severity}} - {{title}}</span>
+                        <a href="{{url}}">Reference</a>
+                    </div>
+                {{/each}}
             </div>
         </div>
     </div>
@@ -87,6 +86,7 @@
 <script src="js/theme-twilight.js"></script>
 
 <script>
+$(document).ready(function() {
     var highlight = ace.require("ace/ext/static_highlight")
     var editor = ace.edit("openApi");
     // editor.setTheme("ace/theme/twilight");
@@ -106,7 +106,11 @@
         marker = editor.getSession().addMarker(new Range(first, 0, last, 0), "ace_active-line", "fullLine");
     });
 
-
+    $('.location-handle').click(function() {
+        $(this).toggleClass('open');
+        $(this).siblings('.location-block').toggleClass('open');
+    });
+});
 </script>
 
 </body>
