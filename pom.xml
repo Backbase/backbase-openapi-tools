@@ -72,16 +72,15 @@
     </properties>
 
     <modules>
-        <!-- Project holding all RAML and OpenAPI specs for testing. Also inclused reusable test harnesses-->
+        <!-- Project holding all RAML and OpenAPI specs for testing. Also includes reusable test harnesses-->
         <module>boat-trail-resources</module>
         <module>boat-engine</module>
         <module>boat-scaffold</module>
         <module>boat-terminal</module>
         <module>boat-quay</module>
+        <module>boat-sonar</module>
         <module>boat-maven-plugin</module>
         <!-- Code Coverage Project -->
-
-
         <module>tests</module>
     </modules>
 
