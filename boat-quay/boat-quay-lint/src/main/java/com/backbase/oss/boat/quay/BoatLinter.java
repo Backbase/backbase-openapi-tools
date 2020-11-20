@@ -31,15 +31,15 @@ public class BoatLinter {
     private final RulesManager rulesManager;
     private final RulesPolicy rulesPolicy;
     private final Map<String, BoatLintRule> availableRules;
+    private final Config config;
 
     public BoatLinter() {
         this(new String[]{});
     }
 
     public BoatLinter(String... ignoreRules) {
-
         RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
-        Config config = rulesValidatorConfiguration.config("boat.conf");
+        this.config = rulesValidatorConfiguration.config("boat.conf");
         this.rulesManager = rulesValidatorConfiguration.rulesManager(config);
         this.rulesPolicy = new RulesPolicy(Arrays.asList(ignoreRules));
         this.validator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
@@ -51,6 +51,7 @@ public class BoatLinter {
         List<BoatViolation> violations = validate.stream()
             .map(this::transformResult)
             .collect(Collectors.toList());
+
         OpenAPI openAPI = OpenAPILoader.parse(openApiContent);
 
         BoatLintReport boatLintReport = new BoatLintReport();
@@ -87,8 +88,12 @@ public class BoatLinter {
     private Map<String, BoatLintRule> mapAvailableRules() {
         Map<String, BoatLintRule> rules = new LinkedHashMap<>();
 
+        Config extraRuleAnnotations = config.getConfig("ExtraRuleAnnotations");
+        Config defaultConfig = extraRuleAnnotations.getConfig("default");
         rulesManager.rules(rulesPolicy)
             .forEach(ruleDetails -> {
+                long effortInMinutes = getEffortInMinutes(extraRuleAnnotations, defaultConfig, ruleDetails);
+                BoatLintRule.Type type = getType(extraRuleAnnotations, defaultConfig, ruleDetails);
                 BoatLintRule boatLintRule = new BoatLintRule();
                 Rule rule = ruleDetails.getRule();
                 RuleSet ruleSet = ruleDetails.getRuleSet();
@@ -98,9 +103,27 @@ public class BoatLinter {
                 boatLintRule.setSeverity(rule.severity());
                 boatLintRule.setIgnored(false);
                 boatLintRule.setRuleSet(ruleSet.getId());
+                boatLintRule.setType(type);
+                boatLintRule.setEffortMinutes(effortInMinutes);
                 rules.put(rule.id(), boatLintRule);
             });
         return rules;
+    }
+
+    private BoatLintRule.Type getType(Config extraRuleAnnotations, Config defaultConfig, org.zalando.zally.core.RuleDetails ruleDetails) {
+        BoatLintRule.Type defaultType = defaultConfig.getEnum(BoatLintRule.Type.class, ruleDetails.getRule().severity() + ".type");
+        BoatLintRule.Type type = extraRuleAnnotations.hasPath("rules." + ruleDetails.getRule().id()+ ".type")
+            ? extraRuleAnnotations.getEnum(BoatLintRule.Type.class, "rules." + ruleDetails.getRule().id()+ ".type")
+            : defaultType;
+        return type;
+    }
+
+    private long getEffortInMinutes(Config extraRuleAnnotations, Config defaultConfig, org.zalando.zally.core.RuleDetails ruleDetails) {
+        long defaultEffortMinutes = defaultConfig.getLong(ruleDetails.getRule().severity() + ".effortMinutes");
+        long effortInMinutes = extraRuleAnnotations.hasPath("rules." + ruleDetails.getRule().id()+ ".effortMinutes")
+            ? extraRuleAnnotations.getLong("rules." + ruleDetails.getRule().id()+ ".effortMinutes")
+            : defaultEffortMinutes;
+        return effortInMinutes;
     }
 
     public List<BoatLintRule> getAvailableRules() {
