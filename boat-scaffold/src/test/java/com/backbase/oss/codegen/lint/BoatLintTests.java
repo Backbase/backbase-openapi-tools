@@ -9,7 +9,7 @@ import org.junit.Test;
 public class BoatLintTests {
 
     @Test
-    public void testBoatLin() {
+    public void testBoatLint() {
 
         File input = getFile("/oas-examples/petstore.yaml");
         File output = new File("target/boat-lint");
