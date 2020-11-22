@@ -1,27 +1,75 @@
-package com.backbase.oss.sonar;
+package com.backbase.oss.boat.sonar;
 
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
-import com.backbase.oss.sonar.model.BoatSonarIssue;
-import com.backbase.oss.sonar.model.BoatSonarLocation;
-import com.backbase.oss.sonar.model.BoatSonarLocationRange;
-import com.backbase.oss.sonar.model.BoatSonarReport;
+import com.backbase.oss.boat.sonar.model.BoatSonarIssue;
+import com.backbase.oss.boat.sonar.model.BoatSonarIssues;
+import com.backbase.oss.boat.sonar.model.BoatSonarLocation;
+import com.backbase.oss.boat.sonar.model.BoatSonarLocationRange;
+import java.io.StringWriter;
+import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import kotlin.ranges.IntRange;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
+import lombok.SneakyThrows;
 
-@UtilityClass
 public class SonarReportConvertor {
 
-    public static BoatSonarReport convert(BoatLintReport boatLintReport) {
+    public static Coverage generateCoverage(BoatLintReport boatLintReport) {
+
+        ObjectFactory objectFactory = new ObjectFactory();
+        Coverage coverage = objectFactory.createCoverage();
+        coverage.version  = BigInteger.ONE;
+        coverage.file = Collections.singletonList(boatLintReport.getFilePath()).stream().map(path -> {
+            Coverage.File coverageFile = objectFactory.createCoverageFile();
+            coverageFile.path = path;
+//            Coverage.File.LineToCover coverageFileLineToCover = objectFactory.createCoverageFileLineToCover();
+//
+//            coverageFileLineToCover.covered = true;
+//            coverageFile.lineToCover = Collections.singletonList(coverageFileLineToCover);
+            return coverageFile;
+        }).collect(Collectors.toList());
+
+
+        return coverage;
+    }
+
+    @SneakyThrows
+    public static String generateCoverageXml(BoatLintReport boatLintReport) {
+
+
+        //Create JAXB Context
+        JAXBContext jaxbContext = JAXBContext.newInstance(Coverage.class);
+
+        //Create Marshaller
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+        //Required formatting??
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        //Print XML String to Console
+        StringWriter sw = new StringWriter();
+
+        //Write XML to StringWriter
+        Coverage o = generateCoverage(boatLintReport);
+        jaxbMarshaller.marshal(o, sw);
+
+        //Verify XML Content
+        String xmlContent = sw.toString();
+        return xmlContent;
+    }
+
+    public static BoatSonarIssues convert(BoatLintReport boatLintReport) {
         List<BoatSonarIssue> issues = boatLintReport.getViolations().stream()
             .map((BoatViolation boatViolation) -> convertToSonarIssue(boatViolation, boatLintReport))
             .collect(Collectors.toList());
 
-        return new BoatSonarReport(issues);
+        return new BoatSonarIssues(issues);
     }
 
     private static BoatSonarIssue convertToSonarIssue(BoatViolation boatViolation, BoatLintReport lintReport) {
