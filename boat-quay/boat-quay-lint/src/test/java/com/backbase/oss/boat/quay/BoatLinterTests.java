@@ -28,7 +28,7 @@ public class BoatLinterTests {
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertFalse(boatLintReport.getViolations().isEmpty());
+        Assert.assertFalse(boatLintReport.hasViolations());
     }
 
     @Test
