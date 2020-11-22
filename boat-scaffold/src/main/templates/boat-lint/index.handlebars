@@ -54,11 +54,11 @@
                 <h2>Violations</h2>
                 {{#each violations}}
                     <div class="result" id="{{rule.id}}">
-                        <h3 class="title"><span class="severity {{severity}}">{{severity}}</span><span>{{rule.title}}</span></h3>
+                        <h3 class="title"><div class="severity {{severity}}">{{severity}}</div><span>{{rule.title}}</span></h3>
                         <p class="description">{{description}}</p>
                         <a class="more" href="{{rule.url}}">More information</a>
                         <span class="location-handle"><span class="handle"></span>Location</span>
-                        <div class="location-block"><div>{{pointer}}</div>
+                        <div class="location-block">
                             <span class="location-lines">Lines: {{lines.start}} to: {{lines.last}}</span>
                             <button class="highlight" data-lines-first="{{lines.first}}" data-lines-last="{{lines.last}}"
                                     data-lines-start="{{lines.start}}">Highlight
@@ -103,7 +103,7 @@ $(document).ready(function() {
         if (marker != null) {
             editor.getSession().removeMarker(marker);
         }
-        marker = editor.getSession().addMarker(new Range(first, 0, last, 0), "ace_active-line", "fullLine");
+        marker = editor.getSession().addMarker(new Range(first-1, 0, last-1, 0), "ace_active-line", "fullLine");
     });
 
     $('.location-handle').click(function() {
