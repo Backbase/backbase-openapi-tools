@@ -49,7 +49,7 @@ public class BoatLintGenerator extends AbstractDocumentationGenerator {
         // After processing our model, convert it into a map;
         Map<String, Object> bundle = convertToBundle(boatLintReport);
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Yard for portal: {}", boatLintReport.getTitle());
+        log.info("Finished creating BOAT Lint for portal: {}", boatLintReport.getTitle());
 
         return files;
     }
