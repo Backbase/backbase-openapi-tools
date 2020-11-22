@@ -40,10 +40,6 @@ public class BoatLinter {
     private final Map<String, BoatLintRule> availableRules;
     private final Config config;
 
-    public BoatLinter() {
-        this(new String[]{});
-    }
-
     public BoatLinter(String... ignoreRules) {
         RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
         this.config = rulesValidatorConfiguration.config("boat.conf");
@@ -64,7 +60,7 @@ public class BoatLinter {
 
     @NotNull
     private Path getFilePath(File inputFile) {
-        File workingDirectory =  new File(".").getAbsoluteFile();
+        File workingDirectory = new File(".").getAbsoluteFile();
         return workingDirectory.toPath().relativize(inputFile.toPath());
     }
 
@@ -130,19 +126,20 @@ public class BoatLinter {
     }
 
     private BoatLintRule.Type getType(Config extraRuleAnnotations, Config defaultConfig, org.zalando.zally.core.RuleDetails ruleDetails) {
-        BoatLintRule.Type defaultType = defaultConfig.getEnum(BoatLintRule.Type.class, ruleDetails.getRule().severity() + ".type");
-        BoatLintRule.Type type = extraRuleAnnotations.hasPath("rules." + ruleDetails.getRule().id()+ ".type")
-            ? extraRuleAnnotations.getEnum(BoatLintRule.Type.class, "rules." + ruleDetails.getRule().id()+ ".type")
+        String defaultPath = ruleDetails.getRule().severity() + ".type";
+        BoatLintRule.Type defaultType = defaultConfig.getEnum(BoatLintRule.Type.class, defaultPath);
+        String path = "rules." + ruleDetails.getRule().id() + ".type";
+        return extraRuleAnnotations.hasPath(path)
+            ? extraRuleAnnotations.getEnum(BoatLintRule.Type.class, path)
             : defaultType;
-        return type;
     }
 
     private long getEffortInMinutes(Config extraRuleAnnotations, Config defaultConfig, org.zalando.zally.core.RuleDetails ruleDetails) {
         long defaultEffortMinutes = defaultConfig.getLong(ruleDetails.getRule().severity() + ".effortMinutes");
-        long effortInMinutes = extraRuleAnnotations.hasPath("rules." + ruleDetails.getRule().id()+ ".effortMinutes")
-            ? extraRuleAnnotations.getLong("rules." + ruleDetails.getRule().id()+ ".effortMinutes")
+        String path = "rules." + ruleDetails.getRule().id() + ".effortMinutes";
+        return extraRuleAnnotations.hasPath(path)
+            ? extraRuleAnnotations.getLong(path)
             : defaultEffortMinutes;
-        return effortInMinutes;
     }
 
     public List<BoatLintRule> getAvailableRules() {
