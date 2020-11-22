@@ -2,7 +2,9 @@ package com.backbase.oss.sonar;
 
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
-import com.backbase.oss.sonar.model.BoatSonarReport;
+import com.backbase.oss.boat.sonar.Coverage;
+import com.backbase.oss.boat.sonar.SonarReportConvertor;
+import com.backbase.oss.boat.sonar.model.BoatSonarIssues;
 import io.swagger.util.Json;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,9 +31,11 @@ public class SonarReportConvertorTest {
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
         boatLintReport.setFilePath(filePath);
 
-        BoatSonarReport boatSonarReport = SonarReportConvertor.convert(boatLintReport);
-        log.info("\n{}",Json.pretty(boatSonarReport));
-        Assert.assertEquals(boatSonarReport.getIssues().size(), boatLintReport.getViolations().size());
+        BoatSonarIssues boatSonarIssues = SonarReportConvertor.convert(boatLintReport);
+        Coverage coverage = SonarReportConvertor.generateCoverage(boatLintReport);
+        log.info("\n{}", Json.pretty(boatSonarIssues));
+        log.info("\n{}", SonarReportConvertor.generateCoverageXml(boatLintReport));
+        Assert.assertEquals(boatSonarIssues.getIssues().size(), boatLintReport.getViolations().size());
 
     }
 }

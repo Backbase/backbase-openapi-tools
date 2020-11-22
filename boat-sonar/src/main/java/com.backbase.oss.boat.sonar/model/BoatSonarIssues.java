@@ -1,14 +1,14 @@
-package com.backbase.oss.sonar.model;
+package com.backbase.oss.boat.sonar.model;
 
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class BoatSonarReport {
+public class BoatSonarIssues {
     
     private List<BoatSonarIssue> issues;
 
-    public BoatSonarReport(List<BoatSonarIssue> issues) {
+    public BoatSonarIssues(List<BoatSonarIssue> issues) {
         this.issues = issues;
     }
 }
