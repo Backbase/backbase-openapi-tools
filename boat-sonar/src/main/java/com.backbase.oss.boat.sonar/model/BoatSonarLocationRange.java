@@ -1,4 +1,4 @@
-package com.backbase.oss.sonar.model;
+package com.backbase.oss.boat.sonar.model;
 
 import lombok.Data;
 
