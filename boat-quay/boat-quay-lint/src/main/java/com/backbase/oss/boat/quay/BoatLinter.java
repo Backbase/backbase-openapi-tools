@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.zalando.zally.core.ApiValidator;
@@ -28,6 +29,7 @@ import org.zalando.zally.core.RulesPolicy;
 import org.zalando.zally.rule.api.Rule;
 import org.zalando.zally.rule.api.RuleSet;
 
+@Slf4j
 public class BoatLinter {
 
     private final ApiValidator validator;
@@ -52,12 +54,18 @@ public class BoatLinter {
     }
 
     public BoatLintReport lint(File inputFile) throws IOException {
+        Path relativePath = getFilePath(inputFile);
+        log.info("Linting: {}", inputFile);
         String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
         BoatLintReport boatLintReport = lint(contents);
-        File workingDirectory =  new File(".").getAbsoluteFile();
-        Path relativePath = workingDirectory.toPath().relativize(inputFile.toPath());
         boatLintReport.setFilePath(relativePath.toString());
         return boatLintReport;
+    }
+
+    @NotNull
+    private Path getFilePath(File inputFile) {
+        File workingDirectory =  new File(".").getAbsoluteFile();
+        return workingDirectory.toPath().relativize(inputFile.toPath());
     }
 
     public BoatLintReport lint(String openApiContent) {

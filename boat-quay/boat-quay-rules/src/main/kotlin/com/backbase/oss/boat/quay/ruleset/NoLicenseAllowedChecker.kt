@@ -18,7 +18,7 @@ class NoLicenseAllowedChecker() {
         return when {
             !context.isOpenAPI3() -> emptyList()
             context.api.info.license != null ->
-                listOf(Violation("OpenAPI must not contain a license  because it's covered by the License Agreement we already negotiate with customers. ", "/openapi/openapi".toJsonPointer()))
+                listOf(Violation("OpenAPI must not contain a license  because it's covered by the License Agreement we already negotiate with customers. ", "/openapi/info/version".toJsonPointer()))
             else -> emptyList()
         }
     }
