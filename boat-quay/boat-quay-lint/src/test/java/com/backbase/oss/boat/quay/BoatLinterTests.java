@@ -4,7 +4,9 @@ import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatViolation;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +34,13 @@ public class BoatLinterTests {
 
     @Test
     public void testRulesWithFile() throws IOException {
-        BoatLintReport boatLintReport = boatLinter.lint(new File(getClass().getResource("/openapi/presentation-client-api/openapi.yaml").getFile()));
+        // Can't ret relative file from class path resources. Copy into new file
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+
+        File inputFile = new File("target/openapi.yaml");
+        Files.write(inputFile.toPath(), openApiContents.getBytes());
+
+        BoatLintReport boatLintReport = boatLinter.lint(inputFile);
 
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
