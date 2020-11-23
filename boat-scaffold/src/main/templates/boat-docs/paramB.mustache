@@ -2,8 +2,8 @@
     <p class="marked">{{description}}</p>
     <div class="requests-wrapper">
         <div class="examples-tab-wrapper">
-            <div class="tab-content exampleStyle">
-                <div class="tab-pane active" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema" style="flex: 0 60%;" >
+            <div class="exampleStyle">
+                <div class="left-side" id="requests-{{baseName}}-{{nickname}}-{{code}}-schema" style="width: calc((100% + 64px) * 0.6 - 32px)" >
                     <div id="requests-{{baseName}}-{{nickname}}-{{code}}-schema-data">
                         <script>
                             $(document).ready(function() {
@@ -48,14 +48,14 @@
                                 }
 
                                 var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-                                $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-data').val(JSON.stringify(schema));
+                                $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema-data-input').val(JSON.stringify(schema));
                                 var result = $('#requests-{{baseName}}-{{nickname}}-{{code}}-schema');
                                 result.empty();
                                 result.append(view.render());
                             });
                         </script>
                     </div>
-                    <input id='requests-{{baseName}}-{{nickname}}-{{code}}-schema-data' type='hidden' value=''/>
+                    <input id='requests-{{baseName}}-{{nickname}}-{{code}}-schema-data-input' type='hidden' value=''/>
                 </div>
 
                 {{#hasExamples}}
@@ -66,14 +66,22 @@
                             <select class="example-dropdown-select">
                                 {{#examples}}
                                     <option data-toggle="tab"
-                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}}</option>
+                                            value="#requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">{{name}} - {{contentType}}</option>
                                 {{/examples}}
                             </select>
                         </label>
                         {{#examples}}
                             <div class="example-dropdown-value"
                                  id="requests-{{baseName}}-{{nickname}}-{{code}}-example-{{key}}">
-                                <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
+                                {{#isJson}}
+                                    <div class="buttons-wrapper">
+                                        <button data-action="copy"> Copy </button> <button data-action="expand"> Expand all </button><button data-action="collapse"> Collapse all </button>
+                                    </div>
+                                    <div class="json-viewer ">{{{prettyPrintValue}}}</div>
+                                {{/isJson}}
+                                {{^isJson}}
+                                    <pre class="prettyprint language-json"><code class="json">{{{prettyPrintValue}}}</code></pre>
+                                {{/isJson}}
                             </div>
                         {{/examples}}
 

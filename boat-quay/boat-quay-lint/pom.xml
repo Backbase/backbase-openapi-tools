@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.9.0</version>
+        <version>0.10.0</version>
     </parent>
     <artifactId>boat-quay-lint</artifactId>
     <packaging>jar</packaging>
     <description>Backbase Open Api Tools QUAlitY module</description>
 
-    <name>BOAT :: Quay Rule Set</name>
+    <name>BOAT :: Quay Lint</name>
 
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
@@ -32,6 +32,17 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.backbase.oss</groupId>
@@ -55,6 +66,7 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -65,11 +77,16 @@
                 <version>3.8.1</version>
                 <configuration>
                     <annotationProcessorPaths>
-                        <annotationProcessorPath>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
                             <groupId>com.google.auto.service</groupId>
                             <artifactId>auto-service</artifactId>
                             <version>${auto-service.version}</version>
-                        </annotationProcessorPath>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
