@@ -37,6 +37,24 @@ public class LintMojoTests {
     }
 
     @Test
+    public void testLintDirectoryWithReport() throws MojoFailureException, MojoExecutionException {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile("/oas-examples/"));
+        lintMojo.setFailOnWarning(false);
+        lintMojo.setWriteLintReport(true);
+        lintMojo.execute();
+    }
+
+    @Test(expected = MojoFailureException.class)
+    public void testFailOnWarningWithReport() throws MojoFailureException, MojoExecutionException {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
+        lintMojo.setFailOnWarning(true);
+        lintMojo.setWriteLintReport(true);
+        lintMojo.execute();
+    }
+
+    @Test
     public void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151"));
