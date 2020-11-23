@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.9.0</version>
+        <version>0.10.0</version>
     </parent>
     <artifactId>boat-quay-rules</artifactId>
     <packaging>jar</packaging>
     <description>Backbase Open Api Tools QUAlitY Lint Rules</description>
 
-    <name>BOAT :: Quay Rules</name>
+    <name>BOAT :: Quay Lint Rules</name>
 
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
