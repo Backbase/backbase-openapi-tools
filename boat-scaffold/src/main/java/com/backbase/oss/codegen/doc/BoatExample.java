@@ -23,11 +23,13 @@ public class BoatExample {
     private String name;
     private String contentType;
     private Example example;
+    private boolean isJson;
 
     public BoatExample(String key, String contentType, Example value) {
         this.key = StringUtils.replace(key, " ", "-");
         this.name = key;
         this.contentType = contentType;
+        this.isJson = (value.getValue() instanceof  JsonNode);
         this.example = value;
     }
 
