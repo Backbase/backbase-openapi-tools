@@ -45,6 +45,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.backbase.oss</groupId>
+            <artifactId>boat-quay-lint</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
