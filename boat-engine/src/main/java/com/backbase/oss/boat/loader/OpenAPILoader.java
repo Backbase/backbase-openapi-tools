@@ -10,6 +10,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpenAPILoader {
 
+    public static OpenAPI parse(String openApi) {
+        OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setFlattenComposedSchemas(true);
+        parseOptions.setResolveCombinators(true);
+        SwaggerParseResult swaggerParseResult = openAPIParser.readContents(openApi);
+        return swaggerParseResult.getOpenAPI();
+
+    }
+
     public static OpenAPI load(File file) throws OpenAPILoaderException {
         return load(file, false, false);
     }
