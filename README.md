@@ -19,6 +19,14 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.10.0
+* Maven Plugin 
+   * `boat:lint` mojo will generate an HTML report based on API Guidelines 
+   * `boat:docs` mojo will generate HTML documentation from OpenAPI showing multiple examples and requests as well as Custom Annotations
+* General Bug Fixes
+* Linting Rule Engine extended with reserved word linting
+* **NOTE**: The lint rules are still in development. The documentation is still in the works. 
+
 ## 0.9.0
 * *Maven Plugin*
   * Added `version` parameter to `bundle` goal.

@@ -1,54 +1,58 @@
 package com.backbase.oss.boat.quay;
 
-import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
-import com.typesafe.config.Config;
+import com.backbase.oss.boat.quay.model.BoatLintReport;
+import com.backbase.oss.boat.quay.model.BoatViolation;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.nio.file.Files;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.zalando.zally.core.ApiValidator;
-import org.zalando.zally.core.DefaultContextFactory;
-import org.zalando.zally.core.Result;
-import org.zalando.zally.core.RuleDetails;
-import org.zalando.zally.core.RulesManager;
 
 public class BoatLinterTests {
 
     BoatLinter boatLinter;
-    private RulesManager rulesManager;
 
     @Before
     public void setupBoatLinter() {
-
-        RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
-        Config config = rulesValidatorConfiguration.config("boat.conf");
-        rulesManager = rulesValidatorConfiguration.rulesManager(config);
-        ApiValidator apiValidator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
-        boatLinter = new BoatLinter(apiValidator);
+        boatLinter = new BoatLinter();
     }
 
     @Test
     public void testRules() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
-        List<Result> lint = boatLinter.lint(openApiContents);
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
 
-        for (Result result : lint) {
+        for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertFalse(lint.isEmpty());
+        Assert.assertTrue(boatLintReport.hasViolations());
+    }
+
+    @Test
+    public void testRulesWithFile() throws IOException {
+        // Can't ret relative file from class path resources. Copy into new file
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+
+        File inputFile = new File("target/openapi.yaml");
+        Files.write(inputFile.toPath(), openApiContents.getBytes());
+
+        BoatLintReport boatLintReport = boatLinter.lint(inputFile);
+
+        for (BoatViolation result : boatLintReport.getViolations()) {
+            System.out.println(result.toString());
+        }
+        Assert.assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
     public void ruleManager() {
-
-        List<RuleDetails> rules = rulesManager.getRules();
-        rules.forEach(ruleDetails -> {
+        boatLinter.getAvailableRules().forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });
 
-        Assert.assertFalse(rules.isEmpty());
     }
 }
