@@ -79,7 +79,7 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
                 }
                 File of = new File(outputFolder);
                 if (!of.isDirectory()) {
-                    if (!dryRun && !of.mkdirs()) {
+                    if (!of.mkdirs()) {
                         log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
                     }
                 }
