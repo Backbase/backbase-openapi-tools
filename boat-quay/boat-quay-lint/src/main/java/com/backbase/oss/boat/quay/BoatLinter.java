@@ -60,8 +60,15 @@ public class BoatLinter {
 
     @NotNull
     private Path getFilePath(File inputFile) {
-        File workingDirectory = new File(".").getAbsoluteFile();
-        return workingDirectory.toPath().relativize(inputFile.toPath());
+        File workingDirectory = new File(".");
+        Path relativize;
+        try {
+            relativize = workingDirectory.toPath().relativize(inputFile.toPath());
+        } catch (RuntimeException exception) {
+            log.warn("Failed to get relative path for: {} in working directory: {}", inputFile, workingDirectory);
+            return inputFile.toPath();
+        }
+        return relativize;
     }
 
     public BoatLintReport lint(String openApiContent) {
