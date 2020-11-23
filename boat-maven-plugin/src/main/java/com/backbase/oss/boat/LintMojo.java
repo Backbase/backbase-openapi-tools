@@ -23,7 +23,7 @@ public class LintMojo extends AbstractLintMojo {
         boolean isFailed = false;
         for (BoatLintReport report : boatLintReports) {
             log.info("Lint report for: {}", report.getTitle());
-            if (report.getViolations().isEmpty()) {
+            if (report.hasViolations()) {
                 log.info("OpenAPI: {}, is valid! No warnings!", report.getFilePath());
             } else {
                 isFailed =  true;
