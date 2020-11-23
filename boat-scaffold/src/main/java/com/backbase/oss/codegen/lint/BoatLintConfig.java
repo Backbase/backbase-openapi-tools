@@ -1,6 +1,5 @@
 package com.backbase.oss.codegen.lint;
 
-import java.io.File;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.DefaultCodegen;
@@ -13,7 +12,7 @@ public class BoatLintConfig extends DefaultCodegen {
     public BoatLintConfig() {
         super();
         library = "boat-lint";
-
+        templateDir = "boat-lint";
 
         supportingFiles.add(new SupportingFile("index.handlebars", "index.html"));
         supportingFiles.add(new SupportingFile("css/styles.css", "css/styles.css"));
