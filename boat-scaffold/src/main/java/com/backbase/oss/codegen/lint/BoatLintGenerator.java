@@ -43,13 +43,13 @@ public class BoatLintGenerator extends AbstractDocumentationGenerator {
     }
 
     @SneakyThrows
-    private List<File> generate(BoatLintReport boatLintReport) {
+    public List<File> generate(BoatLintReport boatLintReport) {
         log.info("Generating BOAT Lint Report for: {}", boatLintReport.getTitle());
 
         // After processing our model, convert it into a map;
         Map<String, Object> bundle = convertToBundle(boatLintReport);
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Lint for portal: {}", boatLintReport.getTitle());
+        log.info("Finished creating BOAT Lint for portal: {} in: {} ", boatLintReport.getTitle(), output);
 
         return files;
     }
