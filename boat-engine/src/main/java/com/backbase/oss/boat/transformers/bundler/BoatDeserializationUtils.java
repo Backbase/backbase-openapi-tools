@@ -39,11 +39,11 @@ public class BoatDeserializationUtils {
     }
 
     private static boolean isJson(String contents) {
-        return contents.toString().trim().startsWith("{");
+        return contents.trim().startsWith("{");
     }
 
     private static boolean isXml(String contents) {
-        return contents.toString().trim().startsWith("<");
+        return contents.trim().startsWith("<");
     }
 
 }
