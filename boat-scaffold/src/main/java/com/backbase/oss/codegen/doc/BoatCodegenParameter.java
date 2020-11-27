@@ -49,7 +49,7 @@ public class BoatCodegenParameter extends CodegenParameter {
     }
 
 
-    static BoatCodegenParameter fromCodegenParameter(CodegenParameter codegenParameter) {
+    public static BoatCodegenParameter fromCodegenParameter(CodegenParameter codegenParameter) {
 
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
@@ -161,7 +161,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         return fromCodegenParameter(this);
     }
 
-    static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
+    public static BoatCodegenParameter fromCodegenParameter(Parameter parameter, CodegenParameter codegenParameter, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
         boatCodegenParameter.parameter = parameter;
 
@@ -171,7 +171,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         // Copy Parameter Examples if applicable
         if (parameter.getExample() != null) {
             Object example = parameter.getExample();
-            BoatExample boatExample = new BoatExample("example", codegenParameter.baseType, new Example().value(example));
+            BoatExample boatExample = new BoatExample("example", codegenParameter.baseType, new Example().value(example), false);
             if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
                 boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
             }
@@ -181,7 +181,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (parameter.getExamples() != null) {
             boatCodegenParameter.examples.addAll(parameter.getExamples().entrySet().stream()
                 .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(),
-                    codegenParameter.baseType, stringExampleEntry.getValue()))
+                    codegenParameter.baseType, stringExampleEntry.getValue(), false))
                 .collect(Collectors.toList()));
 
         }
