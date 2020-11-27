@@ -80,6 +80,66 @@ public class GeneratorTests {
     }
 
     @Test
+    public void testAngular() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-angular");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName= "boat-angular";
+        mojo.execute();
+    }
+
+    @Test
+    public void testAngularMock() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-angular-mock");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName= "boat-angular-mock";
+        mojo.execute();
+    }
+
+    @Test
     public void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
