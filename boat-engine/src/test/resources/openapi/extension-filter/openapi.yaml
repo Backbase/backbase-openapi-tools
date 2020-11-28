@@ -1,0 +1,56 @@
+openapi: 3.0.3
+x-remove: remove
+x-keep: keep
+info:
+  title: title
+  version: 1.0.0
+  x-remove: remove
+  x-keep: keep
+servers:
+  - x-remove: remove
+    x-keep: keep
+    url: http://localhost
+paths:
+  x-remove: remove
+  x-keep: keep
+  /:
+    x-remove: remove
+    x-keep: keep
+    get:
+      x-remove: remove
+      x-keep: keep
+      operationId: get
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          x-remove: remove
+          x-keep: keep
+      responses:
+        x-remove: remove
+        x-keep: keep
+        '200':
+          x-remove: remove
+          x-keep: keep
+          description: description
+          content:
+            application/json:
+              x-remove: remove
+              x-keep: keep
+              schema:
+                $ref: "#/components/schemas/One"
+
+components:
+  x-remove: remove
+  x-keep: keep
+  schemas:
+    One:
+      x-remove: remove
+      x-keep: keep
+      type: object
+      properties:
+        id:
+          type: integer
+          x-remove: remove
+          x-keep: keep
