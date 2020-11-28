@@ -89,7 +89,6 @@ public class BoatCache extends ResolverCache {
         }
 
         final String file = refParts[0];
-        final String definitionPath = refParts.length == 2 ? refParts[1] : null;
         String contents = getExternalFileCache().get(file);
 
         if(parentDirectory != null) {
