@@ -15,12 +15,14 @@ public class SpecVersionTransformer implements Transformer {
     private final String version;
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
         final Info info = ofNullable(openAPI.getInfo()).orElseGet(Info::new);
 
         info.setVersion(this.version);
 
         openAPI.setInfo(info);
+
+        return openAPI;
     }
 
 }
