@@ -12,27 +12,34 @@
   ],
   "license": "Unlicense",
   "scripts": {
-    "build": "ng-packagr -p ng-package.json"
+    "build": "ng-packagr -p package.json"
+  },
+  "ngPackage": {
+    "lib": {
+      "entryFile": "public_api.ts"
+    },
+    "dest": "{{{buildDist}}}"
   },
   "peerDependencies": {
     "@angular/core": "^{{ngVersion}}",
+    "@backbase/foundation-ang": "^{{foundationVersion}}",
     "rxjs": "^{{rxjsVersion}}"
   },
   "devDependencies": {
-    "@angular/common": "^{{ngVersion}}",
-    "@angular/compiler": "^{{ngVersion}}",
-    "@angular/compiler-cli": "^{{ngVersion}}",
-    "@angular/core": "^{{ngVersion}}",
-    "@angular/platform-browser": "^{{ngVersion}}",
+    "@angular/common": "~{{ngVersion}}",
+    "@angular/compiler": "~{{ngVersion}}",
+    "@angular/compiler-cli": "~{{ngVersion}}",
+    "@angular/core": "~{{ngVersion}}",
+    "@angular/platform-browser": "~{{ngVersion}}",
     "ng-packagr": "^{{ngPackagrVersion}}",
     "reflect-metadata": "^0.1.3",
-    "rxjs": "^{{rxjsVersion}}",
+    "@backbase/foundation-ang": "~{{foundationVersion}}",
+    "rxjs": "~{{rxjsVersion}}",
     "tsickle": "^{{tsickleVersion}}",
     "typescript": "{{{tsVersion}}}",
     "zone.js": "^{{zonejsVersion}}"
   }{{#npmRepository}},
   "publishConfig": {
     "registry": "{{{npmRepository}}}"
-  }
-{{/npmRepository}}
+  }{{/npmRepository}}
 }

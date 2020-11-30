@@ -4,6 +4,9 @@
 export * from './{{ classFilename }}';
 import { {{ classname }} } from './{{ classFilename }}';
 {{/operations}}
+{{#withMocks}}
+export * from './{{ classFilename }}.mocks';
+{{/withMocks}}
 {{#withInterfaces}}
 export * from './{{ classFilename }}Interface';
 {{/withInterfaces}}
