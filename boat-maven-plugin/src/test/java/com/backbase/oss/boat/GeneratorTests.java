@@ -84,7 +84,7 @@ public class GeneratorTests {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/client-api.yaml").getFile());
 
-        log.info("Generating docs for: {}", spec);
+        log.info("Generating client for: {}", spec);
 
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
@@ -114,7 +114,7 @@ public class GeneratorTests {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
-        log.info("Generating docs for: {}", spec);
+        log.info("Generating client for: {}", spec);
 
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
@@ -144,7 +144,7 @@ public class GeneratorTests {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
-        log.info("Generating docs for: {}", spec);
+        log.info("Generating mocks for: {}", spec);
 
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
@@ -166,6 +166,7 @@ public class GeneratorTests {
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
         mojo.generatorName= "boat-angular-mock";
+        mojo.enablePostProcessFile= true;
         mojo.execute();
     }
 

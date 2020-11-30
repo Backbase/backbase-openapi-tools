@@ -17,14 +17,21 @@
 
 package com.backbase.oss.codegen.angular;
 
+import com.backbase.oss.codegen.doc.BoatCodegenParameter;
+import com.backbase.oss.codegen.doc.BoatCodegenResponse;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
-import org.openapitools.codegen.meta.FeatureSet;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.SemVer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -35,23 +42,13 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.openapitools.codegen.utils.StringUtils.*;
 
 @Slf4j
-public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClientCodegen {
-
-    private static String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    private static String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    private static String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
-
-    public static enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key};
-
-    private static final String DEFAULT_IMPORT_PREFIX = "./";
-
+public abstract class BoatAngularAbstractGenerator extends AbstractTypeScriptClientCodegen {
     public static final String NPM_REPOSITORY = "npmRepository";
     public static final String WITH_INTERFACES = "withInterfaces";
-    public static final String WITH_MOCKS = "withMocks";
     public static final String USE_SINGLE_REQUEST_PARAMETER = "useSingleRequestParameter";
     public static final String TAGGED_UNIONS = "taggedUnions";
     public static final String NG_VERSION = "ngVersion";
-    public static final String FOUNDATION_VERSION = "foundationVersion";
+
     public static final String PROVIDED_IN_ROOT = "providedInRoot";
     public static final String ENFORCE_GENERIC_MODULE_WITH_PROVIDERS = "enforceGenericModuleWithProviders";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
@@ -62,14 +59,19 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
     public static final String FILE_NAMING = "fileNaming";
     public static final String STRING_ENUMS = "stringEnums";
     public static final String STRING_ENUMS_DESC = "Generate string enums instead of objects for enum values.";
-    public static final String BUILD_DIST = "buildDist";
-
-    protected String foundationVersion = "6.0.0";
     public static final String QUERY_PARAM_OBJECT_FORMAT = "queryParamObjectFormat";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BoatAngularAbstractGenerator.class);
+    private static final String DEFAULT_IMPORT_PREFIX = "./";
 
+    protected static final String FOUNDATION_VERSION = "foundationVersion";
+    public static final String BUILD_DIST = "buildDist";
+    protected String foundationVersion = "6.0.0";
+
+    private static String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
+    private static String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
+    private static String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
     protected String ngVersion = "10.0.0";
     protected String npmRepository = null;
-    private boolean useSingleRequestParameter = true;
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
     protected String modelSuffix = "";
@@ -78,22 +80,14 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
     protected Boolean stringEnums = false;
     protected QUERY_PARAM_OBJECT_FORMAT_TYPE queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.dot;
 
-    private boolean taggedUnions = false;
+    protected boolean useSingleRequestParameter = true;
+    protected boolean taggedUnions = false;
 
-	private FeatureSet featureSet;
-
-    public BackbaseTypescriptAngularGenerator() {
+    public BoatAngularAbstractGenerator() {
         super();
 
         modifyFeatureSet(features -> features.includeDocumentationFeatures(DocumentationFeature.Readme));
 
-        this.outputFolder = "generated-code/backbase-typescript-angular";
-
-        supportsMultipleInheritance = true;
-
-        embeddedTemplateDir = templateDir = "backbase-typescript-angular";
-        modelTemplateFiles.put("model.mustache", ".ts");
-        apiTemplateFiles.put("api.service.mustache", ".ts");
         languageSpecificPrimitives.add("Blob");
         typeMapping.put("file", "Blob");
         apiPackage = "api";
@@ -103,9 +97,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
                 "Use this property to set an url your private npmRepo in the package.json"));
         this.cliOptions.add(CliOption.newBoolean(WITH_INTERFACES,
                 "Setting this property to true will generate interfaces next to the default class implementations.",
-                false));
-        this.cliOptions.add(CliOption.newBoolean(WITH_MOCKS,
-                "Setting this property to true will generate mocks out of the examples.",
                 false));
         this.cliOptions.add(CliOption.newBoolean(USE_SINGLE_REQUEST_PARAMETER,
                 "Setting this property to true will generate functions with a single argument containing all API endpoint parameters instead of one argument per parameter.",
@@ -117,7 +108,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
                 "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
                 false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 6.0.0)").defaultValue(this.ngVersion));
-        this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(SERVICE_FILE_SUFFIX, "The suffix of the file of the generated service (service<suffix>.ts).").defaultValue(this.serviceFileSuffix));
@@ -125,8 +115,11 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         this.cliOptions.add(new CliOption(MODEL_FILE_SUFFIX, "The suffix of the file of the generated model (model<suffix>.ts)."));
         this.cliOptions.add(new CliOption(FILE_NAMING, "Naming convention for the output files: 'camelCase', 'kebab-case'.").defaultValue(this.fileNaming));
         this.cliOptions.add(new CliOption(STRING_ENUMS, STRING_ENUMS_DESC).defaultValue(String.valueOf(this.stringEnums)));
-        this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
         this.cliOptions.add(new CliOption(QUERY_PARAM_OBJECT_FORMAT, "The format for query param objects: 'dot', 'json', 'key'.").defaultValue(this.queryParamObjectFormat.name()));
+
+        this.cliOptions.add(new CliOption(NPM_REPOSITORY, "Use this property to set an url your private npmRepo in the package.json"));
+        this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
+        this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
     }
 
     @Override
@@ -137,12 +130,12 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
 
     @Override
     public String getName() {
-        return "backbase-typescript-angular";
+        return "boat-angular-abstract";
     }
 
     @Override
     public String getHelp() {
-        return "Generates a TypeScript Angular (6.x - 10.x) client library.";
+        return "Generates a TypeScript Angular (6.x - 10.x) client library compatible with Backbase.";
     }
 
     @Override
@@ -152,7 +145,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
                 new SupportingFile("models.mustache", modelPackage().replace('.', File.separatorChar), "models.ts"));
         supportingFiles
                 .add(new SupportingFile("apis.mustache", apiPackage().replace('.', File.separatorChar), "api.ts"));
-        supportingFiles.add(new SupportingFile("public_api.mustache", getIndexDirectory(), "public_api.ts"));
+        supportingFiles.add(new SupportingFile("index.mustache", getIndexDirectory(), "index.ts"));
         supportingFiles.add(new SupportingFile("api.module.mustache", getIndexDirectory(), "api.module.ts"));
         supportingFiles.add(new SupportingFile("configuration.mustache", getIndexDirectory(), "configuration.ts"));
         supportingFiles.add(new SupportingFile("variables.mustache", getIndexDirectory(), "variables.ts"));
@@ -167,17 +160,8 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             ngVersion = new SemVer(additionalProperties.get(NG_VERSION).toString());
         } else {
             ngVersion = new SemVer(this.ngVersion);
-            log.info("generating code for Angular {} ...", ngVersion);
-            log.info("  (you can select the angular version by setting the additionalProperty ngVersion)");
-        }
-
-        SemVer foundationVersion;
-        if (additionalProperties.containsKey(FOUNDATION_VERSION)) {
-            foundationVersion = new SemVer(additionalProperties.get(FOUNDATION_VERSION).toString());
-        } else {
-            foundationVersion = new SemVer(this.foundationVersion);
-            log.info("generating code with foundation-ang {} ...", foundationVersion);
-            log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
+            LOGGER.info("generating code for Angular {} ...", ngVersion);
+            LOGGER.info("  (you can select the angular version by setting the additionalProperty ngVersion)");
         }
 
         if (additionalProperties.containsKey(NPM_NAME)) {
@@ -199,13 +183,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             }
         }
 
-        if (additionalProperties.containsKey(WITH_MOCKS)) {
-            boolean withMocks = Boolean.parseBoolean(additionalProperties.get(WITH_MOCKS).toString());
-            if (withMocks) {
-                apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
-            }
-        }
-
         if (additionalProperties.containsKey(USE_SINGLE_REQUEST_PARAMETER)) {
             this.setUseSingleRequestParameter(convertPropertyToBoolean(USE_SINGLE_REQUEST_PARAMETER));
         }
@@ -219,7 +196,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             additionalProperties.put(PROVIDED_IN_ROOT, true);
         } else {
             additionalProperties.put(PROVIDED_IN_ROOT, Boolean.parseBoolean(
-                additionalProperties.get(PROVIDED_IN_ROOT).toString()
+                    additionalProperties.get(PROVIDED_IN_ROOT).toString()
             ));
         }
 
@@ -230,7 +207,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         }
 
         additionalProperties.put(NG_VERSION, ngVersion);
-        additionalProperties.put(FOUNDATION_VERSION, foundationVersion);
 
         if (additionalProperties.containsKey(API_MODULE_PREFIX)) {
             String apiModulePrefix = additionalProperties.get(API_MODULE_PREFIX).toString();
@@ -265,9 +241,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         if (additionalProperties.containsKey(FILE_NAMING)) {
             this.setFileNaming(additionalProperties.get(FILE_NAMING).toString());
         }
-        if (!additionalProperties.containsKey(BUILD_DIST)) {
-            additionalProperties.put(BUILD_DIST, "dist");
-        }
 
         if (additionalProperties.containsKey(QUERY_PARAM_OBJECT_FORMAT)) {
             setQueryParamObjectFormat((String) additionalProperties.get(QUERY_PARAM_OBJECT_FORMAT));
@@ -275,10 +248,9 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         additionalProperties.put("isQueryParamObjectFormatDot", getQueryParamObjectFormatDot());
         additionalProperties.put("isQueryParamObjectFormatJson", getQueryParamObjectFormatJson());
         additionalProperties.put("isQueryParamObjectFormatKey", getQueryParamObjectFormatKey());
-
     }
 
-    private void addNpmPackageGeneration(SemVer ngVersion) {
+    protected void addNpmPackageGeneration(SemVer ngVersion) {
 
         if (additionalProperties.containsKey(NPM_REPOSITORY)) {
             this.setNpmRepository(additionalProperties.get(NPM_REPOSITORY).toString());
@@ -311,6 +283,8 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             // Angular v6
             additionalProperties.put("rxjsVersion", "6.1.0");
         }
+
+        supportingFiles.add(new SupportingFile("ng-package.mustache", getIndexDirectory(), "ng-package.json"));
 
         // Specific ng-packagr configuration
         if (ngVersion.atLeast("10.0.0")) {
@@ -348,17 +322,17 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
     }
 
-    private String getIndexDirectory() {
+    protected String getIndexDirectory() {
         String indexPackage = modelPackage.substring(0, Math.max(0, modelPackage.lastIndexOf('.')));
         return indexPackage.replace('.', File.separatorChar);
     }
 
-    public void setStringEnums(boolean value) {
-        stringEnums = value;
-    }
-
     public Boolean getStringEnums() {
         return stringEnums;
+    }
+
+    public void setStringEnums(boolean value) {
+        stringEnums = value;
     }
 
     public boolean getQueryParamObjectFormatDot() {
@@ -387,8 +361,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         }
     }
 
-
-    private String applyLocalTypeMapping(String type) {
+    protected String applyLocalTypeMapping(String type) {
         if (typeMapping.containsKey(type)) {
             type = typeMapping.get(type);
         }
@@ -404,7 +377,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
     @Override
     public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> operations, List<Object> allModels) {
         Map<String, Object> objs = (Map<String, Object>) operations.get("operations");
-        Map<String, Map<String, Object>> pathOperations = new HashMap<String, Map<String, Object>>();
 
         // Add filename information for api imports
         objs.put("apiFilename", getApiFilenameFromClassname(objs.get("classname").toString()));
@@ -422,25 +394,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             StringBuilder pathBuffer = new StringBuilder();
             StringBuilder parameterName = new StringBuilder();
             int insideCurly = 0;
-
-            Map<String, Object> pathOp = new HashMap<>();
-            pathOp.put("pathName", removeNonNameElementToCamelCase(op.path.replaceAll("[\\{\\}\\/]", "-")));
-            pathOp.put("pattern", op.path);
-            pathOp.put("hasExamples", op.examples != null && !op.examples.isEmpty());
-            pathOp.put("operations", Arrays.asList(op));
-            pathOperations.merge(op.path, pathOp, (o1, o2) -> {
-                o1.put("operations", Stream.of(
-                    (List<CodegenOperation>) o1.get("operations"),
-                    (List<CodegenOperation>) o2.get("operations")
-                ).flatMap(oper -> oper.stream())
-                .collect(Collectors.toList()));
-                o1.put("hasExamples",
-                    (boolean) o1.get("hasExamples") ||
-                    (boolean) o2.get("hasExamples")
-                );
-
-                return o1;
-            });
 
             // Iterate through existing string, one character at a time.
             for (int i = 0; i < op.path.length(); i++) {
@@ -480,7 +433,6 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
             op.path = pathBuffer.toString();
         }
 
-        operations.put("pathOperations", pathOperations.values());
         operations.put("hasSomeFormParams", hasSomeFormParams);
 
         // Add additional filename information for model imports in the services
@@ -497,11 +449,11 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
     /**
      * Finds and returns a path parameter of an operation by its name
      *
-     * @param operation the operation
+     * @param operation     the operation
      * @param parameterName the name of the parameter
      * @return param
      */
-    private CodegenParameter findPathParameterByName(CodegenOperation operation, String parameterName) {
+    protected CodegenParameter findPathParameterByName(CodegenOperation operation, String parameterName) {
         for (CodegenParameter param : operation.pathParams) {
             if (param.baseName.equals(parameterName)) {
                 return param;
@@ -546,7 +498,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
     /**
      * Parse imports
      */
-    private Set<String> parseImports(CodegenModel cm) {
+    protected Set<String> parseImports(CodegenModel cm) {
         Set<String> newImports = new HashSet<String>();
         if (cm.imports.size() > 0) {
             for (String name : cm.imports) {
@@ -563,7 +515,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         return newImports;
     }
 
-    private List<Map<String, String>> toTsImports(CodegenModel cm, Set<String> imports) {
+    protected List<Map<String, String>> toTsImports(CodegenModel cm, Set<String> imports) {
         List<Map<String, String>> tsImports = new ArrayList<>();
         for (String im : imports) {
             if (!im.equals(cm.classname)) {
@@ -625,15 +577,15 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         this.npmRepository = npmRepository;
     }
 
-    private boolean getUseSingleRequestParameter() {
+    protected boolean getUseSingleRequestParameter() {
         return useSingleRequestParameter;
     }
 
-    private void setUseSingleRequestParameter(boolean useSingleRequestParameter) {
+    protected void setUseSingleRequestParameter(boolean useSingleRequestParameter) {
         this.useSingleRequestParameter = useSingleRequestParameter;
     }
 
-    private String getApiFilenameFromClassname(String classname) {
+    protected String getApiFilenameFromClassname(String classname) {
         String name = classname.substring(0, classname.length() - serviceSuffix.length());
         return toApiFilename(name);
     }
@@ -668,7 +620,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
      * @param argument The name of the argument being validated. This is only used for displaying an error message.
      * @param value    The value that is being validated.
      */
-    private void validateFileSuffixArgument(String argument, String value) {
+    protected void validateFileSuffixArgument(String argument, String value) {
         if (!value.matches(FILE_NAME_SUFFIX_PATTERN)) {
             throw new IllegalArgumentException(
                     String.format(Locale.ROOT, "%s file suffix only allows '.', '-' and alphanumeric characters.", argument)
@@ -683,7 +635,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
      * @param argument The name of the argument being validated. This is only used for displaying an error message.
      * @param value    The value that is being validated.
      */
-    private void validateClassPrefixArgument(String argument, String value) {
+    protected void validateClassPrefixArgument(String argument, String value) {
         if (!value.matches(CLASS_NAME_PREFIX_PATTERN)) {
             throw new IllegalArgumentException(
                     String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", argument)
@@ -698,7 +650,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
      * @param argument The name of the argument being validated. This is only used for displaying an error message.
      * @param value    The value that is being validated.
      */
-    private void validateClassSuffixArgument(String argument, String value) {
+    protected void validateClassSuffixArgument(String argument, String value) {
         if (!value.matches(CLASS_NAME_SUFFIX_PATTERN)) {
             throw new IllegalArgumentException(
                     String.format(Locale.ROOT, "%s class suffix only allows alphanumeric characters.", argument)
@@ -729,7 +681,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
      *
      * @param fileNaming the file naming to use
      */
-    private void setFileNaming(String fileNaming) {
+    protected void setFileNaming(String fileNaming) {
         if ("camelCase".equals(fileNaming) || "kebab-case".equals(fileNaming)) {
             this.fileNaming = fileNaming;
         } else {
@@ -744,7 +696,7 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
      * @param originalName the original name to transform
      * @return the transformed name
      */
-    private String convertUsingFileNamingConvention(String originalName) {
+    protected String convertUsingFileNamingConvention(String originalName) {
         String name = this.removeModelPrefixSuffix(originalName);
         if ("kebab-case".equals(fileNaming)) {
             name = dashize(underscore(name));
@@ -753,5 +705,51 @@ public class BackbaseTypescriptAngularGenerator extends AbstractTypeScriptClient
         }
         return name;
     }
+
+    private CodegenParameter mapComponentRequestBody(Set<String> imports, java.util.Map.Entry<String, RequestBody> namedRequestBody) {
+        String name = namedRequestBody.getKey();
+        RequestBody requestBody = namedRequestBody.getValue();
+        return fromRequestBody(requestBody, imports, name);
+    }
+
+    private CodegenParameter mapComponentParameter(Set<String> imports, java.util.Map.Entry<String, Parameter> nameParameter) {
+        Parameter parameter = nameParameter.getValue();
+        return fromParameter(parameter, imports);
+    }
+
+    private CodegenResponse mapCodegenResponse(java.util.Map.Entry<String, ApiResponse> codeResponse) {
+        String responseCode = codeResponse.getKey();
+        // try to resolve response code from key. otherwise use default
+        responseCode = responseCode.replaceAll("\\D+", "");
+        if (responseCode.length() != 3) {
+            responseCode = "default";
+        }
+        ApiResponse response = codeResponse.getValue();
+        return fromResponse(responseCode, response);
+    }
+
+    @Override
+    public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
+        CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
+        log.debug("Created CodegenParameter model for parameter: {}", parameter.getName());
+        return BoatCodegenParameter.fromCodegenParameter(parameter, codegenParameter, openAPI);
+    }
+
+    @Override
+    public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
+        CodegenParameter codegenParameter = super.fromRequestBody(body, imports, bodyParameterName);
+        log.debug("Created CodegenParameter model for request body: {} with bodyParameterName: {}", codegenParameter.baseName, bodyParameterName);
+        return BoatCodegenParameter.fromCodegenParameter(codegenParameter, body, openAPI);
+    }
+
+    @Override
+    public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
+        CodegenResponse r = super.fromResponse(responseCode, response);
+        r.message = StringUtils.replace(r.message, "`", "\\`");
+
+        return new BoatCodegenResponse(r, responseCode, response, openAPI);
+    }
+
+    public static enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key}
 
 }
