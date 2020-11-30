@@ -80,36 +80,6 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testBackbaseTypescriptAngular() throws MojoExecutionException {
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/client-api.yaml").getFile());
-
-        log.info("Generating client for: {}", spec);
-
-        GenerateMojo mojo = new GenerateMojo();
-        File input = new File(spec);
-        File output = new File("target/backbase-typescript-angular");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.bundleSpecs = true;
-        mojo.dereferenceComponents = true;
-        mojo.generatorName= "backbase-typescript-angular";
-        mojo.execute();
-    }
-
-    @Test
     public void testAngular() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
