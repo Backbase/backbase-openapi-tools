@@ -4,12 +4,13 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.assertj.core.util.Lists;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
@@ -106,37 +107,13 @@ public class GeneratorTests {
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
         mojo.generatorName= "boat-angular";
-        mojo.execute();
-    }
-
-    @Test
-    public void testAngularMock() throws MojoExecutionException {
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-
-        log.info("Generating mocks for: {}", spec);
-
-        GenerateMojo mojo = new GenerateMojo();
-        File input = new File(spec);
-        File output = new File("target/boat-angular-mock");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.bundleSpecs = true;
-        mojo.dereferenceComponents = true;
-        mojo.generatorName= "boat-angular-mock";
         mojo.enablePostProcessFile= true;
+
+        if(Objects.isNull(mojo.additionalProperties)){
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+
         mojo.execute();
     }
 
