@@ -82,7 +82,7 @@ public class GeneratorTests {
     @Test
     public void testBackbaseTypescriptAngular() throws MojoExecutionException {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/client-api.yaml").getFile());
 
         log.info("Generating docs for: {}", spec);
 
