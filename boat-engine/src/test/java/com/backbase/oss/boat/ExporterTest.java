@@ -33,6 +33,14 @@ public class ExporterTest extends AbstractBoatEngineTests {
     }
 
     @Test
+    public void testXmlTypeSchemaConversion() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
+    @Test
     public void normalizeNameTests() {
         String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
         assertEquals("BatchuploadGetResponse", s);

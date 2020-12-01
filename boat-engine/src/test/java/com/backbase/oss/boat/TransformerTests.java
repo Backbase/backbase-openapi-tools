@@ -3,18 +3,15 @@ package com.backbase.oss.boat;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
-import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
-import com.backbase.oss.boat.transformers.Bundler;
-import com.backbase.oss.boat.transformers.CaseFormatTransformer;
-import com.backbase.oss.boat.transformers.Deprecator;
-import com.backbase.oss.boat.transformers.Normaliser;
-import com.backbase.oss.boat.transformers.OpenAPIExtractor;
+import com.backbase.oss.boat.transformers.*;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -100,5 +97,6 @@ public class TransformerTests extends AbstractBoatEngineTests {
         Assert.assertTrue(new File("target/openapi.yaml").exists());
 
     }
+
 
 }
