@@ -37,7 +37,7 @@ public class XmlSchemaToOpenApi {
 
     }
 
-    public static void map(Element node, Schema schema, Components components) {
+    private static void map(Element node, Schema schema, Components components) {
 
         NodeList complexTypes = ((Element) node).getElementsByTagName("xs:complexType");
         for (int i = 0; i < complexTypes.getLength(); i++) {
