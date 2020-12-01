@@ -448,7 +448,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                         insideCurly++;
 
                         // Add the more complicated component instead of just the brace.
-                        pathBuffer.append("${encodeURIComponent(String(");
+                        pathBuffer.append("${encodeURIComponent(String(_");
                         break;
                     case '}':
                         // We exited curly braces, so track that.
