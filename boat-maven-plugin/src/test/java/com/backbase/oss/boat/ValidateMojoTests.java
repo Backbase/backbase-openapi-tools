@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ValidateMojoTests {
 
@@ -43,9 +44,10 @@ public class ValidateMojoTests {
     }
 
     @Test
-    public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException {
+    public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
 
         File output = new File("src/test/resources/ReadWriteFiles/output.yaml");
+        output.createNewFile();
         File input = new File("src/test/resources/oas-examples/petstore.yaml");
         RemoveDeprecatedMojo removeDeprecatedMojo = new RemoveDeprecatedMojo();
         removeDeprecatedMojo.setInput(input);
@@ -57,8 +59,9 @@ public class ValidateMojoTests {
     }
 
     @Test
-    public void testDecompseMojo() throws MojoFailureException, MojoExecutionException {
+    public void testDecompseMojo() throws MojoFailureException, MojoExecutionException, IOException {
         File output = new File("src/test/resources/ReadWriteFiles/output.yaml");
+        output.createNewFile();
         File input = new File("src/test/resources/oas-examples/petstore.yaml");
         DecomposeMojo decomposeMojo = new DecomposeMojo();
         decomposeMojo.setInput(input);
