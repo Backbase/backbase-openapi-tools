@@ -33,6 +33,14 @@ public class BoatLinterTests {
     }
 
     @Test
+    public void testBoatViolationDisplay() throws IOException {
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
+        BoatViolation testDisplay = boatLintReport.getViolations().get(0);
+        Assert.assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
+    }
+
+    @Test
     public void testRulesWithFile() throws IOException {
         // Can't ret relative file from class path resources. Copy into new file
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
