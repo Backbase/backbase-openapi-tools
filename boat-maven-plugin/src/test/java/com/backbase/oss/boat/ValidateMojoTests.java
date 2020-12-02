@@ -47,7 +47,6 @@ public class ValidateMojoTests {
     public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
 
         File output = new File("src/test/resources/ReadWriteFiles/output.yaml");
-        output.createNewFile();
         File input = new File("src/test/resources/oas-examples/petstore.yaml");
         RemoveDeprecatedMojo removeDeprecatedMojo = new RemoveDeprecatedMojo();
         removeDeprecatedMojo.setInput(input);
@@ -56,12 +55,12 @@ public class ValidateMojoTests {
         removeDeprecatedMojo.execute();
         Assert.assertTrue(output.length()>0);
         output.delete();
+        output.createNewFile();
     }
 
     @Test
-    public void testDecompseMojo() throws MojoFailureException, MojoExecutionException, IOException {
+    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException, IOException {
         File output = new File("src/test/resources/ReadWriteFiles/output.yaml");
-        output.createNewFile();
         File input = new File("src/test/resources/oas-examples/petstore.yaml");
         DecomposeMojo decomposeMojo = new DecomposeMojo();
         decomposeMojo.setInput(input);
@@ -69,6 +68,7 @@ public class ValidateMojoTests {
         Assert.assertEquals(0, output.length());
         decomposeMojo.execute();
         Assert.assertTrue(output.length()>0);
+        output.createNewFile();
         output.delete();
     }
 }
