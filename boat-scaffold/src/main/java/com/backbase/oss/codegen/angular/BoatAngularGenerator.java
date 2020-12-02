@@ -28,8 +28,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
-import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
-import org.openapitools.codegen.meta.FeatureSet;
+import org.openapitools.codegen.languages.TypeScriptAngularClientCodegen;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.SemVer;
@@ -43,7 +42,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.openapitools.codegen.utils.StringUtils.*;
 
 @Slf4j
-public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
+public class BoatAngularGenerator extends TypeScriptAngularClientCodegen {
 
     public static final String NPM_REPOSITORY = "npmRepository";
     public static final String WITH_INTERFACES = "withInterfaces";
@@ -66,9 +65,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String BUILD_DIST = "buildDist";
     public static final String QUERY_PARAM_OBJECT_FORMAT = "queryParamObjectFormat";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
-    private static String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    private static String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    private static String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
+    private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
+    private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
+    private static final String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
     protected String foundationVersion = "6.0.0";
     protected String ngVersion = "10.0.0";
     protected String npmRepository = null;
@@ -81,7 +80,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected QUERY_PARAM_OBJECT_FORMAT_TYPE queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.dot;
     private boolean useSingleRequestParameter = true;
     private boolean taggedUnions = false;
-    private FeatureSet featureSet;
 
     public BoatAngularGenerator() {
         super();
@@ -186,7 +184,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         }
 
         if (additionalProperties.containsKey(STRING_ENUMS)) {
-            setStringEnums(Boolean.valueOf(additionalProperties.get(STRING_ENUMS).toString()));
+            setStringEnums(Boolean.parseBoolean(additionalProperties.get(STRING_ENUMS).toString()));
             additionalProperties.put("stringEnums", getStringEnums());
             if (getStringEnums()) {
                 classEnumSeparator = "";
@@ -235,7 +233,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         if (additionalProperties.containsKey(API_MODULE_PREFIX)) {
             String apiModulePrefix = additionalProperties.get(API_MODULE_PREFIX).toString();
-            validateClassPrefixArgument("ApiModule", apiModulePrefix);
+            validateClassPrefixArgument(apiModulePrefix);
 
             additionalProperties.put("apiModuleClassName", apiModulePrefix + "ApiModule");
             additionalProperties.put("configurationClassName", apiModulePrefix + "Configuration");
@@ -432,7 +430,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     @Override
     public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> operations, List<Object> allModels) {
         Map<String, Object> objs = (Map<String, Object>) operations.get("operations");
-        Map<String, Map<String, Object>> pathOperations = new HashMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> pathOperations = new HashMap<>();
 
         // Add filename information for api imports
         objs.put("apiFilename", getApiFilenameFromClassname(objs.get("classname").toString()));
@@ -452,15 +450,15 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             int insideCurly = 0;
 
             Map<String, Object> pathOp = new HashMap<>();
-            pathOp.put("pathName", removeNonNameElementToCamelCase(op.path.replaceAll("[\\{\\}\\/]", "-")));
+            pathOp.put("pathName", removeNonNameElementToCamelCase(op.path.replaceAll("[{}/]", "-")));
             pathOp.put("pattern", op.path);
             pathOp.put("hasExamples", op.examples != null && !op.examples.isEmpty());
-            pathOp.put("operations", Arrays.asList(op));
+            pathOp.put("operations", Collections.singletonList(op));
             pathOperations.merge(op.path, pathOp, (o1, o2) -> {
                 o1.put("operations", Stream.of(
                         (List<CodegenOperation>) o1.get("operations"),
                         (List<CodegenOperation>) o2.get("operations")
-                ).flatMap(oper -> oper.stream())
+                ).flatMap(Collection::stream)
                         .collect(Collectors.toList()));
                 o1.put("hasExamples",
                         (boolean) o1.get("hasExamples") ||
@@ -575,14 +573,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
      * Parse imports
      */
     private Set<String> parseImports(CodegenModel cm) {
-        Set<String> newImports = new HashSet<String>();
+        Set<String> newImports = new HashSet<>();
         if (cm.imports.size() > 0) {
             for (String name : cm.imports) {
-                if (name.indexOf(" | ") >= 0) {
+                if (name.contains(" | ")) {
                     String[] parts = name.split(" \\| ");
-                    for (String s : parts) {
-                        newImports.add(s);
-                    }
+                    Collections.addAll(newImports, parts);
                 } else {
                     newImports.add(name);
                 }
@@ -708,13 +704,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
      * Validates that the given string value only contains alpha numeric characters.
      * Throws an IllegalArgumentException, if the string contains any other characters.
      *
-     * @param argument The name of the argument being validated. This is only used for displaying an error message.
      * @param value    The value that is being validated.
      */
-    private void validateClassPrefixArgument(String argument, String value) {
+    private void validateClassPrefixArgument(String value) {
         if (!value.matches(CLASS_NAME_PREFIX_PATTERN)) {
             throw new IllegalArgumentException(
-                    String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", argument)
+                    String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", "ApiModule")
             );
         }
     }
@@ -782,28 +777,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return name;
     }
 
-    private CodegenParameter mapComponentRequestBody(Set<String> imports, java.util.Map.Entry<String, RequestBody> namedRequestBody) {
-        String name = namedRequestBody.getKey();
-        RequestBody requestBody = namedRequestBody.getValue();
-        return fromRequestBody(requestBody, imports, name);
-    }
-
-    private CodegenParameter mapComponentParameter(Set<String> imports, java.util.Map.Entry<String, Parameter> nameParameter) {
-        Parameter parameter = nameParameter.getValue();
-        return fromParameter(parameter, imports);
-    }
-
-    private CodegenResponse mapCodegenResponse(java.util.Map.Entry<String, ApiResponse> codeResponse) {
-        String responseCode = codeResponse.getKey();
-        // try to resolve response code from key. otherwise use default
-        responseCode = responseCode.replaceAll("\\D+", "");
-        if (responseCode.length() != 3) {
-            responseCode = "default";
-        }
-        ApiResponse response = codeResponse.getValue();
-        return fromResponse(responseCode, response);
-    }
-
     @Override
     public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
         CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
@@ -826,6 +799,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
 
-    public static enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key}
+    public enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key}
 
 }
