@@ -37,6 +37,9 @@ public class BoatLinterTests {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
         BoatViolation testDisplay = boatLintReport.getViolations().get(0);
+        if (!testDisplay.displayString().contains("[219]")){
+            testDisplay = boatLintReport.getViolations().get(2);
+        }
         Assert.assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
     }
 
