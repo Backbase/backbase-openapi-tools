@@ -19,10 +19,12 @@ package com.backbase.oss.codegen.angular;
 
 import com.backbase.oss.codegen.doc.BoatCodegenParameter;
 import com.backbase.oss.codegen.doc.BoatCodegenResponse;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.servers.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
@@ -391,6 +393,34 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             type = typeMapping.get(type);
         }
         return type;
+    }
+
+    @Override
+    public CodegenOperation fromOperation(String path,
+                                          String httpMethod,
+                                          Operation operation,
+                                          List<Server> servers) {
+        CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+
+        codegenOperation.responses.stream()
+                .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
+                .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
+
+        return codegenOperation;
+    }
+
+    private void addProducesReturnType(ApiResponse inputResponse, CodegenOperation codegenOperation) {
+        ApiResponse response = ModelUtils.getReferencedApiResponse(this.openAPI, inputResponse);
+        if (response == null || response.getContent() == null || response.getContent().isEmpty() || codegenOperation.produces == null) {
+            return;
+        }
+
+        inputResponse.getContent().forEach((contentType, mediaType) -> {
+            String typeDeclaration = getTypeDeclaration(ModelUtils.unaliasSchema(this.openAPI, mediaType.getSchema()));
+            codegenOperation.produces.stream()
+                    .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))
+                    .forEach(codegenMediaType -> codegenMediaType.put("returnType", typeDeclaration));
+        });
     }
 
     @Override
