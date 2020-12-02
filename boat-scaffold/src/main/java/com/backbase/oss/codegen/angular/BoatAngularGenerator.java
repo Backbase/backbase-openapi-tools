@@ -35,6 +35,7 @@ import org.openapitools.codegen.utils.SemVer;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,9 +145,136 @@ public class BoatAngularGenerator extends TypeScriptAngularClientCodegen {
         return "Generates a TypeScript Angular (6.x - 10.x) client library.";
     }
 
+
+    private void processOpt(String key, Consumer<String> whenProvided) {
+        processOpt(key, whenProvided, null);
+    }
+
+    private void processOpt(String key, Runnable whenProvided) {
+        processOpt(key, (_value) -> whenProvided.run());
+    }
+
+    private void processOpt(String key, Consumer<String> whenProvided, Runnable notProvided) {
+        if (additionalProperties.containsKey(key)) {
+            whenProvided.accept(additionalProperties.get(key).toString());
+        } else if (notProvided != null) {
+            notProvided.run();
+        }
+    }
+
+    private void processBooleanOpt(String key, Consumer<Boolean> whenProvided) {
+        processBooleanOpt(key, whenProvided, null);
+    }
+    private void processBooleanOpt(String key, Consumer<Boolean> whenProvided, Runnable notProvided) {
+        if (additionalProperties.containsKey(key)) {
+            whenProvided.accept(convertPropertyToBoolean(key));
+        } else if (notProvided != null) {
+            notProvided.run();
+        }
+    }
+
     @Override
     public void processOpts() {
         super.processOpts();
+        addSupportingFiles();
+
+        processOpt(NG_VERSION, (value) -> applyAngularVersion(new SemVer(value)), () -> {
+            SemVer angularVersion = new SemVer(ngVersion);
+            applyAngularVersion(angularVersion);
+            log.info("generating code for Angular {} ...", angularVersion);
+            log.info("  (you can select the angular version by setting the additionalProperty ngVersion)");
+        });
+
+        processOpt(FOUNDATION_VERSION,
+                (value) -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
+                () -> {
+                    SemVer foundationVersion = new SemVer(this.foundationVersion);
+                    additionalProperties.put(FOUNDATION_VERSION, foundationVersion);
+                    log.info("generating code with foundation-ang {} ...", foundationVersion);
+                    log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
+                });
+
+        processBooleanOpt(STRING_ENUMS, (value) -> {
+            setStringEnums(value);
+            additionalProperties.put("stringEnums", getStringEnums());
+            if (getStringEnums()) {
+                classEnumSeparator = "";
+            }
+        });
+
+        processBooleanOpt(WITH_INTERFACES, (withInterfaces) -> {
+            if (withInterfaces) {
+                apiTemplateFiles.put("apiInterface.mustache", "Interface.ts");
+            }
+        });
+
+        processBooleanOpt(WITH_MOCKS, (withMocks) -> {
+            if (withMocks) {
+                apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
+            }
+        });
+
+        processBooleanOpt(USE_SINGLE_REQUEST_PARAMETER, this::setUseSingleRequestParameter);
+        writePropertyBack(USE_SINGLE_REQUEST_PARAMETER, getUseSingleRequestParameter());
+
+        processBooleanOpt(TAGGED_UNIONS, (value) -> taggedUnions = value);
+
+        processBooleanOpt(PROVIDED_IN_ROOT,
+                (value) -> additionalProperties.put(PROVIDED_IN_ROOT, value),
+                () -> additionalProperties.put(PROVIDED_IN_ROOT, true)
+        );
+
+        processOpt(API_MODULE_PREFIX, (value) -> {
+            validateClassPrefixArgument(value);
+
+            additionalProperties.put("apiModuleClassName", value + "ApiModule");
+            additionalProperties.put("configurationClassName", value + "Configuration");
+            additionalProperties.put("configurationParametersInterfaceName", value + "ConfigurationParameters");
+            additionalProperties.put("apiModulePrefix", true);
+        }, () -> {
+            additionalProperties.put("apiModuleClassName", "ApiModule");
+            additionalProperties.put("configurationClassName", "Configuration");
+            additionalProperties.put("configurationParametersInterfaceName", "ConfigurationParameters");
+            additionalProperties.put("apiModulePrefix", false);
+        });
+        processOpt(SERVICE_SUFFIX, (value) -> {
+            serviceSuffix = value;
+            validateClassSuffixArgument("Service", serviceSuffix);
+        });
+        processOpt(SERVICE_FILE_SUFFIX, (value) -> {
+            serviceFileSuffix = value;
+            validateFileSuffixArgument("Service", serviceFileSuffix);
+        });
+        processOpt(MODEL_SUFFIX, (value) -> {
+            modelSuffix = value;
+            validateClassSuffixArgument("Model", modelSuffix);
+        });
+        processOpt(MODEL_FILE_SUFFIX, (value) -> {
+            modelFileSuffix = value;
+            validateFileSuffixArgument("Model", modelFileSuffix);
+        });
+        processOpt(FILE_NAMING, this::setFileNaming);
+        processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
+
+        processOpt(QUERY_PARAM_OBJECT_FORMAT, this::setQueryParamObjectFormat);
+        additionalProperties.put("isQueryParamObjectFormatDot", getQueryParamObjectFormatDot());
+        additionalProperties.put("isQueryParamObjectFormatJson", getQueryParamObjectFormatJson());
+        additionalProperties.put("isQueryParamObjectFormatKey", getQueryParamObjectFormatKey());
+    }
+
+    private void applyAngularVersion(SemVer angularVersion) {
+        if (angularVersion.atLeast("9.0.0")) {
+            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, true);
+        } else {
+            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, false);
+        }
+
+        additionalProperties.put(NG_VERSION, angularVersion);
+
+        processOpt(NPM_NAME, () -> addNpmPackageGeneration(angularVersion));
+    }
+
+    private void addSupportingFiles() {
         supportingFiles.add(
                 new SupportingFile("models.mustache", modelPackage().replace('.', File.separatorChar), "models.ts"));
         supportingFiles
@@ -159,122 +287,6 @@ public class BoatAngularGenerator extends TypeScriptAngularClientCodegen {
         supportingFiles.add(new SupportingFile("gitignore", "", ".gitignore"));
         supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
         supportingFiles.add(new SupportingFile("README.mustache", getIndexDirectory(), "README.md"));
-
-        // determine NG version
-        SemVer ngVersion;
-        if (additionalProperties.containsKey(NG_VERSION)) {
-            ngVersion = new SemVer(additionalProperties.get(NG_VERSION).toString());
-        } else {
-            ngVersion = new SemVer(this.ngVersion);
-            log.info("generating code for Angular {} ...", ngVersion);
-            log.info("  (you can select the angular version by setting the additionalProperty ngVersion)");
-        }
-
-        SemVer foundationVersion;
-        if (additionalProperties.containsKey(FOUNDATION_VERSION)) {
-            foundationVersion = new SemVer(additionalProperties.get(FOUNDATION_VERSION).toString());
-        } else {
-            foundationVersion = new SemVer(this.foundationVersion);
-            log.info("generating code with foundation-ang {} ...", foundationVersion);
-            log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
-        }
-
-        if (additionalProperties.containsKey(NPM_NAME)) {
-            addNpmPackageGeneration(ngVersion);
-        }
-
-        if (additionalProperties.containsKey(STRING_ENUMS)) {
-            setStringEnums(Boolean.parseBoolean(additionalProperties.get(STRING_ENUMS).toString()));
-            additionalProperties.put("stringEnums", getStringEnums());
-            if (getStringEnums()) {
-                classEnumSeparator = "";
-            }
-        }
-
-        if (additionalProperties.containsKey(WITH_INTERFACES)) {
-            boolean withInterfaces = Boolean.parseBoolean(additionalProperties.get(WITH_INTERFACES).toString());
-            if (withInterfaces) {
-                apiTemplateFiles.put("apiInterface.mustache", "Interface.ts");
-            }
-        }
-
-        if (additionalProperties.containsKey(WITH_MOCKS)) {
-            boolean withMocks = Boolean.parseBoolean(additionalProperties.get(WITH_MOCKS).toString());
-            if (withMocks) {
-                apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
-            }
-        }
-
-        if (additionalProperties.containsKey(USE_SINGLE_REQUEST_PARAMETER)) {
-            this.setUseSingleRequestParameter(convertPropertyToBoolean(USE_SINGLE_REQUEST_PARAMETER));
-        }
-        writePropertyBack(USE_SINGLE_REQUEST_PARAMETER, getUseSingleRequestParameter());
-
-        if (additionalProperties.containsKey(TAGGED_UNIONS)) {
-            taggedUnions = Boolean.parseBoolean(additionalProperties.get(TAGGED_UNIONS).toString());
-        }
-
-        if (!additionalProperties.containsKey(PROVIDED_IN_ROOT)) {
-            additionalProperties.put(PROVIDED_IN_ROOT, true);
-        } else {
-            additionalProperties.put(PROVIDED_IN_ROOT, Boolean.parseBoolean(
-                    additionalProperties.get(PROVIDED_IN_ROOT).toString()
-            ));
-        }
-
-        if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, true);
-        } else {
-            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, false);
-        }
-
-        additionalProperties.put(NG_VERSION, ngVersion);
-        additionalProperties.put(FOUNDATION_VERSION, foundationVersion);
-
-        if (additionalProperties.containsKey(API_MODULE_PREFIX)) {
-            String apiModulePrefix = additionalProperties.get(API_MODULE_PREFIX).toString();
-            validateClassPrefixArgument(apiModulePrefix);
-
-            additionalProperties.put("apiModuleClassName", apiModulePrefix + "ApiModule");
-            additionalProperties.put("configurationClassName", apiModulePrefix + "Configuration");
-            additionalProperties.put("configurationParametersInterfaceName", apiModulePrefix + "ConfigurationParameters");
-            additionalProperties.put("apiModulePrefix", true);
-        } else {
-            additionalProperties.put("apiModuleClassName", "ApiModule");
-            additionalProperties.put("configurationClassName", "Configuration");
-            additionalProperties.put("configurationParametersInterfaceName", "ConfigurationParameters");
-            additionalProperties.put("apiModulePrefix", false);
-        }
-        if (additionalProperties.containsKey(SERVICE_SUFFIX)) {
-            serviceSuffix = additionalProperties.get(SERVICE_SUFFIX).toString();
-            validateClassSuffixArgument("Service", serviceSuffix);
-        }
-        if (additionalProperties.containsKey(SERVICE_FILE_SUFFIX)) {
-            serviceFileSuffix = additionalProperties.get(SERVICE_FILE_SUFFIX).toString();
-            validateFileSuffixArgument("Service", serviceFileSuffix);
-        }
-        if (additionalProperties.containsKey(MODEL_SUFFIX)) {
-            modelSuffix = additionalProperties.get(MODEL_SUFFIX).toString();
-            validateClassSuffixArgument("Model", modelSuffix);
-        }
-        if (additionalProperties.containsKey(MODEL_FILE_SUFFIX)) {
-            modelFileSuffix = additionalProperties.get(MODEL_FILE_SUFFIX).toString();
-            validateFileSuffixArgument("Model", modelFileSuffix);
-        }
-        if (additionalProperties.containsKey(FILE_NAMING)) {
-            this.setFileNaming(additionalProperties.get(FILE_NAMING).toString());
-        }
-        if (!additionalProperties.containsKey(BUILD_DIST)) {
-            additionalProperties.put(BUILD_DIST, "dist");
-        }
-
-        if (additionalProperties.containsKey(QUERY_PARAM_OBJECT_FORMAT)) {
-            setQueryParamObjectFormat((String) additionalProperties.get(QUERY_PARAM_OBJECT_FORMAT));
-        }
-        additionalProperties.put("isQueryParamObjectFormatDot", getQueryParamObjectFormatDot());
-        additionalProperties.put("isQueryParamObjectFormatJson", getQueryParamObjectFormatJson());
-        additionalProperties.put("isQueryParamObjectFormatKey", getQueryParamObjectFormatKey());
-
     }
 
     private void addNpmPackageGeneration(SemVer ngVersion) {
@@ -704,7 +716,7 @@ public class BoatAngularGenerator extends TypeScriptAngularClientCodegen {
      * Validates that the given string value only contains alpha numeric characters.
      * Throws an IllegalArgumentException, if the string contains any other characters.
      *
-     * @param value    The value that is being validated.
+     * @param value The value that is being validated.
      */
     private void validateClassPrefixArgument(String value) {
         if (!value.matches(CLASS_NAME_PREFIX_PATTERN)) {
