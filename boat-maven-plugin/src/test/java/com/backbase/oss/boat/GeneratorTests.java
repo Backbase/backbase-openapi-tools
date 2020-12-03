@@ -113,6 +113,8 @@ public class GeneratorTests {
             mojo.additionalProperties = new LinkedList<>();
         }
         mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
 
         mojo.execute();
     }
