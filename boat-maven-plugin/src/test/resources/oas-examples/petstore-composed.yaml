@@ -84,7 +84,7 @@ paths:
       summary: Info for dog
       operationId: showByDogId
       tags:
-        -pets
+        - pets
       responses:
         '200':
           description: Expected response to a valid request
@@ -110,12 +110,12 @@ components:
     Dog:
       allOf:
         - $ref: "#/components/schemas/Pet"
-        - type: object
-          required:
-            - breed
-          properties:
-            breed:
-              type: string
+      type: object
+      required:
+        - breed
+      properties:
+        breed:
+          type: string
     Pets:
       type: array
       items:
