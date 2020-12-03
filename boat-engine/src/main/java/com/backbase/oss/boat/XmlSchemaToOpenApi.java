@@ -18,14 +18,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.nio.charset.StandardCharsets;
+
 @Log
 public class XmlSchemaToOpenApi {
     private static DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
+    private XmlSchemaToOpenApi(){
+            throw new AssertionError("Private constructor");
+    }
     @SneakyThrows
     public static Schema convert(String name, String schemaContent, Components components) {
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(IOUtils.toInputStream(schemaContent, "UTF-8"));
+        Document doc = docBuilder.parse(IOUtils.toInputStream(schemaContent, StandardCharsets.UTF_8));
 
         XML xml = new XML();
         xml.addExtension("x-bb-schema-content", schemaContent);
@@ -39,7 +44,7 @@ public class XmlSchemaToOpenApi {
 
     private static void map(Element node, Schema schema, Components components) {
 
-        NodeList complexTypes = ((Element) node).getElementsByTagName("xs:complexType");
+        NodeList complexTypes = ( node).getElementsByTagName("xs:complexType");
         for (int i = 0; i < complexTypes.getLength(); i++) {
             Element complexType = (Element) complexTypes.item(i);
             String name = complexType.getAttribute("name");
@@ -48,7 +53,7 @@ public class XmlSchemaToOpenApi {
             map(complexType, complexTypeSchema, components);
             components.addSchemas(name, complexTypeSchema);
         }
-        NodeList elements = ((Element) node).getElementsByTagName("xs:element");
+        NodeList elements = ( node).getElementsByTagName("xs:element");
         for (int i = 0; i < elements.getLength(); i++) {
             Element element = (Element) elements.item(i);
             String name = element.getAttribute("name");
@@ -56,11 +61,10 @@ public class XmlSchemaToOpenApi {
             if (StringUtils.isEmpty(type)) {
                 type = "string";
             }
-            Schema propertySchema = createSchemaFor(name, type, components);
+            Schema propertySchema = createSchemaFor( type, components);
             propertySchema.setName(name);
             schema.addProperties(name, propertySchema);
         }
-        NodeList sequences = ((Element) node).getElementsByTagName("xs:sequence");
         for (int i = 0; i < elements.getLength(); i++) {
             Element element = (Element) elements.item(i);
 
@@ -76,7 +80,7 @@ public class XmlSchemaToOpenApi {
     }
 
 
-    private static Schema createSchemaFor(String propertyName, String type, Components components) {
+    private static Schema createSchemaFor( String type, Components components) {
         switch (type) {
             case "xs:string":
                 return new StringSchema();
@@ -84,6 +88,7 @@ public class XmlSchemaToOpenApi {
                 return new BooleanSchema();
             case "xs:int":
                 return new IntegerSchema();
+            default:
 
         }
         Schema complexType = components.getSchemas().get(type);

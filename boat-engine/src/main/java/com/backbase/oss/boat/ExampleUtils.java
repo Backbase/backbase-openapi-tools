@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 class ExampleUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(ExampleUtils.class);
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -27,7 +26,7 @@ class ExampleUtils {
         Object value;
         TypeInstance structuredValue = ramlExample.structuredValue();
         for (TypeInstanceProperty property : structuredValue.properties()) {
-            if (property.isArray()) {
+            if (Boolean.TRUE.equals(property.isArray())) {
                 return property.values().stream().map(TypeInstance::value).collect(Collectors.toList());
             } else {
                 return property.value().value();
