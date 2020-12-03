@@ -95,9 +95,10 @@ public class Utils {
     }
 
     static Schema resolveSchemaByJavaType(JsonNode type, Components components) {
-        if (type.hasNonNull("javaType") && !type.get("javaType").textValue().startsWith("java")) {
-            log.debug("Resolving Schema Type from javaType: {}", type.get("javaType").textValue());
-            final String javaType = type.get("javaType").textValue();
+        String typeName = "javaType";
+        if (type.hasNonNull(typeName) && !type.get(typeName).textValue().startsWith("java")) {
+            log.debug("Resolving Schema Type from javaType: {}", type.get(typeName).textValue());
+            final String javaType = type.get(typeName).textValue();
             Optional<io.swagger.v3.oas.models.media.Schema> first = components.getSchemas().values().stream()
                 .filter(schema -> schema.getExtensions() != null && javaType
                     .equals(schema.getExtensions().get(X_JAVA_TYPE)))

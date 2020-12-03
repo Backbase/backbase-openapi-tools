@@ -14,13 +14,6 @@ import static org.apache.commons.io.FileUtils.getFile;
 
 public class ResolverTests extends AbstractBoatEngineTests {
 
-//    @Test
-//    public void deserializationUtilsTest() throws OpenAPILoaderException {
-//        OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-client-api/openapi.yaml"), false);
-//
-//        new BoatOpenAPIResolver(openAPI).resolve();
-//    }
-
     @Test(expected = OpenAPILoaderException.class)
     public void exceptionTest() throws OpenAPILoaderException {
 

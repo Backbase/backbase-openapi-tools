@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpenAPILoader {
 
+    private OpenAPILoader(){
+        throw new AssertionError("Private constructor");
+    }
     public static OpenAPI parse(String openApi) {
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
