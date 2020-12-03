@@ -178,7 +178,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         super.processOpts();
         addSupportingFiles();
 
-        processOpt(NG_VERSION, (value) -> applyAngularVersion(new SemVer(value)), () -> {
+        processOpt(NG_VERSION, value -> applyAngularVersion(new SemVer(value)), () -> {
             SemVer angularVersion = new SemVer(ngVersion);
             applyAngularVersion(angularVersion);
             log.info("generating code for Angular {} ...", angularVersion);
@@ -186,30 +186,30 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         });
 
         processOpt(FOUNDATION_VERSION,
-                (value) -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
+                value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
                 () -> {
-                    SemVer foundationVersion = new SemVer(this.foundationVersion);
-                    additionalProperties.put(FOUNDATION_VERSION, foundationVersion);
-                    log.info("generating code with foundation-ang {} ...", foundationVersion);
+                    SemVer version = new SemVer(this.foundationVersion);
+                    additionalProperties.put(FOUNDATION_VERSION, version);
+                    log.info("generating code with foundation-ang {} ...", version);
                     log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
                 });
 
-        processBooleanOpt(STRING_ENUMS, (value) -> {
+        processBooleanOpt(STRING_ENUMS, value -> {
             setStringEnums(value);
-            additionalProperties.put("stringEnums", getStringEnums());
+            additionalProperties.put(STRING_ENUMS, getStringEnums());
             if (getStringEnums()) {
                 classEnumSeparator = "";
             }
         });
 
-        processBooleanOpt(WITH_INTERFACES, (withInterfaces) -> {
-            if (withInterfaces) {
+        processBooleanOpt(WITH_INTERFACES, withInterfaces -> {
+            if (Boolean.TRUE.equals(withInterfaces)) {
                 apiTemplateFiles.put("apiInterface.mustache", "Interface.ts");
             }
         });
 
-        processBooleanOpt(WITH_MOCKS, (withMocks) -> {
-            if (withMocks) {
+        processBooleanOpt(WITH_MOCKS, withMocks -> {
+            if (Boolean.TRUE.equals(withMocks)) {
                 apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
             }
         });
@@ -217,39 +217,39 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processBooleanOpt(USE_SINGLE_REQUEST_PARAMETER, this::setUseSingleRequestParameter);
         writePropertyBack(USE_SINGLE_REQUEST_PARAMETER, getUseSingleRequestParameter());
 
-        processBooleanOpt(TAGGED_UNIONS, (value) -> taggedUnions = value);
+        processBooleanOpt(TAGGED_UNIONS, value -> taggedUnions = value);
 
         processBooleanOpt(PROVIDED_IN_ROOT,
-                (value) -> additionalProperties.put(PROVIDED_IN_ROOT, value),
+                value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
                 () -> additionalProperties.put(PROVIDED_IN_ROOT, true)
         );
 
-        processOpt(API_MODULE_PREFIX, (value) -> {
+        processOpt(API_MODULE_PREFIX, value -> {
             validateClassPrefixArgument(value);
 
             additionalProperties.put("apiModuleClassName", value + "ApiModule");
             additionalProperties.put("configurationClassName", value + "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", value + "ConfigurationParameters");
-            additionalProperties.put("apiModulePrefix", true);
+            additionalProperties.put(API_MODULE_PREFIX, true);
         }, () -> {
             additionalProperties.put("apiModuleClassName", "ApiModule");
             additionalProperties.put("configurationClassName", "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", "ConfigurationParameters");
-            additionalProperties.put("apiModulePrefix", false);
+            additionalProperties.put(API_MODULE_PREFIX, false);
         });
-        processOpt(SERVICE_SUFFIX, (value) -> {
+        processOpt(SERVICE_SUFFIX, value -> {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
         });
-        processOpt(SERVICE_FILE_SUFFIX, (value) -> {
+        processOpt(SERVICE_FILE_SUFFIX, value -> {
             serviceFileSuffix = value;
             validateFileSuffixArgument("Service", serviceFileSuffix);
         });
-        processOpt(MODEL_SUFFIX, (value) -> {
+        processOpt(MODEL_SUFFIX, value -> {
             modelSuffix = value;
             validateClassSuffixArgument("Model", modelSuffix);
         });
-        processOpt(MODEL_FILE_SUFFIX, (value) -> {
+        processOpt(MODEL_FILE_SUFFIX, value -> {
             modelFileSuffix = value;
             validateFileSuffixArgument("Model", modelFileSuffix);
         });
