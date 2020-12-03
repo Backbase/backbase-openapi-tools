@@ -1,24 +1,22 @@
 import { createMocks } from '@backbase/foundation-ang/data-http';
 import { Provider } from '@angular/core';
 
-let example;
-
-const {{baseName}}Examples = [];
 {{#operations}}
     {{#operation}}
-        const {{nickname}}Examples = [
-        {
+/**
+* Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
+*/
+export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = createMocks([{
         urlPattern: "{{{basePathWithoutHost}}}{{path}}",
         method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
         responses: [
         {{#responses}}
-
             {{#examples}}
                 {{#isJson}}
-                    {
+                {
                     status: {{{code}}},
                     body: {{{prettyPrintValue}}}
-                    },
+                },
                 {{/isJson}}
                 {{^isJson}}
                     {
@@ -28,16 +26,39 @@ const {{baseName}}Examples = [];
                 {{/isJson}}
             {{/examples}}
         {{/responses}}
-        ]
-        }];
-        {{baseName}}Examples.push({{nickname}}Examples);
-        /**
-        * Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
-        */
-        export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = createMocks({{nickname}}Examples);
-
+    ]
+}]);
     {{/operation}}
 {{/operations}}
-export const {{classname}}MocksProvider: Provider = createMocks({{baseName}}Examples);
+
+export const {{classname}}MocksProvider: Provider = createMocks(
+    [{{#operations}}
+    {{#operation}}
+    {
+        urlPattern: "{{{basePathWithoutHost}}}{{path}}",
+        method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
+        responses: [
+        {{#responses}}
+
+        {{#examples}}
+            {{#isJson}}
+            {
+                status: {{{code}}},
+                body: {{{prettyPrintValue}}}
+            },
+            {{/isJson}}
+            {{^isJson}}
+                {
+                status: {{{code}}},
+                body: "{{#escapeJavascript}}{{{prettyPrintValue}}}{{/escapeJavascript}}"
+                },
+            {{/isJson}}
+        {{/examples}}
+    {{/responses}}
+    ]
+},
+    {{/operation}}
+{{/operations}}]
+);
 
 
