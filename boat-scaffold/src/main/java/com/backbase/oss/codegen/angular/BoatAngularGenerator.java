@@ -71,7 +71,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private static final String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
     protected String foundationVersion = "6.0.0";
     protected String ngVersion = "10.0.0";
-    protected String npmRepository = null;
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
     protected String modelSuffix = "";
@@ -290,73 +289,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void addNpmPackageGeneration(SemVer ngVersion) {
-
-        if (additionalProperties.containsKey(NPM_REPOSITORY)) {
-            this.setNpmRepository(additionalProperties.get(NPM_REPOSITORY).toString());
-        }
-
-        // Set the typescript version compatible to the Angular version
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.9.2 <4.0.0");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.6.0 <3.8.0");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.4.0 <3.6.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.1.1 <3.2.0");
-        } else {
-            // Angular v6 requires typescript ">=2.7.2 and <2.10.0"
-            additionalProperties.put("tsVersion", ">=2.7.2 and <2.10.0");
-        }
-
-        // Set the rxJS version compatible to the Angular version
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.6.0");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.5.3");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.5.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.3.0");
-        } else {
-            // Angular v6
-            additionalProperties.put("rxjsVersion", "6.1.0");
-        }
-
-        // Specific ng-packagr configuration
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "10.0.3");
-            additionalProperties.put("tsickleVersion", "0.39.1");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "9.0.1");
-            additionalProperties.put("tsickleVersion", "0.38.0");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "5.4.0");
-            additionalProperties.put("tsickleVersion", "0.35.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            // compatible versions with typescript version
-            additionalProperties.put("ngPackagrVersion", "5.1.0");
-            additionalProperties.put("tsickleVersion", "0.34.0");
-        } else {
-            // angular v6
-            // compatible versions with typescript version
-            additionalProperties.put("ngPackagrVersion", "3.0.6");
-            additionalProperties.put("tsickleVersion", "0.32.1");
-        }
-
-        // set zone.js version
-        if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("zonejsVersion", "0.10.2");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("zonejsVersion", "0.9.1");
-        } else {
-            // compatible versions to Angular 6+
-            additionalProperties.put("zonejsVersion", "0.8.26");
-        }
-
-        //Files for building our lib
-        supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
-        supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
+        NpmPackageGenerator npm = new NpmPackageGenerator(additionalProperties, supportingFiles);
+        npm.addNpmPackage(ngVersion, getIndexDirectory());
     }
 
     private String getIndexDirectory() {
@@ -653,14 +587,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return modelPackage() + "/" + toModelFilename(name).substring(DEFAULT_IMPORT_PREFIX.length());
     }
 
-    public String getNpmRepository() {
-        return npmRepository;
-    }
-
-    public void setNpmRepository(String npmRepository) {
-        this.npmRepository = npmRepository;
-    }
-
     private boolean getUseSingleRequestParameter() {
         return useSingleRequestParameter;
     }
@@ -812,5 +738,98 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     public enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key}
+
+}
+
+class NpmPackageGenerator {
+    private final Map<String, Object> additionalProperties;
+    private final List<SupportingFile> supportingFiles;
+
+    public NpmPackageGenerator(Map<String, Object> additionalProperties, List<SupportingFile> supportingFiles) {
+        this.additionalProperties = additionalProperties;
+        this.supportingFiles = supportingFiles;
+    }
+
+    public void addNpmPackage(SemVer ngVersion, String indexDirectory) {
+        addSupportingFiles(indexDirectory);
+
+        addTypescriptVersion(ngVersion);
+        addRxjsVersion(ngVersion);
+        addNgPackagrVersion(ngVersion);
+        addZonejsVersion(ngVersion);
+    }
+
+    private void addSupportingFiles(String indexDirectory) {
+        //Files for building our lib
+        supportingFiles.add(new SupportingFile("package.mustache", indexDirectory, "package.json"));
+        supportingFiles.add(new SupportingFile("tsconfig.mustache", indexDirectory, "tsconfig.json"));
+    }
+
+    private void addZonejsVersion(SemVer ngVersion) {
+        // set zone.js version
+        if (ngVersion.atLeast("9.0.0")) {
+            additionalProperties.put("zonejsVersion", "0.10.2");
+        } else if (ngVersion.atLeast("8.0.0")) {
+            additionalProperties.put("zonejsVersion", "0.9.1");
+        } else {
+            // compatible versions to Angular 6+
+            additionalProperties.put("zonejsVersion", "0.8.26");
+        }
+    }
+
+    private void addNgPackagrVersion(SemVer ngVersion) {
+        // Specific ng-packagr configuration
+        if (ngVersion.atLeast("10.0.0")) {
+            additionalProperties.put("ngPackagrVersion", "10.0.3");
+            additionalProperties.put("tsickleVersion", "0.39.1");
+        } else if (ngVersion.atLeast("9.0.0")) {
+            additionalProperties.put("ngPackagrVersion", "9.0.1");
+            additionalProperties.put("tsickleVersion", "0.38.0");
+        } else if (ngVersion.atLeast("8.0.0")) {
+            additionalProperties.put("ngPackagrVersion", "5.4.0");
+            additionalProperties.put("tsickleVersion", "0.35.0");
+        } else if (ngVersion.atLeast("7.0.0")) {
+            // compatible versions with typescript version
+            additionalProperties.put("ngPackagrVersion", "5.1.0");
+            additionalProperties.put("tsickleVersion", "0.34.0");
+        } else {
+            // angular v6
+            // compatible versions with typescript version
+            additionalProperties.put("ngPackagrVersion", "3.0.6");
+            additionalProperties.put("tsickleVersion", "0.32.1");
+        }
+    }
+
+    private void addRxjsVersion(SemVer ngVersion) {
+        // Set the rxJS version compatible to the Angular version
+        if (ngVersion.atLeast("10.0.0")) {
+            additionalProperties.put("rxjsVersion", "6.6.0");
+        } else if (ngVersion.atLeast("9.0.0")) {
+            additionalProperties.put("rxjsVersion", "6.5.3");
+        } else if (ngVersion.atLeast("8.0.0")) {
+            additionalProperties.put("rxjsVersion", "6.5.0");
+        } else if (ngVersion.atLeast("7.0.0")) {
+            additionalProperties.put("rxjsVersion", "6.3.0");
+        } else {
+            // Angular v6
+            additionalProperties.put("rxjsVersion", "6.1.0");
+        }
+    }
+
+    private void addTypescriptVersion(SemVer ngVersion) {
+        // Set the typescript version compatible to the Angular version
+        if (ngVersion.atLeast("10.0.0")) {
+            additionalProperties.put("tsVersion", ">=3.9.2 <4.0.0");
+        } else if (ngVersion.atLeast("9.0.0")) {
+            additionalProperties.put("tsVersion", ">=3.6.0 <3.8.0");
+        } else if (ngVersion.atLeast("8.0.0")) {
+            additionalProperties.put("tsVersion", ">=3.4.0 <3.6.0");
+        } else if (ngVersion.atLeast("7.0.0")) {
+            additionalProperties.put("tsVersion", ">=3.1.1 <3.2.0");
+        } else {
+            // Angular v6 requires typescript ">=2.7.2 and <2.10.0"
+            additionalProperties.put("tsVersion", ">=2.7.2 and <2.10.0");
+        }
+    }
 
 }
