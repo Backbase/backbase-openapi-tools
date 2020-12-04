@@ -15,6 +15,8 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import static org.junit.Assert.fail;
+
 @Slf4j
 public class GeneratorTests {
 
@@ -91,7 +93,7 @@ public class GeneratorTests {
         File input = new File(spec);
         File output = new File("target/boat-angular");
         if (!output.exists()) {
-            output.mkdirs();
+            output.mkdirs()
         }
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
@@ -116,7 +118,12 @@ public class GeneratorTests {
         mojo.additionalProperties.add("npmName=@petstore/http");
         mojo.additionalProperties.add("npmRepository=https://repo.example.com");
 
-        mojo.execute();
+        try {
+            mojo.execute();
+        } catch (Exception e){
+            fail("Generation should not throw exceptions");
+        }
+
     }
 
     @Test
