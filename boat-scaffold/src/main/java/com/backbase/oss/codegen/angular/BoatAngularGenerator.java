@@ -58,7 +58,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
     private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    private static final String FILE_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9.-]*$";
     protected String foundationVersion = "6.0.0";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
@@ -90,7 +89,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(CliOption.newBoolean(PROVIDED_IN_ROOT,
                 "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
                 false));
-        this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 6.0.0)").defaultValue(this.ngVersion));
+        this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
@@ -146,12 +145,10 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         super.processOpts();
         addSupportingFiles();
 
-        processOpt(NG_VERSION, value -> applyAngularVersion(new SemVer(value)), () -> {
-            SemVer angularVersion = new SemVer(ngVersion);
-            applyAngularVersion(angularVersion);
-            log.info("generating code for Angular {} ...", angularVersion);
-            log.info("  (you can select the angular version by setting the additionalProperty ngVersion)");
-        });
+        processOpt(NG_VERSION,
+                value -> applyAngularVersion(new SemVer(value)),
+                () -> applyAngularVersion(new SemVer(this.ngVersion))
+        );
 
         processOpt(FOUNDATION_VERSION,
                 value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
@@ -194,9 +191,21 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
+        if (!angularVersion.atLeast("10.0.0")) {
+            throw new IllegalArgumentException("Only angular versions >= 10.0.0 are supported.");
+        }
+
         additionalProperties.put(NG_VERSION, angularVersion);
 
-        processOpt(NPM_NAME, () -> addNpmPackageGeneration(angularVersion));
+        if (additionalProperties.containsKey(NPM_NAME)) {
+            supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
+            supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
+            additionalProperties.put("zonejsVersion", "0.10.2");
+            additionalProperties.put("ngPackagrVersion", "10.0.3");
+            additionalProperties.put("tsickleVersion", "0.39.1");
+            additionalProperties.put("rxjsVersion", "6.6.0");
+            additionalProperties.put("tsVersion", ">=3.9.2 <4.0.0");
+        }
     }
 
     private void addSupportingFiles() {
@@ -210,11 +219,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         supportingFiles.add(new SupportingFile("gitignore", "", ".gitignore"));
         supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
         supportingFiles.add(new SupportingFile("README.mustache", getIndexDirectory(), "README.md"));
-    }
-
-    private void addNpmPackageGeneration(SemVer ngVersion) {
-        NpmPackageGenerator npm = new NpmPackageGenerator(additionalProperties, supportingFiles);
-        npm.addNpmPackage(ngVersion, getIndexDirectory());
     }
 
     private String getIndexDirectory() {
@@ -505,21 +509,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     /**
-     * Validates that the given string value only contains '-', '.' and alpha numeric characters.
-     * Throws an IllegalArgumentException, if the string contains any other characters.
-     *
-     * @param argument The name of the argument being validated. This is only used for displaying an error message.
-     * @param value    The value that is being validated.
-     */
-    private void validateFileSuffixArgument(String argument, String value) {
-        if (!value.matches(FILE_NAME_SUFFIX_PATTERN)) {
-            throw new IllegalArgumentException(
-                    String.format(Locale.ROOT, "%s file suffix only allows '.', '-' and alphanumeric characters.", argument)
-            );
-        }
-    }
-
-    /**
      * Validates that the given string value only contains alpha numeric characters.
      * Throws an IllegalArgumentException, if the string contains any other characters.
      *
@@ -580,97 +569,4 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
-}
-
-class NpmPackageGenerator {
-    private final Map<String, Object> additionalProperties;
-    private final List<SupportingFile> supportingFiles;
-
-    public NpmPackageGenerator(Map<String, Object> additionalProperties, List<SupportingFile> supportingFiles) {
-        this.additionalProperties = additionalProperties;
-        this.supportingFiles = supportingFiles;
-    }
-
-    public void addNpmPackage(SemVer ngVersion, String indexDirectory) {
-        addSupportingFiles(indexDirectory);
-
-        addTypescriptVersion(ngVersion);
-        addRxjsVersion(ngVersion);
-        addNgPackagrVersion(ngVersion);
-        addZonejsVersion(ngVersion);
-    }
-
-    private void addSupportingFiles(String indexDirectory) {
-        //Files for building our lib
-        supportingFiles.add(new SupportingFile("package.mustache", indexDirectory, "package.json"));
-        supportingFiles.add(new SupportingFile("tsconfig.mustache", indexDirectory, "tsconfig.json"));
-    }
-
-    private void addZonejsVersion(SemVer ngVersion) {
-        // set zone.js version
-        if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("zonejsVersion", "0.10.2");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("zonejsVersion", "0.9.1");
-        } else {
-            // compatible versions to Angular 6+
-            additionalProperties.put("zonejsVersion", "0.8.26");
-        }
-    }
-
-    private void addNgPackagrVersion(SemVer ngVersion) {
-        // Specific ng-packagr configuration
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "10.0.3");
-            additionalProperties.put("tsickleVersion", "0.39.1");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "9.0.1");
-            additionalProperties.put("tsickleVersion", "0.38.0");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("ngPackagrVersion", "5.4.0");
-            additionalProperties.put("tsickleVersion", "0.35.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            // compatible versions with typescript version
-            additionalProperties.put("ngPackagrVersion", "5.1.0");
-            additionalProperties.put("tsickleVersion", "0.34.0");
-        } else {
-            // angular v6
-            // compatible versions with typescript version
-            additionalProperties.put("ngPackagrVersion", "3.0.6");
-            additionalProperties.put("tsickleVersion", "0.32.1");
-        }
-    }
-
-    private void addRxjsVersion(SemVer ngVersion) {
-        // Set the rxJS version compatible to the Angular version
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.6.0");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.5.3");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.5.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            additionalProperties.put("rxjsVersion", "6.3.0");
-        } else {
-            // Angular v6
-            additionalProperties.put("rxjsVersion", "6.1.0");
-        }
-    }
-
-    private void addTypescriptVersion(SemVer ngVersion) {
-        // Set the typescript version compatible to the Angular version
-        if (ngVersion.atLeast("10.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.9.2 <4.0.0");
-        } else if (ngVersion.atLeast("9.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.6.0 <3.8.0");
-        } else if (ngVersion.atLeast("8.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.4.0 <3.6.0");
-        } else if (ngVersion.atLeast("7.0.0")) {
-            additionalProperties.put("tsVersion", ">=3.1.1 <3.2.0");
-        } else {
-            // Angular v6 requires typescript ">=2.7.2 and <2.10.0"
-            additionalProperties.put("tsVersion", ">=2.7.2 and <2.10.0");
-        }
-    }
-
 }
