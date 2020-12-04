@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +18,7 @@ public class BoatLinterTests {
 
     BoatLinter boatLinter;
 
-    @BeforeAll
+    @BeforeEach
     public void setupBoatLinter() {
         boatLinter = new BoatLinter();
     }
