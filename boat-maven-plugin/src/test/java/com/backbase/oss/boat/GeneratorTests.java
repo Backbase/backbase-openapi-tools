@@ -93,7 +93,7 @@ public class GeneratorTests {
         File input = new File(spec);
         File output = new File("target/boat-angular");
         if (!output.exists()) {
-            output.mkdirs()
+            output.mkdirs();
         }
 
         DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
@@ -123,7 +123,6 @@ public class GeneratorTests {
         } catch (Exception e){
             fail("Generation should not throw exceptions");
         }
-
     }
 
     @Test
