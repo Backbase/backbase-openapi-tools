@@ -41,7 +41,7 @@ public class BoatAngularTemplatesTests {
     private static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
     private static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
 
-    private static final String[] CASES = {"nom", "reg", "mck", "pir"};
+    private static final String[] CASES = {"nom", "reg", "mck", "pir", "amp"};
 
     @Parameterized.Parameters(name = "{0}")
     static public Object parameters() {
@@ -90,6 +90,7 @@ public class BoatAngularTemplatesTests {
     private final boolean npmName;
     private final boolean withMocks;
     private final boolean providedInRoot;
+    private final boolean apiModulePrefix;
 
     static private List<File> files;
 
@@ -100,6 +101,7 @@ public class BoatAngularTemplatesTests {
         this.npmRepository = (mask & 1 << 1) != 0;
         this.withMocks = (mask & 1 << 2) != 0;
         this.providedInRoot = (mask & 1 << 3) != 0;
+        this.apiModulePrefix = (mask & 1 << 4) != 0;
     }
 
     @Before
@@ -150,6 +152,18 @@ public class BoatAngularTemplatesTests {
         assertThat(
                 findPattern("/api\\.module\\.ts$", "providers: \\[]"),
                 equalTo(this.providedInRoot)
+        );
+    }
+
+    @Test
+    public void apiModulePrefix() {
+        assertThat(
+                findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
+                equalTo(this.apiModulePrefix)
+        );
+        assertThat(
+                findPattern("/api\\.module\\.ts$", "export class ApiModule"),
+                equalTo(!this.apiModulePrefix)
         );
     }
 
@@ -211,6 +225,9 @@ public class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.NPM_NAME, "@example/angular-http");
         }
         cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.providedInRoot);
+        if (this.apiModulePrefix) {
+            cf.addAdditionalProperty(BoatAngularGenerator.API_MODULE_PREFIX, "Boat");
+        }
 
         final String destPackage = this.caseName.replace('-', '.') + ".";
 
