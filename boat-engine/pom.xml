@@ -38,12 +38,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.raml</groupId>
             <artifactId>raml-parser-2</artifactId>
             <version>1.0.51</version>

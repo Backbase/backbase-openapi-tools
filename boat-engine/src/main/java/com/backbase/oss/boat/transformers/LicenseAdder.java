@@ -17,10 +17,12 @@ public class LicenseAdder implements Transformer {
     private final String licenseUrl;
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
         if (openAPI.getInfo().getLicense() == null) {
             openAPI.getInfo().setLicense(new License().name(licenseName).url(licenseUrl));
             log.info("Adding License: {} with url: {} to Schema: {}", licenseName, licenseUrl, openAPI.getInfo().getTitle());
         }
+
+        return openAPI;
     }
 }

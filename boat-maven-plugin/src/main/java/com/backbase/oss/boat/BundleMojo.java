@@ -1,6 +1,8 @@
 package com.backbase.oss.boat;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonMap;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
@@ -8,14 +10,17 @@ import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.SpecVersionTransformer;
+import com.backbase.oss.boat.transformers.VendorExtensionFilter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +43,9 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "input", required = true)
     private File input;
 
+    @Parameter(name = "includes", required = false, defaultValue = "*.yaml")
+    private String includes;
+
     @Parameter(name = "output", required = true)
     private File output;
 
@@ -46,6 +54,9 @@ public class BundleMojo extends AbstractMojo {
 
     @Parameter(name = "versionFileName", required = false)
     private boolean versionFileName = false;
+
+    @Parameter(name = "removeExtensions", required = false, defaultValue = "")
+    private List<String> removeExtensions;
 
     /**
      * Skip the execution.
@@ -67,14 +78,18 @@ public class BundleMojo extends AbstractMojo {
             throw new MojoExecutionException("Both input and output need to be either a directory or a file.");
         }
 
-        File[] inputFiles;
-        File[] outputFiles;
+        final File[] inputFiles;
+        final File[] outputFiles;
         if (input.isDirectory()) {
-            inputFiles = input.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
-            outputFiles = new File[inputFiles.length];
-            for (int i = 0; i < inputFiles.length; i++) {
-                outputFiles[i] = new File(output, inputFiles[i].getName());
-            }
+            String[] inputs = selectInputs(input.toPath());
+
+            inputFiles = stream(inputs)
+                .map(file -> new File(input, file))
+                .toArray(File[]::new);
+            outputFiles = stream(inputs)
+                .map(file -> new File(output, file))
+                .toArray(File[]::new);
+
             log.info("Found " + inputFiles.length + " specs to bundle.");
         } else {
             inputFiles = new File[] {input};
@@ -87,15 +102,38 @@ public class BundleMojo extends AbstractMojo {
 
     }
 
+    private String[] selectInputs(Path inputPath) throws MojoExecutionException {
+        final PathMatcher matcher = inputPath
+            .getFileSystem()
+            .getPathMatcher("glob:" + includes);
+
+        try (Stream<Path> paths = Files.list(inputPath)) {
+            return paths
+                .map(inputPath::relativize)
+                .filter(matcher::matches)
+                .map(Path::toString)
+                .toArray(String[]::new);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Cannot scan input: " + inputPath, e);
+        }
+    }
+
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
         try {
             OpenAPI openAPI = OpenAPILoader.load(inputFile);
 
             if (isNotBlank(version)) {
-                new SpecVersionTransformer(version).transform(openAPI, emptyMap());
+                openAPI = new SpecVersionTransformer(version)
+                    .transform(openAPI);
             }
 
-            new Bundler(inputFile).transform(openAPI, Collections.emptyMap());
+            openAPI = new Bundler(inputFile)
+                .transform(openAPI);
+
+            if (isNotEmpty(removeExtensions)) {
+                openAPI = new VendorExtensionFilter()
+                    .transform(openAPI, singletonMap("remove", removeExtensions));
+            }
 
             File directory = outputFile.getParentFile();
             if (!directory.exists()) {
@@ -113,17 +151,17 @@ public class BundleMojo extends AbstractMojo {
     }
 
     String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
-        String versionFileName = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
-        if (versionFileName == null) {
+        String version = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
+        if (version == null) {
             throw new MojoExecutionException("Configured to use version in filename, but no version set.");
         }
         String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
-        String majorFromVersion = versionFileName.substring(0, versionFileName.indexOf("."));
+        String majorFromVersion = version.substring(0, version.indexOf("."));
         if (!majorFromFileName.equals(majorFromVersion)) {
-            throw new MojoExecutionException("Invalid version " + versionFileName + " in file " + originalFileName);
+            throw new MojoExecutionException("Invalid version " + version + " in file " + originalFileName);
         }
         // payment-order-client-api-v2.yaml
-        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + versionFileName + "$3");
+        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + version + "$3");
     }
 
 }
