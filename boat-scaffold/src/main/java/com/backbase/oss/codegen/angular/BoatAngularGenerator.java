@@ -61,7 +61,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String STRING_ENUMS = "stringEnums";
     public static final String STRING_ENUMS_DESC = "Generate string enums instead of objects for enum values.";
     public static final String BUILD_DIST = "buildDist";
-    public static final String QUERY_PARAM_OBJECT_FORMAT = "queryParamObjectFormat";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
     private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
@@ -74,7 +73,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String modelFileSuffix = "";
     protected String fileNaming = "camelCase";
     protected Boolean stringEnums = false;
-    protected QUERY_PARAM_OBJECT_FORMAT_TYPE queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.dot;
 
     public BoatAngularGenerator() {
         super();
@@ -111,7 +109,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(FILE_NAMING, "Naming convention for the output files: 'camelCase', 'kebab-case'.").defaultValue(this.fileNaming));
         this.cliOptions.add(new CliOption(STRING_ENUMS, STRING_ENUMS_DESC).defaultValue(String.valueOf(this.stringEnums)));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
-        this.cliOptions.add(new CliOption(QUERY_PARAM_OBJECT_FORMAT, "The format for query param objects: 'dot', 'json', 'key'.").defaultValue(this.queryParamObjectFormat.name()));
     }
 
     @Override
@@ -229,11 +226,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         });
         processOpt(FILE_NAMING, this::setFileNaming);
         processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
-
-        processOpt(QUERY_PARAM_OBJECT_FORMAT, this::setQueryParamObjectFormat);
-        additionalProperties.put("isQueryParamObjectFormatDot", getQueryParamObjectFormatDot());
-        additionalProperties.put("isQueryParamObjectFormatJson", getQueryParamObjectFormatJson());
-        additionalProperties.put("isQueryParamObjectFormatKey", getQueryParamObjectFormatKey());
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
@@ -271,18 +263,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     public void setStringEnums(boolean value) {
         stringEnums = value;
-    }
-
-    public boolean getQueryParamObjectFormatDot() {
-        return QUERY_PARAM_OBJECT_FORMAT_TYPE.dot.equals(queryParamObjectFormat);
-    }
-
-    public boolean getQueryParamObjectFormatJson() {
-        return QUERY_PARAM_OBJECT_FORMAT_TYPE.json.equals(queryParamObjectFormat);
-    }
-
-    public boolean getQueryParamObjectFormatKey() {
-        return QUERY_PARAM_OBJECT_FORMAT_TYPE.key.equals(queryParamObjectFormat);
     }
 
     @Override
@@ -616,24 +596,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     /**
-     * Set the query param object format.
-     *
-     * @param format the query param object format to use
-     */
-    public void setQueryParamObjectFormat(String format) {
-        try {
-            queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.valueOf(format);
-        } catch (IllegalArgumentException e) {
-            String values = Stream.of(QUERY_PARAM_OBJECT_FORMAT_TYPE.values())
-                    .map(value -> "'" + value.name() + "'")
-                    .collect(Collectors.joining(", "));
-
-            String msg = String.format(Locale.ROOT, "Invalid query param object format '%s'. Must be one of %s.", format, values);
-            throw new IllegalArgumentException(msg);
-        }
-    }
-
-    /**
      * Set the file naming type.
      *
      * @param fileNaming the file naming to use
@@ -684,9 +646,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
-
-    public enum QUERY_PARAM_OBJECT_FORMAT_TYPE {dot, json, key}
-
 }
 
 class NpmPackageGenerator {
