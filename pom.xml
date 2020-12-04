@@ -53,7 +53,7 @@
 
         <sonar.organization>backbase-technology-prototyping</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.login>84b7c2f6a994f9a2356b24e045ff95cbedfb7a34</sonar.login>
+        <sonar.login>***REMOVED***</sonar.login>
         <openapi-generator.version>4.3.1</openapi-generator.version>
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
