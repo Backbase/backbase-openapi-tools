@@ -1,10 +1,15 @@
 package com.backbase.oss.boat.transformers.bundler;
 
+import com.backbase.oss.boat.transformers.TransformerException;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.examples.Example;
 
 public class BoatDeserializationUtils {
+
+    private BoatDeserializationUtils(){
+        throw new AssertionError("Private constructor");
+    }
 
     public static <T> T deserialize(Object contents, String fileOrHost, Class<T> expectedType) {
         T result;
@@ -32,18 +37,18 @@ public class BoatDeserializationUtils {
                 result = Json.mapper().convertValue(contents, expectedType);
             }
         } catch (Exception e) {
-            throw new RuntimeException("An exception was thrown while trying to deserialize the contents of " + fileOrHost + " into type " + expectedType, e);
+            throw new TransformerException("An exception was thrown while trying to deserialize the contents of " + fileOrHost + " into type " + expectedType, e);
         }
 
         return result;
     }
 
     private static boolean isJson(String contents) {
-        return contents.toString().trim().startsWith("{");
+        return contents.trim().startsWith("{");
     }
 
     private static boolean isXml(String contents) {
-        return contents.toString().trim().startsWith("<");
+        return contents.trim().startsWith("<");
     }
 
 }

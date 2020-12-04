@@ -10,6 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpenAPILoader {
 
+    private OpenAPILoader() {
+        throw new AssertionError("Private constructor");
+    }
+
     public static OpenAPI parse(String openApi) {
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
@@ -29,6 +33,11 @@ public class OpenAPILoader {
     }
 
     public static OpenAPI load(File file, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
+
+        if (!file.exists()) {
+            throw new OpenAPILoaderException("Could not load open api from file :" + file.getAbsolutePath() + ". File does not exist!");
+        }
+
         log.debug("Reading OpenAPI from: {} resolveFully: {}", file, resolveFully);
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
@@ -37,9 +46,12 @@ public class OpenAPILoader {
         parseOptions.setResolveFully(resolveFully);
         parseOptions.setFlattenComposedSchemas(true);
         parseOptions.setResolveCombinators(true);
+
         SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(file.toURI().toString(), null, parseOptions);
-
-
+        if (swaggerParseResult.getOpenAPI() == null) {
+            log.error("Could not load OpenAPI from file: {} \n{}", file, String.join("\t\n", swaggerParseResult.getMessages()));
+            throw new OpenAPILoaderException("Could not load open api from file :" + file);
+        }
         return swaggerParseResult.getOpenAPI();
 
     }
