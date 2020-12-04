@@ -151,7 +151,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void processOpt(String key, Runnable whenProvided) {
-        processOpt(key, (_value) -> whenProvided.run());
+        processOpt(key, value -> whenProvided.run());
     }
 
     private void processOpt(String key, Consumer<String> whenProvided, Runnable notProvided) {
@@ -197,7 +197,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processBooleanOpt(STRING_ENUMS, value -> {
             setStringEnums(value);
             additionalProperties.put(STRING_ENUMS, getStringEnums());
-            if (getStringEnums()) {
+            if (Boolean.TRUE.equals(getStringEnums())) {
                 classEnumSeparator = "";
             }
         });
@@ -263,11 +263,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
-        if (angularVersion.atLeast("9.0.0")) {
-            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, true);
-        } else {
-            additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, false);
-        }
+        additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, angularVersion.atLeast("9.0.0"));
 
         additionalProperties.put(NG_VERSION, angularVersion);
 
@@ -521,7 +517,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
      */
     private Set<String> parseImports(CodegenModel cm) {
         Set<String> newImports = new HashSet<>();
-        if (cm.imports.size() > 0) {
+        if (!cm.imports.isEmpty()) {
             for (String name : cm.imports) {
                 if (name.contains(" | ")) {
                     String[] parts = name.split(" \\| ");

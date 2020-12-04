@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class BoatExample {
 
-    public Mustache.Lambda escapeJavascript = (fragment, writer) -> {
+    public static final Mustache.Lambda escapeJavascript = (fragment, writer) -> {
         String text = fragment.execute();
         StringEscapeUtils.escapeJavaScript(writer, text);
     };
