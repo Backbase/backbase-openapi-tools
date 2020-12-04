@@ -32,6 +32,8 @@ public class RamlResourceLoader implements ResourceLoaderExtended {
 
     /**
      * Constructor specifying where to look for resources.
+     * @param baseDir Base Directory to search references from
+     * @param root The raml file to load
      */
     public RamlResourceLoader(File baseDir, File root) {
         this.root = root;

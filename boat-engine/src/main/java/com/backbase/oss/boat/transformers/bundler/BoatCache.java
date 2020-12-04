@@ -1,13 +1,11 @@
 package com.backbase.oss.boat.transformers.bundler;
 
-import static io.swagger.v3.parser.models.RefFormat.RELATIVE;
-
+import com.backbase.oss.boat.transformers.TransformerException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.ResolverCache;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.models.RefFormat;
-import io.swagger.v3.parser.util.DeserializationUtils;
 import io.swagger.v3.parser.util.PathUtils;
 import io.swagger.v3.parser.util.RefUtils;
 import java.io.File;
@@ -16,28 +14,28 @@ import java.nio.file.Paths;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
+import static io.swagger.v3.parser.models.RefFormat.RELATIVE;
+
 @Slf4j
 public class BoatCache extends ResolverCache {
 
     private final ExamplesProcessor examplesProcessor;
     private final Path parentDirectory;
 
-    private String rootPath ;
-    private List<AuthorizationValue> auths;
-    private OpenAPI openApi;
+    private String rootPath;
+    private final List<AuthorizationValue> auths;
 
 
     public BoatCache(OpenAPI openApi, List<AuthorizationValue> auths, String parentFileLocation,
-        ExamplesProcessor examplesProcessor) {
+                     ExamplesProcessor examplesProcessor) {
         super(openApi, auths, parentFileLocation);
         this.rootPath = parentFileLocation;
-        this.openApi = openApi;
         this.examplesProcessor = examplesProcessor;
         this.auths = auths;
 
 
-        if(parentFileLocation != null) {
-            if(parentFileLocation.startsWith("http")) {
+        if (parentFileLocation != null) {
+            if (parentFileLocation.startsWith("http")) {
                 parentDirectory = null;
             } else {
                 parentDirectory = PathUtils.getParentDirectoryOfFile(parentFileLocation);
@@ -49,11 +47,12 @@ public class BoatCache extends ResolverCache {
 
     /**
      * When loading references resources that contain links themselves, also resolve these references.
-     * @param ref
-     * @param refFormat
-     * @param expectedType
-     * @param <T>
-     * @return
+     *
+     * @param ref Json Pointer
+     * @param refFormat Format
+     * @param expectedType Type to expect
+     * @param <T> Return type
+     * @return Instance of reference
      */
     @Override
     public <T> T loadRef(String ref, RefFormat refFormat, Class<T> expectedType) {
@@ -85,27 +84,22 @@ public class BoatCache extends ResolverCache {
         final String[] refParts = ref.split("#/");
 
         if (refParts.length > 2) {
-            throw new RuntimeException("Invalid ref format: " + ref);
+            throw new TransformerException("Invalid ref format: " + ref);
         }
 
         final String file = refParts[0];
         String contents = getExternalFileCache().get(file);
 
-        if(parentDirectory != null) {
+        if (parentDirectory != null) {
             contents = RefUtils.readExternalRef(file, refFormat, auths, parentDirectory);
-        }
-        else if(rootPath != null && rootPath.startsWith("http")) {
+        } else if (rootPath != null && rootPath.startsWith("http")) {
             contents = RefUtils.readExternalUrlRef(file, refFormat, auths, rootPath);
-        }
-        else if (rootPath != null) {
+        } else if (rootPath != null) {
             contents = RefUtils.readExternalClasspathRef(file, refFormat, auths, rootPath);
         }
 
-        T result = BoatDeserializationUtils.deserialize(contents, file, expectedType);
-        return result;
+        return BoatDeserializationUtils.deserialize(contents, file, expectedType);
     }
-
-
 
 
 }
