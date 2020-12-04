@@ -23,7 +23,7 @@ public class LintMojo extends AbstractLintMojo {
     @Parameter(name = "output", defaultValue = "${project.build.directory}/boat-lint-reports")
     public File output;
 
-    @Parameter(name = "writeLintReport", defaultValue = "${true}")
+    @Parameter(name = "writeLintReport", defaultValue = "true")
     private boolean writeLintReport;
 
     @Override

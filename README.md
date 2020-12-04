@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.11.0
+
+* *Maven Plugin*
+   * Added `removeExtensions` mojo parameter to `boat:bundle` to filter out the given vendor extensions from bundle.
+   * Added `includes` mojo parameter to `boat:bundle` as a glob pattern selecting the specification files (defaults to `*.yaml`).
+
 ## 0.10.0
 * Maven Plugin 
    * `boat:lint` mojo will generate an HTML report based on API Guidelines 

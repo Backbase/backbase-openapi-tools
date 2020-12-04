@@ -15,7 +15,7 @@ public class Normaliser implements Transformer {
 
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         openAPI.getPaths().forEach((s, pathItem) ->
             pathItem.readOperations().forEach(operation -> {
@@ -26,6 +26,8 @@ public class Normaliser implements Transformer {
             ));
         openAPI.getComponents().getRequestBodies().forEach(this::normalizeRequest);
         openAPI.getComponents().getResponses().forEach(this::normalizeResponse);
+
+        return openAPI;
     }
 
     private void normalizeResponse(String s, ApiResponse apiResponse) {

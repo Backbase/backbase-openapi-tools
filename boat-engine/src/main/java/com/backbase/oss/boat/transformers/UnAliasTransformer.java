@@ -17,10 +17,12 @@ public class UnAliasTransformer implements Transformer {
         "object", "array", "map").build();
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         OpenApiStreamUtil.streamSchemas(openAPI)
             .forEach(schema -> unAliasType(schema, openAPI));
+
+        return openAPI;
     }
 
     private void unAliasType(Schema schema, OpenAPI openAPI) {
