@@ -42,6 +42,7 @@ public class BundleMojoTest {
         mojo.setInput(new File(getClass().getResource("/bundler/folder/one-client-api-v1.yaml").getFile())
             .getParentFile());
         mojo.setOutput(new File("target/test-bundle-folder"));
+        mojo.setIncludes("*-api-v*.yaml");
         mojo.setVersionFileName(true);
         mojo.execute();
 
