@@ -1,10 +1,5 @@
 package com.backbase.oss.boat.transformers;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
@@ -28,14 +23,19 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
-public class BundlerTest {
+public class BundlerTests {
 
     private static final String APPLICATION_JSON = "application/json";
-    private static org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
+    private static final org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
 
         @Override
         public boolean matches(Object item) {
@@ -58,7 +58,7 @@ public class BundlerTest {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
-        Assert.assertEquals(openAPIUnproccessed,openAPI);
+        assertEquals(openAPIUnproccessed,openAPI);
     }
 
     @Test

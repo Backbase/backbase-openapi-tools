@@ -2,16 +2,16 @@ package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
-import org.junit.Test;
-
 import java.io.File;
+import org.junit.jupiter.api.Test;
 
-import static org.apache.commons.io.FileUtils.getFile;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ResolverTests extends AbstractBoatEngineTestBase {
 
-    @Test(expected = OpenAPILoaderException.class)
+    @Test
     public void exceptionTest() throws OpenAPILoaderException {
-        OpenAPILoader.load(new File("invalidOpenAPI.yaml"),false );
+        assertThrows(OpenAPILoaderException.class, () ->
+            OpenAPILoader.load(new File("invalidOpenAPI.yaml"), false));
     }
 }

@@ -4,7 +4,7 @@ import com.backbase.oss.codegen.yard.BoatYardConfig;
 import com.backbase.oss.codegen.yard.BoatYardGenerator;
 import java.io.File;
 import java.net.URL;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BoatLintTests {
 
