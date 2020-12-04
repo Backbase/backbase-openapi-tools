@@ -28,6 +28,7 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.Assert;
 import org.junit.Test;
 
 @Slf4j
@@ -53,9 +54,11 @@ public class BundlerTest {
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
+        OpenAPI openAPIUnproccessed = openAPI;
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+        Assert.assertEquals(openAPIUnproccessed,openAPI);
     }
 
     @Test
@@ -66,7 +69,7 @@ public class BundlerTest {
 
         OpenAPI openAPI = OpenAPILoader.load(input);
 
-        new Bundler(input).transform(openAPI, Collections.emptyMap());
+        OpenAPI transform = new Bundler(input).transform(openAPI, Collections.emptyMap());
 
         log.debug(Yaml.pretty(openAPI));
 

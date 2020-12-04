@@ -20,13 +20,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ExporterTest extends AbstractBoatEngineTests {
+public class ExporterTest extends AbstractBoatEngineTestBase {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 
     @Test
     public void testHelloWorld() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
+    @Test
+    public void testUnusualTypesSchemaConversion() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);

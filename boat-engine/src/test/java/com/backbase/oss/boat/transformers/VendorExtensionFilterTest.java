@@ -30,8 +30,6 @@ public class VendorExtensionFilterTest {
 
         final String s = SerializerUtils.toYamlString(api2);
 
-        log.info("\n{}", s);
-
         assertThat(s, containsString("x-keep"));
         assertThat(s, not(containsString("x-remove")));
     }

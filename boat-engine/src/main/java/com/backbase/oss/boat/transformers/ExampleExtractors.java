@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
  */
 public class ExampleExtractors {
 
+    private ExampleExtractors() {
+        throw new AssertionError("Private constructor");
+    }
+
     /**
      * Extracts examples from the header.
      * The header has pairs of named examples of its own, and may also have a content field, which may have its own.
@@ -115,7 +119,7 @@ public class ExampleExtractors {
         return Optional.ofNullable(optSchema).map(schema ->
                 Optional.ofNullable(schema.getName()).orElse(
                         Optional.ofNullable(schema.get$ref())
-                                .map($ref -> $ref.replaceAll("([a-zA-Z0-9._#]+/)*", ""))
+                                .map(ref -> ref.replaceAll("([a-zA-Z0-9._#]+/)*", ""))
                                 .orElse("")
                 )).orElse("");
     }
