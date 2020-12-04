@@ -54,9 +54,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String PROVIDED_IN_ROOT = "providedInRoot";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
-    public static final String SERVICE_FILE_SUFFIX = "serviceFileSuffix";
     public static final String MODEL_SUFFIX = "modelSuffix";
-    public static final String MODEL_FILE_SUFFIX = "modelFileSuffix";
     public static final String BUILD_DIST = "buildDist";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
@@ -98,9 +96,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
-        this.cliOptions.add(new CliOption(SERVICE_FILE_SUFFIX, "The suffix of the file of the generated service (service<suffix>.ts).").defaultValue(this.serviceFileSuffix));
         this.cliOptions.add(new CliOption(MODEL_SUFFIX, "The suffix of the generated model."));
-        this.cliOptions.add(new CliOption(MODEL_FILE_SUFFIX, "The suffix of the file of the generated model (model<suffix>.ts)."));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
     }
 
@@ -197,17 +193,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
         });
-        processOpt(SERVICE_FILE_SUFFIX, value -> {
-            serviceFileSuffix = value;
-            validateFileSuffixArgument("Service", serviceFileSuffix);
-        });
         processOpt(MODEL_SUFFIX, value -> {
             modelSuffix = value;
             validateClassSuffixArgument("Model", modelSuffix);
-        });
-        processOpt(MODEL_FILE_SUFFIX, value -> {
-            modelFileSuffix = value;
-            validateFileSuffixArgument("Model", modelFileSuffix);
         });
         processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
