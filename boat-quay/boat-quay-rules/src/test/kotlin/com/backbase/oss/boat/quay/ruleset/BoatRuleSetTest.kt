@@ -1,7 +1,7 @@
 package com.backbase.oss.boat.quay.ruleset
 
 import io.swagger.models.Swagger
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.zalando.zally.rule.api.Check
 import org.zalando.zally.rule.api.Rule
 import org.zalando.zally.rule.api.Severity
@@ -11,10 +11,10 @@ class BoatRuleSetTest {
 
     /** TestRule used for testing RulesPolicy */
     @Rule(
-            ruleSet = BoatRuleSet::class,
-            id = "TestRule",
-            severity = Severity.MUST,
-            title = "Test Rule"
+        ruleSet = BoatRuleSet::class,
+        id = "TestRule",
+        severity = Severity.MUST,
+        title = "Test Rule"
     )
     class TestRule(val result: Violation?) {
 

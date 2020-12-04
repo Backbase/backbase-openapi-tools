@@ -4,8 +4,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import java.net.URL;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UtilTests {
 
@@ -15,7 +16,7 @@ public class UtilTests {
         URL url = new URL("file://test.json");
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
-        Assert.assertEquals("Test",actual);
+        assertEquals("Test",actual);
     }
 
     @SneakyThrows
@@ -26,13 +27,13 @@ public class UtilTests {
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual;
         actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
-        Assert.assertEquals("Test",actual);
+        assertEquals("Test",actual);
         actual = Utils.getSchemaNameFromReference(other, "test", referenceNames);
-        Assert.assertEquals("Other", actual);
+        assertEquals("Other", actual);
         actual = Utils.getSchemaNameFromReference(url, "other", referenceNames);
-        Assert.assertEquals("Test", actual);
+        assertEquals("Test", actual);
         actual = Utils.getSchemaNameFromReference(other, "other", referenceNames);
-        Assert.assertEquals("Other",actual);
+        assertEquals("Other",actual);
     }
 
 

@@ -13,9 +13,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 public class GeneratorTests {
@@ -25,7 +28,7 @@ public class GeneratorTests {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         OpenAPI load = OpenAPILoader.load(new File(spec), true, false);
         System.out.println(load.toString());
-        Assert.assertEquals(getExpectedApi(),load.toString());
+        assertEquals(getExpectedApi(),load.toString());
     }
 
     @Test
@@ -53,7 +56,7 @@ public class GeneratorTests {
         mojo.execute();
         String[] expectedGeneratedDocs = {"index.html",
                 ".openapi-generator-ignore",".openapi-generator"};
-        Assert.assertArrayEquals(expectedGeneratedDocs,output.list());
+        assertArrayEquals(expectedGeneratedDocs,output.list());
 
     }
 
@@ -87,7 +90,7 @@ public class GeneratorTests {
 
         String[] expectedGeneratedDocs = {"index.html",
                 ".openapi-generator-ignore",".openapi-generator"};
-        Assert.assertArrayEquals(expectedGeneratedDocs,output.list());
+        assertArrayEquals(expectedGeneratedDocs,output.list());
     }
 
     @Test
@@ -127,7 +130,7 @@ public class GeneratorTests {
         String[] actualGeneratedFiles = output.list();
         Arrays.sort(actualGeneratedFiles);
         String[] expectedFiles= {".openapi-generator",".openapi-generator-ignore","dereferenced-openapi.yml","index.html"};
-        Assert.assertArrayEquals(expectedFiles,actualGeneratedFiles);
+        assertArrayEquals(expectedFiles,actualGeneratedFiles);
     }
 
 
@@ -167,7 +170,7 @@ public class GeneratorTests {
         String[] actualFilesGenerated = output.list();
         Arrays.sort(actualFilesGenerated);
         String[] expected = {".openapi-generator",".openapi-generator-ignore","README.md","pom.xml","src"};
-        Assert.assertArrayEquals(expected,actualFilesGenerated);
+        assertArrayEquals(expected,actualFilesGenerated);
 
     }
 
@@ -196,7 +199,7 @@ public class GeneratorTests {
         String[] actualFilesGenerated = output.list();
         Arrays.sort(actualFilesGenerated);
         String[] expected = {".openapi-generator",".openapi-generator-ignore","api","gradle","src"};
-        Assert.assertArrayEquals(expected,actualFilesGenerated);
+        assertArrayEquals(expected,actualFilesGenerated);
 
 
 

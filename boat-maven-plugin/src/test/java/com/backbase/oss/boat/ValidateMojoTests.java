@@ -1,17 +1,12 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
-import io.swagger.v3.oas.models.OpenAPI;
+import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidateMojoTests {
 
@@ -38,7 +33,7 @@ public class ValidateMojoTests {
         mojo.setInput(new File("bad.yaml"));
         mojo.setFailOnWarning(true);
 
-        Assert.assertThrows(MojoFailureException.class, ()-> mojo.execute());
+        assertThrows(MojoFailureException.class, mojo::execute);
 
 
     }

@@ -12,8 +12,8 @@ import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.DefaultCodegen;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -21,7 +21,7 @@ public class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
     private final MavenProject project = new MavenProject();
 
-    @Before
+    @BeforeAll
     public void setUp() {
         buildContext.enableLogging(new ConsoleLogger());
     }
