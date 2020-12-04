@@ -148,3 +148,6 @@ export class {{{configurationClassName}}} {
 {{#apiModulePrefix}}
 export { {{configurationClassName}} as Configuration };
 {{/apiModulePrefix}}
+
+export const CONFIG_TOKEN = new InjectionToken('api-data-module {{configurationClassName}}');
+
