@@ -57,7 +57,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String SERVICE_FILE_SUFFIX = "serviceFileSuffix";
     public static final String MODEL_SUFFIX = "modelSuffix";
     public static final String MODEL_FILE_SUFFIX = "modelFileSuffix";
-    public static final String FILE_NAMING = "fileNaming";
     public static final String BUILD_DIST = "buildDist";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
@@ -69,7 +68,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String serviceFileSuffix = ".service";
     protected String modelSuffix = "";
     protected String modelFileSuffix = "";
-    protected String fileNaming = "camelCase";
 
     public BoatAngularGenerator() {
         super();
@@ -103,7 +101,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(SERVICE_FILE_SUFFIX, "The suffix of the file of the generated service (service<suffix>.ts).").defaultValue(this.serviceFileSuffix));
         this.cliOptions.add(new CliOption(MODEL_SUFFIX, "The suffix of the generated model."));
         this.cliOptions.add(new CliOption(MODEL_FILE_SUFFIX, "The suffix of the file of the generated model (model<suffix>.ts)."));
-        this.cliOptions.add(new CliOption(FILE_NAMING, "Naming convention for the output files: 'camelCase', 'kebab-case'.").defaultValue(this.fileNaming));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
     }
 
@@ -212,7 +209,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             modelFileSuffix = value;
             validateFileSuffixArgument("Model", modelFileSuffix);
         });
-        processOpt(FILE_NAMING, this::setFileNaming);
         processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
 
@@ -576,33 +572,14 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     /**
-     * Set the file naming type.
-     *
-     * @param fileNaming the file naming to use
-     */
-    private void setFileNaming(String fileNaming) {
-        if ("camelCase".equals(fileNaming) || "kebab-case".equals(fileNaming)) {
-            this.fileNaming = fileNaming;
-        } else {
-            throw new IllegalArgumentException("Invalid file naming '" +
-                    fileNaming + "'. Must be 'camelCase' or 'kebab-case'");
-        }
-    }
-
-    /**
-     * Converts the original name according to the current <code>fileNaming</code> strategy.
+     * Converts the original name to camelCase
      *
      * @param originalName the original name to transform
      * @return the transformed name
      */
     private String convertUsingFileNamingConvention(String originalName) {
         String name = this.removeModelPrefixSuffix(originalName);
-        if ("kebab-case".equals(fileNaming)) {
-            name = dashize(underscore(name));
-        } else {
-            name = camelize(name, true);
-        }
-        return name;
+        return camelize(name, true);
     }
 
     @Override
