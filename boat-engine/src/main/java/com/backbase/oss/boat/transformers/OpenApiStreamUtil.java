@@ -62,7 +62,7 @@ public class OpenApiStreamUtil {
             .collect(toList());
 
         // traverse down the tree of the list of first level schemas, also keep the first level schemas
-        return (Stream<Schema>) Stream.of(
+        return  Stream.of(
             firstLevelSchemas.stream(),
             firstLevelSchemas.stream()
                 .map(OpenApiStreamUtil::stream)

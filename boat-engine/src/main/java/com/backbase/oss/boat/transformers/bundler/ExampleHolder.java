@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.transformers.bundler;
 
+import com.backbase.oss.boat.transformers.TransformerException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -22,6 +23,7 @@ public abstract class ExampleHolder<T> {
         + "%1$s:\n"
         + "  $ref: %2$s";
     private static final String REF_KEY = "$ref";
+    public static final String VALUE = "value";
 
     private static class ExampleExampleHolder extends ExampleHolder<Example> {
         private final boolean componentExample;
@@ -60,12 +62,12 @@ public abstract class ExampleHolder<T> {
         private ObjectNodeExampleHolder(String name, ObjectNode objectNode) {
             super(name, objectNode);
             if (objectNode.get(REF_KEY) == null
-                && objectNode.get("value") != null
-                && objectNode.get("value").get(REF_KEY) != null) {
-                String ref = objectNode.get("value").get(REF_KEY).asText();
+                && objectNode.get(VALUE) != null
+                && objectNode.get(VALUE).get(REF_KEY) != null) {
+                String ref = objectNode.get(VALUE).get(REF_KEY).asText();
                 log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, "?", ref));
-                objectNode.set(REF_KEY, objectNode.get("value").get(REF_KEY));
-                objectNode.remove("value");
+                objectNode.set(REF_KEY, objectNode.get(VALUE).get(REF_KEY));
+                objectNode.remove(VALUE);
             }
 
         }
@@ -143,6 +145,10 @@ public abstract class ExampleHolder<T> {
         this.exampleName = exampleName;
     }
 
+    public String getExampleNmae() {
+        return this.exampleName;
+    }
+
     abstract String getRef();
 
     abstract void replaceRef(String ref);
@@ -167,7 +173,7 @@ public abstract class ExampleHolder<T> {
         } else if( o instanceof ArrayNode) {
             return new ArrayNodeExampleHolder(name, (ArrayNode) o);
         } else {
-            throw new RuntimeException("Unknown type backing example " + o.getClass().getName());
+            throw new TransformerException("Unknown type backing example " + o.getClass().getName());
         }
     }
 

@@ -1,10 +1,13 @@
 package com.backbase.oss.boat.loader;
 
-import java.io.IOException;
 
+public class OpenAPILoaderException extends Exception {
 
-public class OpenAPILoaderException extends Throwable {
-    public OpenAPILoaderException(String s, IOException e) {
-        super(s, e);
+    public OpenAPILoaderException(String message) {
+        super(message);
+    }
+
+    public OpenAPILoaderException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }
