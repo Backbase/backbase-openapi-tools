@@ -16,7 +16,7 @@ public class AdditionalPropertiesAdder implements Transformer {
     private final String additionsType;
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
         openAPI.getComponents().getSchemas().entrySet().stream()
             .filter(stringSchemaEntry -> schemaNames.contains(stringSchemaEntry.getKey()))
             .forEach(stringSchemaEntry -> {
@@ -28,5 +28,7 @@ public class AdditionalPropertiesAdder implements Transformer {
                 propertiesItem.setAdditionalProperties(additionsTypeSchema);
                 stringSchemaEntry.getValue().addProperties("additions", propertiesItem);
             });
+        
+        return openAPI;
     }
 }
