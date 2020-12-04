@@ -51,7 +51,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String WITH_MOCKS = "withMocks";
     public static final String USE_SINGLE_REQUEST_PARAMETER = "useSingleRequestParameter";
 
-    public static final String TAGGED_UNIONS = "taggedUnions";
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
     public static final String PROVIDED_IN_ROOT = "providedInRoot";
@@ -79,7 +78,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected Boolean stringEnums = false;
     protected QUERY_PARAM_OBJECT_FORMAT_TYPE queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.dot;
     private boolean useSingleRequestParameter = true;
-    private boolean taggedUnions = false;
 
     public BoatAngularGenerator() {
         super();
@@ -109,9 +107,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(CliOption.newBoolean(USE_SINGLE_REQUEST_PARAMETER,
                 "Setting this property to true will generate functions with a single argument containing all API endpoint parameters instead of one argument per parameter.",
                 false));
-        this.cliOptions.add(CliOption.newBoolean(TAGGED_UNIONS,
-                "Use discriminators to create tagged unions instead of extending interfaces.",
-                this.taggedUnions));
         this.cliOptions.add(CliOption.newBoolean(PROVIDED_IN_ROOT,
                 "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
                 false));
@@ -215,8 +210,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         processBooleanOpt(USE_SINGLE_REQUEST_PARAMETER, this::setUseSingleRequestParameter);
         writePropertyBack(USE_SINGLE_REQUEST_PARAMETER, getUseSingleRequestParameter());
-
-        processBooleanOpt(TAGGED_UNIONS, value -> taggedUnions = value);
 
         processBooleanOpt(PROVIDED_IN_ROOT,
                 value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
@@ -488,17 +481,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             List<Map<String, Object>> models = (List<Map<String, Object>>) inner.get("models");
             for (Map<String, Object> mo : models) {
                 CodegenModel cm = (CodegenModel) mo.get("model");
-                if (taggedUnions) {
-                    mo.put(TAGGED_UNIONS, true);
-                    if (cm.discriminator != null && cm.children != null) {
-                        for (CodegenModel child : cm.children) {
-                            cm.imports.add(child.classname);
-                        }
-                    }
-                    if (cm.parent != null) {
-                        cm.imports.remove(cm.parent);
-                    }
-                }
                 // Add additional filename information for imports
                 Set<String> parsedImports = parseImports(cm);
                 mo.put("tsImports", toTsImports(cm, parsedImports));
