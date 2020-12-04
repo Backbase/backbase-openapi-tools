@@ -47,7 +47,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String NAME = "boat-angular";
 
     public static final String NPM_REPOSITORY = "npmRepository";
-    public static final String WITH_INTERFACES = "withInterfaces";
     public static final String WITH_MOCKS = "withMocks";
     public static final String USE_SINGLE_REQUEST_PARAMETER = "useSingleRequestParameter";
 
@@ -98,9 +97,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         this.cliOptions.add(new CliOption(NPM_REPOSITORY,
                 "Use this property to set an url your private npmRepo in the package.json"));
-        this.cliOptions.add(CliOption.newBoolean(WITH_INTERFACES,
-                "Setting this property to true will generate interfaces next to the default class implementations.",
-                false));
         this.cliOptions.add(CliOption.newBoolean(WITH_MOCKS,
                 "Setting this property to true will generate mocks out of the examples.",
                 false));
@@ -193,12 +189,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             additionalProperties.put(STRING_ENUMS, getStringEnums());
             if (Boolean.TRUE.equals(getStringEnums())) {
                 classEnumSeparator = "";
-            }
-        });
-
-        processBooleanOpt(WITH_INTERFACES, withInterfaces -> {
-            if (Boolean.TRUE.equals(withInterfaces)) {
-                apiTemplateFiles.put("apiInterface.mustache", "Interface.ts");
             }
         });
 
