@@ -44,6 +44,7 @@ import static org.openapitools.codegen.utils.StringUtils.*;
 
 @Slf4j
 public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
+    public static final String NAME = "boat-angular";
 
     public static final String NPM_REPOSITORY = "npmRepository";
     public static final String WITH_INTERFACES = "withInterfaces";
@@ -90,7 +91,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         supportsMultipleInheritance = true;
 
-        embeddedTemplateDir = templateDir = "boat-angular";
+        embeddedTemplateDir = templateDir = NAME;
         modelTemplateFiles.put("model.mustache", ".ts");
         apiTemplateFiles.put("api.service.mustache", ".ts");
         languageSpecificPrimitives.add("Blob");
@@ -136,7 +137,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     public String getName() {
-        return "boat-angular";
+        return NAME;
     }
 
     @Override
