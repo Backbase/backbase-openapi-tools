@@ -138,13 +138,19 @@ The `boat` plugin has multiple goals:
     Bundles a spec by resolving external references.
     
     Configuration can point to a single in- and output file, or to in- and output directories. When directories are
-    specified, all file with a `.yaml` extension are bundled.
+    specified, all files specified by the `includes` parameter are bundled.
     
     Examples in `json` files are parsed to objects.
     ```
     <configuration>
+        <skip>${bundle.skip}</skip>
         <input>${project.basedir}/src/main/resources/</input>
         <output>${project.build.outputDirectory}/specs/</output>
+        <includes>*-api-v*.yaml</includes>
+        <removeExtensions>
+            <extension>x-extra-annotations</extension>
+            <extension>x-implements</extension>
+        </removeExtensions>
     </configuration>
 
     ```
