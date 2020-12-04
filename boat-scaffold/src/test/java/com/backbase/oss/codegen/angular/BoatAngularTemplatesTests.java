@@ -41,7 +41,7 @@ public class BoatAngularTemplatesTests {
     private static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
     private static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
 
-    private static final String[] CASES = {"nom", "reg", "mck", "pir", "amp"};
+    private static final String[] CASES = {"nom", "reg", "mck", "pir", "amp", "srv"};
 
     @Parameterized.Parameters(name = "{0}")
     static public Object parameters() {
@@ -91,6 +91,7 @@ public class BoatAngularTemplatesTests {
     private final boolean withMocks;
     private final boolean providedInRoot;
     private final boolean apiModulePrefix;
+    private final boolean serviceSuffix;
 
     static private List<File> files;
 
@@ -102,6 +103,7 @@ public class BoatAngularTemplatesTests {
         this.withMocks = (mask & 1 << 2) != 0;
         this.providedInRoot = (mask & 1 << 3) != 0;
         this.apiModulePrefix = (mask & 1 << 4) != 0;
+        this.serviceSuffix = (mask & 1 << 5) != 0;
     }
 
     @Before
@@ -167,6 +169,18 @@ public class BoatAngularTemplatesTests {
         );
     }
 
+    @Test
+    public void serviceSuffix() {
+        assertThat(
+                findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
+                equalTo(this.serviceSuffix)
+        );
+        assertThat(
+                findPattern("/api/.+\\.service.ts$", "export class .*Service "),
+                equalTo(!this.serviceSuffix)
+        );
+    }
+
     private boolean findPattern(String filePattern, String linePattern) {
         List<String> selection = selectFiles(filePattern);
         assertThat(selection, not(hasSize(0)));
@@ -227,6 +241,9 @@ public class BoatAngularTemplatesTests {
         cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.providedInRoot);
         if (this.apiModulePrefix) {
             cf.addAdditionalProperty(BoatAngularGenerator.API_MODULE_PREFIX, "Boat");
+        }
+        if (this.serviceSuffix) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SERVICE_SUFFIX, "Gateway");
         }
 
         final String destPackage = this.caseName.replace('-', '.') + ".";
