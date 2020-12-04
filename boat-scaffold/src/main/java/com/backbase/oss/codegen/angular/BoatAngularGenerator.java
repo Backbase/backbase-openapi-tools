@@ -58,8 +58,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String MODEL_SUFFIX = "modelSuffix";
     public static final String MODEL_FILE_SUFFIX = "modelFileSuffix";
     public static final String FILE_NAMING = "fileNaming";
-    public static final String STRING_ENUMS = "stringEnums";
-    public static final String STRING_ENUMS_DESC = "Generate string enums instead of objects for enum values.";
     public static final String BUILD_DIST = "buildDist";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
@@ -72,7 +70,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String modelSuffix = "";
     protected String modelFileSuffix = "";
     protected String fileNaming = "camelCase";
-    protected Boolean stringEnums = false;
 
     public BoatAngularGenerator() {
         super();
@@ -107,7 +104,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(MODEL_SUFFIX, "The suffix of the generated model."));
         this.cliOptions.add(new CliOption(MODEL_FILE_SUFFIX, "The suffix of the file of the generated model (model<suffix>.ts)."));
         this.cliOptions.add(new CliOption(FILE_NAMING, "Naming convention for the output files: 'camelCase', 'kebab-case'.").defaultValue(this.fileNaming));
-        this.cliOptions.add(new CliOption(STRING_ENUMS, STRING_ENUMS_DESC).defaultValue(String.valueOf(this.stringEnums)));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
     }
 
@@ -175,14 +171,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                     log.info("generating code with foundation-ang {} ...", version);
                     log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
                 });
-
-        processBooleanOpt(STRING_ENUMS, value -> {
-            setStringEnums(value);
-            additionalProperties.put(STRING_ENUMS, getStringEnums());
-            if (Boolean.TRUE.equals(getStringEnums())) {
-                classEnumSeparator = "";
-            }
-        });
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
@@ -255,14 +243,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private String getIndexDirectory() {
         String indexPackage = modelPackage.substring(0, Math.max(0, modelPackage.lastIndexOf('.')));
         return indexPackage.replace('.', File.separatorChar);
-    }
-
-    public Boolean getStringEnums() {
-        return stringEnums;
-    }
-
-    public void setStringEnums(boolean value) {
-        stringEnums = value;
     }
 
     @Override
