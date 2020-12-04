@@ -75,7 +75,7 @@ public class BoatOpenAPIResolver {
                 }
 
                 String pathname = (String)var1.next();
-                pathItem = (PathItem)this.openApi.getPaths().get(pathname);
+                pathItem = this.openApi.getPaths().get(pathname);
             } while(pathItem.readOperations() == null);
 
             Iterator var4 = pathItem.readOperations().iterator();

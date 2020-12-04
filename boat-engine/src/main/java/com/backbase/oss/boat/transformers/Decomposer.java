@@ -55,7 +55,7 @@ public class Decomposer implements Transformer {
             composedSchema.required(new ArrayList<>());
         }
         if (schema.getRequired() != null) {
-            List<String> required = new ArrayList<String>(composedSchema.getRequired());
+            List<String> required = new ArrayList(composedSchema.getRequired());
             required.addAll(schema.getRequired());
             required = required.stream().distinct().collect(Collectors.toList());
             composedSchema.required(required);

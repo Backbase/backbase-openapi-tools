@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ExporterTest extends AbstractBoatEngineTests {
+public class ExporterTest extends AbstractBoatEngineTestBase {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 

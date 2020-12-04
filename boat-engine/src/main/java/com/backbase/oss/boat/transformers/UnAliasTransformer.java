@@ -40,10 +40,10 @@ public class UnAliasTransformer implements Transformer {
             referredSchema = openAPI.getComponents().getSchemas().get(RefUtils.extractSimpleName(
                 referredSchema.get$ref()).getLeft());
             if (count++ > 20) {
-                throw new RuntimeException("Did not resolve " + schema.get$ref() + " after following 20 refs.");
+                throw new TransformerException("Did not resolve " + schema.get$ref() + " after following 20 refs.");
             }
         }
-        if (!isAliasOfSimpleTypes(referredSchema)) {
+        if (Boolean.TRUE.equals(!isAliasOfSimpleTypes(referredSchema))) {
             return;
         }
         unAlias(schema, referredSchema);

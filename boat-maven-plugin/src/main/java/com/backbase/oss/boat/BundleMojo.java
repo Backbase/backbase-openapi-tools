@@ -70,12 +70,7 @@ public class BundleMojo extends AbstractMojo {
         File[] inputFiles;
         File[] outputFiles;
         if (input.isDirectory()) {
-            inputFiles = input.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getName().endsWith(".yaml");
-                }
-            });
+            inputFiles = input.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
             outputFiles = new File[inputFiles.length];
             for (int i = 0; i < inputFiles.length; i++) {
                 outputFiles[i] = new File(output, inputFiles[i].getName());
@@ -118,17 +113,17 @@ public class BundleMojo extends AbstractMojo {
     }
 
     String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
-        String version = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
-        if (version == null) {
+        String versionFileName = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
+        if (versionFileName == null) {
             throw new MojoExecutionException("Configured to use version in filename, but no version set.");
         }
         String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
-        String majorFromVersion = version.substring(0, version.indexOf("."));
+        String majorFromVersion = versionFileName.substring(0, versionFileName.indexOf("."));
         if (!majorFromFileName.equals(majorFromVersion)) {
-            throw new MojoExecutionException("Invalid version " + version + " in file " + originalFileName);
+            throw new MojoExecutionException("Invalid version " + versionFileName + " in file " + originalFileName);
         }
         // payment-order-client-api-v2.yaml
-        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + version + "$3");
+        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + versionFileName + "$3");
     }
 
 }

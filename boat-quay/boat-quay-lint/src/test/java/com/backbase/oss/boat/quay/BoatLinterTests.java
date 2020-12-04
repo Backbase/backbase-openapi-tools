@@ -65,5 +65,6 @@ public class BoatLinterTests {
             System.out.println(ruleDetails.toString());
         });
 
+
     }
 }

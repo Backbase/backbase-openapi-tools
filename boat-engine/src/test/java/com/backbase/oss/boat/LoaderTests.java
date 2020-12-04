@@ -7,9 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.security.PublicKey;
 
-public class LoaderTests extends AbstractBoatEngineTests {
+public class LoaderTests extends AbstractBoatEngineTestBase {
 
     @Test
     public void testRamlResourceLoaderExceptions(){

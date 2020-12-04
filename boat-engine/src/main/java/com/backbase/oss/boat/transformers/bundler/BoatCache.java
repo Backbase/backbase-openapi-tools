@@ -2,12 +2,12 @@ package com.backbase.oss.boat.transformers.bundler;
 
 import static io.swagger.v3.parser.models.RefFormat.RELATIVE;
 
+import com.backbase.oss.boat.transformers.TransformerException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.ResolverCache;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.models.RefFormat;
-import io.swagger.v3.parser.util.DeserializationUtils;
 import io.swagger.v3.parser.util.PathUtils;
 import io.swagger.v3.parser.util.RefUtils;
 import java.io.File;
@@ -24,14 +24,12 @@ public class BoatCache extends ResolverCache {
 
     private String rootPath ;
     private List<AuthorizationValue> auths;
-    private OpenAPI openApi;
 
 
     public BoatCache(OpenAPI openApi, List<AuthorizationValue> auths, String parentFileLocation,
         ExamplesProcessor examplesProcessor) {
         super(openApi, auths, parentFileLocation);
         this.rootPath = parentFileLocation;
-        this.openApi = openApi;
         this.examplesProcessor = examplesProcessor;
         this.auths = auths;
 
@@ -85,11 +83,10 @@ public class BoatCache extends ResolverCache {
         final String[] refParts = ref.split("#/");
 
         if (refParts.length > 2) {
-            throw new RuntimeException("Invalid ref format: " + ref);
+            throw new TransformerException("Invalid ref format: " + ref);
         }
 
         final String file = refParts[0];
-        final String definitionPath = refParts.length == 2 ? refParts[1] : null;
         String contents = getExternalFileCache().get(file);
 
         if(parentDirectory != null) {
@@ -102,8 +99,7 @@ public class BoatCache extends ResolverCache {
             contents = RefUtils.readExternalClasspathRef(file, refFormat, auths, rootPath);
         }
 
-        T result = BoatDeserializationUtils.deserialize(contents, file, expectedType);
-        return result;
+        return BoatDeserializationUtils.deserialize(contents, file, expectedType);
     }
 
 

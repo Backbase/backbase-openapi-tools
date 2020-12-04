@@ -33,9 +33,9 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             return;
         }
         // Find all the components referenced from paths.
-        openAPI.getComponents().getSchemas().forEach((name, schema) -> {
-            deferenceSchema(schema, openAPI, name);
-        });
+        openAPI.getComponents().getSchemas().forEach((name, schema) ->
+            deferenceSchema(schema, openAPI, name)
+        );
     }
 
     private void deferenceSchema(Schema schema, OpenAPI openAPI, String crumb) {
@@ -63,16 +63,15 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
         for (Entry<String, Schema> entry : ((Map<String, Schema>) schema.getProperties()).entrySet()) {
             Schema propertySchema = entry.getValue();
-            if (propertySchema.get$ref() != null) {
-                if (!resolvedShemas.containsKey(propertySchema.get$ref())) {
+            if (propertySchema.get$ref() != null && !resolvedShemas.containsKey(propertySchema.get$ref())) {
                     log.debug(crumb + " : Replacing property {} with schema {}", entry.getKey(),
                         propertySchema.get$ref());
                     Schema referencedSchema = getSchemaByInternalReference(propertySchema.get$ref(), openAPI);
                     replacements.put(entry.getKey(), referencedSchema);
                     propertySchema = referencedSchema;
                     resolvedShemas.put(propertySchema.get$ref(), referencedSchema);
-                }
             }
+
             deferenceSchema(propertySchema, openAPI, crumb + "/" + entry.getKey());
         }
         log.debug(crumb + " : Replacing {} properties", replacements.size());
@@ -94,12 +93,12 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             log.warn(crumb + " composite schema without all-of not dereferenced.");
             return;
         }
-        schema.getAllOf().stream().forEach(ref -> apply(ref, schema, openAPI, crumb));
+        schema.getAllOf().stream().forEach(ref -> apply(ref, schema, openAPI));
         // can we get away with this? or should it be replaced with a proper Schema<Object> ?
         schema.setAllOf(null);
     }
 
-    private void apply(Schema ref, ComposedSchema schema, OpenAPI openAPI, String crumb) {
+    private void apply(Schema ref, ComposedSchema schema, OpenAPI openAPI) {
         Schema refSchema = ref;
         if (ref.get$ref() != null) {
             refSchema = getSchemaByInternalReference(ref.get$ref(), openAPI);
@@ -130,7 +129,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
 
         Schema schema = openAPI.getComponents().getSchemas().get(parts[0]);
         if (schema == null) {
-            throw new RuntimeException(String.format("No component schema found by name %s", internalReference));
+            throw new TransformerException(String.format("No component schema found by name %s", internalReference));
         }
 
         for (int i = 1; i < parts.length; i++) {
@@ -139,7 +138,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
             } else if (parts[i].equals("items")) {
                 schema = ((ArraySchema) schema).getItems();
             } else {
-                throw new RuntimeException("Unable to process $ref " + internalReference);
+                throw new TransformerException("Unable to process $ref " + internalReference);
             }
         }
 
