@@ -55,7 +55,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
     public static final String PROVIDED_IN_ROOT = "providedInRoot";
-    public static final String ENFORCE_GENERIC_MODULE_WITH_PROVIDERS = "enforceGenericModuleWithProviders";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String SERVICE_FILE_SUFFIX = "serviceFileSuffix";
@@ -263,8 +262,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
-        additionalProperties.put(ENFORCE_GENERIC_MODULE_WITH_PROVIDERS, angularVersion.atLeast("9.0.0"));
-
         additionalProperties.put(NG_VERSION, angularVersion);
 
         processOpt(NPM_NAME, () -> addNpmPackageGeneration(angularVersion));
