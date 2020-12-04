@@ -13,16 +13,9 @@ import { {{classname}} } from '../model/models';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
-{{#withInterfaces}}
-import {
-    {{classname}}Interface{{#useSingleRequestParameter}}{{#operations}}{{#operation}}{{#allParams.0}},
-    {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams{{/allParams.0}}{{/operation}}{{/operations}}{{/useSingleRequestParameter}}
-} from './{{classFilename}}Interface';
-{{/withInterfaces}}
 
 {{#operations}}
 
-{{^withInterfaces}}
 {{#useSingleRequestParameter}}
 {{#operation}}
 {{#allParams.0}}
@@ -36,7 +29,6 @@ export interface {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterIn
 {{/allParams.0}}
 {{/operation}}
 {{/useSingleRequestParameter}}
-{{/withInterfaces}}
 
 {{#description}}
 /**
@@ -51,12 +43,7 @@ export interface {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterIn
   providedIn: 'root'
 })
 {{/providedInRoot}}
-{{#withInterfaces}}
-export class {{classname}} implements {{classname}}Interface {
-{{/withInterfaces}}
-{{^withInterfaces}}
 export class {{classname}} {
-{{/withInterfaces}}
 
     protected basePath = '{{{basePathWithoutHost}}}';
     public defaultHeaders = new HttpHeaders();
