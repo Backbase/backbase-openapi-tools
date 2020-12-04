@@ -1,13 +1,5 @@
 package com.backbase.oss.codegen.java;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,14 +11,13 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -36,11 +27,20 @@ import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.languages.features.OptionalFeatures;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+
 /**
  * These tests verifies that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
  */
-@RunWith(Parameterized.class)
 public class BoatSpringTemplatesTests {
 
     private static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
@@ -48,12 +48,11 @@ public class BoatSpringTemplatesTests {
 
     private static final String[] CASES = {"val", "opt", "req", "lmb", "nul", "unq", "wth"};
 
-    @Parameterized.Parameters(name = "{0}")
-    static public Object parameters() {
+    static public Stream<Arguments> parameters() {
         final List<Object[]> data = new ArrayList<>();
 
         if (PROP_FAST) {
-            data.add(new Object[] {caseName(0), 0});
+            data.add(new Object[]{caseName(0), 0});
         }
 
         // generate all combinations
@@ -62,28 +61,30 @@ public class BoatSpringTemplatesTests {
                 continue;
             }
 
-            data.add(new Object[] {caseName(mask), mask,});
+            data.add(new Object[]{caseName(mask), mask,});
         }
 
         if (PROP_FAST) {
-            data.add(new Object[] {caseName(-1), -1});
+            data.add(new Object[]{caseName(-1), -1});
         }
 
-        return data;
+        Stream<Arguments> argumentsStream = data.stream().map(objects -> Arguments.of(objects[0], objects[1]));
+
+        return argumentsStream;
     }
 
     static private String caseName(int mask) {
         return mask == 0
             ? "backbase"
             : IntStream.range(0, CASES.length)
-                .filter(n -> (mask & (1 << n)) != 0)
-                .mapToObj(n -> CASES[n])
-                .collect(joining("-", "backbase-", ""));
+            .filter(n -> (mask & (1 << n)) != 0)
+            .mapToObj(n -> CASES[n])
+            .collect(joining("-", "backbase-", ""));
     }
 
     static private final String TEST_OUTPUS = System.getProperty(PROP_BASE + "output", "target/test-outputs");
 
-    @BeforeClass
+    @BeforeAll
     static public void setUpClass() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUS));
         FileUtils.deleteDirectory(new File(TEST_OUTPUS, "src"));
@@ -114,7 +115,7 @@ public class BoatSpringTemplatesTests {
         this.useWithModifiers = (mask & 1 << 6) != 0;
     }
 
-    @Before
+    @BeforeEach
     public void generate() throws IOException {
         final Path marker = Paths.get(TEST_OUTPUS, "src", "." + this.caseName);
 
@@ -130,7 +131,8 @@ public class BoatSpringTemplatesTests {
         assertThat(files.size(), not(equalTo(0)));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void useBeanValidation() {
         assertThat(findPattern("/api/.+\\.java$", "@Valid"),
             equalTo(this.useBeanValidation));
@@ -138,7 +140,8 @@ public class BoatSpringTemplatesTests {
             equalTo(this.useBeanValidation));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void useOptional() {
         assertThat(findPattern("/api/.+\\.java$", "Optional<(?!NativeWebRequest)[^>]+>"),
             equalTo(this.useOptional));
@@ -146,7 +149,8 @@ public class BoatSpringTemplatesTests {
             is(false));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void addServletRequest() {
         assertThat(findPattern("/api/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
             equalTo(this.addServletRequest));
@@ -154,7 +158,8 @@ public class BoatSpringTemplatesTests {
             is(false));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void useLombokAnnotations() {
         assertThat(findPattern("/api/.+\\.java$", "@lombok\\.Getter"),
             is(false));
@@ -162,7 +167,8 @@ public class BoatSpringTemplatesTests {
             equalTo(this.useLombokAnnotations));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void openApiNullable() {
         assertThat(findPattern("/api/.+\\.java$", "JsonNullable<[^>]+>"),
             is(false));
@@ -170,7 +176,8 @@ public class BoatSpringTemplatesTests {
             equalTo(this.openApiNullable));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void useSetForUniqueItems() {
         assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
             equalTo(this.useSetForUniqueItems));
@@ -178,7 +185,8 @@ public class BoatSpringTemplatesTests {
             equalTo(this.useSetForUniqueItems));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("parameters")
     public void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));

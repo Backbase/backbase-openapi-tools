@@ -3,17 +3,20 @@ package com.backbase.oss.boat;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class RemoveMojoTests {
+
     @Test
-    public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException, OpenAPILoaderException {
+    public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
 
         File output = getFile("/readWriteFiles/output.yaml");
         File input = getFile("/oas-examples/petstore-deprecated.yaml");
@@ -24,12 +27,12 @@ public class RemoveMojoTests {
         Paths.get(output.getPath());
         String depreciated = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
 
-        Assert.assertTrue(!depreciated.contains("/pets/{petId}: get:"));
+        assertTrue(!depreciated.contains("/pets/{petId}: get:"));
 
     }
 
     @Test
-    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException, IOException {
+    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException {
         File output = getFile("/readWriteFiles/output.yaml");
         File input = getFile("/oas-examples/petstore-composed.yaml");
         DecomposeMojo decomposeMojo = new DecomposeMojo();
