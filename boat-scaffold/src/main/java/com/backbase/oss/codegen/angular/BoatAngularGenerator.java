@@ -48,7 +48,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     public static final String NPM_REPOSITORY = "npmRepository";
     public static final String WITH_MOCKS = "withMocks";
-    public static final String USE_SINGLE_REQUEST_PARAMETER = "useSingleRequestParameter";
 
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
@@ -76,7 +75,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String fileNaming = "camelCase";
     protected Boolean stringEnums = false;
     protected QUERY_PARAM_OBJECT_FORMAT_TYPE queryParamObjectFormat = QUERY_PARAM_OBJECT_FORMAT_TYPE.dot;
-    private boolean useSingleRequestParameter = true;
 
     public BoatAngularGenerator() {
         super();
@@ -99,9 +97,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 "Use this property to set an url your private npmRepo in the package.json"));
         this.cliOptions.add(CliOption.newBoolean(WITH_MOCKS,
                 "Setting this property to true will generate mocks out of the examples.",
-                false));
-        this.cliOptions.add(CliOption.newBoolean(USE_SINGLE_REQUEST_PARAMETER,
-                "Setting this property to true will generate functions with a single argument containing all API endpoint parameters instead of one argument per parameter.",
                 false));
         this.cliOptions.add(CliOption.newBoolean(PROVIDED_IN_ROOT,
                 "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
@@ -197,9 +192,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
             }
         });
-
-        processBooleanOpt(USE_SINGLE_REQUEST_PARAMETER, this::setUseSingleRequestParameter);
-        writePropertyBack(USE_SINGLE_REQUEST_PARAMETER, getUseSingleRequestParameter());
 
         processBooleanOpt(PROVIDED_IN_ROOT,
                 value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
@@ -549,14 +541,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             return importMapping.get(name);
         }
         return modelPackage() + "/" + toModelFilename(name).substring(DEFAULT_IMPORT_PREFIX.length());
-    }
-
-    private boolean getUseSingleRequestParameter() {
-        return useSingleRequestParameter;
-    }
-
-    private void setUseSingleRequestParameter(boolean useSingleRequestParameter) {
-        this.useSingleRequestParameter = useSingleRequestParameter;
     }
 
     private String getApiFilenameFromClassname(String classname) {
