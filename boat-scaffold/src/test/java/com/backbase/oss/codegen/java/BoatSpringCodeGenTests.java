@@ -26,7 +26,7 @@ public class BoatSpringCodeGenTests {
         gen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> Assert.assertEquals(k + " is described multiple times", v.size(), 1));
+            .forEach((k, v) -> Assert.assertEquals(k + " is described multiple times",1 , v.size()));
     }
 
     @Test

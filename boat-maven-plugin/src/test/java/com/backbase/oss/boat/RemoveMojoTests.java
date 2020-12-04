@@ -21,7 +21,6 @@ public class RemoveMojoTests {
         removeDeprecatedMojo.setInput(input);
         removeDeprecatedMojo.setOutput(output);
         removeDeprecatedMojo.execute();
-        Paths.get(output.getPath());
         String depreciated = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
 
         Assert.assertTrue(!depreciated.contains("/pets/{petId}: get:"));
@@ -35,9 +34,9 @@ public class RemoveMojoTests {
         DecomposeMojo decomposeMojo = new DecomposeMojo();
         decomposeMojo.setInput(input);
         decomposeMojo.setOutput(output);
-        // Assert.assertEquals(0, output.length());
         decomposeMojo.execute();
-        // Assert.assertTrue(output.length()>0);
+        String decomposed = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
+        Assert.assertEquals("", decomposed);
 
     }
     private File getFile(String fileName) {

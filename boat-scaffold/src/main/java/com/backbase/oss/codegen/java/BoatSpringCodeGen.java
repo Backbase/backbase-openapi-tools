@@ -2,6 +2,7 @@ package com.backbase.oss.codegen.java;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.reducing;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 import com.samskivert.mustache.Mustache;
@@ -30,11 +31,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
+    private static final String typeMap = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
         private final int level;
         private final String prefix;
-
+        private static final String regex = "\\s+$";
         NewLineIndent(int level, String space) {
             this.level = level;
             this.prefix = IntStream.range(0, this.level).mapToObj(n -> space).collect(joining());
@@ -60,14 +62,17 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         private String[] splitLines(final String text) {
             return stream(text.split("\\r\\n|\\n"))
-                .map(s -> s.replaceFirst("\\s+$", ""))
+                .map(s -> {
+
+                    return s.replaceFirst(regex, "");
+                })
                 .toArray(String[]::new);
         }
 
         private int minIndent(String[] lines) {
             return stream(lines)
                 .filter(StringUtils::isNotBlank)
-                .map(s -> s.replaceFirst("\\s+$", ""))
+                .map(s -> s.replaceFirst(regex, ""))
                 .map(NewLineIndent::indentLevel)
                 .min(Integer::compareTo)
                 .orElse(0);
@@ -75,7 +80,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         static int indentLevel(String text) {
             return IntStream
-                .range(0, text.replaceFirst("\\s+$", text).length())
+                .range(0, text.replaceFirst(regex, text).length())
                 .filter(n -> !Character.isWhitespace(text.charAt(n)))
                 .findFirst().orElse(0);
         }
@@ -188,9 +193,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
         if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", "java.util.Set");
+            this.typeMapping.put("set", typeMap);
 
-            this.importMapping.put("Set", "java.util.Set");
+            this.importMapping.put("Set", typeMap);
             this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
         }
 
@@ -204,14 +209,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer) {
-            if (this.useSetForUniqueItems && p.getUniqueItems()) {
+        if (p.isContainer &&this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.containerType = "set";
-                p.baseType = "java.util.Set";
-                p.dataType = "java.util.Set<" + p.items.dataType + ">";
-                p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
+                p.baseType = typeMap;
+                p.dataType = typeMap+"<" + p.items.dataType + ">";
+                p.datatypeWithEnum = typeMap+"<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-            }
+
         }
     }
 
@@ -224,9 +228,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
             p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = "java.util.Set";
-                p.dataType = "java.util.Set<" + p.items.dataType + ">";
-                p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
+                p.baseType = typeMap;
+                p.dataType = typeMap+"<" + p.items.dataType + ">";
+                p.datatypeWithEnum = typeMap+"<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
             }
         }

@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class BoatExampleUtils {
 
+    private BoatExampleUtils(){
+        throw new AssertionError("Private constructor");
+    }
   public static void convertExamples(MediaType mediaType, String contentType,  List<BoatExample> examples) {
       if (mediaType.getExample() != null) {
           Object example = mediaType.getExample();

@@ -2,6 +2,7 @@ package com.backbase.oss.codegen.yard;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.codegen.AbstractDocumentationGenerator;
+import com.backbase.oss.codegen.BoatScaffoldException;
 import com.backbase.oss.codegen.doc.BoatDocsGenerator;
 import com.backbase.oss.codegen.yard.model.Portal;
 import com.backbase.oss.codegen.yard.model.Spec;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,7 +74,7 @@ public class BoatYardGenerator extends AbstractDocumentationGenerator {
                 });
             }
         );
-        // After processing our model, convert it into a map;
+        // After processing our model, convert it into a map.
         Map<String, Object> bundle = convertToBundle(portal);
         List<File> files = processTemplates(bundle);
         log.info("Finished creating BOAT Yard for portal: {}", portal.getTitle());
@@ -115,7 +115,7 @@ public class BoatYardGenerator extends AbstractDocumentationGenerator {
         try {
             yardModel = yaml.loadAs(new FileInputStream(input), YardModel.class);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot create BOAT Yard from input: " + input, e);
+            throw new BoatScaffoldException("Cannot create BOAT Yard from input: " + input, e);
         }
         return yardModel;
     }

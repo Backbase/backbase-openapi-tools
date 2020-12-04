@@ -40,7 +40,7 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
     protected CodegenIgnoreProcessor ignoreProcessor;
     private final TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
 
-    public AbstractDocumentationGenerator(CodegenConfig config) {
+    protected AbstractDocumentationGenerator(CodegenConfig config) {
         this.config = config;
         this.input = config.getInputSpec();
         this.output = config.getOutputDir();
@@ -78,10 +78,10 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
                     outputFolder += File.separator + support.folder;
                 }
                 File of = new File(outputFolder);
-                if (!of.isDirectory()) {
-                    if (!of.mkdirs()) {
+                if (!of.isDirectory() && !of.mkdir()) {
+
                         log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
-                    }
+
                 }
                 String outputFilename = new File(support.destinationFilename).isAbsolute() // split
                     ? support.destinationFilename
@@ -116,13 +116,8 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
                             config.postProcessFile(written, "supporting-mustache");
                         }
                     } else {
-                        InputStream in = null;
+                        InputStream in = getInputStream(templateFile);
 
-                        try {
-                            in = new FileInputStream(templateFile);
-                        } catch (Exception e) {
-                            // continue
-                        }
                         if (in == null) {
                             in = this.getClass().getClassLoader().getResourceAsStream(getCPResourcePath(templateFile));
                         }
@@ -137,10 +132,19 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
                     log.info("Skipped generation of {} due to rule in .openapi-generator-ignore", outputFilename);
                 }
             } catch (Exception e) {
-                throw new RuntimeException("Could not generate supporting file '" + support + "'", e);
+                throw new BoatScaffoldException("Could not generate supporting file '" + support + "'", e);
             }
         }
         return files;
+    }
+
+    private InputStream getInputStream(String templateFile){
+        try {
+            return  new FileInputStream(templateFile);
+        } catch (Exception e) {
+            // continue
+        }
+        return null;
     }
 
     protected File writeInputStreamToFile(String filename, InputStream in, String templateFile) throws IOException {

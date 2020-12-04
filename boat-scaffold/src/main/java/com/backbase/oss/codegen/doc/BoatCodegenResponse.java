@@ -12,10 +12,10 @@ import org.openapitools.codegen.CodegenResponse;
 @Slf4j
 public class BoatCodegenResponse extends CodegenResponse {
 
-    private List<BoatExample> examples;
+    private List<BoatExample> examplesList;
 
     public boolean hasExamples() {
-        return examples != null && !examples.isEmpty();
+        return examplesList != null && !examplesList.isEmpty();
     }
 
     public BoatCodegenResponse(CodegenResponse o, String responseCode, ApiResponse response, OpenAPI openAPI) {
@@ -73,14 +73,12 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.pattern = o.pattern;
         this.multipleOf = o.multipleOf;
 
-        List<BoatExample> examples = new ArrayList<>();
+        List<BoatExample> tempExamples = new ArrayList<>();
         if (response.getContent() != null) {
-            response.getContent().forEach((contentType, mediaType) -> {
-                BoatExampleUtils.convertExamples(mediaType, contentType, examples);
-            });
-            BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
+            response.getContent().forEach((contentType, mediaType) -> BoatExampleUtils.convertExamples(mediaType, contentType, tempExamples));
+            BoatExampleUtils.inlineExamples(responseCode, tempExamples, openAPI);
 
-            this.examples = examples;
+            this.examplesList = tempExamples;
 
         }
     }

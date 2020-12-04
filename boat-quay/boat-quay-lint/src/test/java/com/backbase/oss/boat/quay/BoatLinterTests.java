@@ -65,6 +65,7 @@ public class BoatLinterTests {
             System.out.println(ruleDetails.toString());
         });
 
+        Assert.assertEquals("BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG)",boatLinter.getAvailableRules().get(0).toString());
 
     }
 }
