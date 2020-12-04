@@ -1,18 +1,19 @@
 package com.backbase.oss.boat;
 
-import java.io.File;
-
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
+import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class ExportMojoTests {
@@ -40,7 +41,7 @@ public class ExportMojoTests {
         mojo.output = output;
         mojo.execute();
 
-        Assert.assertTrue(outputYaml.exists());
+        assertTrue(outputYaml.exists());
 
     }
 
@@ -69,10 +70,10 @@ public class ExportMojoTests {
         mojo.licenseUrl= "testUrl";
         mojo.execute();
 
-        Assert.assertTrue(outputYaml.exists());
+        assertTrue(outputYaml.exists());
         OpenAPI load = OpenAPILoader.load(outputYaml, false, false);
-        Assert.assertEquals("testLicence",load.getInfo().getLicense().getName() );
-        Assert.assertEquals("testUrl",load.getInfo().getLicense().getUrl());
+        assertEquals("testLicence",load.getInfo().getLicense().getName() );
+        assertEquals("testUrl",load.getInfo().getLicense().getUrl());
     }
 
     @Test
@@ -94,9 +95,9 @@ public class ExportMojoTests {
         mojo.output = output;
         mojo.execute();
 
-        Assert.assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
-        Assert.assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
-        Assert.assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
 
     }
 

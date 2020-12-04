@@ -4,19 +4,20 @@ import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatViolation;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoatLinterTests {
 
     BoatLinter boatLinter;
 
-    @Before
+    @BeforeAll
     public void setupBoatLinter() {
         boatLinter = new BoatLinter();
     }
@@ -29,7 +30,7 @@ public class BoatLinterTests {
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertTrue(boatLintReport.hasViolations());
+        assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
@@ -40,7 +41,7 @@ public class BoatLinterTests {
         if (!testDisplay.displayString().contains("[219]")){
             testDisplay = boatLintReport.getViolations().get(2);
         }
-        Assert.assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
+        assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
     }
 
     @Test
@@ -56,7 +57,7 @@ public class BoatLinterTests {
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertTrue(boatLintReport.hasViolations());
+        assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
