@@ -54,7 +54,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String PROVIDED_IN_ROOT = "providedInRoot";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
-    public static final String MODEL_SUFFIX = "modelSuffix";
     public static final String BUILD_DIST = "buildDist";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
@@ -64,7 +63,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
-    protected String modelSuffix = "";
     protected String modelFileSuffix = "";
 
     public BoatAngularGenerator() {
@@ -96,7 +94,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
-        this.cliOptions.add(new CliOption(MODEL_SUFFIX, "The suffix of the generated model."));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
     }
 
@@ -192,10 +189,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(SERVICE_SUFFIX, value -> {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
-        });
-        processOpt(MODEL_SUFFIX, value -> {
-            modelSuffix = value;
-            validateClassSuffixArgument("Model", modelSuffix);
         });
         processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
@@ -494,15 +487,11 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     public String toModelName(String name) {
-        name = addSuffix(name, modelSuffix);
         return super.toModelName(name);
     }
 
     public String removeModelPrefixSuffix(String name) {
         String result = name;
-        if (modelSuffix.length() > 0 && result.endsWith(modelSuffix)) {
-            result = result.substring(0, result.length() - modelSuffix.length());
-        }
         String prefix = capitalize(this.modelNamePrefix);
         String suffix = capitalize(this.modelNameSuffix);
         if (prefix.length() > 0 && result.startsWith(prefix)) {
