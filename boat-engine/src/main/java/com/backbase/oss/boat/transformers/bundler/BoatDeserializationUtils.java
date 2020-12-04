@@ -4,6 +4,8 @@ import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.examples.Example;
 
+import java.util.Objects;
+
 public class BoatDeserializationUtils {
 
     public static <T> T deserialize(Object contents, String fileOrHost, Class<T> expectedType) {
@@ -39,11 +41,11 @@ public class BoatDeserializationUtils {
     }
 
     private static boolean isJson(String contents) {
-        return contents.trim().startsWith("{");
+        return !Objects.isNull(contents) && contents.trim().startsWith("{");
     }
 
     private static boolean isXml(String contents) {
-        return contents.trim().startsWith("<");
+        return !Objects.isNull(contents) && contents.trim().startsWith("<");
     }
 
 }
