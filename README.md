@@ -24,9 +24,18 @@ BOAT is still under development and subject to change.
 * *Maven Plugin*
    * Added `removeExtensions` mojo parameter to `boat:bundle` to filter out the given vendor extensions from bundle.
    * Added `includes` mojo parameter to `boat:bundle` as a glob pattern selecting the specification files (defaults to `*.yaml`).
+   * Added `apisToGenerate` mojo parameter to `boat:generate`
+   * Set the default of `httpUserAgent` to `${project.artifactId}-${project.version}`.
+
+* *Java Generator - resttemplate library*
+  * Added `useWithModifiers` option to use the `with` prefix for POJO modifiers (defaults to `false`).
+  * added `useSetForUniqueItems` to map arrays containing `uniqueItems` to `Set` (defaults to `false`).
+  * Added `useClassLevelBeanValidation` option (defaults to `false`).
+  * Added `useJacksonConversion` to use Jackson for parameters conversion instead of `toString` (defaults to `false`).
+  * Added `restTemplateBeanName` to qualify the autowired RestTemplate bean.
 
 ## 0.10.0
-* Maven Plugin 
+* *Maven Plugin*
    * `boat:lint` mojo will generate an HTML report based on API Guidelines 
    * `boat:docs` mojo will generate HTML documentation from OpenAPI showing multiple examples and requests as well as Custom Annotations
 * General Bug Fixes
