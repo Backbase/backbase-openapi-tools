@@ -26,16 +26,28 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+{{#useBeanValidation}}
+{{#useClassLevelBeanValidation}}
+import org.springframework.validation.annotation.Validated;
+{{/useClassLevelBeanValidation}}
+{{/useBeanValidation}}
 
 {{>generatedAnnotation}}
 @Component("{{package}}.{{classname}}")
 {{#operations}}
+{{#useBeanValidation}}{{!
+}}{{#useClassLevelBeanValidation}}{{!
+}}@Validated
+{{/useClassLevelBeanValidation}}{{!
+}}{{/useBeanValidation}}
 public class {{classname}} {
-    private ApiClient apiClient;
+    private {{^useDefaultApiClient}}final {{/useDefaultApiClient}}ApiClient apiClient;
 
+{{^useDefaultApiClient}}
     public {{classname}}() {
         this(new ApiClient());
     }
+{{/useDefaultApiClient}}
 
     @Autowired
     public {{classname}}(ApiClient apiClient) {
@@ -46,9 +58,11 @@ public class {{classname}} {
         return apiClient;
     }
 
+{{^useDefaultApiClient}}
     public void setApiClient(ApiClient apiClient) {
         this.apiClient = apiClient;
     }
+{{/useDefaultApiClient}}
 
     {{#operation}}
     /**
@@ -116,7 +130,7 @@ public class {{classname}} {
         final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
-        final MultiValueMap localVarFormParams = new LinkedMultiValueMap();{{#hasQueryParams}}
+        final MultiValueMap<String, String> localVarFormParams = new LinkedMultiValueMap<String, String>();{{#hasQueryParams}}
 
         {{#queryParams}}localVarQueryParams.putAll(apiClient.parameterToMultiValueMap({{#collectionFormat}}ApiClient.CollectionFormat.valueOf("{{{collectionFormat}}}".toUpperCase(Locale.ROOT)){{/collectionFormat}}{{^collectionFormat}}null{{/collectionFormat}}, "{{baseName}}", {{paramName}}));{{#hasMore}}
         {{/hasMore}}{{/queryParams}}{{/hasQueryParams}}{{#hasHeaderParams}}
