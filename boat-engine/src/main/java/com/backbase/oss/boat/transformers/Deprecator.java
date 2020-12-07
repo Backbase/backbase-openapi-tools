@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Deprecator implements Transformer {
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         openAPI.getPaths().forEach((s, pathItem) -> {
 
@@ -62,6 +62,8 @@ public class Deprecator implements Transformer {
         });
 
         openAPI.getComponents().getSchemas().values().stream().forEach(Deprecator::removeDeprecatedProperties);
+
+        return openAPI;
     }
 
     private boolean isGetDeprecated(PathItem pathItem) {

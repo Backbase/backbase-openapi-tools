@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.10.0</version>
+        <version>0.11.0</version>
     </parent>
     <artifactId>boat-quay-lint</artifactId>
     <packaging>jar</packaging>
@@ -15,7 +15,7 @@
     <name>BOAT :: Quay Lint</name>
 
     <properties>
-        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <kotlin.version>1.3.61</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>

@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressWarnings("java:S3740")
 public class Decomposer implements Transformer {
 
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         List<Schema> composedSchemas = openAPI.getComponents().getSchemas().values().stream()
             .filter(schema -> schema instanceof ComposedSchema)
@@ -26,6 +26,8 @@ public class Decomposer implements Transformer {
         for (Schema composedSchema : composedSchemas) {
             ((ComposedSchema) composedSchema).setAllOf(null);
         }
+
+        return openAPI;
     }
 
     private void mergeComposedSchema(OpenAPI openAPI, Schema composedSchema) {
@@ -55,7 +57,7 @@ public class Decomposer implements Transformer {
             composedSchema.required(new ArrayList<>());
         }
         if (schema.getRequired() != null) {
-            List<String> required = new ArrayList<String>(composedSchema.getRequired());
+            List<String> required = new ArrayList(composedSchema.getRequired());
             required.addAll(schema.getRequired());
             required = required.stream().distinct().collect(Collectors.toList());
             composedSchema.required(required);

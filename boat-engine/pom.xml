@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.10.0</version>
+        <version>0.11.0</version>
     </parent>
     <artifactId>boat-engine</artifactId>
     <packaging>jar</packaging>
@@ -16,7 +16,8 @@
 
     <properties>
         <sonar.coverage.exclusions>
-            src/main/java/com/backbase/oss/boat/ExporterOptions.java
+            src/main/java/com/backbase/oss/boat/ExporterOptions.java,
+            src/main/java/com/backbase/oss/boat/transformers/TransformerException.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
@@ -35,12 +36,6 @@
             <groupId>me.andrz.jackson</groupId>
             <artifactId>jackson-json-reference-core</artifactId>
             <version>0.3.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -72,10 +67,17 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
