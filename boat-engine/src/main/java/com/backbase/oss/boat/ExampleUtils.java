@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 class ExampleUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(ExampleUtils.class);
 
     private static ObjectMapper mapper = new ObjectMapper();
 

@@ -27,15 +27,17 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
     private Map<String, Schema> resolvedShemas = new HashMap<>();
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
         if (openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) {
             log.debug("nothing to dereference.");
-            return;
+            return openAPI;
         }
         // Find all the components referenced from paths.
         openAPI.getComponents().getSchemas().forEach((name, schema) -> {
             deferenceSchema(schema, openAPI, name);
         });
+
+        return openAPI;
     }
 
     private void deferenceSchema(Schema schema, OpenAPI openAPI, String crumb) {

@@ -12,12 +12,14 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 
 /**
  * Convenience example extractors from common OpenAPI spec elements.
  * Names of examples in returned lists are extracted from keys in hash maps or
  * other names collected during the traversal of the {@link OpenAPI} spec instance.
  */
+@UtilityClass
 public class ExampleExtractors {
 
     /**
@@ -115,7 +117,7 @@ public class ExampleExtractors {
         return Optional.ofNullable(optSchema).map(schema ->
                 Optional.ofNullable(schema.getName()).orElse(
                         Optional.ofNullable(schema.get$ref())
-                                .map($ref -> $ref.replaceAll("([a-zA-Z0-9._#]+/)*", ""))
+                                .map(ref -> ref.replaceAll("([a-zA-Z0-9._#]+/)*", ""))
                                 .orElse("")
                 )).orElse("");
     }

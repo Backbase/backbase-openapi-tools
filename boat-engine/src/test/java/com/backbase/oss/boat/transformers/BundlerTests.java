@@ -1,13 +1,10 @@
 package com.backbase.oss.boat.transformers;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
+import com.backbase.oss.boat.transformers.bundler.BoatCache;
+import com.backbase.oss.boat.transformers.bundler.ExamplesProcessor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -18,6 +15,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,13 +26,20 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
-public class BundlerTest {
+public class BundlerTests {
 
     private static final String APPLICATION_JSON = "application/json";
-    private static org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
+    private static final org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
 
         @Override
         public boolean matches(Object item) {
@@ -48,14 +53,52 @@ public class BundlerTest {
     };
 
     @Test
-    public void testBundleExamples() throws OpenAPILoaderException, IOException {
+    public void testBoatCache() throws OpenAPILoaderException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
 
+        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, spec));
+        assertThrows(TransformerException.class, () -> boatCache.loadRef("not exists", RefFormat.RELATIVE, Example.class));
+
+
+    }
+
+    @Test
+    public void testBundleExamples() throws OpenAPILoaderException, IOException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+        OpenAPI openAPIUnproccessed = openAPI;
+
         new Bundler(input).transform(openAPI, Collections.emptyMap());
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+        assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    public void testBundleHttp() throws OpenAPILoaderException, IOException {
+
+        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml";
+        OpenAPI openAPI = OpenAPILoader.load(url);
+        OpenAPI openAPIUnproccessed = openAPI;
+
+        new Bundler(url).transform(openAPI, Collections.emptyMap());
+        log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+        assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    public void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+
+        assertThrows(TransformerException.class, () ->
+            new Bundler(input).transform(openAPI, Collections.emptyMap()));
     }
 
     @Test
@@ -66,7 +109,7 @@ public class BundlerTest {
 
         OpenAPI openAPI = OpenAPILoader.load(input);
 
-        new Bundler(input).transform(openAPI, Collections.emptyMap());
+        OpenAPI transform = new Bundler(input).transform(openAPI, Collections.emptyMap());
 
         log.debug(Yaml.pretty(openAPI));
 
@@ -151,5 +194,6 @@ public class BundlerTest {
         output.delete();
         Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
     }
+
 
 }
