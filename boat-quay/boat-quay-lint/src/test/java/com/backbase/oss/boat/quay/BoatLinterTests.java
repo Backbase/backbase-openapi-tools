@@ -1,16 +1,19 @@
 package com.backbase.oss.boat.quay;
 
 import com.backbase.oss.boat.quay.model.BoatLintReport;
+import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoatLinterTests {
@@ -62,17 +65,12 @@ public class BoatLinterTests {
 
     @Test
     public void ruleManager() {
-        boatLinter.getAvailableRules().forEach(ruleDetails -> {
+        List<BoatLintRule> availableRules = boatLinter.getAvailableRules();
+        availableRules.forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });
-        String firstActualRule = boatLinter.getAvailableRules().get(0).toString();
-        String expected = "BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG)";
-        if (!firstActualRule.contains("id=219")){
-            firstActualRule = boatLinter.getAvailableRules().get(2).toString();
-            expected = "BoatViolation(rule=BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG), description=API Audience must be provided, severity=MUST, lines=2..6, pointer=/info/x-audience)";
 
-        }
-        assertEquals( expected , firstActualRule);
+        assertFalse(availableRules.isEmpty());
 
     }
 }
