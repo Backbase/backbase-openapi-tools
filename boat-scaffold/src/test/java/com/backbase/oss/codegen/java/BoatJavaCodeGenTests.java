@@ -1,7 +1,6 @@
 package com.backbase.oss.codegen.java;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
@@ -13,6 +12,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public class BoatJavaCodeGenTests {
         gen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> Assert.assertEquals(k + " is described multiple times", v.size(), 1));
+            .forEach((k, v) -> assertEquals( v.size(), 1, k + " is described multiple times"));
     }
 
     @Test
