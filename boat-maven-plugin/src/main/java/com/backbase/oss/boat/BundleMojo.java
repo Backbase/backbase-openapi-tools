@@ -15,12 +15,9 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +78,13 @@ public class BundleMojo extends AbstractMojo {
         final File[] inputFiles;
         final File[] outputFiles;
         if (input.isDirectory()) {
-            String[] inputs = selectInputs(input.toPath());
+            String[] inputs;
+
+            try {
+                inputs = Utils.selectInputs(input.toPath(), includes);
+            } catch (IOException e) {
+                throw new MojoExecutionException("Cannot scan input " + input, e);
+            }
 
             inputFiles = stream(inputs)
                 .map(file -> new File(input, file))
@@ -100,22 +103,6 @@ public class BundleMojo extends AbstractMojo {
             bundleOpenAPI(inputFiles[i], outputFiles[i]);
         }
 
-    }
-
-    private String[] selectInputs(Path inputPath) throws MojoExecutionException {
-        final PathMatcher matcher = inputPath
-            .getFileSystem()
-            .getPathMatcher("glob:" + includes);
-
-        try (Stream<Path> paths = Files.list(inputPath)) {
-            return paths
-                .map(inputPath::relativize)
-                .filter(matcher::matches)
-                .map(Path::toString)
-                .toArray(String[]::new);
-        } catch (IOException e) {
-            throw new MojoExecutionException("Cannot scan input: " + inputPath, e);
-        }
     }
 
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
