@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
-public class BundlerTests {
+class BundlerTests {
 
     private static final String APPLICATION_JSON = "application/json";
     private static final org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
@@ -53,7 +53,7 @@ public class BundlerTests {
     };
 
     @Test
-    public void testBoatCache() throws OpenAPILoaderException {
+    void testBoatCache() throws OpenAPILoaderException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -66,7 +66,7 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleExamples() throws OpenAPILoaderException, IOException {
+    void testBundleExamples() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -79,7 +79,7 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleHttp() throws OpenAPILoaderException, IOException {
+    void testBundleHttp() throws OpenAPILoaderException, IOException {
 
         String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml";
         OpenAPI openAPI = OpenAPILoader.load(url);
@@ -91,7 +91,7 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
+    void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -102,7 +102,7 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleApi() throws OpenAPILoaderException, IOException {
+    void testBundleApi() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -183,7 +183,7 @@ public class BundlerTests {
     }
 
     // @Test - not really a test.
-    public void testDraftsApi() throws OpenAPILoaderException, IOException {
+    void testDraftsApi() throws OpenAPILoaderException, IOException {
 
         File input = new File("/Users/jasper/git/jasper/collect-specs/projects/payment-order-a2a-id-provider-spec/src/main/resources/payment-order-a2a-id-provider-service-api-v1.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);

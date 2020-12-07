@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class ExporterTests extends AbstractBoatEngineTestBase {
+class ExporterTests extends AbstractBoatEngineTestBase {
 
     Logger log = LoggerFactory.getLogger(ExporterTests.class);
 
     @Test
-    public void testHelloWorld() throws Exception {
+    void testHelloWorld() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
@@ -34,7 +34,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testUnusualTypesSchemaConversion() throws ExportException, IOException {
+    void testUnusualTypesSchemaConversion() throws ExportException, IOException {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
@@ -42,7 +42,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void normalizeNameTests() {
+    void normalizeNameTests() {
         String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
         assertEquals("BatchuploadGetResponse", s);
         s = Utils.normalizeSchemaName("batchUpload-GET-Response");
@@ -50,7 +50,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testWalletPresentation() throws Exception {
+    void testWalletPresentation() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -64,51 +64,51 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testInvalidFile() {
+    void testInvalidFile() {
         File inputFile = getFile("/raml-examples/invalid-ramls/empty.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+        assertThrows(ExportException.class, () -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
     @Test
-    public void testWrongTypes() {
+    void testWrongTypes() {
         File inputFile = getFile("/raml-examples/invalid-ramls/invalid-types.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+        assertThrows(ExportException.class, () -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
     @Test
-    public void testMarkupDocumentation() throws IOException, ExportException {
+    void testMarkupDocumentation() throws IOException, ExportException {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-markup-documentation-client.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
     }
-    
+
     @Test
-    public void testWalletPresentationMissingRef() {
+    void testWalletPresentationMissingRef() {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+        assertThrows(ExportException.class, () -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
     @Test
-    public void testWalletPresentationInvalidRef() throws Exception {
+    void testWalletPresentationInvalidRef() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+        assertThrows(ExportException.class, () -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
     @Test
-    public void testWalletIntegration() throws Exception {
+    void testWalletIntegration() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-integration-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -120,7 +120,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testWalletService() throws Exception {
+    void testWalletService() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -134,7 +134,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
 
 
     @Test
-    public void testBankingApi() throws Exception {
+    void testBankingApi() throws Exception {
 
         File inputFile = getFile("/raml-examples/others/banking-api/api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
@@ -143,7 +143,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testBackbaseWalletApi() throws Exception {
+    void testBackbaseWalletApi() throws Exception {
 
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));

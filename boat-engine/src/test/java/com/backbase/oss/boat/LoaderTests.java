@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LoaderTests extends AbstractBoatEngineTestBase {
+class LoaderTests extends AbstractBoatEngineTestBase {
 
     @Test
-    public void testRamlResourceLoaderExceptions() {
+    void testRamlResourceLoaderExceptions() {
         File root = new File("src/test/resources/openapi/error-catching");
         File base = new File("src/test/resources/openapi/error-catching");
         String resourceName = "empty-directory";
@@ -21,7 +21,7 @@ public class LoaderTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testCatchingResourceLoader() {
+    void testCatchingResourceLoader() {
         File root = new File("src/test/resources/openapi/error-catching");
         File base = new File("src/test/resources/openapi/error-catching");
         String resourceName = "empty-directory";
