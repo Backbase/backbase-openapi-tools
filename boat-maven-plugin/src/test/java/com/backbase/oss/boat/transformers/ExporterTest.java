@@ -14,13 +14,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ExporterTest extends AbstractBoatEngineTests {
@@ -52,7 +53,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         for (String message : swaggerParseResult.getMessages()) {
             log.error("Error parsing Open API: {}", message);
         }
-        Assert.assertTrue(swaggerParseResult.getMessages().isEmpty());
+        assertTrue(swaggerParseResult.getMessages().isEmpty());
 
         return swaggerParseResult;
     }

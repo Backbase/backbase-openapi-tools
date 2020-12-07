@@ -1,23 +1,22 @@
 package com.backbase.oss.codegen.doc;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.samskivert.mustache.Mustache;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
 @Slf4j
 public class BoatExample {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    static {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
+    public static final Mustache.Lambda escapeJavascript = (fragment, writer) -> {
+        String text = fragment.execute();
+        StringEscapeUtils.escapeJavaScript(writer, text);
+    };
 
     private String key;
     private String name;
@@ -25,11 +24,11 @@ public class BoatExample {
     private Example example;
     private boolean isJson;
 
-    public BoatExample(String key, String contentType, Example value) {
+    public BoatExample(String key, String contentType, Example value, boolean isJson) {
         this.key = StringUtils.replace(key, " ", "-");
         this.name = key;
         this.contentType = contentType;
-        this.isJson = (value.getValue() instanceof  JsonNode);
+        this.isJson = isJson;
         this.example = value;
     }
 
@@ -40,5 +39,4 @@ public class BoatExample {
             return example.getValue().toString();
         }
     }
-
 }

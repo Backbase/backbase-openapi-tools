@@ -1,8 +1,7 @@
 package com.backbase.oss.boat.transformers.bundler;
 
 
-import static com.google.common.collect.Maps.newHashMap;
-
+import com.backbase.oss.boat.transformers.TransformerException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,15 +27,17 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+
 @Slf4j
 public class ExamplesProcessor {
 
+    public static final String COMPONENTS_EXAMPLES = "#/components/examples/";
     ObjectMapper yamlObjectMapper = new ObjectMapper(YAMLFactory.builder().build());
     ObjectMapper jsonObjectMapper = new ObjectMapper();
 
     private final OpenAPI openAPI;
     private final Path rootDir;
-    private final Map<String, ExampleHolder> cache = newHashMap();
+    private final Map<String, ExampleHolder> cache = new LinkedHashMap<>();
 
     public ExamplesProcessor(OpenAPI openAPI, String inputFile) {
         super();
@@ -87,7 +88,7 @@ public class ExamplesProcessor {
 
     }
 
-    public void processMediaType(MediaType mediaType, String relativePath, boolean  derefenceExamples) {
+    public void processMediaType(MediaType mediaType, String relativePath, boolean derefenceExamples) {
         if (mediaType.getExamples() != null) {
             mediaType.getExamples().forEach(((key, example) -> {
                 log.debug("Processing Example: {} with value: {} and ref: {} ", key, example.getValue(), example.get$ref());
@@ -142,7 +143,7 @@ public class ExamplesProcessor {
             return;
         }
 
-        if(refPath.startsWith("#/components/examples/")) {
+        if (refPath.startsWith(COMPONENTS_EXAMPLES)) {
             log.debug("Ref path already points to examples. Leave it as it is");
             return;
         }
@@ -177,7 +178,7 @@ public class ExamplesProcessor {
                     exampleHolder.setContent(content);
                     if (exampleName != null) {
                         exampleHolder.setExampleName(exampleName);
-                        exampleHolder.replaceRef("#/components/examples/" + exampleName);
+                        exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
                     }
 
                     if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
@@ -200,7 +201,7 @@ public class ExamplesProcessor {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TransformerException("Unable to fix inline examples", e);
         }
     }
 
@@ -232,7 +233,7 @@ public class ExamplesProcessor {
         String exampleName = makeCountedName(rootName, count);
         Object content = convertExampleContent(exampleHolder, exampleHolder.getRef());
         cache.put(exampleName, exampleHolder);
-        exampleHolder.replaceRef("#/components/examples/" + exampleName);
+        exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
         putComponentExample(exampleName, new Example().value(content).summary(exampleName));
     }
 
@@ -243,7 +244,7 @@ public class ExamplesProcessor {
             }
             return exampleHolder.getContent();
         } catch (JsonProcessingException | RuntimeException e) {
-            throw new RuntimeException("Failed to process example content for " + exampleHolder, e);
+            throw new TransformerException("Failed to process example content for " + exampleHolder, e);
         }
     }
 
