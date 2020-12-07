@@ -14,15 +14,22 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
 import lombok.SneakyThrows;
 import org.apache.commons.lang.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,5 +264,19 @@ public class Utils {
         YAMLFactory yamlFactory = new YAMLFactory();
         yamlFactory.enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
         return new ObjectMapper(yamlFactory);
+    }
+
+    public static String[] selectInputs(Path inputPath, String glob) throws IOException {
+        final PathMatcher matcher = inputPath
+            .getFileSystem()
+            .getPathMatcher("glob:" + glob);
+
+        try (Stream<Path> paths = Files.list(inputPath)) {
+            return paths
+                .map(inputPath::relativize)
+                .filter(matcher::matches)
+                .map(Path::toString)
+                .toArray(String[]::new);
+        }
     }
 }
