@@ -81,6 +81,15 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
+
+    @Test
+    public void testMarkupDocumentation() throws IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-markup-documentation-client.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+    
     @Test
     public void testWalletPresentationMissingRef() {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
