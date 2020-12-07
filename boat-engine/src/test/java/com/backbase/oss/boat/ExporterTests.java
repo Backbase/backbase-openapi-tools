@@ -1,8 +1,5 @@
 package com.backbase.oss.boat;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Decomposer;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -14,19 +11,31 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ExporterTest extends AbstractBoatEngineTests {
 
-    Logger log = LoggerFactory.getLogger(ExporterTest.class);
+public class ExporterTests extends AbstractBoatEngineTestBase {
+
+    Logger log = LoggerFactory.getLogger(ExporterTests.class);
 
     @Test
     public void testHelloWorld() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
+    @Test
+    public void testUnusualTypesSchemaConversion() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
@@ -54,22 +63,48 @@ public class ExporterTest extends AbstractBoatEngineTests {
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
     }
 
-    @Test(expected = ExportException.class)
-    public void testWalletPresentationMissingRef() throws ExportException {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+    @Test
+    public void testInvalidFile() {
+        File inputFile = getFile("/raml-examples/invalid-ramls/empty.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer())));
+            .transformers(Collections.singletonList(new Decomposer()))));
     }
 
-    @Test(expected = ExportException.class)
-    public void testWalletPresentationInvalidRef() throws Exception {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
+    @Test
+    public void testWrongTypes() {
+        File inputFile = getFile("/raml-examples/invalid-ramls/invalid-types.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
             .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer())));
+            .transformers(Collections.singletonList(new Decomposer()))));
+    }
+
+    @Test
+    public void testMarkupDocumentation() throws IOException, ExportException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-markup-documentation-client.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+    
+    @Test
+    public void testWalletPresentationMissingRef() {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(true)
+            .transformers(Collections.singletonList(new Decomposer()))));
+    }
+
+    @Test
+    public void testWalletPresentationInvalidRef() throws Exception {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(true)
+            .transformers(Collections.singletonList(new Decomposer()))));
     }
 
     @Test
@@ -132,7 +167,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
         for (String message : swaggerParseResult.getMessages()) {
             log.error("Error parsing Open API: {}", message);
         }
-        Assert.assertTrue(swaggerParseResult.getMessages().isEmpty());
+        assertTrue(swaggerParseResult.getMessages().isEmpty());
 
         return swaggerParseResult;
     }

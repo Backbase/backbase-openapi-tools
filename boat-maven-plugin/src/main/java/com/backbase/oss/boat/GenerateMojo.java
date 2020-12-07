@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -50,7 +52,9 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
@@ -75,6 +79,16 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 @Slf4j
 public class GenerateMojo extends AbstractMojo {
 
+    private static String trimCSV(String text) {
+        if (isNotEmpty(text)) {
+            return stream(text.split("[,;\\s]+"))
+                .map(StringUtils::trimToNull)
+                .filter(Objects::nonNull)
+                .collect(joining(","));
+        } else {
+            return "";
+        }
+    }
 
     public static final String INSTANTIATION_TYPES = "instantiation-types";
     public static final String IMPORT_MAPPINGS = "import-mappings";
@@ -261,7 +275,8 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Sets custom User-Agent header value.
      */
-    @Parameter(name = "httpUserAgent", property = "openapi.generator.maven.plugin.httpUserAgent", required = false)
+    @Parameter(name = "httpUserAgent", property = "openapi.generator.maven.plugin.httpUserAgent", required = false,
+        defaultValue = "${project.artifactId}-${project.version}")
     protected String httpUserAgent;
 
     /**
@@ -367,6 +382,12 @@ public class GenerateMojo extends AbstractMojo {
     protected String modelsToGenerate = "";
 
     /**
+     * A comma separated list of apis to generate. All apis is the default.
+     */
+    @Parameter(name = "apisToGenerate", property = "openapi.generator.maven.plugin.apisToGenerate", required = false)
+    protected String apisToGenerate = "";
+
+    /**
      * Generate the supporting files.
      */
     @Parameter(name = "generateSupportingFiles", property = "openapi.generator.maven.plugin.generateSupportingFiles", required = false)
@@ -429,7 +450,7 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * Add the output directory to the project as a test source root, so that the generated java types
-     * are compiled only for the test classpath of the project. Mutually exclusive with
+     * are compiled only for the test classpath of the project. Setting this parameter will ignore
      * {@link #addCompileSourceRoot}.
      */
     @Parameter(defaultValue = "false", property = "openapi.generator.maven.plugin.addTestCompileSourceRoot")
@@ -611,6 +632,7 @@ public class GenerateMojo extends AbstractMojo {
 
                     case "html2":
                         generatorName = "boat-docs";
+                        break;
                     default:
                         // use the original generator
                 }
@@ -695,19 +717,19 @@ public class GenerateMojo extends AbstractMojo {
 
             // Set generation options
             if (null != generateApis && generateApis) {
-                GlobalSettings.setProperty(CodegenConstants.APIS, "");
+                GlobalSettings.setProperty(CodegenConstants.APIS, trimCSV(apisToGenerate));
             } else {
                 GlobalSettings.clearProperty(CodegenConstants.APIS);
             }
 
             if (null != generateModels && generateModels) {
-                GlobalSettings.setProperty(CodegenConstants.MODELS, modelsToGenerate);
+                GlobalSettings.setProperty(CodegenConstants.MODELS, trimCSV(modelsToGenerate));
             } else {
                 GlobalSettings.clearProperty(CodegenConstants.MODELS);
             }
 
             if (null != generateSupportingFiles && generateSupportingFiles) {
-                GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, supportingFilesToGenerate);
+                GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, trimCSV(supportingFilesToGenerate));
             } else {
                 GlobalSettings.clearProperty(CodegenConstants.SUPPORTING_FILES);
             }
@@ -979,14 +1001,10 @@ public class GenerateMojo extends AbstractMojo {
     }
 
     private void addCompileSourceRootIfConfigured() throws MojoExecutionException {
-        if (addCompileSourceRoot) {
-            if (addTestCompileSourceRoot) {
-                throw new MojoExecutionException(
-                    "Either 'addCompileSourceRoot' or 'addTestCompileSourceRoot' may be active, not both.");
-            }
-            project.addCompileSourceRoot(getCompileSourceRoot());
-        } else if (addTestCompileSourceRoot) {
+        if (addTestCompileSourceRoot) {
             project.addTestCompileSourceRoot(getCompileSourceRoot());
+        } else if (addCompileSourceRoot) {
+            project.addCompileSourceRoot(getCompileSourceRoot());
         }
 
         // Reset all environment variables to their original value. This prevents unexpected

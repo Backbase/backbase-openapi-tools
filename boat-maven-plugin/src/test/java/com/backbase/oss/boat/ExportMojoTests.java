@@ -1,13 +1,19 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class ExportMojoTests {
@@ -35,8 +41,39 @@ public class ExportMojoTests {
         mojo.output = output;
         mojo.execute();
 
-        Assert.assertTrue(outputYaml.exists());
+        assertTrue(outputYaml.exists());
 
+    }
+
+    @Test
+    public void testLicenceAdder() throws MojoExecutionException, OpenAPILoaderException {
+
+        ExportMojo mojo = new ExportMojo();
+
+        File input = getFile("/raml-examples/helloworld/helloworld.raml");
+        File output = new File("target");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        File outputYaml = new File(output, "helloworld/openapi.yaml");
+        outputYaml.delete();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger(2, "BOAT"));
+
+        mojo.getLog();
+        mojo.project = new MavenProject();
+        mojo.inputFile = input;
+        mojo.output = output;
+        mojo.licenseName = "testLicence";
+        mojo.licenseUrl= "testUrl";
+        mojo.execute();
+
+        assertTrue(outputYaml.exists());
+        OpenAPI load = OpenAPILoader.load(outputYaml, false, false);
+        assertEquals("testLicence",load.getInfo().getLicense().getName() );
+        assertEquals("testUrl",load.getInfo().getLicense().getUrl());
     }
 
     @Test
@@ -58,9 +95,9 @@ public class ExportMojoTests {
         mojo.output = output;
         mojo.execute();
 
-        Assert.assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
-        Assert.assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
-        Assert.assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
+        assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
 
     }
 

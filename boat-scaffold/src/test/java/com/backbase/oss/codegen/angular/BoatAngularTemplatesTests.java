@@ -1,183 +1,219 @@
 package com.backbase.oss.codegen.angular;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DynamicNode;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 /**
  * These tests verifies that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
  */
-@RunWith(Parameterized.class)
 public class BoatAngularTemplatesTests {
 
-    private static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
-    private static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
+    static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
+    static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
 
-    private static final String[] CASES = {"nom", "reg", "mck", "pir", "amp", "srv"};
 
-    @Parameterized.Parameters(name = "{0}")
-    static public Object parameters() {
-        final List<Object[]> data = new ArrayList<>();
-
-        if (PROP_FAST) {
-            data.add(new Object[] {caseName(0), 0});
-        }
-
-        // generate all combinations
-        for (int mask = 0; mask < 1 << CASES.length; mask++) {
-            if (PROP_FAST && Integer.bitCount(mask) != 1) {
-                continue;
-            }
-
-            data.add(new Object[] {caseName(mask), mask,});
-        }
-
-        if (PROP_FAST) {
-            data.add(new Object[] {caseName(-1), -1});
-        }
-
-        return data;
-    }
-
-    static private String caseName(int mask) {
-        return mask == 0
-            ? "backbase"
-            : IntStream.range(0, CASES.length)
-                .filter(n -> (mask & (1 << n)) != 0)
-                .mapToObj(n -> CASES[n])
-                .collect(joining("-", "backbase-", ""));
-    }
-
-    static private final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
-
-    @BeforeClass
+    @BeforeAll
     static public void setUpClass() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT));
         FileUtils.deleteDirectory(new File(TEST_OUTPUT));
     }
 
-    private final String caseName;
+    static class Combination {
+        static final String[] CASES = {"nom", "reg", "mck", "pir", "amp", "srv"};
 
-    private final boolean npmRepository;
-    private final boolean npmName;
-    private final boolean withMocks;
-    private final boolean providedInRoot;
-    private final boolean apiModulePrefix;
-    private final boolean serviceSuffix;
 
-    static private List<File> files;
+        final String name;
+        final boolean npmRepository;
+        final boolean npmName;
+        final boolean withMocks;
+        final boolean providedInRoot;
+        final boolean apiModulePrefix;
+        final boolean serviceSuffix;
 
-    public BoatAngularTemplatesTests(String caseName, int mask) {
-        this.caseName = caseName;
-
-        this.npmName = (mask & 1) != 0;
-        this.npmRepository = (mask & 1 << 1) != 0;
-        this.withMocks = (mask & 1 << 2) != 0;
-        this.providedInRoot = (mask & 1 << 3) != 0;
-        this.apiModulePrefix = (mask & 1 << 4) != 0;
-        this.serviceSuffix = (mask & 1 << 5) != 0;
-    }
-
-    @Before
-    public void generate() throws IOException {
-        final Path marker = Paths.get(TEST_OUTPUT, "." + this.caseName);
-
-        // generate once per case name
-        if (!Files.exists(marker)) {
-            files = generateFrom(null);
-            // used in development
-            Files.write(marker, Collections.singletonList(""));
+        Combination(int mask) {
+            this.name = caseName(mask);
+            this.npmName = (mask & 1) != 0;
+            this.npmRepository = (mask & 1 << 1) != 0;
+            this.withMocks = (mask & 1 << 2) != 0;
+            this.providedInRoot = (mask & 1 << 3) != 0;
+            this.apiModulePrefix = (mask & 1 << 4) != 0;
+            this.serviceSuffix = (mask & 1 << 5) != 0;
         }
 
-        assertThat(files, not(nullValue()));
-        assertThat(files.size(), not(equalTo(0)));
+        static private String caseName(int mask) {
+            return mask == 0
+                ? "backbase"
+                : IntStream.range(0, CASES.length)
+                .filter(n -> (mask & (1 << n)) != 0)
+                .mapToObj(n -> CASES[n])
+                .collect(joining("-", "backbase-", ""));
+        }
+
+
+        static Stream<Combination> combinations(boolean minimal) {
+            final List<Integer> cases = new ArrayList<>();
+
+            if (minimal) {
+                cases.add(0);
+            }
+
+            // generate all combinations
+            for (int mask = 0; mask < 1 << CASES.length; mask++) {
+                if (minimal && Integer.bitCount(mask) != 1) {
+                    continue;
+                }
+
+                cases.add(mask);
+            }
+
+            if (minimal) {
+                cases.add(-1);
+            }
+
+            return cases.stream().map(Combination::new);
+        }
     }
 
-    @Test
+    /**
+     * dynamic suite creation
+     **/
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Check {
+    }
+
+
+    @TestFactory
+    Stream<DynamicNode> withCombinations() {
+        return Combination
+            .combinations(PROP_FAST)
+            .map(param -> dynamicContainer(param.name, testStream(param)));
+    }
+
+    Stream<DynamicTest> testStream(BoatAngularTemplatesTests.Combination param) {
+        return concat(
+            Stream.of(dynamicTest("generate", () -> generate(param))),
+            stream(getClass().getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(BoatAngularTemplatesTests.Check.class))
+                .map(m -> dynamicTest(m.getName(), () -> invoke(m))));
+    }
+
+    @SneakyThrows
+    private void invoke(Method m) {
+        m.invoke(this);
+    }
+
+    /** the actual testing code **/
+
+    private Combination param;
+    private List<File> files;
+
+    void generate(Combination param) {
+        this.param = param;
+        this.files = generateFrom(null);
+        // used in development
+        // this.files = generateFrom(param, "openapi-generator-originals/JavaSpring-4.3.1");
+
+        assertThat(this.files, not(nullValue()));
+        assertThat(this.files.size(), not(equalTo(0)));
+    }
+
+    @Check
     public void npmName() {
         assertThat(
-                findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
-                equalTo(this.npmName)
+            findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
+            equalTo(this.param.npmName)
         );
     }
 
-    @Test
+    @Check
     public void npmRepository() {
         assertThat(
-                findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
-                equalTo(this.npmRepository && this.npmName)
+            findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
+            equalTo(this.param.npmRepository && this.param.npmName)
         );
     }
 
-    @Test
+    @Check
     public void withMocks() {
         assertThat(
-                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
-                equalTo(this.withMocks)
+            findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
+            equalTo(this.param.withMocks)
         );
     }
 
-    @Test
+    @Check
     public void providedInRoot() {
         assertThat(
-                findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
-                equalTo(this.providedInRoot)
+            findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
+            equalTo(this.param.providedInRoot)
         );
         assertThat(
-                findPattern("/api\\.module\\.ts$", "providers: \\[]"),
-                equalTo(this.providedInRoot)
+            findPattern("/api\\.module\\.ts$", "providers: \\[]"),
+            equalTo(this.param.providedInRoot)
         );
     }
 
-    @Test
+    @Check
     public void apiModulePrefix() {
         assertThat(
-                findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
-                equalTo(this.apiModulePrefix)
+            findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
+            equalTo(this.param.apiModulePrefix)
         );
         assertThat(
-                findPattern("/api\\.module\\.ts$", "export class ApiModule"),
-                equalTo(!this.apiModulePrefix)
+            findPattern("/api\\.module\\.ts$", "export class ApiModule"),
+            equalTo(!this.param.apiModulePrefix)
         );
     }
 
-    @Test
+    @Check
     public void serviceSuffix() {
         assertThat(
-                findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
-                equalTo(this.serviceSuffix)
+            findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
+            equalTo(this.param.serviceSuffix)
         );
         assertThat(
-                findPattern("/api/.+\\.service.ts$", "export class .*Service "),
-                equalTo(!this.serviceSuffix)
+            findPattern("/api/.+\\.service.ts$", "export class .*Service "),
+            equalTo(!this.param.serviceSuffix)
         );
     }
 
@@ -189,20 +225,17 @@ public class BoatAngularTemplatesTests {
 
     private List<String> selectFiles(String filePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
-        final List<String> selection = files.stream()
-                .map(File::getPath)
-                .map(path -> path.replace(File.separatorChar, '/'))
-                .filter(fileMatch)
-                .collect(toList());
-        return selection;
+        return files.stream()
+            .map(File::getPath)
+            .map(path -> path.replace(File.separatorChar, '/'))
+            .filter(fileMatch)
+            .collect(toList());
     }
 
     private boolean findPattern(List<String> selection, String linePattern) {
         final Predicate<String> lineMatch = Pattern.compile(linePattern).asPredicate();
         return selection.stream()
-            .filter(file -> contentMatches(file, lineMatch))
-            .findAny()
-            .isPresent();
+            .anyMatch(file -> contentMatches(file, lineMatch));
     }
 
     @SneakyThrows
@@ -229,24 +262,24 @@ public class BoatAngularTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "");
 
         cf.setApiNameSuffix("-api");
-        cf.setModelNameSuffix(this.caseName);
+        cf.setModelNameSuffix(this.param.name);
 
-        cf.addAdditionalProperty(BoatAngularGenerator.WITH_MOCKS, this.withMocks);
-        if (this.npmRepository) {
+        cf.addAdditionalProperty(BoatAngularGenerator.WITH_MOCKS, this.param.withMocks);
+        if (this.param.npmRepository) {
             cf.addAdditionalProperty(BoatAngularGenerator.NPM_REPOSITORY, "https://registry.example.com/npm");
         }
-        if (this.npmName) {
+        if (this.param.npmName) {
             cf.addAdditionalProperty(BoatAngularGenerator.NPM_NAME, "@example/angular-http");
         }
-        cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.providedInRoot);
-        if (this.apiModulePrefix) {
+        cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.param.providedInRoot);
+        if (this.param.apiModulePrefix) {
             cf.addAdditionalProperty(BoatAngularGenerator.API_MODULE_PREFIX, "Boat");
         }
-        if (this.serviceSuffix) {
+        if (this.param.serviceSuffix) {
             cf.addAdditionalProperty(BoatAngularGenerator.SERVICE_SUFFIX, "Gateway");
         }
 
-        final String destPackage = this.caseName.replace('-', '.') + ".";
+        final String destPackage = this.param.name.replace('-', '.') + ".";
 
         cf.setApiPackage(destPackage + "api");
         cf.setModelPackage(destPackage + "model");

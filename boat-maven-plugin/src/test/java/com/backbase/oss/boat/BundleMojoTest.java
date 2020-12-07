@@ -5,8 +5,12 @@ import io.swagger.v3.oas.models.info.Info;
 import java.io.File;
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BundleMojoTest {
 
@@ -17,7 +21,7 @@ public class BundleMojoTest {
         mojo.setInput(new File("."));
         mojo.setOutput(new File("target/testInputDirectoryAndOutputFile.yaml"));
 
-        Assert.assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        assertThrows(MojoExecutionException.class, mojo::execute);
     }
 
     @Test
@@ -30,7 +34,7 @@ public class BundleMojoTest {
         try {
             mojo.execute();
         } catch (MojoExecutionException e) {
-            Assert.fail("Expecting skip execution but fails on input file not found.");
+            fail("Expecting skip execution but fails on input file not found.");
         }
     }
 
@@ -46,9 +50,9 @@ public class BundleMojoTest {
         mojo.setVersionFileName(true);
         mojo.execute();
 
-        Assert.assertTrue(new File("target/test-bundle-folder/one-client-api-v1.3.5.yaml").exists());
-        Assert.assertTrue(new File("target/test-bundle-folder/one-client-api-v2.0.0.yaml").exists());
-        Assert.assertTrue(new File("target/test-bundle-folder/another-client-api-v1.7.9.yaml").exists());
+        assertTrue(new File("target/test-bundle-folder/one-client-api-v1.3.5.yaml").exists());
+        assertTrue(new File("target/test-bundle-folder/one-client-api-v2.0.0.yaml").exists());
+        assertTrue(new File("target/test-bundle-folder/another-client-api-v1.7.9.yaml").exists());
     }
 
     @Test
@@ -56,7 +60,7 @@ public class BundleMojoTest {
     public void testVersionFileName() {
         BundleMojo mojo = new BundleMojo();
 
-        Assert.assertEquals(
+        assertEquals(
             "payment-order-client-api-v2.0.0.yaml",
             mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("2.0.0")));
     }
@@ -66,7 +70,7 @@ public class BundleMojoTest {
     public void testNoInfoInApi() {
         BundleMojo mojo = new BundleMojo();
 
-        Assert.assertThrows(MojoExecutionException.class, () ->
+        assertThrows(MojoExecutionException.class, () ->
             mojo.versionFileName("payment-order-client-api-v2.yaml", new OpenAPI()));
     }
 
@@ -75,7 +79,7 @@ public class BundleMojoTest {
     public void testNoVersionInfoInApi() {
         BundleMojo mojo = new BundleMojo();
 
-        Assert.assertThrows(MojoExecutionException.class, () ->
+        assertThrows(MojoExecutionException.class, () ->
             mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion(null)));
     }
 
@@ -86,7 +90,7 @@ public class BundleMojoTest {
 
         OpenAPI openAPI = new OpenAPI();
         openAPI.setInfo(new Info());
-        Assert.assertThrows(MojoExecutionException.class, () ->
+        assertThrows(MojoExecutionException.class, () ->
             mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("3.0.0")));
     }
 
