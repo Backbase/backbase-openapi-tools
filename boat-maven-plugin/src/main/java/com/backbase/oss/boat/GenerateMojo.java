@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -48,6 +49,7 @@ import org.openapitools.codegen.config.GlobalSettings;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
@@ -69,7 +71,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
  * Generates client/server code from an OpenAPI json/yaml definition.
  */
 @SuppressWarnings({"DefaultAnnotationParam", "java:S3776", "java:S5411"})
-@Mojo(name = "generate", threadSafe = true)
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 @Slf4j
 public class GenerateMojo extends AbstractMojo {
 
@@ -83,8 +85,8 @@ public class GenerateMojo extends AbstractMojo {
     public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
 
     /**
-     * The build context is only avail when running from within eclipse.
-     * It is used to update the eclipse-m2e-layer when the plugin is executed inside the IDE.
+     * The build context is only avail when running from within eclipse. It is used to update the
+     * eclipse-m2e-layer when the plugin is executed inside the IDE.
      */
     @Component
     protected BuildContext buildContext = new DefaultBuildContext();
@@ -121,7 +123,16 @@ public class GenerateMojo extends AbstractMojo {
 
 
     /**
-     * Location of the OpenAPI spec, as URL or file.
+     * Location of the OpenAPI spec, as URL or local file glob pattern.
+     * <p>
+     * If the input is a local file, the value of this property is considered a glob pattern that must
+     * resolve to a unique file.
+     * </p>
+     * <p>
+     * The glob pattern allows to express the input specification in a version neutral way. For
+     * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
+     * {@code my-service-api-v*.yaml}.
+     * </p>
      */
     @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
     protected String inputSpec;
@@ -473,6 +484,31 @@ public class GenerateMojo extends AbstractMojo {
         }
 
         File inputSpecFile = new File(inputSpec);
+        File inputParent = inputSpecFile.getParentFile();
+
+        if (inputParent.isDirectory()) {
+            try {
+                String[] files = Utils.selectInputs(inputParent.toPath(), inputSpecFile.getName());
+
+                switch (files.length) {
+                    case 0:
+                        throw new MojoExecutionException(
+                            format("Input spec %s doesn't match any local file", inputSpec));
+
+                    case 1:
+                        inputSpecFile = new File(inputParent, files[0]);
+                        inputSpec = inputSpecFile.getAbsolutePath();
+                        break;
+
+                    default:
+                        throw new MojoExecutionException(
+                            format("Input spec %s matches more than one single file", inputSpec));
+                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Cannot find input " + inputSpec);
+            }
+        }
+
         addCompileSourceRootIfConfigured();
 
         try {
@@ -572,6 +608,7 @@ public class GenerateMojo extends AbstractMojo {
                     case "spring":
                         generatorName = "boat-" + generatorName;
                         break;
+
                     case "html2":
                         generatorName = "boat-docs";
                         break;
