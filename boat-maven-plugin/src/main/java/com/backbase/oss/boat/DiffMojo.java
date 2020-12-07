@@ -3,7 +3,10 @@ package com.backbase.oss.boat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -72,7 +75,7 @@ public class DiffMojo extends AbstractMojo {
                 throw new MojoExecutionException("Invalid changelogRender. Supported types are 'markdown' and 'html");
             }
             try {
-                FileUtils.write(new File(changelogOutput, "changelog." + extension), render.render(changedOpenApi));
+                FileUtils.write(new File(changelogOutput, "changelog." + extension), render.render(changedOpenApi), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to write output", e);
             }

@@ -1,27 +1,27 @@
 package com.backbase.oss.boat;
 
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-
 import com.backbase.oss.codegen.java.BoatJavaCodeGen;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen;
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.DefaultCodegen;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 public class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
     private final MavenProject project = new MavenProject();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         buildContext.enableLogging(new ConsoleLogger());
     }
