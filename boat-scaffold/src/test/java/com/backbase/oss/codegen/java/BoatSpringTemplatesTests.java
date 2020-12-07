@@ -60,12 +60,12 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringCodeGenTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
-    static final String TEST_OUTPUS = System.getProperty(PROP_BASE + "output", "target/test-outputs");
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
 
     @BeforeAll
     static public void setUpClass() throws IOException {
-        Files.createDirectories(Paths.get(TEST_OUTPUS));
-        FileUtils.deleteDirectory(new File(TEST_OUTPUS, "src"));
+        Files.createDirectories(Paths.get(TEST_OUTPUT));
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT, "src"));
     }
 
     static class Combination {
@@ -250,7 +250,7 @@ class BoatSpringTemplatesTests {
 
         gcf.setGeneratorName(BoatSpringCodeGen.NAME);
         gcf.setInputSpec(input.getAbsolutePath());
-        gcf.setOutputDir(TEST_OUTPUS);
+        gcf.setOutputDir(TEST_OUTPUT);
 
         GlobalSettings.setProperty(CodegenConstants.APIS, "");
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "true");
