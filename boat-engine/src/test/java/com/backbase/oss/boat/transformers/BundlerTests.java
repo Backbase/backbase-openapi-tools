@@ -3,6 +3,7 @@ package com.backbase.oss.boat.transformers;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
+import com.backbase.oss.boat.transformers.bundler.BoatDeserializationUtils;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import java.io.File;
@@ -30,6 +32,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 public class BundlerTests {
@@ -49,6 +52,33 @@ public class BundlerTests {
     };
 
     @Test
+    public void testDeserializeExample() {
+        BoatDeserializationUtils.deserialize("test", "test.yaml", Example.class);
+    }
+
+    @Test
+    public void testDeserializeJsonExample() {
+        BoatDeserializationUtils.deserialize("{ 'example': 'value'}", "test.yaml", Example.class);
+    }
+
+    @Test
+    public void testComponentsYaml() {
+        BoatDeserializationUtils.deserialize("title: BadRequestError\n" +
+            "type: object\n" +
+            "properties:\n" +
+            "  message:\n" +
+            "    description: Any further information\n" +
+            "    type: string\n" +
+            "  errors:\n" +
+            "    description: Detailed error information\n" +
+            "    type: array\n" +
+            "    items:\n" +
+            "      $ref: error-item.yaml\n" +
+            "required:\n" +
+            "  - message\n", "schema.yaml", Schema.class);
+    }
+
+    @Test
     public void testBundleExamples() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
@@ -58,7 +88,30 @@ public class BundlerTests {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
-        assertEquals(openAPIUnproccessed,openAPI);
+        assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    public void testBundleHttp() throws OpenAPILoaderException, IOException {
+
+        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml";
+        OpenAPI openAPI = OpenAPILoader.load(url);
+        OpenAPI openAPIUnproccessed = openAPI;
+
+        new Bundler(url).transform(openAPI, Collections.emptyMap());
+        log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+        assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    public void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+
+        assertThrows(TransformerException.class, () ->
+            new Bundler(input).transform(openAPI, Collections.emptyMap()));
     }
 
     @Test
@@ -154,5 +207,7 @@ public class BundlerTests {
         output.delete();
         Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
     }
+
+
 
 }
