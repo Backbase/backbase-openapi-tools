@@ -12,17 +12,15 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 
 /**
  * Convenience example extractors from common OpenAPI spec elements.
  * Names of examples in returned lists are extracted from keys in hash maps or
  * other names collected during the traversal of the {@link OpenAPI} spec instance.
  */
+@UtilityClass
 public class ExampleExtractors {
-
-    private ExampleExtractors() {
-        throw new AssertionError("Private constructor");
-    }
 
     /**
      * Extracts examples from the header.
