@@ -64,6 +64,24 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
+    public void testInvalidFile() {
+        File inputFile = getFile("/raml-examples/invalid-ramls/empty.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(true)
+            .transformers(Collections.singletonList(new Decomposer()))));
+    }
+
+    @Test
+    public void testWrongTypes() {
+        File inputFile = getFile("/raml-examples/invalid-ramls/invalid-types.raml");
+        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
+            .addJavaTypeExtensions(true)
+            .convertExamplesToYaml(true)
+            .transformers(Collections.singletonList(new Decomposer()))));
+    }
+
+    @Test
     public void testWalletPresentationMissingRef() {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
         assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
