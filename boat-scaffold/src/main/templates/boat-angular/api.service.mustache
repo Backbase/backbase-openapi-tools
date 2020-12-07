@@ -327,5 +327,43 @@ export class {{classname}} {
         );
     }
 
+    public {{nickname}}Url({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams{{/allParams.0}}): string {
+    {{#allParams}}
+        const _{{paramName}} = requestParameters["{{paramName}}"];
+{{#required}}
+        if (_{{paramName}} === null || _{{paramName}} === undefined) {
+            throw new Error('Required parameter {{paramName}} was null or undefined when calling {{nickname}}.');
+        }
+{{/required}}
+{{/allParams}}
+{{#hasQueryParams}}
+        let queryParameters = new HttpParams({encoder: this.encoder});
+{{#queryParams}}
+        {{#isListContainer}}
+        if (_{{paramName}}) {
+        {{#isCollectionFormatMulti}}
+            _{{paramName}}.forEach((element) => {
+                queryParameters = this.addToHttpParams(queryParameters,
+                  <any>element, '{{baseName}}');
+            })
+        {{/isCollectionFormatMulti}}
+        {{^isCollectionFormatMulti}}
+            queryParameters = this.addToHttpParams(queryParameters,
+                _{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']), '{{baseName}}');
+        {{/isCollectionFormatMulti}}
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
+        if (_{{paramName}} !== undefined && _{{paramName}} !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>_{{paramName}}, '{{baseName}}');
+        }
+        {{/isListContainer}}
+{{/queryParams}}
+        const queryString = queryParameters.toString();
+{{/hasQueryParams}}
+        return `${this.configuration.basePath}{{{path}}}{{#hasQueryParams}}${queryString ? `?${queryString}` : ''}{{/hasQueryParams}}`;
+    }
+
 {{/operation}}
 {{/operations}}
