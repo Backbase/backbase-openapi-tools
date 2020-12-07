@@ -1,0 +1,130 @@
+#%RAML 1.0
+---
+#===============================================================
+#  Messages - RAML example http://raml.org/
+#  References:
+#    - RAML Specification - https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md
+#===============================================================
+title: Jobs Test Client API
+uses:
+  traits: lib/traits/traits.raml
+  bb: lib/annotations/annotations.raml
+  common: bbt-common-xml.raml
+version: v1
+baseUri: "client-api/{version}"
+mediaType:  [application/json, application/xml]
+protocols: [ HTTP, HTTPS ]
+types:
+  Song:
+    properties:
+      title: string
+      length: number
+    examples:
+      song1:
+        strict: false
+        value:
+          title: "My Song"
+          length: 12
+      song2:
+        title: "Last"
+        length: 3
+  Person:
+    properties:
+      name:
+        type: string
+        xml:
+          attribute: true # serialize it as an XML attribute
+          name: "fullname" # attribute should be called fullname
+      addresses:
+        type: Address[]
+        xml:
+          wrapped: true # serialize it into its own <addresses>...</addresses> XML element
+  Address:
+    properties:
+      street: string
+      city: string
+  customFile:
+      type: file
+      fileTypes: ['*/*'] # any file type allowed
+      maxLength: 1048576
+  CustomDate:
+      type: date-only
+      facets:
+        onlyFutureDates?: boolean # optional  in `PossibleMeetingDate`
+        noHolidays: boolean # required in `PossibleMeetingDate`
+  User:
+      properties:
+        firstname: string
+        lastname:
+          type: string
+          example: Doe
+          required: false
+annotationTypes:
+  deprecated:
+    properties:
+      date: datetime
+      deprecatedBy: User
+      comment: nil | string
+
+#===============================================================
+# API resource definitions
+#===============================================================
+securedBy: [ bb.bbAccessControl ]
+(bb.x-bb-api-type): [user]
+/jobs:
+  displayName: Jobs
+  post:
+    description: Create a Job
+    body:
+      application/xml:
+        type: |
+          <xs:schema attributeFormDefault="unqualified"
+                     elementFormDefault="qualified"
+                     xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="api-request">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="input"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:schema>
+        example: |
+          <api-request>
+            <input>Test Input</input>
+          </api-request>
+    responses:
+      200:
+        body:
+          application/xml:
+            schema: !include common-schemas/body/content.xml
+
+
+/customer:
+  post:
+    body:
+      application/xml:
+        type: !include datatypes/Content.raml
+    responses:
+      200:
+        body:
+          application/xml:
+            type: Person | nil
+/songs:
+  displayName: Songs
+  description:  Access to all songs inside the music world library.
+  post:
+  /{songId}:
+    get:
+      (deprecated):
+        date: 2016-02-28T16:41:41.090Z
+        deprecatedBy:
+          firstname: Christian
+        comment: no comment
+      responses:
+        200:
+          body:
+            application/json:
+              type: Song
+            application/xml:
+              schema: !include schemas/body/song.xml

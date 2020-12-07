@@ -4,8 +4,10 @@ import java.io.File;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @SuppressWarnings("java:S2699")
@@ -22,12 +24,11 @@ public class DiffMojoTests {
         diffMojo.setChangelogRenderer("markdown");
         diffMojo.execute();
 
-        Assert.assertTrue(new File(diffMojo.getChangelogOutput(), "changelog.md").exists());
+        assertTrue(new File(diffMojo.getChangelogOutput(), "changelog.md").exists());
     }
 
-    @SneakyThrows
     @Test
-    public void testBreakingChange() {
+    public void testBreakingChange() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
@@ -35,18 +36,17 @@ public class DiffMojoTests {
         diffMojo.setChangelogOutput(new File("target"));
         diffMojo.setChangelogRenderer("html");
         diffMojo.execute();
-        Assert.assertTrue(new File(diffMojo.getChangelogOutput(), "changelog.html").exists());
+        assertTrue(new File(diffMojo.getChangelogOutput(), "changelog.html").exists());
     }
 
-    @Test(expected = MojoExecutionException.class)
+    @Test
     public void testBreakingChangeWithBreaking() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
         diffMojo.setBreakOnBreakingChanges(true);
-        diffMojo.execute();
+        assertThrows(MojoExecutionException.class, diffMojo::execute);
     }
-
 
 
     private File getFile(String fileName) {

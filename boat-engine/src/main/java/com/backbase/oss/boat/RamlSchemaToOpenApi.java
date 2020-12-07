@@ -36,7 +36,11 @@ import org.slf4j.LoggerFactory;
 
 public class RamlSchemaToOpenApi {
 
-    private static final Logger log = LoggerFactory.getLogger(JsonSchemaToOpenApi.class);
+    private RamlSchemaToOpenApi() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger log = LoggerFactory.getLogger(RamlSchemaToOpenApi.class);
 
     public static Schema convert(String name, TypeDeclaration type, Components components) {
         log.debug("Creating Schema: {} from RAML type: {}", name, type.type());

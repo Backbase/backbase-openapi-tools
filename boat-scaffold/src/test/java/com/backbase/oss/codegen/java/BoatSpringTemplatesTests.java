@@ -1,17 +1,25 @@
 package com.backbase.oss.codegen.java;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.Arrays.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.DynamicContainer.*;
+import static org.junit.jupiter.api.DynamicTest.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +30,10 @@ import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DynamicNode;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -37,158 +44,185 @@ import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.languages.features.OptionalFeatures;
 
 /**
- * These tests verifies that the code generation works for various combinations of configuration
+ * These tests verify that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
+ *
+ * The suite is generated dynamically, read below.
+ * <p>
+ * With Junit4, the test hierarchy was {@code root-> combination -> method}. The code relied on that
+ * structure to speedup the suite execution.
+ * </p>
+ * <p>
+ * With Jupiter, the hierarchy is {@code root -> method -> combination}, that's why the suite is
+ * created dynamically.
+ * </p>
  */
-@RunWith(Parameterized.class)
-public class BoatSpringTemplatesTests {
+class BoatSpringTemplatesTests {
+    static final String PROP_BASE = BoatSpringCodeGenTests.class.getSimpleName() + ".";
+    static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
 
-    private static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
-    private static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
+    @BeforeAll
+    static public void setUpClass() throws IOException {
+        Files.createDirectories(Paths.get(TEST_OUTPUT));
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT, "src"));
+    }
 
-    private static final String[] CASES = {"val", "opt", "req", "lmb", "nul", "unq", "wth"};
+    static class Combination {
+        static final String[] CASES = {"val", "opt", "req", "lmb", "nul", "unq", "wth"};
 
-    @Parameterized.Parameters(name = "{0}")
-    static public Object parameters() {
-        final List<Object[]> data = new ArrayList<>();
+        final String name;
 
-        if (PROP_FAST) {
-            data.add(new Object[] {caseName(0), 0});
+        final boolean useBeanValidation;
+        final boolean useOptional;
+
+        final boolean addServletRequest;
+        final boolean useLombokAnnotations;
+        final boolean openApiNullable;
+        final boolean useSetForUniqueItems;
+        final boolean useWithModifiers;
+
+        Combination(int mask) {
+            this.name = mask == 0
+                ? "boat"
+                : IntStream.range(0, CASES.length)
+                    .filter(n -> (mask & (1 << n)) != 0)
+                    .mapToObj(n -> CASES[n])
+                    .collect(joining("-", "boat-", ""));
+
+            this.useBeanValidation = (mask & 1 << 0) != 0;
+            this.useOptional = (mask & 1 << 1) != 0;
+            this.addServletRequest = (mask & 1 << 2) != 0;
+            this.useLombokAnnotations = (mask & 1 << 3) != 0;
+            this.openApiNullable = (mask & 1 << 4) != 0;
+            this.useSetForUniqueItems = (mask & 1 << 5) != 0;
+            this.useWithModifiers = (mask & 1 << 6) != 0;
         }
 
-        // generate all combinations
-        for (int mask = 0; mask < 1 << CASES.length; mask++) {
-            if (PROP_FAST && Integer.bitCount(mask) != 1) {
-                continue;
+        static Stream<Combination> combinations(boolean minimal) {
+            final List<Integer> cases = new ArrayList<>();
+
+            if (minimal) {
+                cases.add(0);
             }
 
-            data.add(new Object[] {caseName(mask), mask,});
+            // generate all combinations
+            for (int mask = 0; mask < 1 << CASES.length; mask++) {
+                if (minimal && Integer.bitCount(mask) != 1) {
+                    continue;
+                }
+
+                cases.add(mask);
+            }
+
+            if (minimal) {
+                cases.add(-1);
+            }
+
+            return cases.stream().map(Combination::new);
         }
-
-        if (PROP_FAST) {
-            data.add(new Object[] {caseName(-1), -1});
-        }
-
-        return data;
     }
 
-    static private String caseName(int mask) {
-        return mask == 0
-            ? "backbase"
-            : IntStream.range(0, CASES.length)
-                .filter(n -> (mask & (1 << n)) != 0)
-                .mapToObj(n -> CASES[n])
-                .collect(joining("-", "backbase-", ""));
+    /** dynamic suite creation **/
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Check {
     }
 
-    static private final String TEST_OUTPUS = System.getProperty(PROP_BASE + "output", "target/test-outputs");
-
-    @BeforeClass
-    static public void setUpClass() throws IOException {
-        Files.createDirectories(Paths.get(TEST_OUTPUS));
-        FileUtils.deleteDirectory(new File(TEST_OUTPUS, "src"));
+    @TestFactory
+    Stream<DynamicNode> withCombinations() {
+        return Combination
+            .combinations(PROP_FAST)
+            .map(param -> dynamicContainer(param.name, testStream(param)));
     }
 
-    private final String caseName;
-
-    private final boolean useBeanValidation;
-    private final boolean useOptional;
-
-    private final boolean addServletRequest;
-    private final boolean useLombokAnnotations;
-    private final boolean openApiNullable;
-    private final boolean useSetForUniqueItems;
-    private final boolean useWithModifiers;
-
-    static private List<File> files;
-
-    public BoatSpringTemplatesTests(String caseName, int mask) {
-        this.caseName = caseName;
-
-        this.useBeanValidation = (mask & 1 << 0) != 0;
-        this.useOptional = (mask & 1 << 1) != 0;
-        this.addServletRequest = (mask & 1 << 2) != 0;
-        this.useLombokAnnotations = (mask & 1 << 3) != 0;
-        this.openApiNullable = (mask & 1 << 4) != 0;
-        this.useSetForUniqueItems = (mask & 1 << 5) != 0;
-        this.useWithModifiers = (mask & 1 << 6) != 0;
+    Stream<DynamicTest> testStream(Combination param) {
+        return concat(
+            Stream.of(dynamicTest("generate", () -> generate(param))),
+            stream(getClass().getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(Check.class))
+                .map(m -> dynamicTest(m.getName(), () -> invoke(m))));
     }
 
-    @Before
-    public void generate() throws IOException {
-        final Path marker = Paths.get(TEST_OUTPUS, "src", "." + this.caseName);
-
-        // generate once per case name
-        if (!Files.exists(marker)) {
-            files = generateFrom(null);
-            // used in development
-            // this.files = generateFrom("openapi-generator-originals/JavaSpring-4.3.1");
-            Files.write(marker, asList(""));
-        }
-
-        assertThat(files, not(nullValue()));
-        assertThat(files.size(), not(equalTo(0)));
+    @SneakyThrows
+    private void invoke(Method m) {
+        m.invoke(this);
     }
 
-    @Test
-    public void useBeanValidation() {
+    /** the actual testing code **/
+
+    private Combination param;
+    private List<File> files;
+
+    void generate(Combination param) {
+        this.param = param;
+        this.files = generateFrom(null);
+        // used in development
+        // this.files = generateFrom(param, "openapi-generator-originals/JavaSpring-4.3.1");
+
+        assertThat(this.files, not(nullValue()));
+        assertThat(this.files.size(), not(equalTo(0)));
+    }
+
+    @Check
+    void useBeanValidation() {
         assertThat(findPattern("/api/.+\\.java$", "@Valid"),
-            equalTo(this.useBeanValidation));
+            equalTo(this.param.useBeanValidation));
         assertThat(findPattern("/model/.+\\.java$", "@Valid"),
-            equalTo(this.useBeanValidation));
+            equalTo(this.param.useBeanValidation));
     }
 
-    @Test
-    public void useOptional() {
+    @Check
+    void useOptional() {
         assertThat(findPattern("/api/.+\\.java$", "Optional<(?!NativeWebRequest)[^>]+>"),
-            equalTo(this.useOptional));
+            equalTo(this.param.useOptional));
         assertThat(findPattern("/model/.+\\.java$", "Optional<[^>]+>"),
             is(false));
     }
 
-    @Test
-    public void addServletRequest() {
+    @Check
+    void addServletRequest() {
         assertThat(findPattern("/api/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
-            equalTo(this.addServletRequest));
+            equalTo(this.param.addServletRequest));
         assertThat(findPattern("/model/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
             is(false));
     }
 
-    @Test
-    public void useLombokAnnotations() {
+    @Check
+    void useLombokAnnotations() {
         assertThat(findPattern("/api/.+\\.java$", "@lombok\\.Getter"),
             is(false));
         assertThat(findPattern("/model/.+\\.java$", "@lombok\\.Getter"),
-            equalTo(this.useLombokAnnotations));
+            equalTo(this.param.useLombokAnnotations));
     }
 
-    @Test
-    public void openApiNullable() {
+    @Check
+    void openApiNullable() {
         assertThat(findPattern("/api/.+\\.java$", "JsonNullable<[^>]+>"),
             is(false));
         assertThat(findPattern("/model/.+\\.java$", "JsonNullable<[^>]+>"),
-            equalTo(this.openApiNullable));
+            equalTo(this.param.openApiNullable));
     }
 
-    @Test
-    public void useSetForUniqueItems() {
+    @Check
+    void useSetForUniqueItems() {
         assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.useSetForUniqueItems));
+            equalTo(this.param.useSetForUniqueItems));
         assertThat(findPattern("/model/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.useSetForUniqueItems));
+            equalTo(this.param.useSetForUniqueItems));
     }
 
-    @Test
-    public void useWithModifiers() {
+    @Check
+    void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));
         assertThat(findPattern("/model/.+\\.java$", "\\s+with\\p{Upper}"),
-            equalTo(this.useWithModifiers));
+            equalTo(this.param.useWithModifiers));
     }
 
     private boolean findPattern(String filePattern, String linePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
-        final List<String> selection = files.stream()
+        final List<String> selection = this.files.stream()
             .map(File::getPath)
             .map(path -> path.replace(File.separatorChar, '/'))
             .filter(fileMatch)
@@ -212,11 +246,11 @@ public class BoatSpringTemplatesTests {
 
     private List<File> generateFrom(String templates) {
         final File input = new File("src/test/resources/boat-spring/openapi.yaml");
-        final CodegenConfigurator cf = new CodegenConfigurator();
+        final CodegenConfigurator gcf = new CodegenConfigurator();
 
-        cf.setGeneratorName(BoatSpringCodeGen.NAME);
-        cf.setInputSpec(input.getAbsolutePath());
-        cf.setOutputDir(TEST_OUTPUS);
+        gcf.setGeneratorName(BoatSpringCodeGen.NAME);
+        gcf.setInputSpec(input.getAbsolutePath());
+        gcf.setOutputDir(TEST_OUTPUT);
 
         GlobalSettings.setProperty(CodegenConstants.APIS, "");
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "true");
@@ -226,43 +260,43 @@ public class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
         GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "");
 
-        cf.setApiNameSuffix("-api");
-        cf.setModelNameSuffix(this.caseName);
+        gcf.setApiNameSuffix("-api");
+        gcf.setModelNameSuffix(this.param.name);
 
-        cf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.useBeanValidation);
-        cf.addAdditionalProperty(OptionalFeatures.USE_OPTIONAL, this.useOptional);
+        gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
+        gcf.addAdditionalProperty(OptionalFeatures.USE_OPTIONAL, this.param.useOptional);
 
-        cf.addAdditionalProperty(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, true);
-        cf.addAdditionalProperty(BoatSpringCodeGen.ADD_SERVLET_REQUEST, this.addServletRequest);
-        cf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        cf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
-        cf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.openApiNullable);
-        cf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.useWithModifiers);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, true);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.ADD_SERVLET_REQUEST, this.param.addServletRequest);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
 
-        final String destPackage = this.caseName.replace('-', '.') + ".";
+        final String destPackage = this.param.name.replace('-', '.') + ".";
 
-        cf.setApiPackage(destPackage + "api");
-        cf.setModelPackage(destPackage + "model");
-        cf.setInvokerPackage(destPackage + "invoker");
+        gcf.setApiPackage(destPackage + "api");
+        gcf.setModelPackage(destPackage + "model");
+        gcf.setInvokerPackage(destPackage + "invoker");
 
-        cf.addAdditionalProperty(SpringCodegen.BASE_PACKAGE, destPackage + "base");
-        cf.addAdditionalProperty(SpringCodegen.CONFIG_PACKAGE, destPackage + "config");
+        gcf.addAdditionalProperty(SpringCodegen.BASE_PACKAGE, destPackage + "base");
+        gcf.addAdditionalProperty(SpringCodegen.CONFIG_PACKAGE, destPackage + "config");
 
-        cf.addAdditionalProperty(CodegenConstants.HIDE_GENERATION_TIMESTAMP, true);
-        cf.addAdditionalProperty(SpringCodegen.INTERFACE_ONLY, true);
-        cf.addAdditionalProperty(SpringCodegen.USE_TAGS, true);
-        cf.addAdditionalProperty(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
-        cf.addAdditionalProperty(CodegenConstants.ARTIFACT_ID, "boat-templates-tests");
-        cf.addAdditionalProperty("additionalDependencies", ""
+        gcf.addAdditionalProperty(CodegenConstants.HIDE_GENERATION_TIMESTAMP, true);
+        gcf.addAdditionalProperty(SpringCodegen.INTERFACE_ONLY, true);
+        gcf.addAdditionalProperty(SpringCodegen.USE_TAGS, true);
+        gcf.addAdditionalProperty(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
+        gcf.addAdditionalProperty(CodegenConstants.ARTIFACT_ID, "boat-templates-tests");
+        gcf.addAdditionalProperty("additionalDependencies", ""
             + "        <dependency>\n"
             + "            <groupId>jakarta.persistence</groupId>\n"
             + "            <artifactId>jakarta.persistence-api</artifactId>\n"
             + "            <version>2.2.3</version>\n"
             + "        </dependency>");
 
-        cf.setTemplateDir(templates);
+        gcf.setTemplateDir(templates);
 
-        final ClientOptInput coi = cf.toClientOptInput();
+        final ClientOptInput coi = gcf.toClientOptInput();
 
         return new DefaultGenerator().opts(coi).generate();
     }

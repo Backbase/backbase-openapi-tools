@@ -4,29 +4,24 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.assertj.core.util.Lists;
+import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 public class GeneratorTests {
-
-    @Test
-    public void testDereference() throws OpenAPILoaderException {
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-        OpenAPI load = OpenAPILoader.load(new File(spec), true, false);
-        System.out.println(load.toString());
-
-    }
 
     @Test
     public void testHtml2() throws MojoExecutionException {
@@ -34,7 +29,7 @@ public class GeneratorTests {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
-        File output = new File("target/boat-docs");
+        File output = new File("target/boat-docs-generate");
         if (!output.exists()) {
             output.mkdirs();
         }
@@ -51,6 +46,10 @@ public class GeneratorTests {
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
+        String[] expectedGeneratedDocs = {"index.html",
+                ".openapi-generator-ignore",".openapi-generator"};
+        assertArrayEquals(expectedGeneratedDocs,output.list());
+
     }
 
     @Test
@@ -80,49 +79,10 @@ public class GeneratorTests {
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
         mojo.execute();
-    }
 
-    @Test
-    public void testAngular() throws MojoExecutionException {
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-
-        log.info("Generating client for: {}", spec);
-
-        GenerateMojo mojo = new GenerateMojo();
-        File input = new File(spec);
-        File output = new File("target/boat-angular");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.bundleSpecs = true;
-        mojo.dereferenceComponents = true;
-        mojo.generatorName= "boat-angular";
-        mojo.enablePostProcessFile= true;
-
-        if(Objects.isNull(mojo.additionalProperties)){
-            mojo.additionalProperties = new LinkedList<>();
-        }
-        mojo.additionalProperties.add("withMocks=true");
-        mojo.additionalProperties.add("npmName=@petstore/http");
-        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
-
-        try {
-            mojo.execute();
-        } catch (Exception e){
-            fail("Generation should not throw exceptions");
-        }
+        String[] expectedGeneratedDocs = {"index.html",
+                ".openapi-generator-ignore",".openapi-generator"};
+        assertArrayEquals(expectedGeneratedDocs,output.list());
     }
 
     @Test
@@ -131,6 +91,7 @@ public class GeneratorTests {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
         log.info("Generating docs for: {}", spec);
+
 
         BundleMojo bundleMojo = new BundleMojo();
         bundleMojo.setInput(new File(spec));
@@ -158,6 +119,10 @@ public class GeneratorTests {
         mojo.bundleSpecs = false;
         mojo.dereferenceComponents = false;
         mojo.execute();
+        String[] actualGeneratedFiles = output.list();
+        Arrays.sort(actualGeneratedFiles);
+        String[] expectedFiles= {".openapi-generator",".openapi-generator-ignore","dereferenced-openapi.yml","index.html"};
+        assertArrayEquals(expectedFiles,actualGeneratedFiles);
     }
 
 
@@ -167,7 +132,7 @@ public class GeneratorTests {
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
         File input = new File(inputFile);
-        File output = new File("target");
+        File output = new File("target/spring-mvc");
         if (!output.exists()) {
             output.mkdirs();
         }
@@ -190,10 +155,14 @@ public class GeneratorTests {
         mojo.generatorName = "spring";
         mojo.configOptions = configOption;
         mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = new File("target/spring-mvc");
+        mojo.output = output;
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
+        String[] actualFilesGenerated = output.list();
+        Arrays.sort(actualFilesGenerated);
+        String[] expected = {".openapi-generator",".openapi-generator-ignore","README.md","pom.xml","src"};
+        assertArrayEquals(expected,actualFilesGenerated);
 
     }
 
@@ -219,5 +188,11 @@ public class GeneratorTests {
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
 
+        String[] actualFilesGenerated = output.list();
+        Arrays.sort(actualFilesGenerated);
+        String[] expected = {".openapi-generator",".openapi-generator-ignore","api","gradle","src"};
+        assertArrayEquals(expected,actualFilesGenerated);
+
     }
+
 }
