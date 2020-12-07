@@ -15,6 +15,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import org.raml.v2.api.model.v10.datamodel.AnyTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.BooleanTypeDeclaration;
@@ -34,11 +35,9 @@ import org.raml.v2.api.model.v10.datamodel.XMLTypeDeclaration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"java:S3776","java:S3740", "rawtypes"})
+@UtilityClass
 public class RamlSchemaToOpenApi {
-
-    private RamlSchemaToOpenApi() {
-        throw new IllegalStateException("Utility class");
-    }
 
     private static final Logger log = LoggerFactory.getLogger(RamlSchemaToOpenApi.class);
 
