@@ -22,6 +22,11 @@ import java.util.Map;
 
 {{>generatedAnnotation}}
 {{#operations}}
+{{#useBeanValidation}}
+{{#useClassLevelBeanValidation}}
+@Validated
+{{/useClassLevelBeanValidation}}
+{{/useBeanValidation}}
 public class {{classname}} {
   private ApiClient apiClient;
 

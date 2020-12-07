@@ -6,18 +6,19 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("InfiniteLoopStatement")
 @Slf4j
@@ -55,15 +56,32 @@ public class BoatDocsTest {
     }
 
     @Test
-    public void testGenerateDocs() {
+    public void testGenerateDocs() throws IOException {
         System.setProperty("spec", getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml").getAbsolutePath());
         generateDocs();
+
+        File output = new File("target/docs/");
+        String[] actualDirectorySorted =output.list();
+        Arrays.sort(actualDirectorySorted);
+        String[] expectedDirectory= {".openapi-generator",".openapi-generator-ignore","index.html"};
+        assertArrayEquals(expectedDirectory,actualDirectorySorted);
+        File index = new File("target/docs/index.html");
+        String generated = String.join( " ", Files.readAllLines(Paths.get(index.getPath())));
+        assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
     }
 
     @Test
-    public void testGenerateDocsQuery() {
+    public void testGenerateDocsQuery() throws IOException {
         System.setProperty("spec", getFile("/oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
         generateDocs();
+        File output = new File("target/docs/");
+        String[] actualDirectorySorted =output.list();
+        Arrays.sort(actualDirectorySorted);
+        String[] expectedDirectory= {".openapi-generator",".openapi-generator-ignore","index.html"};
+        assertArrayEquals(expectedDirectory,actualDirectorySorted);
+        File index = new File("target/docs/index.html");
+        String generated = String.join( " ", Files.readAllLines(Paths.get(index.getPath())));
+        assertTrue(generated.contains("<title>Swagger Petstore</title>"));
     }
 
 
