@@ -1,3 +1,4 @@
 com.backbase.oss.codegen.java.BoatSpringCodeGen
 com.backbase.oss.codegen.java.BoatJavaCodeGen
 com.backbase.oss.codegen.doc.BoatDocsGenerator
+com.backbase.oss.codegen.angular.BoatAngularGenerator

@@ -14,7 +14,7 @@ public class BoatExampleUtils {
   public static void convertExamples(MediaType mediaType, String contentType,  List<BoatExample> examples) {
       if (mediaType.getExample() != null) {
           Object example = mediaType.getExample();
-          BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example));
+          BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example), contentType.toLowerCase().contains("json"));
           if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
               boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
           }
@@ -22,7 +22,7 @@ public class BoatExampleUtils {
       }
       if (mediaType.getExamples() != null) {
           mediaType.getExamples().forEach((key, example) -> {
-              BoatExample boatExample = new BoatExample(key, contentType, example);
+              BoatExample boatExample = new BoatExample(key, contentType, example, contentType.toLowerCase().contains("json"));
               examples.add(boatExample);
           });
       }
