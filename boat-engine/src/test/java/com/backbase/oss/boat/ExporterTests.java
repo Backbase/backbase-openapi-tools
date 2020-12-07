@@ -63,6 +63,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
     }
 
+    @Test
     public void testWalletPresentationMissingRef() {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
         assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
@@ -71,6 +72,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
+    @Test
     public void testWalletPresentationInvalidRef() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
         assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
