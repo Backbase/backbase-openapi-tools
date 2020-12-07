@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 public class RemoveMojoTests {
 
     @Test
@@ -38,9 +40,9 @@ public class RemoveMojoTests {
         DecomposeMojo decomposeMojo = new DecomposeMojo();
         decomposeMojo.setInput(input);
         decomposeMojo.setOutput(output);
-        // Assert.assertEquals(0, output.length());
         decomposeMojo.execute();
-        // Assert.assertTrue(output.length()>0);
+        String decomposed = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
+        Assert.assertTrue(!decomposed.contains("allOf:"));
 
     }
     private File getFile(String fileName) {
