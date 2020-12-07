@@ -81,9 +81,8 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
             .transformers(Collections.singletonList(new Decomposer()))));
     }
 
-
     @Test
-    public void testMarkupDocumentation() throws IOException {
+    public void testMarkupDocumentation() throws IOException, ExportException {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-markup-documentation-client.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
