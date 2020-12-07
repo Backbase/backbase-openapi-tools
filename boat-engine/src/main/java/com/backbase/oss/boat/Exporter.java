@@ -140,7 +140,7 @@ public class Exporter {
         try {
             baseUrl = parentFile.toURI().toURL();
         } catch (MalformedURLException e) {
-            throw new ExportException("Unable to determine parent location", e);
+            throw new ExportException("Failed to export baseUrl" + parentFile, e);
         }
 
         Map<String, String> ramlTypeReferences = new TreeMap<>();
@@ -151,7 +151,7 @@ public class Exporter {
             JsonNode jsonNode = mapper.readTree(ramlAsString);
             parseRamlTypeReferences(baseUrl, ramlTypeReferences, jsonNode);
         } catch (Exception e) {
-            throw new ExportException("Cannot read yaml file", e);
+            throw new ExportException("Failed to export ramlTypes", e);
         }
 
         CachingResourceLoader resourceLoader = new CachingResourceLoader(
@@ -204,7 +204,7 @@ public class Exporter {
             try {
                 jsonSchemaToOpenApi.dereferenceSchema(schema, components);
             } catch (Exception e) {
-                throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
+                throw new ExportException("Failed to dereference schema", e);
             }
         }
         components.getSchemas().values()
@@ -229,7 +229,7 @@ public class Exporter {
         try {
             convertResources(ramlBaseUrl, ramlApi.resources(), paths, components, jsonSchemaToOpenApi, operations);
         } catch (DerefenceException e) {
-            throw new ExportException("Failed to dereference resources", e);
+            throw new ExportException("Faield to defererence resources", e);
         }
 
         OpenAPI openAPI = new OpenAPI();
@@ -246,7 +246,7 @@ public class Exporter {
             try {
                 jsonSchemaToOpenApi.dereferenceSchema(schema, components);
             } catch (Exception e) {
-                throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
+                throw new ExportException("Failed to dereference schema", e);
             }
         }
         components.getSchemas().values()
