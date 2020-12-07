@@ -1,16 +1,13 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,7 +31,7 @@ public class RemoveMojoTests {
     }
 
     @Test
-    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException {
+    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException, IOException {
         File output = getFile("/readWriteFiles/output.yaml");
         File input = getFile("/oas-examples/petstore-composed.yaml");
         DecomposeMojo decomposeMojo = new DecomposeMojo();
@@ -42,7 +39,7 @@ public class RemoveMojoTests {
         decomposeMojo.setOutput(output);
         decomposeMojo.execute();
         String decomposed = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
-        Assert.assertTrue(!decomposed.contains("allOf:"));
+        assertTrue(!decomposed.contains("allOf:"));
 
     }
     private File getFile(String fileName) {
