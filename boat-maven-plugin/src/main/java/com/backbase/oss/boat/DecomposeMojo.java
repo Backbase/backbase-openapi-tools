@@ -30,6 +30,13 @@ public class DecomposeMojo extends AbstractMojo {
     @Parameter(name = "output", required = true)
     private File output;
 
+    public void setOutput(File output) {
+        this.output = output;
+    }
+
+    public void setInput(File input) {
+        this.input = input;
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

@@ -10,6 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpenAPILoader {
 
+    private OpenAPILoader() {
+        throw new AssertionError("Private constructor");
+    }
+
     public static OpenAPI parse(String openApi) {
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
@@ -18,6 +22,10 @@ public class OpenAPILoader {
         SwaggerParseResult swaggerParseResult = openAPIParser.readContents(openApi);
         return swaggerParseResult.getOpenAPI();
 
+    }
+
+    public static OpenAPI load(String url) throws OpenAPILoaderException {
+        return load(url, false, false);
     }
 
     public static OpenAPI load(File file) throws OpenAPILoaderException {
@@ -29,7 +37,14 @@ public class OpenAPILoader {
     }
 
     public static OpenAPI load(File file, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
-        log.debug("Reading OpenAPI from: {} resolveFully: {}", file, resolveFully);
+        if (!file.exists()) {
+            throw new OpenAPILoaderException("Could not load open api from file :" + file.getAbsolutePath() + ". File does not exist!");
+        }
+        return load(file.toURI().toString(), resolveFully,flatten);
+    }
+
+    public static OpenAPI load(String url, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
+        log.debug("Reading OpenAPI from: {} resolveFully: {}", url, resolveFully);
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlatten(flatten);
@@ -37,11 +52,12 @@ public class OpenAPILoader {
         parseOptions.setResolveFully(resolveFully);
         parseOptions.setFlattenComposedSchemas(true);
         parseOptions.setResolveCombinators(true);
-        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(file.toURI().toString(), null, parseOptions);
 
-
+        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(url, null, parseOptions);
+        if (swaggerParseResult.getOpenAPI() == null) {
+            log.error("Could not load OpenAPI from : {} \n{}", url, String.join("\t\n", swaggerParseResult.getMessages()));
+            throw new OpenAPILoaderException("Could not load open api from :" + url);
+        }
         return swaggerParseResult.getOpenAPI();
-
     }
-
 }
