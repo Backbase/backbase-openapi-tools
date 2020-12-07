@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-public class BoatJavaCodeGenTests {
+class BoatJavaCodeGenTests {
 
     @Test
-    public void clientOptsUnicity() {
+    void clientOptsUnicity() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         gen.cliOptions()
             .stream()
@@ -28,7 +28,7 @@ public class BoatJavaCodeGenTests {
     }
 
     @Test
-    public void processOptsWithRestTemplateDefaults() {
+    void processOptsWithRestTemplateDefaults() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
 
         gen.setLibrary("resttemplate");
@@ -44,7 +44,7 @@ public class BoatJavaCodeGenTests {
     }
 
     @Test
-    public void processOptsWithRestTemplate() {
+    void processOptsWithRestTemplate() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final Map<String, Object> options = gen.additionalProperties();
 
@@ -69,7 +69,7 @@ public class BoatJavaCodeGenTests {
     }
 
     @Test
-    public void processOptsWithoutRestTemplate() {
+    void processOptsWithoutRestTemplate() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final Map<String, Object> options = gen.additionalProperties();
 
@@ -93,7 +93,7 @@ public class BoatJavaCodeGenTests {
     }
 
     @Test
-    public void uniquePropertyToSet() {
+    void uniquePropertyToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenProperty prop = new CodegenProperty();
 
@@ -113,7 +113,7 @@ public class BoatJavaCodeGenTests {
     }
 
     @Test
-    public void uniqueParameterToSet() {
+    void uniqueParameterToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenParameter param = new CodegenParameter();
 

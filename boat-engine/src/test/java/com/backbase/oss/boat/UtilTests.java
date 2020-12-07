@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UtilTests {
+ class UtilTests {
 
     @SneakyThrows
     @Test
-    public void testUtils() {
+     void testUtils() {
         URL url = new URL("file://test.json");
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
@@ -21,7 +21,7 @@ public class UtilTests {
 
     @SneakyThrows
     @Test
-    public void testUtils2() {
+     void testUtils2() {
         URL url = new URL("file://test.json");
         URL other = new URL("file://other.json");
         BiMap<String, String> referenceNames = HashBiMap.create();

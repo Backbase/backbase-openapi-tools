@@ -17,12 +17,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class DereferenceComponentsPropertiesTransformerTests {
+class DereferenceComponentsPropertiesTransformerTests {
 
     private static final String APPLICATION_JSON = "application/json";
 
     @Test
-    public void testDereferenceComponentsPropertiesApi() throws OpenAPILoaderException {
+    void testDereferenceComponentsPropertiesApi() throws OpenAPILoaderException {
 
         File input = new File("src/test/resources/openapi/decomposer-test-api/openapi.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
@@ -81,7 +81,7 @@ public class DereferenceComponentsPropertiesTransformerTests {
     }
 
     @Test
-    public void testNullComponentsShouldNotFailWithNPE() {
+    void testNullComponentsShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
         try {
             new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
@@ -92,7 +92,7 @@ public class DereferenceComponentsPropertiesTransformerTests {
     }
 
     @Test
-    public void testNullComponentSchemasShouldNotFailWithNPE() {
+    void testNullComponentSchemasShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
         openAPI.setComponents(new Components());
         try {

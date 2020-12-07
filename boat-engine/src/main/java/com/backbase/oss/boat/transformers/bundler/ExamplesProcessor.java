@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 @Slf4j
+@SuppressWarnings({"rawtypes","java:S3740"})
 public class ExamplesProcessor {
 
     public static final String COMPONENTS_EXAMPLES = "#/components/examples/";
@@ -169,26 +170,7 @@ public class ExamplesProcessor {
                 JsonNode exampleNode = jsonNode.at(jsonPointer);
 
                 if (exampleNode.has("$ref")) {
-                    refPath = exampleNode.get("$ref").asText();
-                    exampleHolder.replaceRef(refPath);
-                    path = resolvePath(relativePath, refPath);
-                    resolvePath(relativePath, refPath);
-                    content = readContent(path);
-
-                    exampleHolder.setContent(content);
-                    if (exampleName != null) {
-                        exampleHolder.setExampleName(exampleName);
-                        exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
-                    }
-
-                    if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
-                        log.debug("Updating example: {} in components/examples", exampleName);
-                        // Check whether example is already dereferenced
-                    } else {
-                        log.debug("Adding Example: {} to components/examples", exampleName);
-                        putComponentExample(exampleName,
-                            new Example().value(convertExampleContent(exampleHolder, refPath)));
-                    }
+                    processExample(exampleHolder, relativePath, exampleName, exampleNode);
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
                 }
@@ -202,6 +184,32 @@ public class ExamplesProcessor {
 
         } catch (IOException e) {
             throw new TransformerException("Unable to fix inline examples", e);
+        }
+    }
+
+    private void processExample(ExampleHolder exampleHolder, String relativePath, String exampleName, JsonNode exampleNode) throws IOException {
+        String refPath;
+        Path path;
+        String content;
+        refPath = exampleNode.get("$ref").asText();
+        exampleHolder.replaceRef(refPath);
+        path = resolvePath(relativePath, refPath);
+        resolvePath(relativePath, refPath);
+        content = readContent(path);
+
+        exampleHolder.setContent(content);
+        if (exampleName != null) {
+            exampleHolder.setExampleName(exampleName);
+            exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
+        }
+
+        if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
+            log.debug("Updating example: {} in components/examples", exampleName);
+            // Check whether example is already dereferenced
+        } else {
+            log.debug("Adding Example: {} to components/examples", exampleName);
+            putComponentExample(exampleName,
+                new Example().value(convertExampleContent(exampleHolder, refPath)));
         }
     }
 
