@@ -1207,13 +1207,17 @@ components:
       type: object
       properties:
         message:
-          type: string
-          description: Any further information
+          $ref: '#/components/schemas/ErrorMessage'
         errors:
           type: array
           description: Detailed error information
           items:
             $ref: '#/components/schemas/ErrorItem'
+    ErrorMessage:
+      required:
+      - message
+      type: string
+      description: Any further information
     BbAccessControl:
       required:
       - function
