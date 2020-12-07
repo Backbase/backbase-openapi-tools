@@ -16,7 +16,8 @@
 
     <properties>
         <sonar.coverage.exclusions>
-            src/main/java/com/backbase/oss/boat/ExporterOptions.java
+            src/main/java/com/backbase/oss/boat/ExporterOptions.java,
+            src/main/java/com/backbase/oss/boat/transformers/TransformerException.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
