@@ -4,15 +4,18 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.assertj.core.util.Lists;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.Assert.fail;
 
 @Slf4j
 public class GeneratorTests {
@@ -80,12 +83,54 @@ public class GeneratorTests {
     }
 
     @Test
+    public void testAngular() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating client for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-angular");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName= "boat-angular";
+        mojo.enablePostProcessFile= true;
+
+        if(Objects.isNull(mojo.additionalProperties)){
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
+
+        try {
+            mojo.execute();
+        } catch (Exception e){
+            fail("Generation should not throw exceptions");
+        }
+    }
+
+    @Test
     public void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
         log.info("Generating docs for: {}", spec);
-
 
         BundleMojo bundleMojo = new BundleMojo();
         bundleMojo.setInput(new File(spec));
