@@ -66,10 +66,13 @@ public class BoatLinterTests {
             System.out.println(ruleDetails.toString());
         });
         String firstActualRule = boatLinter.getAvailableRules().get(0).toString();
+        String expected = "BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG)";
         if (!firstActualRule.contains("id=219")){
             firstActualRule = boatLinter.getAvailableRules().get(2).toString();
+            expected = "BoatViolation(rule=BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG), description=API Audience must be provided, severity=MUST, lines=2..6, pointer=/info/x-audience)";
+
         }
-        assertEquals("BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG)" , firstActualRule);
+        assertEquals( expected , firstActualRule);
 
     }
 }
