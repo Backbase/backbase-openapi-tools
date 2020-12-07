@@ -54,7 +54,7 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * </p>
  * <p>
  * With Jupiter, the hierarchy is {@code root -> method -> combination}, that's why the suite is
- * created dynamically and the actual testing code has been moved to {@link BoatSpringTemplatesRun}.
+ * created dynamically.
  * </p>
  */
 class BoatSpringTemplatesTests {

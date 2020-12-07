@@ -148,6 +148,7 @@ public class BoatAngularTemplatesTests {
     private List<File> files;
 
     void generate(Combination param) {
+        this.param = param;
         this.files = generateFrom(null);
         // used in development
         // this.files = generateFrom(param, "openapi-generator-originals/JavaSpring-4.3.1");
@@ -156,7 +157,7 @@ public class BoatAngularTemplatesTests {
         assertThat(this.files.size(), not(equalTo(0)));
     }
 
-    @Test
+    @Check
     public void npmName() {
         assertThat(
             findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
@@ -164,7 +165,7 @@ public class BoatAngularTemplatesTests {
         );
     }
 
-    @Test
+    @Check
     public void npmRepository() {
         assertThat(
             findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
@@ -172,7 +173,7 @@ public class BoatAngularTemplatesTests {
         );
     }
 
-    @Test
+    @Check
     public void withMocks() {
         assertThat(
             findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
@@ -180,7 +181,7 @@ public class BoatAngularTemplatesTests {
         );
     }
 
-    @Test
+    @Check
     public void providedInRoot() {
         assertThat(
             findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
@@ -192,7 +193,7 @@ public class BoatAngularTemplatesTests {
         );
     }
 
-    @Test
+    @Check
     public void apiModulePrefix() {
         assertThat(
             findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
@@ -204,7 +205,7 @@ public class BoatAngularTemplatesTests {
         );
     }
 
-    @Test
+    @Check
     public void serviceSuffix() {
         assertThat(
             findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
