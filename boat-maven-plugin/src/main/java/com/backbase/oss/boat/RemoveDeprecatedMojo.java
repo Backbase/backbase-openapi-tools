@@ -30,6 +30,13 @@ public class RemoveDeprecatedMojo extends AbstractMojo {
     @Parameter(name = "output", required = true)
     private File output;
 
+    public void setInput(File input) {
+        this.input = input;
+    }
+
+    public void setOutput(File output) {
+        this.output = output;
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

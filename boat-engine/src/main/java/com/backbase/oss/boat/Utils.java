@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
+    public static final String JAVA_TYPE = "javaType";
 
     private Utils() {
         throw new UnsupportedOperationException("private constructor");
@@ -102,9 +103,9 @@ public class Utils {
     }
 
     static Schema resolveSchemaByJavaType(JsonNode type, Components components) {
-        if (type.hasNonNull("javaType") && !type.get("javaType").textValue().startsWith("java")) {
-            log.debug("Resolving Schema Type from javaType: {}", type.get("javaType").textValue());
-            final String javaType = type.get("javaType").textValue();
+        if (type.hasNonNull(JAVA_TYPE) && !type.get(JAVA_TYPE).textValue().startsWith("java")) {
+            log.debug("Resolving Schema Type from javaType: {}", type.get(JAVA_TYPE).textValue());
+            final String javaType = type.get(JAVA_TYPE).textValue();
             Optional<io.swagger.v3.oas.models.media.Schema> first = components.getSchemas().values().stream()
                 .filter(schema -> schema.getExtensions() != null && javaType
                     .equals(schema.getExtensions().get(X_JAVA_TYPE)))
@@ -118,9 +119,9 @@ public class Utils {
     }
 
     static Optional<String> getSchemaNameFromJavaClass(JsonNode type) {
-        if (type.hasNonNull("javaType")) {
-            log.debug("javaType: {}", type.get("javaType").textValue());
-            final String javaType = type.get("javaType").textValue();
+        if (type.hasNonNull(JAVA_TYPE)) {
+            log.debug("javaType: {}", type.get(JAVA_TYPE).textValue());
+            final String javaType = type.get(JAVA_TYPE).textValue();
             if (!javaType.startsWith("java.")) {
                 return Optional.of(StringUtils.substringAfterLast(javaType, "."));
             }
