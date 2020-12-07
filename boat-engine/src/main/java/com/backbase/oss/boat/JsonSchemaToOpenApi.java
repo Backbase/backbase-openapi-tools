@@ -410,7 +410,7 @@ class JsonSchemaToOpenApi {
                     properties.put(field.getKey(), schema);
                 } catch (DerefenceException e) {
                     log.error("Failed to dereference property: {}", field.getKey());
-                    throw new RuntimeException(e);
+                    throw new ExportException("Failed to dereference property: " + field.getKey(), e);
                 }
             });
         }
