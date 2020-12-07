@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +65,11 @@ public class BoatLinterTests {
         boatLinter.getAvailableRules().forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });
-
+        String firstActualRule = boatLinter.getAvailableRules().get(0).toString();
+        if (!firstActualRule.contains("id=219")){
+            firstActualRule = boatLinter.getAvailableRules().get(2).toString();
+        }
+        assertEquals("BoatLintRule(id=219, ruleSet=ZalandoRuleSet, title=Provide API Audience, severity=MUST, ignored=false, url=https://backbase.github.io/backbase-openapi-tools/rules.md#219-provide-api-audience, effortMinutes=30, type=BUG)" , firstActualRule);
 
     }
 }
