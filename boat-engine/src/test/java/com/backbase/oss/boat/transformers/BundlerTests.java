@@ -3,6 +3,8 @@ package com.backbase.oss.boat.transformers;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
+import com.backbase.oss.boat.transformers.bundler.BoatCache;
+import com.backbase.oss.boat.transformers.bundler.ExamplesProcessor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,6 +51,19 @@ public class BundlerTests {
             description.appendText(" should start with '#/components/examples/'");
         }
     };
+
+    @Test
+    public void testBoatCache() throws OpenAPILoaderException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+
+        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, spec));
+        assertThrows(TransformerException.class, () -> boatCache.loadRef("not exists", RefFormat.RELATIVE, Example.class));
+
+
+    }
 
     @Test
     public void testBundleExamples() throws OpenAPILoaderException, IOException {
@@ -178,7 +194,6 @@ public class BundlerTests {
         output.delete();
         Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
     }
-
 
 
 }
