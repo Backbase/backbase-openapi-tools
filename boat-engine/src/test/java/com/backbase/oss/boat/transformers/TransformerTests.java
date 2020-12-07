@@ -20,4 +20,6 @@ public class TransformerTests {
         assertTrue(!openAPI.getOpenapi().contains("$ref"));
     }
 
+
+
 }
