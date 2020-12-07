@@ -1,11 +1,5 @@
 package com.backbase.oss.boat.transformers;
 
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.Components;
@@ -14,10 +8,16 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DereferenceComponentsPropertiesTransformerTest {
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class DereferenceComponentsPropertiesTransformerTests {
 
     private static final String APPLICATION_JSON = "application/json";
 
@@ -86,7 +86,7 @@ public class DereferenceComponentsPropertiesTransformerTest {
         try {
             new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
         } catch (NullPointerException e) {
-            Assert.fail("Unexpected NullPointerException");
+            fail("Unexpected NullPointerException");
         }
 
     }
@@ -98,7 +98,7 @@ public class DereferenceComponentsPropertiesTransformerTest {
         try {
             new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
         } catch (NullPointerException e) {
-            Assert.fail("Unexpected NullPointerException");
+            fail("Unexpected NullPointerException");
         }
     }
 

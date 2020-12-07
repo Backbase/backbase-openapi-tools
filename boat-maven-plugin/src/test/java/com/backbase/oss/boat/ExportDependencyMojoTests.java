@@ -10,9 +10,11 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class ExportDependencyMojoTests {
@@ -58,7 +60,7 @@ public class ExportDependencyMojoTests {
         mojo.continueOnError = false;
         mojo.execute();
 
-        Assert.assertTrue(new File("target/export-aggregated-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
+        assertTrue(new File("target/export-aggregated-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
 
     }
 
@@ -117,7 +119,7 @@ public class ExportDependencyMojoTests {
         mojo.continueOnError = false;
         mojo.execute();
 
-        Assert.assertTrue(new File("target/export-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
+        assertTrue(new File("target/export-dep/test/groupId/artifact-spec/backbase-wallet/presentation-client-api/openapi.yaml").exists());
     }
 
     private File getFile(String fileName) {

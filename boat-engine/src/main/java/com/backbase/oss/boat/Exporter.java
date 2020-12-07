@@ -51,6 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.SneakyThrows;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -133,15 +134,11 @@ public class Exporter {
     }
 
     @SuppressWarnings("java:S3776")
+    @SneakyThrows
     private OpenAPI export(String serviceName, File inputFile) throws ExportException {
 
         File parentFile = inputFile.getParentFile();
-        URL baseUrl;
-        try {
-            baseUrl = parentFile.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new ExportException("Unable to determine parent location", e);
-        }
+        URL baseUrl = parentFile.toURI().toURL();
 
         Map<String, String> ramlTypeReferences = new TreeMap<>();
         // Parse raml document as yaml instead to reverse engineer json references from types
@@ -150,8 +147,8 @@ public class Exporter {
             String ramlAsString = new String(Files.readAllBytes(inputFile.toPath()), Charset.defaultCharset());
             JsonNode jsonNode = mapper.readTree(ramlAsString);
             parseRamlTypeReferences(baseUrl, ramlTypeReferences, jsonNode);
-        } catch (Exception e) {
-            throw new ExportException("Cannot read yaml file", e);
+        } catch (Throwable e) {
+            throw new ExportException("Failed to export ramlTypes", e);
         }
 
         CachingResourceLoader resourceLoader = new CachingResourceLoader(
@@ -204,7 +201,7 @@ public class Exporter {
             try {
                 jsonSchemaToOpenApi.dereferenceSchema(schema, components);
             } catch (Exception e) {
-                throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
+                throw new ExportException("Failed to dereference schema", e);
             }
         }
         components.getSchemas().values()
@@ -229,7 +226,7 @@ public class Exporter {
         try {
             convertResources(ramlBaseUrl, ramlApi.resources(), paths, components, jsonSchemaToOpenApi, operations);
         } catch (DerefenceException e) {
-            throw new ExportException("Failed to dereference resources", e);
+            throw new ExportException("Faield to defererence resources", e);
         }
 
         OpenAPI openAPI = new OpenAPI();
@@ -246,7 +243,7 @@ public class Exporter {
             try {
                 jsonSchemaToOpenApi.dereferenceSchema(schema, components);
             } catch (Exception e) {
-                throw new ExportException("Cannot dereference json schema: " + schema.getName(), e);
+                throw new ExportException("Failed to dereference schema", e);
             }
         }
         components.getSchemas().values()
