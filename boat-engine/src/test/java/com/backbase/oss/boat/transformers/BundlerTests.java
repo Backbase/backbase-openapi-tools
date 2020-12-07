@@ -3,7 +3,6 @@ package com.backbase.oss.boat.transformers;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
-import com.backbase.oss.boat.transformers.bundler.BoatDeserializationUtils;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import java.io.File;
@@ -50,33 +48,6 @@ public class BundlerTests {
             description.appendText(" should start with '#/components/examples/'");
         }
     };
-
-    @Test
-    public void testDeserializeExample() {
-        BoatDeserializationUtils.deserialize("test", "test.yaml", Example.class);
-    }
-
-    @Test
-    public void testDeserializeJsonExample() {
-        BoatDeserializationUtils.deserialize("{ 'example': 'value'}", "test.yaml", Example.class);
-    }
-
-    @Test
-    public void testComponentsYaml() {
-        BoatDeserializationUtils.deserialize("title: BadRequestError\n" +
-            "type: object\n" +
-            "properties:\n" +
-            "  message:\n" +
-            "    description: Any further information\n" +
-            "    type: string\n" +
-            "  errors:\n" +
-            "    description: Detailed error information\n" +
-            "    type: array\n" +
-            "    items:\n" +
-            "      $ref: error-item.yaml\n" +
-            "required:\n" +
-            "  - message\n", "schema.yaml", Schema.class);
-    }
 
     @Test
     public void testBundleExamples() throws OpenAPILoaderException, IOException {
