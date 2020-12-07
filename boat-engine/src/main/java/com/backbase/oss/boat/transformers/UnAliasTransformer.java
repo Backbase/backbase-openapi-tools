@@ -17,10 +17,12 @@ public class UnAliasTransformer implements Transformer {
         "object", "array", "map").build();
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         OpenApiStreamUtil.streamSchemas(openAPI)
             .forEach(schema -> unAliasType(schema, openAPI));
+
+        return openAPI;
     }
 
     private void unAliasType(Schema schema, OpenAPI openAPI) {
@@ -40,7 +42,7 @@ public class UnAliasTransformer implements Transformer {
             referredSchema = openAPI.getComponents().getSchemas().get(RefUtils.extractSimpleName(
                 referredSchema.get$ref()).getLeft());
             if (count++ > 20) {
-                throw new RuntimeException("Did not resolve " + schema.get$ref() + " after following 20 refs.");
+                throw new TransformerException("Did not resolve " + schema.get$ref() + " after following 20 refs.");
             }
         }
         if (!isAliasOfSimpleTypes(referredSchema)) {

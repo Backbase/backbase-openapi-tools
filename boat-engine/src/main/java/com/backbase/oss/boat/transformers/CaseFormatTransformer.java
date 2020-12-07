@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CaseFormatTransformer implements Transformer {
 
     @Override
-    public void transform(OpenAPI openAPI, Map<String, Object> options) {
+    public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
         CaseFormat caseFormatFrom = null;
         CaseFormat caseFormatTo = null;
         Map<String, String> overrides = new HashMap<>();
@@ -48,6 +48,7 @@ public class CaseFormatTransformer implements Transformer {
             transform(openAPI, caseFormatFrom, caseFormatTo, overrides);
         }
 
+        return openAPI;
     }
 
     public String transformCamelCaseToSnakeCase(OpenAPI openAPI) {

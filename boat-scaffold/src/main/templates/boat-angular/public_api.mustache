@@ -1,0 +1,19 @@
+export * from './model/models';
+export * from './variables';
+export * from './configuration';
+export * from './api.module';
+
+{{#apiInfo}}
+{{#apis}}
+{{#operations}}
+export * from './api/{{ classFilename }}';
+{{/operations}}
+
+{{#withMocks}}
+export * from './api/{{ classFilename }}.mocks';
+{{/withMocks}}
+{{#withInterfaces}}
+export * from './api/{{ classFilename }}Interface';
+{{/withInterfaces}}
+{{/apis}}
+{{/apiInfo}}

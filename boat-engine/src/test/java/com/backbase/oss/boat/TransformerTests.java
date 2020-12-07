@@ -4,7 +4,6 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.AdditionalPropertiesAdder;
-import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.CaseFormatTransformer;
 import com.backbase.oss.boat.transformers.Deprecator;
 import com.backbase.oss.boat.transformers.Normaliser;
@@ -17,13 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TransformerTests extends AbstractBoatEngineTests {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class TransformerTests extends AbstractBoatEngineTestBase {
 
     @Test
     public void testNormalizer() throws OpenAPILoaderException, IOException {
@@ -33,7 +31,8 @@ public class TransformerTests extends AbstractBoatEngineTests {
         String output = SerializerUtils.toYamlString(openAPI);
         writeOutput(output, "/openapi.yaml");
 
-        Assert.assertTrue(new File("target/openapi.yaml").exists());
+
+        assertTrue(new File("target/openapi.yaml").exists());
 
     }
 
@@ -51,7 +50,7 @@ public class TransformerTests extends AbstractBoatEngineTests {
         String output = SerializerUtils.toYamlString(openAPI);
         writeOutput(output, "/openapi.yaml");
 
-        Assert.assertTrue(new File("target/openapi.yaml").exists());
+        assertTrue(new File("target/openapi.yaml").exists());
 
     }
 
@@ -62,7 +61,7 @@ public class TransformerTests extends AbstractBoatEngineTests {
 
         File output = new File("target/explode/examples/");
 
-        if(output.exists()) {
+        if (output.exists()) {
             output.delete();
         }
         output.mkdirs();
@@ -72,6 +71,15 @@ public class TransformerTests extends AbstractBoatEngineTests {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         new DirectoryExploder(extractor, writer).serializeIntoDirectory(Paths.get("target/explode"));
+
+        String[] explodedFiles = output.list();
+        Arrays.sort(explodedFiles);
+        String[] expectedFiles = {"bad-request-error.json", "bool.json", "date-time-only.json", "date-time.json",
+            "date-time2616.json", "date.json", "forbidden-error.json", "internal-server-error.json",
+            "name-on-card.json", "not-acceptable-error.json", "not-found-error.json", "payment-card.json",
+            "payment-cards-post-response-body.json", "payment-cards.json", "time.json", "unauthorized-alt-error.json",
+            "unsupported-media-type-error.json", "x--request--id.json"};
+        assertArrayEquals(expectedFiles, explodedFiles);
     }
 
 
@@ -84,7 +92,7 @@ public class TransformerTests extends AbstractBoatEngineTests {
         String output = SerializerUtils.toYamlString(openAPI);
         writeOutput(output, "/openapi.yaml");
 
-        Assert.assertTrue(new File("target/openapi.yaml").exists());
+        assertTrue(new File("target/openapi.yaml").exists());
 
     }
 
@@ -97,8 +105,9 @@ public class TransformerTests extends AbstractBoatEngineTests {
         String output = SerializerUtils.toYamlString(openAPI);
         writeOutput(output, "/openapi.yaml");
 
-        Assert.assertTrue(new File("target/openapi.yaml").exists());
+        assertTrue(new File("target/openapi.yaml").exists());
 
     }
+
 
 }

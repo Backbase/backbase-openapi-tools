@@ -2,7 +2,7 @@ package com.backbase.oss.boat.quay.ruleset
 
 import com.backbase.oss.boat.quay.ruleset.test.ZallyAssertions
 import org.intellij.lang.annotations.Language
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.zalando.zally.core.DefaultContextFactory
 
 class UniqueOperationRuleTest {
@@ -13,7 +13,7 @@ class UniqueOperationRuleTest {
     fun `check unique operations`() {
         @Language("YAML")
         val context = DefaultContextFactory().getOpenApiContext(
-                """
+            """
             openapi: 3.0.3
             info:
               title: Thing API
@@ -47,8 +47,8 @@ class UniqueOperationRuleTest {
         val violations = cut.validate(context)
 
         ZallyAssertions
-                .assertThat(violations)
-                .isEmpty()
+            .assertThat(violations)
+            .isEmpty()
     }
 
 
@@ -56,7 +56,7 @@ class UniqueOperationRuleTest {
     fun `check unique operations fail`() {
         @Language("YAML")
         val context = DefaultContextFactory().getOpenApiContext(
-                """
+            """
             openapi: 3.0.3
             info:
               title: Thing API
@@ -90,8 +90,8 @@ class UniqueOperationRuleTest {
         val violations = cut.validate(context)
 
         ZallyAssertions
-                .assertThat(violations)
-                .isNotEmpty()
+            .assertThat(violations)
+            .isNotEmpty()
     }
 
 
