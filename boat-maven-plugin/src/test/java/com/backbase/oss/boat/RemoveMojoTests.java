@@ -9,6 +9,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -26,7 +27,7 @@ public class RemoveMojoTests {
         Paths.get(output.getPath());
         String depreciated = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
 
-        assertTrue(!depreciated.contains("/pets/{petId}: get:"));
+        assertFalse(depreciated.contains("/pets/{petId}: get:"));
 
     }
 
@@ -39,7 +40,7 @@ public class RemoveMojoTests {
         decomposeMojo.setOutput(output);
         decomposeMojo.execute();
         String decomposed = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
-        assertTrue(!decomposed.contains("allOf:"));
+        assertFalse(decomposed.contains("allOf:"));
 
     }
     private File getFile(String fileName) {
