@@ -28,8 +28,15 @@ public class ValidateMojo extends AbstractMojo {
     @Parameter(name = "failOnWarning", required = true)
     private boolean failOnWarning;
 
+    public void setInput(File input) {
+        this.input = input;
+    }
+    public void setFailOnWarning(boolean failOnWarning) {
+        this.failOnWarning= failOnWarning;
+    }
+
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws  MojoFailureException {
 
         if (!input.exists()) {
             throw new MojoFailureException("File not found: " + input.getName());

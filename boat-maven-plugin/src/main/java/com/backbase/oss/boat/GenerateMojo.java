@@ -632,6 +632,7 @@ public class GenerateMojo extends AbstractMojo {
 
                     case "html2":
                         generatorName = "boat-docs";
+                        break;
                     default:
                         // use the original generator
                 }

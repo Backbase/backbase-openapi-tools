@@ -1,22 +1,26 @@
 package com.backbase.oss.boat.quay;
 
 import com.backbase.oss.boat.quay.model.BoatLintReport;
+import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoatLinterTests {
 
     BoatLinter boatLinter;
 
-    @Before
+    @BeforeEach
     public void setupBoatLinter() {
         boatLinter = new BoatLinter();
     }
@@ -29,7 +33,18 @@ public class BoatLinterTests {
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertTrue(boatLintReport.hasViolations());
+        assertTrue(boatLintReport.hasViolations());
+    }
+
+    @Test
+    public void testBoatViolationDisplay() throws IOException {
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
+        BoatViolation testDisplay = boatLintReport.getViolations().get(0);
+        if (!testDisplay.displayString().contains("[219]")){
+            testDisplay = boatLintReport.getViolations().get(2);
+        }
+        assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
     }
 
     @Test
@@ -45,14 +60,17 @@ public class BoatLinterTests {
         for (BoatViolation result : boatLintReport.getViolations()) {
             System.out.println(result.toString());
         }
-        Assert.assertTrue(boatLintReport.hasViolations());
+        assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
     public void ruleManager() {
-        boatLinter.getAvailableRules().forEach(ruleDetails -> {
+        List<BoatLintRule> availableRules = boatLinter.getAvailableRules();
+        availableRules.forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());
         });
+
+        assertFalse(availableRules.isEmpty());
 
     }
 }
