@@ -17,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-public class VendorExtensionFilterTests {
+class VendorExtensionFilterTests {
 
     @Test
-    public void run() throws Throwable {
+    void run() throws Throwable {
         Transformer trn = new VendorExtensionFilter();
 
         OpenAPI api1 = OpenAPILoader.load(new File("src/test/resources/openapi/extension-filter/openapi.yaml"));

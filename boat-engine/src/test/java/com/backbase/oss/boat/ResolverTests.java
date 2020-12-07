@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ResolverTests extends AbstractBoatEngineTestBase {
+ class ResolverTests extends AbstractBoatEngineTestBase {
 
     @Test
-    public void exceptionTest() throws OpenAPILoaderException {
+     void exceptionTest() throws OpenAPILoaderException {
         assertThrows(OpenAPILoaderException.class, () ->
             OpenAPILoader.load(new File("invalidOpenAPI.yaml"), false));
     }
