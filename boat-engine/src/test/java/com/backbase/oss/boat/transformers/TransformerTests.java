@@ -22,4 +22,13 @@ public class TransformerTests {
 
 
 
+//    @Test
+//    public void testUnAliasExternalRef() throws OpenAPILoaderException {
+//        // should no longer contain refs
+//        File input = new File("src/test/resources/openapi/un-alias-api/openapi.yaml");
+//        OpenAPI openAPI = OpenAPILoader.load(input);
+//        new UnAliasTransformer().transform(openAPI, Collections.EMPTY_MAP);
+//        assertTrue(!openAPI.getOpenapi().contains("$ref"));
+//    }
+
 }
