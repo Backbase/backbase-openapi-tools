@@ -26,6 +26,7 @@ BOAT is still under development and subject to change.
   * Avoid importing `HttpServletResponse` when using reactive
 * *Angular Generator*
   * Handle empty bodies properly in Mock generation
+  * Update foundation-ang to latest version
 
 ## 0.11.0
 
