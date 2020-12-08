@@ -18,7 +18,16 @@ class LoaderTests extends AbstractBoatEngineTestBase {
         RamlResourceLoader ramlResourceLoader = new RamlResourceLoader(base, root);
         assertThrows(RamlLoaderException.class, () -> ramlResourceLoader.fetchResource(resourceName));
 
+         root = new File("src/test/resources/openapi/error-catching/ramlLoaderEception");
+         base = new File("src/test/resources/openapi/error-catching");
+
+
+
+
+
     }
+
+
 
     @Test
     void testCatchingResourceLoader() {
