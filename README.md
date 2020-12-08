@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.11.1
+
+* *Java Generator - boat-spring library*
+  * Fixed reactive spring templates
+  * Avoid importing `HttpServletResponse` when using reactive
+  
 ## 0.11.0
 
 * *Maven Plugin*
