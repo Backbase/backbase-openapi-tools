@@ -6,6 +6,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidateMojoTests {
@@ -35,6 +36,32 @@ public class ValidateMojoTests {
 
         assertThrows(MojoFailureException.class, mojo::execute);
 
+        String spec = System.getProperty("spec", getClass().getResource("/raml-examples/export-mojo-error-catching/error").getFile());
+
+        File input = new File(spec);
+
+
+        mojo.setInput(input);
+        mojo.setFailOnWarning(true);
+
+        assertThrows(MojoFailureException.class, mojo::execute);
+        mojo.setFailOnWarning(false);
+        mojo.execute();
+
+
+    }
+
+    @Test
+    public void testValidatingDirectory() throws MojoFailureException {
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/").getFile());
+
+        File input = new File(spec);
+
+        ValidateMojo mojo = new ValidateMojo();
+        mojo.setInput(input);
+        mojo.setFailOnWarning(true);
+
+        mojo.execute();
 
     }
 
