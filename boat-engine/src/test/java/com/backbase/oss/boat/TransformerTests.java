@@ -54,6 +54,7 @@ class TransformerTests extends AbstractBoatEngineTestBase {
 
     }
 
+
     @Test
     void testDirectoryExploder() throws OpenAPILoaderException, IOException {
 

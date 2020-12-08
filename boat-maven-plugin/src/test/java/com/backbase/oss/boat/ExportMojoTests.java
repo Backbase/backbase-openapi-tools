@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class ExportMojoTests {
@@ -98,6 +97,23 @@ public class ExportMojoTests {
         assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
         assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
         assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
+
+    }
+
+    @Test
+    public void testErrorCatching(){
+        ExportMojo mojo = new ExportMojo();
+        mojo.inputFile=null;
+        // tests for valid file path that contains no raml spec
+        mojo.input=getFile("/raml-examples/export-mojo-error-catching/error");
+
+        assertThrows(MojoExecutionException.class,mojo::execute);
+        // tests for invalid path
+        mojo.input = new File("bad-file-path");
+        assertThrows(MojoExecutionException.class,mojo::execute);
+
+        mojo.inputFile = getFile("/raml-examples/export-mojo-error-catching/invalid-presentation-client-api.raml");
+        assertThrows(MojoExecutionException.class,mojo::execute);
 
     }
 
