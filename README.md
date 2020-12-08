@@ -24,7 +24,9 @@ BOAT is still under development and subject to change.
 * *Java Generator - boat-spring library*
   * Fixed reactive spring templates
   * Avoid importing `HttpServletResponse` when using reactive
-  
+* *Angular Generator*
+  * Handle empty bodies properly in Mock generation
+
 ## 0.11.0
 
 * *Maven Plugin*
