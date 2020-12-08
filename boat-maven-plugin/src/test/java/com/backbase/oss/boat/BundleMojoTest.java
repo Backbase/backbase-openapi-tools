@@ -3,8 +3,14 @@ package com.backbase.oss.boat;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,6 +90,19 @@ public class BundleMojoTest {
     }
 
     @Test
+    public void testSetVersionAtribute() throws MojoFailureException, MojoExecutionException, IOException {
+        File output = getFile("/readWriteFiles/output.yaml");
+        BundleMojo mojo = new BundleMojo();
+        mojo.setVersion("3.0.0");
+        mojo.setInput(getFile("/bundler/folder/another-client-api-v1.yaml"));
+        mojo.setOutput(output);
+        mojo.execute();
+
+        String outputApi = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
+        assertTrue(outputApi.contains("version: 3.0.0"));
+    }
+
+    @Test
     @SneakyThrows
     public void testInvalidVersionInApi() {
         BundleMojo mojo = new BundleMojo();
@@ -100,6 +119,11 @@ public class BundleMojoTest {
         openAPI.setInfo(new Info());
         openAPI.getInfo().setVersion(version);
         return openAPI;
+    }
+    protected File getFile(String name) {
+        URL resource = getClass().getResource(name);
+        assert resource != null;
+        return new File(resource.getFile());
     }
 
 
