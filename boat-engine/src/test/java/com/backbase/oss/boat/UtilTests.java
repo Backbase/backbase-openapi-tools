@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
      void testUtils2() {
         URL url = new URL("file://test.json");
         URL other = new URL("file://other.json");
+        URL unusual = new URL("file://unusual.json");
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual;
         actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
@@ -34,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         assertEquals("Test", actual);
         actual = Utils.getSchemaNameFromReference(other, "other", referenceNames);
         assertEquals("Other",actual);
+        referenceNames.put("file://unusual.json", "differentToUrl");
+        actual = Utils.getSchemaNameFromReference(unusual, "unusual", referenceNames);
+        assertEquals("UnusualUnusual",actual);
     }
 
 
