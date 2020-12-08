@@ -1,24 +1,18 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
-import io.swagger.v3.oas.models.OpenAPI;
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import java.io.File;
+import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Slf4j
 public class GeneratorTests {
@@ -125,6 +119,44 @@ public class GeneratorTests {
         assertArrayEquals(expectedFiles,actualGeneratedFiles);
     }
 
+    @Test
+    public void testAngular() {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating client for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-angular");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName= "boat-angular";
+        mojo.enablePostProcessFile= true;
+
+        if(Objects.isNull(mojo.additionalProperties)){
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
+
+        assertDoesNotThrow(mojo::execute, "Angular client generation should not throw exceptions");
+    }
 
     @Test
     public void testBeanValidation() throws MojoExecutionException {
