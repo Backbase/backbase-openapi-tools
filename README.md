@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.11.1
+
+* *Java Generator - resttemplate library*
+  * Do not import HttpServletResponse when using Spring Reactive
+  
+
 ## 0.11.0
 
 * *Maven Plugin*
@@ -33,6 +39,10 @@ BOAT is still under development and subject to change.
   * Added `useClassLevelBeanValidation` option (defaults to `false`).
   * Added `useJacksonConversion` to use Jackson for parameters conversion instead of `toString` (defaults to `false`).
   * Added `restTemplateBeanName` to qualify the autowired RestTemplate bean.
+
+* *Angular Generator* 
+  * Fixed
+
 
 ## 0.10.0
 * *Maven Plugin*
