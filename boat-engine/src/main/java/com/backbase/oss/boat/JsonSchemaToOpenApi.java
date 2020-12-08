@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.raml.v2.api.model.v10.datamodel.JSONTypeDeclaration;
 
-@SuppressWarnings({"unchecked", "WeakerAccess", "rawtypes","java:S3776", "java:S3740"})
+@SuppressWarnings({"unchecked", "WeakerAccess", "rawtypes", "java:S3776", "java:S3740"})
 @Slf4j
 class JsonSchemaToOpenApi {
 
@@ -395,24 +395,21 @@ class JsonSchemaToOpenApi {
         }
     }
 
-    @SuppressWarnings({"Duplicates","java:S112"})
+    @SuppressWarnings({"Duplicates", "java:S112"})
     private Map<String, Schema> getProperties(Schema parent, JsonNode type, Components components, URL
-        baseUrl) {
+        baseUrl) throws DerefenceException {
         Map<String, Schema> properties = new LinkedHashMap<>();
 
         if (type.hasNonNull(PROPERTIES)) {
             Iterator<Map.Entry<String, JsonNode>> fields = type.get(PROPERTIES).fields();
-            fields.forEachRemaining(field -> {
+            List<Map.Entry<String, JsonNode>> fieldList = new ArrayList();
+            fields.forEachRemaining(fieldList::add);
+            for (Map.Entry<String, JsonNode> field : fieldList) {
                 JsonNode property = field.getValue();
-                Schema schema;
-                try {
-                    schema = mapProperty(parent, components, field.getKey(), (ObjectNode) property, baseUrl, false);
-                    properties.put(field.getKey(), schema);
-                } catch (DerefenceException e) {
-                    log.error("Failed to dereference property: {}", field.getKey());
-                    throw new ExportException("Failed to dereference property: " + field.getKey(), e);
-                }
-            });
+                Schema schema = mapProperty(parent, components, field.getKey(), (ObjectNode) property, baseUrl, false);
+                properties.put(field.getKey(), schema);
+
+            }
         }
         if (properties.isEmpty()) {
             return null;
@@ -422,7 +419,7 @@ class JsonSchemaToOpenApi {
     }
 
     private Schema mapProperty(Schema parent, Components components, String propertyName, ObjectNode jsonSchema,
-        URL baseUrl, boolean derefence) throws DerefenceException {
+                               URL baseUrl, boolean derefence) throws DerefenceException {
         Schema schema;
         boolean hasJsonRef = jsonSchema.has(DOLLAR_REF) && StringUtils.isNotEmpty(jsonSchema.get(DOLLAR_REF).textValue());
 
