@@ -24,7 +24,6 @@ BOAT is still under development and subject to change.
 * *Java Generator - resttemplate library*
   * Do not import HttpServletResponse when using Spring Reactive
   
-
 ## 0.11.0
 
 * *Maven Plugin*

@@ -1,16 +1,10 @@
 package com.backbase.oss.codegen.java;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.stream.IntStream;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +14,10 @@ import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
     public static final String NAME = "boat-spring";
@@ -207,7 +205,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer) {
+        if (p.isContainer && !reactive) {
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.containerType = "set";
                 p.baseType = "java.util.Set";
@@ -222,7 +220,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessParameter(CodegenParameter p) {
         super.postProcessParameter(p);
 
-        if (p.isContainer) {
+        if (p.isContainer && !reactive) {
             // XXX the model set baseType to the container type, why is this different?
             p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
 
