@@ -72,6 +72,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
+        if (WEBCLIENT.equals(getLibrary())) {
+            this.useSetForUniqueItems = false;
+        }
+
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
