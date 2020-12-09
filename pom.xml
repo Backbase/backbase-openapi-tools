@@ -5,7 +5,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.11.0</version>
+    <version>0.11.1</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
@@ -58,6 +58,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
         <lombok.version>1.18.16</lombok.version>
+        <junit.version>4.13.1</junit.version>
 
         <jackson.version>2.11.3</jackson.version>
         <guava-version>30.0-jre</guava-version>
@@ -301,22 +302,12 @@
                 <artifactId>jackson-databind-nullable</artifactId>
                 <version>0.2.1</version>
             </dependency>
-
-
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>5.7.0</version>
                 <scope>test</scope>
             </dependency>
-
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-                <version>5.7.0</version>
-                <scope>test</scope>
-            </dependency>
-
 
             <dependency>
                 <groupId>org.hamcrest</groupId>
