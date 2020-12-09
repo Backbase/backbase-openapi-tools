@@ -102,6 +102,16 @@ class BundlerTests {
     }
 
     @Test
+    void testExamplesProcessor() throws OpenAPILoaderException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+        OpenAPI openAPIUnproccessed = openAPI;
+        new ExamplesProcessor(openAPI,file).processExamples(openAPI);
+    }
+
+    @Test
     void testBundleApi() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
