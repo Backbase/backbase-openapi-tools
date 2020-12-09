@@ -54,6 +54,12 @@ export const {{classname}}MocksProvider: Provider = createMocks(
                 },
             {{/isJson}}
         {{/examples}}
+        {{#hasEmptyBody}}
+        {
+          status: {{{code}}},
+          body: ""
+        },
+        {{/hasEmptyBody}}
     {{/responses}}
     ]
 },

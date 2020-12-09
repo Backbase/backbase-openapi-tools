@@ -21,10 +21,13 @@ BOAT is still under development and subject to change.
 
 ## 0.11.1
 
-* *Java Generator - java reactive library*
-  * Do not import HttpServletResponse when using Spring Reactive
-  * Fix types for reactive classes
-  
+* *Java Generator - boat-spring library*
+  * Fixed reactive spring templates
+  * Avoid importing `HttpServletResponse` when using reactive
+* *Angular Generator*
+  * Handle empty bodies properly in Mock generation
+  * Update foundation-ang to latest version
+
 ## 0.11.0
 
 * *Maven Plugin*
@@ -40,9 +43,14 @@ BOAT is still under development and subject to change.
   * Added `useJacksonConversion` to use Jackson for parameters conversion instead of `toString` (defaults to `false`).
   * Added `restTemplateBeanName` to qualify the autowired RestTemplate bean.
 
-* *Angular Generator* 
-  * Fixed
-
+* *Angular Generator*
+  * Added an Angular client generator for version 10 and up. 
+    The generator template is inherited from the standard one at [openapi-generator.tech](https://openapi-generator.tech/), with the addition of mock responses and a several fixes, among which:
+    * Handling of reserved typescript words
+    * Added support for Typescript and Javascript for escaping of strings in generators
+    * Escaping of model properties when not using `camelCase`
+    * Support for multiple `MediaTypes`
+  * To enable mocks generation, set the `withMocks` option to `true`  
 
 ## 0.10.0
 * *Maven Plugin*
