@@ -11,14 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 public class GeneratorTests {
@@ -192,6 +196,44 @@ public class GeneratorTests {
         Arrays.sort(actualFilesGenerated);
         String[] expected = {".openapi-generator",".openapi-generator-ignore","api","gradle","src"};
         assertArrayEquals(expected,actualFilesGenerated);
+
+    }
+
+    @Test
+    public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
+        GenerateMojo mojo = new GenerateMojo();
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        File input = new File(spec);
+        File output = new File("target/javaclient");
+        if (output.exists()) {
+            output.delete();
+        }
+        output.mkdirs();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+        mojo.generatorName = "java";
+        mojo.library = "native";
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.skipOverwrite  = false;
+        mojo.generateAliasAsModel = false;
+        mojo.execute();
+
+        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+        invocationRequest.setPomFile(new File(output, "pom.xml"));
+        invocationRequest.setGoals(Arrays.asList("compile"));
+        invocationRequest.setBatchMode(true);
+
+        Invoker invoker = new DefaultInvoker();
+        InvocationResult invocationResult = invoker.execute(invocationRequest);
+        assertNull(invocationResult.getExecutionException());
 
     }
 
