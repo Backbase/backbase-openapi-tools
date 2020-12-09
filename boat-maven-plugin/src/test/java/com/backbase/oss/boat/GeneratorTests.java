@@ -1,24 +1,24 @@
 package com.backbase.oss.boat;
 
-import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
-import io.swagger.v3.oas.models.OpenAPI;
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.checkerframework.checker.units.qual.A;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
+import java.util.*;
 
 @Slf4j
 public class GeneratorTests {
@@ -125,6 +125,44 @@ public class GeneratorTests {
         assertArrayEquals(expectedFiles,actualGeneratedFiles);
     }
 
+    @Test
+    public void testAngular() {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating client for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-angular");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName= "boat-angular";
+        mojo.enablePostProcessFile= true;
+
+        if(Objects.isNull(mojo.additionalProperties)){
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
+
+        assertDoesNotThrow(mojo::execute, "Angular client generation should not throw exceptions");
+    }
 
     @Test
     public void testBeanValidation() throws MojoExecutionException {
@@ -192,6 +230,45 @@ public class GeneratorTests {
         Arrays.sort(actualFilesGenerated);
         String[] expected = {".openapi-generator",".openapi-generator-ignore","api","gradle","src"};
         assertArrayEquals(expected,actualFilesGenerated);
+
+    }
+
+    @Test
+    @Ignore
+    public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
+        GenerateMojo mojo = new GenerateMojo();
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        File input = new File(spec);
+        File output = new File("target/javaclient");
+        if (output.exists()) {
+            output.delete();
+        }
+        output.mkdirs();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+        mojo.generatorName = "java";
+        mojo.library = "native";
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.skipOverwrite  = false;
+        mojo.generateAliasAsModel = false;
+        mojo.execute();
+
+        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+        invocationRequest.setPomFile(new File(output, "pom.xml"));
+        invocationRequest.setGoals(Arrays.asList("compile"));
+        invocationRequest.setBatchMode(true);
+
+        Invoker invoker = new DefaultInvoker();
+        InvocationResult invocationResult = invoker.execute(invocationRequest);
+        assertNull(invocationResult.getExecutionException());
 
     }
 

@@ -7,7 +7,7 @@ import { Provider } from '@angular/core';
 * Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
 */
 export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = createMocks([{
-        urlPattern: "{{{basePathWithoutHost}}}{{path}}",
+        urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
         method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
         responses: [
         {{#responses}}
@@ -35,7 +35,7 @@ export const {{classname}}MocksProvider: Provider = createMocks(
     [{{#operations}}
     {{#operation}}
     {
-        urlPattern: "{{{basePathWithoutHost}}}{{path}}",
+        urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
         method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
         responses: [
         {{#responses}}
@@ -54,6 +54,12 @@ export const {{classname}}MocksProvider: Provider = createMocks(
                 },
             {{/isJson}}
         {{/examples}}
+        {{#hasEmptyBody}}
+        {
+          status: {{{code}}},
+          body: ""
+        },
+        {{/hasEmptyBody}}
     {{/responses}}
     ]
 },
