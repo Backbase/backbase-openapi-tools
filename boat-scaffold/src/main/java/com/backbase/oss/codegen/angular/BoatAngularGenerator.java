@@ -58,7 +58,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
     private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
-    protected String foundationVersion = "6.0.0";
+    protected String foundationVersion = "6.6.7";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
