@@ -61,7 +61,7 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
-    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-templates-tests");
 
     @BeforeAll
     static public void setUpClass() throws IOException {
@@ -297,7 +297,13 @@ class BoatSpringTemplatesTests {
             + "            <groupId>jakarta.persistence</groupId>\n"
             + "            <artifactId>jakarta.persistence-api</artifactId>\n"
             + "            <version>2.2.3</version>\n"
-            + "        </dependency>");
+            + "        </dependency>\n"
+            + "        <dependency>\n"
+            + "            <groupId>jakarta.servlet</groupId>\n"
+            + "            <artifactId>jakarta.servlet-api</artifactId>\n"
+            + "            <version>4.0.4</version>\n"
+            + "        </dependency>\n"
+            + "");
 
         gcf.setTemplateDir(templates);
 

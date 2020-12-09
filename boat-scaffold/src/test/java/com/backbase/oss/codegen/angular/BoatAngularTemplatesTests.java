@@ -1,5 +1,17 @@
 package com.backbase.oss.codegen.angular;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
@@ -15,41 +27,28 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
 
 /**
  * These tests verifies that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
  */
 public class BoatAngularTemplatesTests {
-
     static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
-    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
-
+    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-angular-templates-tests");
 
     @BeforeAll
     static public void setUpClass() throws IOException {
@@ -83,9 +82,9 @@ public class BoatAngularTemplatesTests {
             return mask == 0
                 ? "backbase"
                 : IntStream.range(0, CASES.length)
-                .filter(n -> (mask & (1 << n)) != 0)
-                .mapToObj(n -> CASES[n])
-                .collect(joining("-", "backbase-", ""));
+                    .filter(n -> (mask & (1 << n)) != 0)
+                    .mapToObj(n -> CASES[n])
+                    .collect(joining("-", "backbase-", ""));
         }
 
 
@@ -161,71 +160,62 @@ public class BoatAngularTemplatesTests {
     public void npmName() {
         assertThat(
             findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
-            equalTo(this.param.npmName)
-        );
+            equalTo(this.param.npmName));
     }
 
     @Check
     public void npmRepository() {
         assertThat(
             findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
-            equalTo(this.param.npmRepository && this.param.npmName)
-        );
+            equalTo(this.param.npmRepository && this.param.npmName));
     }
 
     @Check
     public void withMocks() {
         assertThat(
             findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
-            equalTo(this.param.withMocks)
-        );
+            equalTo(this.param.withMocks));
     }
 
     @Check
     public void providedInRoot() {
         assertThat(
             findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
-            equalTo(this.param.providedInRoot)
-        );
+            equalTo(this.param.providedInRoot));
         assertThat(
             findPattern("/api\\.module\\.ts$", "providers: \\[]"),
-            equalTo(this.param.providedInRoot)
-        );
+            equalTo(this.param.providedInRoot));
     }
 
     @Check
     public void apiModulePrefix() {
         assertThat(
             findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
-            equalTo(this.param.apiModulePrefix)
-        );
+            equalTo(this.param.apiModulePrefix));
         assertThat(
             findPattern("/api\\.module\\.ts$", "export class ApiModule"),
-            equalTo(!this.param.apiModulePrefix)
-        );
+            equalTo(!this.param.apiModulePrefix));
     }
 
     @Check
     public void serviceSuffix() {
         assertThat(
             findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
-            equalTo(this.param.serviceSuffix)
-        );
+            equalTo(this.param.serviceSuffix));
         assertThat(
             findPattern("/api/.+\\.service.ts$", "export class .*Service "),
-            equalTo(!this.param.serviceSuffix)
-        );
+            equalTo(!this.param.serviceSuffix));
     }
 
     private boolean findPattern(String filePattern, String linePattern) {
-        List<String> selection = selectFiles(filePattern);
+        final List<String> selection = selectFiles(filePattern);
         assertThat(selection, not(hasSize(0)));
         return findPattern(selection, linePattern);
     }
 
     private List<String> selectFiles(String filePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
-        return files.stream()
+        return this.files.stream()
             .map(File::getPath)
             .map(path -> path.replace(File.separatorChar, '/'))
             .filter(fileMatch)
@@ -269,7 +259,7 @@ public class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.NPM_REPOSITORY, "https://registry.example.com/npm");
         }
         if (this.param.npmName) {
-            cf.addAdditionalProperty(BoatAngularGenerator.NPM_NAME, "@example/angular-http");
+            cf.addAdditionalProperty(AbstractTypeScriptClientCodegen.NPM_NAME, "@example/angular-http");
         }
         cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.param.providedInRoot);
         if (this.param.apiModulePrefix) {
