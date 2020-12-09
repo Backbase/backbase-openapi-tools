@@ -72,6 +72,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
+        if (WEBCLIENT.equals(getLibrary())) {
+            this.useSetForUniqueItems = false;
+        }
+
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
@@ -138,9 +142,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
         if (p.isContainer) {
             // XXX the model set baseType to the container type, why is this different?
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
+                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
                 p.baseType = JAVA_UTIL_SET;
                 p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
                 p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
