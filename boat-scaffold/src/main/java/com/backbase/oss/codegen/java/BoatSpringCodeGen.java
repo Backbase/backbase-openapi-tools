@@ -157,6 +157,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void processOpts() {
         super.processOpts();
 
+        if (this.reactive) {
+            this.useSetForUniqueItems = false;
+        }
+
         this.supportingFiles.stream()
             .filter(sf -> "apiUtil.mustache".equals(sf.templateFile))
             .findAny()
@@ -205,7 +209,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer && !reactive) {
+        if (p.isContainer) {
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.containerType = "set";
                 p.baseType = "java.util.Set";
@@ -220,7 +224,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessParameter(CodegenParameter p) {
         super.postProcessParameter(p);
 
-        if (p.isContainer && !reactive) {
+        if (p.isContainer) {
             // XXX the model set baseType to the container type, why is this different?
             p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
 
