@@ -59,8 +59,8 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * </p>
  */
 class BoatSpringTemplatesTests {
-    static final String PROP_BASE = BoatSpringCodeGenTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
+    static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
+    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
 
     @BeforeAll
