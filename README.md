@@ -21,8 +21,9 @@ BOAT is still under development and subject to change.
 
 ## 0.11.1
 
-* *Java Generator - resttemplate library*
+* *Java Generator - java reactive library*
   * Do not import HttpServletResponse when using Spring Reactive
+  * Fix types for reactive classes
   
 ## 0.11.0
 
