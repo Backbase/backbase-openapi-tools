@@ -130,7 +130,7 @@
                        </goals>
                        <configuration>
                            <skipInvocation>${skipTests}</skipInvocation>
-                           <projectsDirectory>target/test-outputs</projectsDirectory>
+                           <projectsDirectory>target/boat-spring-templates-tests</projectsDirectory>
                            <pomIncludes>
                                <pomInclude>pom.xml</pomInclude>
                            </pomIncludes>
