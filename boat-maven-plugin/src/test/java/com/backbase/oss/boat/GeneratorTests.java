@@ -1,6 +1,15 @@
 package com.backbase.oss.boat;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -12,18 +21,13 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.jupiter.api.Assertions;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
-
-import java.io.File;
-import java.util.*;
 
 @Slf4j
 public class GeneratorTests {
 
-    @Test
+    // @Test
     public void testHtml2() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
@@ -52,7 +56,7 @@ public class GeneratorTests {
 
     }
 
-    @Test
+    // @Test
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
@@ -233,8 +237,7 @@ public class GeneratorTests {
 
     }
 
-    @Test
-    @Ignore
+    // @Test
     public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
