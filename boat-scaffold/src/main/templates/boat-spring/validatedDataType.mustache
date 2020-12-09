@@ -4,7 +4,7 @@
 	        }}{{{baseType}}}<String, {{#items}}{{>beanValidationCore}}{{{dataType}}}{{/items}}>{{!
 	    }}{{/isMapContainer}}{{!
 	    }}{{^isMapContainer}}{{!
-	        }}{{{baseType}}}<{{#items}}{{>beanValidationCore}}{{{dataType}}}{{/items}}>{{!
+	        }}{{#reactive}}{{{dataType}}}{{/reactive}}{{^reactive}}{{{baseType}}}<{{#items}}{{>beanValidationCore}}{{{dataType}}}{{/items}}>{{/reactive}}{{!
 	    }}{{/isMapContainer}}{{!
 	}}{{/isContainer}}{{!
 	}}{{^isContainer}}{{!

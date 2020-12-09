@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.11.0</version>
+        <version>0.11.1</version>
     </parent>
     <artifactId>boat-engine</artifactId>
     <packaging>jar</packaging>
@@ -16,8 +16,7 @@
 
     <properties>
         <sonar.coverage.exclusions>
-            src/main/java/com/backbase/oss/boat/ExporterOptions.java,
-            src/main/java/com/backbase/oss/boat/transformers/TransformerException.java
+            src/main/java/com/backbase/oss/boat/ExporterOptions.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
