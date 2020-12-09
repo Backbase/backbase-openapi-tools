@@ -86,7 +86,6 @@ public class ExamplesProcessor {
             processMediaType(mediaType, relativePath, true);
         });
 
-
     }
 
     public void processMediaType(MediaType mediaType, String relativePath, boolean derefenceExamples) {

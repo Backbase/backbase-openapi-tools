@@ -1,0 +1,10 @@
+{
+  "response": {
+    "$ref": "examples/user-post-response.json"
+  },
+  "request":
+  {
+    "name": "Alex",
+    "role": "Manager"
+  }
+}
