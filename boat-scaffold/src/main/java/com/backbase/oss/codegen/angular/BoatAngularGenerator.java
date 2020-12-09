@@ -248,7 +248,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     @Override
-    public CodegenOperation fromOperation(String path,
+    public BoatAngularCodegenOperation fromOperation(String path,
                                           String httpMethod,
                                           Operation operation,
                                           List<Server> servers) {
@@ -258,7 +258,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
                 .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
 
-        return codegenOperation;
+        return new BoatAngularCodegenOperation(codegenOperation);
     }
 
     private void addProducesReturnType(ApiResponse inputResponse, CodegenOperation codegenOperation) {
