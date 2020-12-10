@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="song" type="songType"></xs:element>
+
+
+    <xs:complexType name="songType">
+        <xs:sequence>
+            <xs:element name="title" type="titletype" ></xs:element>
+            <xs:element name="length" type="xs:int" ></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="titletype">
+        <xs:sequence>
+            <xs:element name="album" type="xs:string"></xs:element>
+            <xs:element name="song" type="xs:string"></xs:element>
+            <xs:element name="id" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

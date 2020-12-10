@@ -3,11 +3,10 @@ package com.backbase.oss.boat.transformers;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import io.swagger.v3.oas.models.media.Schema;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,12 @@ class TransformerTests {
         // should no longer contain refs
         File input = new File("src/test/resources/openapi/presentation-client-api/openapi.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
-        new UnAliasTransformer().transform(openAPI, Collections.EMPTY_MAP);
-        assertTrue(!openAPI.getOpenapi().contains("$ref"));
+        assertTrue(openAPI.toString().contains("$ref: #/components/schemas/ErrorMessage"));
+        OpenAPI transformed = new UnAliasTransformer().transform(openAPI, Collections.EMPTY_MAP);
+        assertTrue(!transformed.toString().contains("$ref: #/components/schemas/ErrorMessage"));
     }
+
+
 
     @Test
     void testCaseFormatTransformer() throws OpenAPILoaderException {

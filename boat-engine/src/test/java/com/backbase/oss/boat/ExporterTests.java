@@ -157,7 +157,8 @@ class ExporterTests extends AbstractBoatEngineTestBase {
     public void testExportErrorCatching() throws IOException {
         File inputFile = getFile("/openapi/error-catching/bad-export-api/openapi.yaml");
         assertThrows( ExportException.class ,()->Exporter.export(inputFile, true, Collections.singletonList(new Decomposer())));
-
+        File inputFileTypesInvalid = getFile("/raml-examples/invalid-ramls");
+        assertThrows( ExportException.class ,()->Exporter.export(inputFileTypesInvalid, true, Collections.singletonList(new Decomposer())));
     }
 
     protected SwaggerParseResult validateExport(String export) throws IOException, ExportException {

@@ -4,6 +4,7 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.bundler.BoatCache;
+import com.backbase.oss.boat.transformers.bundler.ExampleHolder;
 import com.backbase.oss.boat.transformers.bundler.ExamplesProcessor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
@@ -22,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
@@ -120,7 +122,10 @@ class BundlerTests {
         OpenAPI openAPI = OpenAPILoader.load(input);
 
         assertThrows(TransformerException.class, ()->new ExamplesProcessor(openAPI,file).processExamples(openAPI));
+
+
     }
+
 
     @Test
     void testBundleApi() throws OpenAPILoaderException, IOException {

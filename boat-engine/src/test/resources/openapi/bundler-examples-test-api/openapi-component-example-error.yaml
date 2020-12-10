@@ -182,11 +182,7 @@ components:
     example-in-components:
       $ref: './examples/user-post-request-response.json#/response'
     example-in-components-1:
-      summary: component-examples with example - should be left alone
-      value:
-        id: "1"
-        name: "Michel"
-        rank: 22
+      $ref: null
     example-number-one:
       summary: component-examples with reference, matching the name of a path examples - also, summary ignored.
       $ref: ./examples/user-post-request.json
