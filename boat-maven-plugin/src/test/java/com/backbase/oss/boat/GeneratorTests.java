@@ -1,6 +1,5 @@
 package com.backbase.oss.boat;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -12,8 +11,9 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -234,7 +234,7 @@ public class GeneratorTests {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
