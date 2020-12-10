@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -58,9 +59,9 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * </p>
  */
 class BoatSpringTemplatesTests {
-    static final String PROP_BASE = BoatSpringCodeGenTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.getBoolean(PROP_BASE + "fast");
-    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/test-outputs");
+    static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
+    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-templates-tests");
 
     @BeforeAll
     static public void setUpClass() throws IOException {
@@ -69,7 +70,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final String[] CASES = {"val", "opt", "req", "lmb", "nul", "unq", "wth"};
+        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nul", "wth");
 
         final String name;
 
@@ -82,21 +83,24 @@ class BoatSpringTemplatesTests {
         final boolean useSetForUniqueItems;
         final boolean useWithModifiers;
 
+        final boolean reactive;
+
         Combination(int mask) {
             this.name = mask == 0
                 ? "boat"
-                : IntStream.range(0, CASES.length)
+                : IntStream.range(0, CASES.size())
                     .filter(n -> (mask & (1 << n)) != 0)
-                    .mapToObj(n -> CASES[n])
+                    .mapToObj(n -> CASES.get(n))
                     .collect(joining("-", "boat-", ""));
 
-            this.useBeanValidation = (mask & 1 << 0) != 0;
-            this.useOptional = (mask & 1 << 1) != 0;
-            this.addServletRequest = (mask & 1 << 2) != 0;
-            this.useLombokAnnotations = (mask & 1 << 3) != 0;
-            this.openApiNullable = (mask & 1 << 4) != 0;
-            this.useSetForUniqueItems = (mask & 1 << 5) != 0;
-            this.useWithModifiers = (mask & 1 << 6) != 0;
+            this.useBeanValidation = (mask & 1 << CASES.indexOf("val")) != 0;
+            this.useOptional = (mask & 1 << CASES.indexOf("opt")) != 0;
+            this.addServletRequest = (mask & 1 << CASES.indexOf("req")) != 0;
+            this.useLombokAnnotations = (mask & 1 << CASES.indexOf("lmb")) != 0;
+            this.openApiNullable = (mask & 1 << CASES.indexOf("nul")) != 0;
+            this.useSetForUniqueItems = (mask & 1 << CASES.indexOf("unq")) != 0;
+            this.useWithModifiers = (mask & 1 << CASES.indexOf("wth")) != 0;
+            this.reactive = (mask & 1 << CASES.indexOf("flx")) != 0;
         }
 
         static Stream<Combination> combinations(boolean minimal) {
@@ -107,7 +111,7 @@ class BoatSpringTemplatesTests {
             }
 
             // generate all combinations
-            for (int mask = 0; mask < 1 << CASES.length; mask++) {
+            for (int mask = 0; mask < 1 << CASES.size(); mask++) {
                 if (minimal && Integer.bitCount(mask) != 1) {
                     continue;
                 }
@@ -158,7 +162,7 @@ class BoatSpringTemplatesTests {
         this.param = param;
         this.files = generateFrom(null);
         // used in development
-        // this.files = generateFrom(param, "openapi-generator-originals/JavaSpring-4.3.1");
+        // this.files = generateFrom("openapi-generator-originals/JavaSpring-4.3.1");
 
         assertThat(this.files, not(nullValue()));
         assertThat(this.files.size(), not(equalTo(0)));
@@ -272,6 +276,7 @@ class BoatSpringTemplatesTests {
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
         gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
+        gcf.addAdditionalProperty(SpringCodegen.REACTIVE, this.param.reactive);
 
         final String destPackage = this.param.name.replace('-', '.') + ".";
 
@@ -292,7 +297,13 @@ class BoatSpringTemplatesTests {
             + "            <groupId>jakarta.persistence</groupId>\n"
             + "            <artifactId>jakarta.persistence-api</artifactId>\n"
             + "            <version>2.2.3</version>\n"
-            + "        </dependency>");
+            + "        </dependency>\n"
+            + "        <dependency>\n"
+            + "            <groupId>jakarta.servlet</groupId>\n"
+            + "            <artifactId>jakarta.servlet-api</artifactId>\n"
+            + "            <version>4.0.4</version>\n"
+            + "        </dependency>\n"
+            + "");
 
         gcf.setTemplateDir(templates);
 
