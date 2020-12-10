@@ -117,10 +117,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(key, whenProvided, null);
     }
 
-    private void processOpt(String key, Runnable whenProvided) {
-        processOpt(key, value -> whenProvided.run());
-    }
-
     private void processOpt(String key, Consumer<String> whenProvided, Runnable notProvided) {
         if (additionalProperties.containsKey(key)) {
             whenProvided.accept(additionalProperties.get(key).toString());
