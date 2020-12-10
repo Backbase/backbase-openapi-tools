@@ -9,6 +9,9 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+{{#restTemplateBeanName}}
+import org.springframework.beans.factory.annotation.Qualifier;
+{{/restTemplateBeanName}}
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -129,7 +132,7 @@ public class ApiClient {
 {{/useJacksonConversion}}
 
     @Autowired
-    public ApiClient({{#restTemplateBeanName}}@Qualifier({{restTemplateBeanName}}) {{/restTemplateBeanName}}RestTemplate restTemplate) {
+    public ApiClient({{#restTemplateBeanName}}@Qualifier("{{restTemplateBeanName}}") {{/restTemplateBeanName}}RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
         init();
     }
