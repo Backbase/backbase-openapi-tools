@@ -18,6 +18,10 @@ public class BoatCodegenResponse extends CodegenResponse {
         return examples != null && !examples.isEmpty();
     }
 
+    public boolean hasEmptyBody() {
+        return this.code.equals("204") && !this.hasExamples();
+    }
+
     public BoatCodegenResponse(CodegenResponse o, String responseCode, ApiResponse response, OpenAPI openAPI) {
         this.headers.addAll(o.headers);
         this.code = o.code;
