@@ -36,6 +36,14 @@ paths:
             text/csv:
               schema:
                 type: file
+        500:
+          content:
+            application/json:
+              example:
+                $ref: '#/components/examples/InternalServerError'
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+          description: InternalServerError
         default:
           description: unexpected error
           content:
@@ -110,5 +118,12 @@ components:
         code:
           type: integer
           format: int32
+        message:
+          type: string
+    InternalServerError:
+      type: object
+      required:
+        - message
+      properties:
         message:
           type: string
