@@ -90,7 +90,7 @@ public class BundleMojoTest {
     }
 
     @Test
-    public void testSetVersionAtribute() throws MojoFailureException, MojoExecutionException, IOException {
+    void testSetVersionAttribute() throws MojoFailureException, MojoExecutionException, IOException {
         File output = getFile("/readWriteFiles/output.yaml");
         BundleMojo mojo = new BundleMojo();
         mojo.setVersion("3.0.0");

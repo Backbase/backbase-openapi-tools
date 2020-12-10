@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings({"java:S3740", "rawtypes"})
 public class Deprecator implements Transformer {
 
+    @SuppressWarnings("java:S5411")
     @Override
     public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 

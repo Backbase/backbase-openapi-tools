@@ -18,8 +18,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DereferenceComponentsPropertiesTransformerTests {
 
@@ -119,7 +118,12 @@ class DereferenceComponentsPropertiesTransformerTests {
 
         openAPI.setComponents(new Components().schemas(schemas));
 
-        assertThrows(TransformerException.class,   ()->     new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap()));
+        try {
+            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+            fail("expected TransformerException to be thrown");
+        }catch (TransformerException e){
+            assertEquals("No component schema found by name #/components/schemas/ref",e.getMessage());
+        }
     }
 
 
