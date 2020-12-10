@@ -29,17 +29,28 @@ types:
       age: number
       birthday: date-only
       other: any
-
   Address:
     properties:
       street: string
       city: string
+    examples:
+      example1:
+        strict: false
+        value:
+          street: "sweetums"
+          city: "Pawnee"
+      example2:
+        strict: false
+        value:
+          street: "copy paper"
+          city: "Staples"
   customFile:
       type: file
       fileTypes: ['*/*'] # any file type allowed
       maxLength: 1048576
   unionType:
     type: integer|boolean
+
   CustomDate:
       type: datetime-only
       facets:
