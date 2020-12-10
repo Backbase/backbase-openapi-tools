@@ -1,9 +1,5 @@
 package com.backbase.oss.boat;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,23 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
-import org.apache.maven.shared.invoker.DefaultInvoker;
-import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.Disabled;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 @Slf4j
 public class GeneratorTests {
 
-    // @Test
+    @Test
     public void testHtml2() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
@@ -268,14 +258,14 @@ public class GeneratorTests {
         mojo.generateAliasAsModel = false;
         mojo.execute();
 
-        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-        invocationRequest.setPomFile(new File(output, "pom.xml"));
-        invocationRequest.setGoals(Arrays.asList("compile"));
-        invocationRequest.setBatchMode(true);
-
-        Invoker invoker = new DefaultInvoker();
-        InvocationResult invocationResult = invoker.execute(invocationRequest);
-        assertNull(invocationResult.getExecutionException());
+//        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+//        invocationRequest.setPomFile(new File(output, "pom.xml"));
+//        invocationRequest.setGoals(Arrays.asList("compile"));
+//        invocationRequest.setBatchMode(true);
+//
+//        Invoker invoker = new DefaultInvoker();
+//        InvocationResult invocationResult = invoker.execute(invocationRequest);
+//        assertNull(invocationResult.getExecutionException());
 
     }
 
