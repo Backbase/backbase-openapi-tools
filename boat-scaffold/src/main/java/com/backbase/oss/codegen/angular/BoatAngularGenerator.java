@@ -117,10 +117,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(key, whenProvided, null);
     }
 
-    private void processOpt(String key, Runnable whenProvided) {
-        processOpt(key, value -> whenProvided.run());
-    }
-
     private void processOpt(String key, Consumer<String> whenProvided, Runnable notProvided) {
         if (additionalProperties.containsKey(key)) {
             whenProvided.accept(additionalProperties.get(key).toString());
@@ -187,7 +183,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
         });
-        processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
+        processOpt(BUILD_DIST,
+                value -> additionalProperties.put(BUILD_DIST, value),
+                () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
