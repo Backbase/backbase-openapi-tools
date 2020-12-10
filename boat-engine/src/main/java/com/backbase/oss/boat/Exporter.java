@@ -330,7 +330,7 @@ public class Exporter {
         return Collections.singletonList(new Tag().name(title));
     }
 
-    private String cleanupMarkdownString(String value) {
+    protected static String cleanupMarkdownString(String value) {
         StringBuilder stringBuilder = new StringBuilder();
         String[] lines = value.split(NEW_LINE);
         for (int i = 0; i < lines.length; i++) {

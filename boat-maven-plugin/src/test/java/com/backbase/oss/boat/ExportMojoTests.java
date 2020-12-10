@@ -101,7 +101,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testErrorCatching(){
+    void testErrorCatching(){
         ExportMojo mojo = new ExportMojo();
         mojo.inputFile=null;
         // tests for valid file path that contains no raml spec
