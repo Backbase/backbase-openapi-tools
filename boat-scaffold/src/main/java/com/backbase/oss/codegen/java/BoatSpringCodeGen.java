@@ -1,16 +1,10 @@
 package com.backbase.oss.codegen.java;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.stream.IntStream;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +14,10 @@ import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
     public static final String NAME = "boat-spring";
@@ -158,6 +156,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
+
+        if (this.reactive) {
+            this.useSetForUniqueItems = false;
+        }
 
         this.supportingFiles.stream()
             .filter(sf -> "apiUtil.mustache".equals(sf.templateFile))
