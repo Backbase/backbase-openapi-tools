@@ -21,3 +21,52 @@ paths:
     $ref: paths/map-types.yaml
   /map-types/{id}/{ids}:
     $ref: paths/map-types-ids.yaml
+  /transactions:
+    patch:
+      tags:
+      - transactions
+      summary: patch
+      description: Updates list of transactions
+      operationId: patchTransactions
+      requestBody:
+        description: Updates list of transactions
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionsPatchRequestBody'
+      responses:
+        "204":
+          description: OK
+
+components:
+  schemas:
+    TransactionsPatchRequestBody:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          maxLength: 300
+          type: string
+          description: Unique identification for the transaction as used in the external
+            system
+        arrangementId:
+          maxLength: 50
+          type: string
+          description: An external reference to the arrangement the transaction belongs
+            to
+        category:
+          maxLength: 50
+          type: string
+          description: Transaction category
+        billingStatus:
+          maxLength: 8
+          type: string
+        creationTime:
+          type: string
+          format: date-time
+          x-java-type: java.time.OffsetDateTime
+      x-java-type: com.backbase.integration.transaction.external.rest.spec.v2.transactions.TransactionsPatchRequestBody
+  
