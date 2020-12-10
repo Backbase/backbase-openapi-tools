@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.11.3
+
+* *Angular Generator*
+  * Apply the correct return type when multiple responses are present
+  * Generate mocks for examples defined in dereferenced schemas
+  
 ## 0.11.1
 
 * *Java Generator - boat-spring library*
