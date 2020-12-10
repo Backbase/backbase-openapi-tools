@@ -8,6 +8,9 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.emptyMap;
@@ -15,6 +18,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class DereferenceComponentsPropertiesTransformerTests {
@@ -101,6 +105,24 @@ class DereferenceComponentsPropertiesTransformerTests {
             fail("Unexpected NullPointerException");
         }
     }
+
+    @Test
+    void testThrows(){
+        OpenAPI openAPI = new OpenAPI();
+
+        Map<String, Schema> properties = new HashMap<>();
+        properties.put("test-property", new Schema().name("test-property").$ref("ref"));
+
+        Map<String, Schema> schemas = new HashMap<>();
+        Schema schema = new Schema().name("test-schema2").properties(properties);
+        schemas.put("test-schema",schema);
+
+        openAPI.setComponents(new Components().schemas(schemas));
+
+        assertThrows(TransformerException.class,   ()->     new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap()));
+    }
+
+
 
     private Schema getProperty(OpenAPI openAPI, String direct, String component) {
         return (Schema) openAPI.getComponents().getSchemas().get(component).getProperties().get(direct);
