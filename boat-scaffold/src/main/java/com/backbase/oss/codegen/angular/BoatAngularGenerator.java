@@ -253,6 +253,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
 
         codegenOperation.responses.stream()
+                .filter(codegenResponse -> codegenResponse.is2xx)
                 .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
                 .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
 
