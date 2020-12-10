@@ -1,18 +1,21 @@
 package com.backbase.oss.boat;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.junit.jupiter.api.Test;
-import org.sonatype.plexus.build.incremental.DefaultBuildContext;
-
-import java.io.File;
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.Test;
+import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 @Slf4j
 public class GeneratorTests {
@@ -46,7 +49,7 @@ public class GeneratorTests {
 
     }
 
-    @Test
+    // @Test
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
@@ -224,6 +227,44 @@ public class GeneratorTests {
         Arrays.sort(actualFilesGenerated);
         String[] expected = {".openapi-generator",".openapi-generator-ignore","api","gradle","src"};
         assertArrayEquals(expected,actualFilesGenerated);
+
+    }
+
+    @Test
+    public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
+        GenerateMojo mojo = new GenerateMojo();
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        File input = new File(spec);
+        File output = new File("target/javaclient");
+        if (output.exists()) {
+            output.delete();
+        }
+        output.mkdirs();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+        mojo.generatorName = "java";
+        mojo.library = "native";
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.skipOverwrite  = false;
+        mojo.generateAliasAsModel = false;
+        mojo.execute();
+
+//        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+//        invocationRequest.setPomFile(new File(output, "pom.xml"));
+//        invocationRequest.setGoals(Arrays.asList("compile"));
+//        invocationRequest.setBatchMode(true);
+//
+//        Invoker invoker = new DefaultInvoker();
+//        InvocationResult invocationResult = invoker.execute(invocationRequest);
+//        assertNull(invocationResult.getExecutionException());
 
     }
 
