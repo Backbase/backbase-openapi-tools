@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.openapitools.codegen.utils.StringUtils.*;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 @Slf4j
 public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
@@ -253,6 +253,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
 
         codegenOperation.responses.stream()
+                .filter(codegenResponse -> codegenResponse.is2xx)
                 .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
                 .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
 
@@ -567,4 +568,5 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
+
 }
