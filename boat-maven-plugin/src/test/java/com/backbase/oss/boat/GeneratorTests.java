@@ -48,7 +48,6 @@ public class GeneratorTests {
     }
 
     @Test
-    @Disabled
     public void testBoatDocs() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
