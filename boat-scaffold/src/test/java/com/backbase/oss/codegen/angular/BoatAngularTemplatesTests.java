@@ -1,33 +1,5 @@
 package com.backbase.oss.codegen.angular;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,6 +13,32 @@ import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
 /**
  * These tests verifies that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
@@ -49,6 +47,12 @@ public class BoatAngularTemplatesTests {
     static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-angular-templates-tests");
+    /**
+     * the actual testing code
+     **/
+
+    private Combination param;
+    private List<File> files;
 
     @BeforeAll
     static public void setUpClass() throws IOException {
@@ -56,95 +60,25 @@ public class BoatAngularTemplatesTests {
         FileUtils.deleteDirectory(new File(TEST_OUTPUT));
     }
 
-    static class Combination {
-        static final String[] CASES = {"nom", "reg", "mck", "pir", "amp", "srv"};
-
-
-        final String name;
-        final boolean npmRepository;
-        final boolean npmName;
-        final boolean withMocks;
-        final boolean providedInRoot;
-        final boolean apiModulePrefix;
-        final boolean serviceSuffix;
-
-        Combination(int mask) {
-            this.name = caseName(mask);
-            this.npmName = (mask & 1) != 0;
-            this.npmRepository = (mask & 1 << 1) != 0;
-            this.withMocks = (mask & 1 << 2) != 0;
-            this.providedInRoot = (mask & 1 << 3) != 0;
-            this.apiModulePrefix = (mask & 1 << 4) != 0;
-            this.serviceSuffix = (mask & 1 << 5) != 0;
-        }
-
-        static private String caseName(int mask) {
-            return mask == 0
-                ? "backbase"
-                : IntStream.range(0, CASES.length)
-                    .filter(n -> (mask & (1 << n)) != 0)
-                    .mapToObj(n -> CASES[n])
-                    .collect(joining("-", "backbase-", ""));
-        }
-
-
-        static Stream<Combination> combinations(boolean minimal) {
-            final List<Integer> cases = new ArrayList<>();
-
-            if (minimal) {
-                cases.add(0);
-            }
-
-            // generate all combinations
-            for (int mask = 0; mask < 1 << CASES.length; mask++) {
-                if (minimal && Integer.bitCount(mask) != 1) {
-                    continue;
-                }
-
-                cases.add(mask);
-            }
-
-            if (minimal) {
-                cases.add(-1);
-            }
-
-            return cases.stream().map(Combination::new);
-        }
-    }
-
-    /**
-     * dynamic suite creation
-     **/
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface Check {
-    }
-
-
     @TestFactory
     Stream<DynamicNode> withCombinations() {
         return Combination
-            .combinations(PROP_FAST)
-            .map(param -> dynamicContainer(param.name, testStream(param)));
+                .combinations(PROP_FAST)
+                .map(param -> dynamicContainer(param.name, testStream(param)));
     }
 
     Stream<DynamicTest> testStream(BoatAngularTemplatesTests.Combination param) {
         return concat(
-            Stream.of(dynamicTest("generate", () -> generate(param))),
-            stream(getClass().getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(BoatAngularTemplatesTests.Check.class))
-                .map(m -> dynamicTest(m.getName(), () -> invoke(m))));
+                Stream.of(dynamicTest("generate", () -> generate(param))),
+                stream(getClass().getDeclaredMethods())
+                        .filter(m -> m.isAnnotationPresent(BoatAngularTemplatesTests.Check.class))
+                        .map(m -> dynamicTest(m.getName(), () -> invoke(m))));
     }
 
     @SneakyThrows
     private void invoke(Method m) {
         m.invoke(this);
     }
-
-    /** the actual testing code **/
-
-    private Combination param;
-    private List<File> files;
 
     void generate(Combination param) {
         this.param = param;
@@ -159,52 +93,52 @@ public class BoatAngularTemplatesTests {
     @Check
     public void npmName() {
         assertThat(
-            findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
-            equalTo(this.param.npmName));
+                findPattern(selectFiles("/package\\.json$"), "\"name\": \"@example/angular-http\""),
+                equalTo(this.param.npmName));
     }
 
     @Check
     public void npmRepository() {
         assertThat(
-            findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
-            equalTo(this.param.npmRepository && this.param.npmName));
+                findPattern(selectFiles("/package\\.json$"), "\"registry\":"),
+                equalTo(this.param.npmRepository && this.param.npmName));
     }
 
     @Check
     public void withMocks() {
         assertThat(
-            findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
-            equalTo(this.param.withMocks));
+                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
+                equalTo(this.param.withMocks));
     }
 
     @Check
     public void providedInRoot() {
         assertThat(
-            findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
-            equalTo(this.param.providedInRoot));
+                findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
+                equalTo(this.param.providedInRoot));
         assertThat(
-            findPattern("/api\\.module\\.ts$", "providers: \\[]"),
-            equalTo(this.param.providedInRoot));
+                findPattern("/api\\.module\\.ts$", "providers: \\[]"),
+                equalTo(this.param.providedInRoot));
     }
 
     @Check
     public void apiModulePrefix() {
         assertThat(
-            findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
-            equalTo(this.param.apiModulePrefix));
+                findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
+                equalTo(this.param.apiModulePrefix));
         assertThat(
-            findPattern("/api\\.module\\.ts$", "export class ApiModule"),
-            equalTo(!this.param.apiModulePrefix));
+                findPattern("/api\\.module\\.ts$", "export class ApiModule"),
+                equalTo(!this.param.apiModulePrefix));
     }
 
     @Check
     public void serviceSuffix() {
         assertThat(
-            findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
-            equalTo(this.param.serviceSuffix));
+                findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
+                equalTo(this.param.serviceSuffix));
         assertThat(
-            findPattern("/api/.+\\.service.ts$", "export class .*Service "),
-            equalTo(!this.param.serviceSuffix));
+                findPattern("/api/.+\\.service.ts$", "export class .*Service "),
+                equalTo(!this.param.serviceSuffix));
     }
 
     private boolean findPattern(String filePattern, String linePattern) {
@@ -216,16 +150,16 @@ public class BoatAngularTemplatesTests {
     private List<String> selectFiles(String filePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
         return this.files.stream()
-            .map(File::getPath)
-            .map(path -> path.replace(File.separatorChar, '/'))
-            .filter(fileMatch)
-            .collect(toList());
+                .map(File::getPath)
+                .map(path -> path.replace(File.separatorChar, '/'))
+                .filter(fileMatch)
+                .collect(toList());
     }
 
     private boolean findPattern(List<String> selection, String linePattern) {
         final Predicate<String> lineMatch = Pattern.compile(linePattern).asPredicate();
         return selection.stream()
-            .anyMatch(file -> contentMatches(file, lineMatch));
+                .anyMatch(file -> contentMatches(file, lineMatch));
     }
 
     @SneakyThrows
@@ -269,6 +203,17 @@ public class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.SERVICE_SUFFIX, "Gateway");
         }
 
+        if (!Objects.isNull(this.param.ngVersion)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.NG_VERSION, this.param.ngVersion);
+        }
+        if (!Objects.isNull(this.param.foundationVersion)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.FOUNDATION_VERSION, this.param.foundationVersion);
+        }
+
+        if (!Objects.isNull(this.param.buildDist)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.BUILD_DIST, this.param.buildDist);
+        }
+
         final String destPackage = this.param.name.replace('-', '.') + ".";
 
         cf.setApiPackage(destPackage + "api");
@@ -281,5 +226,75 @@ public class BoatAngularTemplatesTests {
         final ClientOptInput coi = cf.toClientOptInput();
 
         return new DefaultGenerator().opts(coi).generate();
+    }
+
+    /**
+     * dynamic suite creation
+     **/
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Check {
+    }
+
+    static class Combination {
+        static final String[] CASES = {"nom", "reg", "mck", "pir", "amp", "srv"};
+
+
+        final String name;
+        final String ngVersion;
+        final String foundationVersion;
+        final String buildDist;
+        final boolean npmRepository;
+        final boolean npmName;
+        final boolean withMocks;
+        final boolean providedInRoot;
+        final boolean apiModulePrefix;
+        final boolean serviceSuffix;
+
+        Combination(int mask) {
+            this.name = caseName(mask);
+            this.ngVersion = mask == 0 ? "10.0.0" : mask == 1 ? "11.0.0" : null;
+            this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
+            this.buildDist = mask > 0 ? caseName(mask) : null;
+            this.npmName = (mask & 1) != 0;
+            this.npmRepository = (mask & 1 << 1) != 0;
+            this.withMocks = (mask & 1 << 2) != 0;
+            this.providedInRoot = (mask & 1 << 3) != 0;
+            this.apiModulePrefix = (mask & 1 << 4) != 0;
+            this.serviceSuffix = (mask & 1 << 5) != 0;
+        }
+
+        static private String caseName(int mask) {
+            return mask == 0
+                    ? "backbase"
+                    : IntStream.range(0, CASES.length)
+                    .filter(n -> (mask & (1 << n)) != 0)
+                    .mapToObj(n -> CASES[n])
+                    .collect(joining("-", "backbase-", ""));
+        }
+
+
+        static Stream<Combination> combinations(boolean minimal) {
+            final List<Integer> cases = new ArrayList<>();
+
+            if (minimal) {
+                cases.add(0);
+            }
+
+            // generate all combinations
+            for (int mask = 0; mask < 1 << CASES.length; mask++) {
+                if (minimal && Integer.bitCount(mask) != 1) {
+                    continue;
+                }
+
+                cases.add(mask);
+            }
+
+            if (minimal) {
+                cases.add(-1);
+            }
+
+            return cases.stream().map(Combination::new);
+        }
     }
 }
