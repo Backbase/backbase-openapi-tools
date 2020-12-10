@@ -207,7 +207,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (boatCodegenParameter.examples == null) {
             boatCodegenParameter.examples = new ArrayList<>();
         }
-        BoatExampleUtils.convertExamples(mediaType,contentType, boatCodegenParameter.examples);
+        BoatExampleUtils.convertExamples(openAPI, mediaType,contentType, boatCodegenParameter.examples);
         BoatExampleUtils.inlineExamples(boatCodegenParameter.paramName, boatCodegenParameter.examples, openAPI);
     }
 
