@@ -25,6 +25,12 @@ export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}
                     },
                 {{/isJson}}
             {{/examples}}
+            {{#hasEmptyBody}}
+                {
+                status: {{{code}}},
+                body: ""
+                },
+            {{/hasEmptyBody}}
         {{/responses}}
     ]
 }]);
