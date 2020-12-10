@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.apache.maven.shared.invoker.*;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import java.io.File;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class GeneratorTests {
@@ -231,7 +230,6 @@ public class GeneratorTests {
     }
 
     @Test
-    @Disabled
     public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
@@ -258,14 +256,14 @@ public class GeneratorTests {
         mojo.generateAliasAsModel = false;
         mojo.execute();
 
-//        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-//        invocationRequest.setPomFile(new File(output, "pom.xml"));
-//        invocationRequest.setGoals(Arrays.asList("compile"));
-//        invocationRequest.setBatchMode(true);
-//
-//        Invoker invoker = new DefaultInvoker();
-//        InvocationResult invocationResult = invoker.execute(invocationRequest);
-//        assertNull(invocationResult.getExecutionException());
+        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+        invocationRequest.setPomFile(new File(output, "pom.xml"));
+        invocationRequest.setGoals(Arrays.asList("compile"));
+        invocationRequest.setBatchMode(true);
+
+        Invoker invoker = new DefaultInvoker();
+        InvocationResult invocationResult = invoker.execute(invocationRequest);
+        assertNull(invocationResult.getExecutionException());
 
     }
 
