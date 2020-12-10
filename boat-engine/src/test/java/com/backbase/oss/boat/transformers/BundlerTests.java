@@ -34,8 +34,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class BundlerTests {
@@ -62,8 +61,13 @@ class BundlerTests {
         OpenAPI openAPI = OpenAPILoader.load(input);
 
         BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, spec));
-        assertThrows(TransformerException.class, () -> boatCache.loadRef("not exists", RefFormat.RELATIVE, Example.class));
 
+        try{
+            boatCache.loadRef("doesn't exist", RefFormat.RELATIVE, Example.class);
+            fail("expects TransformerException to be thrown");
+        }catch (TransformerException e){
+            assertEquals("Reference: doesn't exist cannot be loaded", e.getMessage());
+        }
 
     }
 
@@ -98,9 +102,13 @@ class BundlerTests {
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
+        try {
+            new Bundler(input).transform(openAPI, Collections.EMPTY_MAP);
+            fail("Expected TransformerException");
+        }catch (TransformerException e){
+            assertEquals("Unable to fix inline examples",e.getMessage());
+        }
 
-        assertThrows(TransformerException.class, () ->
-            new Bundler(input).transform(openAPI, Collections.emptyMap()));
     }
 
     @Test
@@ -120,8 +128,12 @@ class BundlerTests {
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
-
-        assertThrows(TransformerException.class, ()->new ExamplesProcessor(openAPI,file).processExamples(openAPI));
+        try {
+            new ExamplesProcessor(openAPI,file).processExamples(openAPI);
+            fail("Expected TransformerException");
+        }catch (TransformerException e){
+            assertEquals("Failed to process example content for ExampleHolder{name='example-in-components', ref=null}",e.getMessage());
+        }
 
 
     }

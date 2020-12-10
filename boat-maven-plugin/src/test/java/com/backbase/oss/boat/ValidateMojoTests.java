@@ -52,7 +52,7 @@ public class ValidateMojoTests {
     }
 
     @Test
-    public void testValidatingDirectory() throws MojoFailureException {
+    void testValidatingDirectory() throws MojoFailureException {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/").getFile());
 
         File input = new File(spec);
@@ -61,7 +61,9 @@ public class ValidateMojoTests {
         mojo.setInput(input);
         mojo.setFailOnWarning(true);
 
-        mojo.execute();
+
+        assertDoesNotThrow(()-> mojo.execute());
+
 
     }
 
