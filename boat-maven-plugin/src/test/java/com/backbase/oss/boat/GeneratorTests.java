@@ -12,10 +12,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class GeneratorTests {
@@ -256,6 +256,18 @@ public class GeneratorTests {
         mojo.skipOverwrite  = false;
         mojo.generateAliasAsModel = false;
         mojo.execute();
+        assertEquals(".openapi-generator-ignore," +
+                "pom.xml," +
+                "docs,README.md," +
+                "gradle,git_push.sh,gradlew," +
+                ".gitignore,build.gradle," +
+                ".openapi-generator," +
+                "api,gradle.properties," +
+                "gradlew.bat,settings.gradle," +
+                ".travis.yml," +
+                "build.sbt," +
+                "src",
+                String.join(",",output.list()));
 
 //        InvocationRequest invocationRequest = new DefaultInvocationRequest();
 //        invocationRequest.setPomFile(new File(output, "pom.xml"));
