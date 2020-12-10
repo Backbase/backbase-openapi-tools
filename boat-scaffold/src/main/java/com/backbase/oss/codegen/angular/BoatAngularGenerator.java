@@ -187,7 +187,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
         });
-        processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
+        processOpt(BUILD_DIST,
+                value -> additionalProperties.put(BUILD_DIST, value),
+                () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
