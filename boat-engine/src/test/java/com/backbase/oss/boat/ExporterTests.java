@@ -41,6 +41,13 @@ class ExporterTests extends AbstractBoatEngineTestBase {
         validateExport(export);
     }
 
+    @Test
+    void testDuplicateOperation() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api-duplicate-operation-id.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
 
 
     @Test
