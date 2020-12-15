@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ExportDependencyMojoTests {
 
     @Test
-    public void testAggregatedInputFile() throws MojoExecutionException, ExportException {
+    void testAggregatedInputFile() throws MojoExecutionException, ExportException {
 
         ExportDependenciesMojo mojo = new ExportDependenciesMojo();
 
@@ -65,7 +65,7 @@ public class ExportDependencyMojoTests {
     }
 
     @Test
-    public void testInputFile() throws MojoExecutionException, ExportException {
+    void testInputFile() throws MojoExecutionException, ExportException {
         String groupId = "test.groupId";
         String artifactId = "artifact-spec";
         String version = "2.19.0";
@@ -76,7 +76,7 @@ public class ExportDependencyMojoTests {
     }
 
     @Test
-    public void testInputFile2() throws MojoExecutionException, ExportException {
+    void testInputFile2() throws MojoExecutionException, ExportException {
         String groupId = "test.groupId";
         String artifactId = "artifact-specs";
         String version = "2.19.0";
