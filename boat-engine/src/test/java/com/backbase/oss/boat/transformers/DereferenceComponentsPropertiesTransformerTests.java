@@ -117,9 +117,9 @@ class DereferenceComponentsPropertiesTransformerTests {
         schemas.put("test-schema",schema);
 
         openAPI.setComponents(new Components().schemas(schemas));
-
+        DereferenceComponentsPropertiesTransformer transformer =new DereferenceComponentsPropertiesTransformer();
         try {
-            new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
+            transformer.transform(openAPI, emptyMap());
             fail("expected TransformerException to be thrown");
         }catch (TransformerException e){
             assertEquals("No component schema found by name #/components/schemas/ref",e.getMessage());

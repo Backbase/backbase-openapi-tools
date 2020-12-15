@@ -30,8 +30,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
@@ -102,8 +101,9 @@ class BundlerTests {
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
+        Bundler bundler = new Bundler(input);
         try {
-            new Bundler(input).transform(openAPI, Collections.EMPTY_MAP);
+            bundler.transform(openAPI, Collections.EMPTY_MAP);
             fail("Expected TransformerException");
         }catch (TransformerException e){
             assertEquals("Unable to fix inline examples",e.getMessage());
@@ -128,8 +128,9 @@ class BundlerTests {
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
+        ExamplesProcessor examplesProcessor = new ExamplesProcessor(openAPI,file);
         try {
-            new ExamplesProcessor(openAPI,file).processExamples(openAPI);
+            examplesProcessor.processExamples(openAPI);
             fail("Expected TransformerException");
         }catch (TransformerException e){
             assertEquals("Failed to process example content for ExampleHolder{name='example-in-components', ref=null}",e.getMessage());
