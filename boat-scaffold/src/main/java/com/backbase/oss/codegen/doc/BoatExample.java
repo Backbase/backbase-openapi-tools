@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+
 @Data
 @Slf4j
 public class BoatExample {
@@ -33,7 +35,8 @@ public class BoatExample {
     }
 
     public String getPrettyPrintValue() {
-        if (example.getValue() instanceof JsonNode) {
+        if (example.getValue() instanceof JsonNode
+                || example.getValue() instanceof HashMap) {
             return Json.pretty(example.getValue());
         } else {
             return example.getValue().toString();

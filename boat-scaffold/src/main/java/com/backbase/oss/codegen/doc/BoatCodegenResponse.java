@@ -80,12 +80,11 @@ public class BoatCodegenResponse extends CodegenResponse {
         List<BoatExample> examples = new ArrayList<>();
         if (response.getContent() != null) {
             response.getContent().forEach((contentType, mediaType) -> {
-                BoatExampleUtils.convertExamples(mediaType, contentType, examples);
+                BoatExampleUtils.convertExamples(openAPI, mediaType, contentType, examples);
             });
             BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
 
             this.examples = examples;
-
         }
     }
 }
