@@ -34,4 +34,3 @@ hs_err_pid*
 .*
 # but not git dot files (e.g. .gitattribute)
 !.git?*
-pom.xml
