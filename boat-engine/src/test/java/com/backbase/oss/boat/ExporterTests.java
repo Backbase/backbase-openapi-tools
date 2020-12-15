@@ -14,6 +14,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,27 +137,13 @@ class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
 
-    @Test
-    void testBankingApi() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/raml-examples/others/banking-api/api.raml",
+            "/raml-examples/backbase-wallet/presentation-client-api.raml",
+            "/raml-examples/backbase-wallet/presentation-client-api-extension.raml"})
+    void testExportWithDifferentApis(String apiFile) throws Exception {
 
-        File inputFile = getFile("/raml-examples/others/banking-api/api.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
-        String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
-    }
-
-    @Test
-    void testBackbaseWalletApi() throws Exception {
-
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
-        String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
-    }
-
-    @Test
-    void testExtensionExport() throws ExportException, IOException {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api-extension.raml");
+        File inputFile = getFile(apiFile);
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
