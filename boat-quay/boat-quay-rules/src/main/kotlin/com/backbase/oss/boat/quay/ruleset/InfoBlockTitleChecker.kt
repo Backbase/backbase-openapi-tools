@@ -6,7 +6,7 @@ import org.zalando.zally.rule.api.*
 
 @Rule(
         ruleSet = BoatRuleSet::class,
-        id = "B004",
+        id = "B005",
         severity = Severity.MUST,
         title = "Check info block title format."
 )
