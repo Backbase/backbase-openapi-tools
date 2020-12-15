@@ -1,6 +1,7 @@
 package com.backbase.oss.boat.quay.ruleset
 
 import com.typesafe.config.Config
+import org.zalando.zally.core.toJsonPointer
 import org.zalando.zally.rule.api.*
 
 @Rule(
@@ -21,11 +22,12 @@ class InfoBlockTagsChecker(config: Config) {
     @Check(Severity.MUST)
     fun validate(context: Context): List<Violation>  {
         val validTags = productTags.union(informativeTags)
-        return context.api.tags
-                .filter { tag -> !validTags.contains(tag.name)
-                }
-                .map {
-                    context.violation("Tag name is not allowed: ${it.name}. Only $validTags are allowed", context.api.tags)
+        if(context.api.tags == null) {
+            return listOf(context.violation("tags are required", "/openapi/info/tags".toJsonPointer()))
+        }
+        return context.api.tags.filter { tag -> !validTags.contains(tag.name)
+                }.map {
+                    context.violation("tag name is not allowed: ${it.name}. Only $validTags are allowed", context.api.tags)
                 }
     }
 }
