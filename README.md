@@ -23,7 +23,10 @@ BOAT is still under development and subject to change.
 * *Java Templates*
   * Correct the import and use of @Qualifier in ApiClient template
   * Only change base type when date useSetForUniqueNames is set true
-
+    
+* *Boat Docs*
+  * Handle examples for MediaTypes without Schemas (such as text/csv)
+  
 ## 0.11.3
 
 * *Angular Generator*
