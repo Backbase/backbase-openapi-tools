@@ -22,7 +22,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testInputDirectoryAndOutputFile() {
+    void testInputDirectoryAndOutputFile() {
         BundleMojo mojo = new BundleMojo();
         mojo.setInput(new File("."));
         mojo.setOutput(new File("target/testInputDirectoryAndOutputFile.yaml"));
@@ -32,7 +32,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testSkip() {
+    void testSkip() {
         BundleMojo mojo = new BundleMojo();
         mojo.setSkip(true);
         mojo.setInput(new File("target/testInputDirectoryAndOutputFile.yaml"));
@@ -46,7 +46,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testBundleFolder() {
+    void testBundleFolder() {
         BundleMojo mojo = new BundleMojo();
 
         mojo.setInput(new File(getClass().getResource("/bundler/folder/one-client-api-v1.yaml").getFile())
@@ -63,7 +63,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testVersionFileName() {
+    void testVersionFileName() {
         BundleMojo mojo = new BundleMojo();
 
         assertEquals(
@@ -73,7 +73,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testNoInfoInApi() {
+    void testNoInfoInApi() {
         BundleMojo mojo = new BundleMojo();
 
         assertThrows(MojoExecutionException.class, () ->
@@ -82,7 +82,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testNoVersionInfoInApi() {
+    void testNoVersionInfoInApi() {
         BundleMojo mojo = new BundleMojo();
 
         assertThrows(MojoExecutionException.class, () ->
@@ -104,7 +104,7 @@ public class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    public void testInvalidVersionInApi() {
+    void testInvalidVersionInApi() {
         BundleMojo mojo = new BundleMojo();
 
         OpenAPI openAPI = new OpenAPI();

@@ -6,6 +6,11 @@
       "type": "string"
     }
   },
+  "examples": {
+    "example": {
+      "message": "unauthorized "
+    }
+  },
   "required": [
     "message"
   ]

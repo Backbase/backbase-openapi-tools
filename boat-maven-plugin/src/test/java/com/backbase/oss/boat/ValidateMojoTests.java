@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ValidateMojoTests {
 
     @Test
-    public void testValidation() throws MojoFailureException {
+    void testValidation() throws MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -27,7 +27,7 @@ public class ValidateMojoTests {
     }
 
     @Test
-    public void testValidationCatches() throws MojoFailureException, MojoExecutionException{
+    void testValidationCatches() throws MojoFailureException, MojoExecutionException{
 
 
         ValidateMojo mojo = new ValidateMojo();
