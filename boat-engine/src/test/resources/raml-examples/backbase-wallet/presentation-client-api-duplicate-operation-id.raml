@@ -127,9 +127,20 @@ securedBy: [ bb.bbAccessControl ]
         type: string
         examples:
           example: "1890-8541-0423"
-    get:
-      responses:
-        200:
-          body:
+    /{songId}:
+      get:
+        responses:
+          200:
+            body:
+              application/xml:
+                schema: !include schemas/body/song.xsd
+      /customer:
+       post:
+         body:
             application/xml:
-              schema: !include schemas/body/song.xsd
+              schema: !include schemas/body/request.xsd
+         responses:
+           200:
+            body:
+              application/xml:
+                type: Person | nil
