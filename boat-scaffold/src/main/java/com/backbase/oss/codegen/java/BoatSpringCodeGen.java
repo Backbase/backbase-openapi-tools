@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import static java.util.Optional.ofNullable;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import java.io.IOException;
@@ -9,9 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
@@ -161,10 +164,11 @@ public class BoatSpringCodeGen extends SpringCodegen {
             this.useSetForUniqueItems = false;
         }
 
-        this.supportingFiles.stream()
-            .filter(sf -> "apiUtil.mustache".equals(sf.templateFile))
-            .findAny()
-            .ifPresent(this.supportingFiles::remove);
+        writePropertyBack("useApiUtil",
+            ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
+                .map(StringUtils::trimToNull)
+                .map(s -> s.contains("ApiUtil.java"))
+                .orElse(true));
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);

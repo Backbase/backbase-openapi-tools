@@ -70,7 +70,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nbl", "wth");
+        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nul", "wth", "utl");
 
         final String name;
 
@@ -84,6 +84,7 @@ class BoatSpringTemplatesTests {
         final boolean useWithModifiers;
 
         final boolean reactive;
+        final boolean apiUtil;
 
         Combination(int mask) {
             this.name = mask == 0
@@ -101,6 +102,7 @@ class BoatSpringTemplatesTests {
             this.useSetForUniqueItems = (mask & 1 << CASES.indexOf("unq")) != 0;
             this.useWithModifiers = (mask & 1 << CASES.indexOf("wth")) != 0;
             this.reactive = (mask & 1 << CASES.indexOf("flx")) != 0;
+            this.apiUtil = (mask & 1 << CASES.indexOf("utl")) != 0;
         }
 
         static Stream<Combination> combinations(boolean minimal) {
@@ -120,6 +122,8 @@ class BoatSpringTemplatesTests {
             }
 
             if (minimal) {
+                cases.add(-1 & ~(1 << CASES.indexOf("flx")));
+                cases.add(-1 & ~(1 << CASES.indexOf("utl")));
                 cases.add(-1);
             }
 
@@ -262,7 +266,12 @@ class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODELS, "");
         GlobalSettings.setProperty(CodegenConstants.MODEL_TESTS, "true");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
-        GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "");
+
+        if (this.param.apiUtil) {
+            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml");
+        } else {
+            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
+        }
 
         gcf.setApiNameSuffix("-api");
         gcf.setModelNameSuffix(this.param.name);
@@ -288,7 +297,7 @@ class BoatSpringTemplatesTests {
         gcf.addAdditionalProperty(SpringCodegen.CONFIG_PACKAGE, destPackage + "config");
 
         gcf.addAdditionalProperty(CodegenConstants.HIDE_GENERATION_TIMESTAMP, true);
-        gcf.addAdditionalProperty(SpringCodegen.INTERFACE_ONLY, true);
+        gcf.addAdditionalProperty(SpringCodegen.INTERFACE_ONLY, false);
         gcf.addAdditionalProperty(SpringCodegen.USE_TAGS, true);
         gcf.addAdditionalProperty(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
         gcf.addAdditionalProperty(CodegenConstants.ARTIFACT_ID, "boat-templates-tests");
@@ -302,6 +311,15 @@ class BoatSpringTemplatesTests {
             + "            <groupId>jakarta.servlet</groupId>\n"
             + "            <artifactId>jakarta.servlet-api</artifactId>\n"
             + "            <version>4.0.4</version>\n"
+            + "        </dependency>\n"
+            + "        <dependency>\n"
+            + "            <groupId>org.springframework.boot</groupId>\n"
+            + "            <artifactId>spring-boot-starter-webflux</artifactId>\n"
+            + "        </dependency>\n"
+            + "        <dependency>\n"
+            + "            <groupId>org.openapitools</groupId>\n"
+            + "            <artifactId>jackson-databind-nullable</artifactId>\n"
+            + "            <version>0.2.1</version>\n"
             + "        </dependency>\n"
             + "");
 
