@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.openapitools.codegen.utils.StringUtils.*;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 @Slf4j
 public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
@@ -117,10 +117,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(key, whenProvided, null);
     }
 
-    private void processOpt(String key, Runnable whenProvided) {
-        processOpt(key, value -> whenProvided.run());
-    }
-
     private void processOpt(String key, Consumer<String> whenProvided, Runnable notProvided) {
         if (additionalProperties.containsKey(key)) {
             whenProvided.accept(additionalProperties.get(key).toString());
@@ -187,7 +183,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             serviceSuffix = value;
             validateClassSuffixArgument("Service", serviceSuffix);
         });
-        processOpt(BUILD_DIST, () -> additionalProperties.put(BUILD_DIST, "dist"));
+        processOpt(BUILD_DIST,
+                value -> additionalProperties.put(BUILD_DIST, value),
+                () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
@@ -255,6 +253,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
 
         codegenOperation.responses.stream()
+                .filter(codegenResponse -> codegenResponse.is2xx)
                 .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
                 .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
 
@@ -569,4 +568,5 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
+
 }

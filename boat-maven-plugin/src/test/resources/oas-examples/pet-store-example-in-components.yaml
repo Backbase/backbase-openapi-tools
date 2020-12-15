@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /first:
+    get:
+      operationId: getFirst
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+  /second:
+    get:
+      operationId: getSecond
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+components:
+  schemas:
+    LegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
