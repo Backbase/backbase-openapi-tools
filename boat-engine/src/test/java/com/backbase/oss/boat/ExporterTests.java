@@ -14,7 +14,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,6 +154,14 @@ class ExporterTests extends AbstractBoatEngineTestBase {
         validateExport(export);
     }
 
+    @Test
+    void testExtensionExport() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api-extension.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
 
     @ParameterizedTest
     @CsvSource({
@@ -171,6 +178,10 @@ class ExporterTests extends AbstractBoatEngineTestBase {
         }
 
     }
+
+//    void testExporterBodyConversion(){
+//        new Exporter().convertExamples();
+//    }
 
     protected SwaggerParseResult validateExport(String export) throws IOException, ExportException {
         if (export == null) {

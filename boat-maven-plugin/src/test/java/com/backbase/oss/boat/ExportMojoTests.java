@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ExportMojoTests {
 
     @Test
-    public void testInputFile() throws MojoExecutionException {
+    void testInputFile() throws MojoExecutionException {
 
         ExportMojo mojo = new ExportMojo();
 
@@ -45,7 +45,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testLicenceAdder() throws MojoExecutionException, OpenAPILoaderException {
+    void testLicenceAdder() throws MojoExecutionException, OpenAPILoaderException {
 
         ExportMojo mojo = new ExportMojo();
 
@@ -76,7 +76,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testInputDir() throws MojoExecutionException {
+    void testInputDir() throws MojoExecutionException {
         ExportMojo mojo = new ExportMojo();
 
         File input = getFile("/raml-examples/backbase-wallet");

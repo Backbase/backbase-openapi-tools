@@ -30,8 +30,8 @@
     "nameOnCard": {
       "type": "string"
     },
-    "creationDate" : { 
-      "type":"string", 
+    "creationDate" : {
+      "type":"string",
       "format":"date-time"
     },
     "balance" : {
