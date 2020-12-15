@@ -42,7 +42,7 @@ public class GenerateMojoTests {
 
         String testRoot = mojo.project.getTestCompileSourceRoots().get(testRoots);
 
-        assertThat(testRoot, endsWith("/here-i-am"));
+        assertThat(testRoot, endsWith(File.separator + "here-i-am"));
     }
 
     @Test
