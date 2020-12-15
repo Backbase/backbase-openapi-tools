@@ -23,6 +23,7 @@
         <module>raml-2-openapi-generate-webclient-embedded</module>
         <module>raml-2-openapi-generate-doc</module>
         <module>raml-2-openapi-generate-yard</module>
+        <module>generate-supporting-files</module>
     </modules>
 
    <build>
