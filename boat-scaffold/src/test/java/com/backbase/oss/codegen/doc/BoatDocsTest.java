@@ -6,63 +6,30 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@SuppressWarnings("InfiniteLoopStatement")
 @Slf4j
 class BoatDocsTest {
-
-    static void main(String[] args) {
-
-        try {
-
-            WatchService watcher = FileSystems.getDefault().newWatchService();
-            File templates = new File(System.getProperty("templates"));
-
-            templates.toPath().register(watcher, ENTRY_CREATE,
-                ENTRY_DELETE,
-                ENTRY_MODIFY);
-
-            generateDocs();
-
-            WatchKey key;
-            while ((key = watcher.take()) != null) {
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    System.out.println("Event kind:" + event.kind() + ". File affected: " + event.context() + ".");
-                    new Thread(BoatDocsTest::generateDocs).start();
-
-                }
-                key.reset();
-
-            }
-
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+    @Test
+    void testGenerate()  {
+        String spec = System.getProperty("spec");
+        if (spec != null) {
+            generateDocs(new File(spec));
+        } else {
+            generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
-
     }
-
     @Test
     void testGenerateDocs() throws IOException {
-        System.setProperty("spec", getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml").getAbsolutePath());
-        generateDocs();
+        generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
 
         File output = new File("target/docs/");
         String[] actualDirectorySorted = output.list();
@@ -76,8 +43,7 @@ class BoatDocsTest {
 
     @Test
     void testGenerateDocsQuery() throws IOException {
-        System.setProperty("spec", getFile("/oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
-        generateDocs();
+        generateDocs(getFile("/oas-examples/petstore-query-string-array.yaml"));
         File output = new File("target/docs/");
         String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
@@ -96,11 +62,8 @@ class BoatDocsTest {
     }
 
 
-    private static void generateDocs() {
-
-
-        File spec = new File(System.getProperty("spec"));
-
+    private static void generateDocs(File spec) {
+        log.info("Generate docs for: {}", spec);
         OpenAPI openAPI = null;
         try {
             openAPI = OpenAPILoader.load(spec, true, true);
