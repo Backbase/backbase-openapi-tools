@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.11.3</version>
+        <version>0.11.4</version>
     </parent>
     <artifactId>boat-scaffold</artifactId>
 
@@ -117,28 +117,28 @@
                 </configuration>
             </plugin>
 
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-invoker-plugin</artifactId>
-               <executions>
-                   <execution>
-                       <phase>integration-test</phase>
-                       <goals>
-                           <goal>install</goal>
-                           <goal>run</goal>
-                       </goals>
-                       <configuration>
-                           <skipInvocation>${skipTests}</skipInvocation>
-                           <projectsDirectory>target/boat-spring-templates-tests</projectsDirectory>
-                           <pomIncludes>
-                               <pomInclude>pom.xml</pomInclude>
-                           </pomIncludes>
-                           <streamLogs>true</streamLogs>
-                           <postBuildHookScript>compile</postBuildHookScript>
-                       </configuration>
-                   </execution>
-               </executions>
-           </plugin>
+<!--           <plugin>-->
+<!--               <groupId>org.apache.maven.plugins</groupId>-->
+<!--               <artifactId>maven-invoker-plugin</artifactId>-->
+<!--               <executions>-->
+<!--                   <execution>-->
+<!--                       <phase>integration-test</phase>-->
+<!--                       <goals>-->
+<!--                           <goal>install</goal>-->
+<!--                           <goal>run</goal>-->
+<!--                       </goals>-->
+<!--                       <configuration>-->
+<!--                           <skipInvocation>${skipTests}</skipInvocation>-->
+<!--                           <projectsDirectory>target/boat-spring-templates-tests</projectsDirectory>-->
+<!--                           <pomIncludes>-->
+<!--                               <pomInclude>pom.xml</pomInclude>-->
+<!--                           </pomIncludes>-->
+<!--                           <streamLogs>true</streamLogs>-->
+<!--                           <postBuildHookScript>compile</postBuildHookScript>-->
+<!--                       </configuration>-->
+<!--                   </execution>-->
+<!--               </executions>-->
+<!--           </plugin>-->
         </plugins>
 
     </build>
