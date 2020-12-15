@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class LintMojoTests {
 
     @Test
-    public void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
+    void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151"));
         lintMojo.setInput(getFile("/oas-examples/no-lint-warnings.yaml"));
@@ -28,7 +28,7 @@ public class LintMojoTests {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void testsFailOnWarningWithReport(boolean report) throws MojoFailureException, MojoExecutionException {
+    void testsFailOnWarningWithReport(boolean report) throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
         lintMojo.setFailOnWarning(true);
@@ -44,7 +44,7 @@ public class LintMojoTests {
         "false, false, /oas-examples/",
         "true, false, /oas-examples/ "
     })
-    public void testsLintFile(boolean report, boolean fail, String fileName) throws MojoFailureException, MojoExecutionException {
+    void testsLintFile(boolean report, boolean fail, String fileName) throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile(fileName));
         lintMojo.setFailOnWarning(fail);

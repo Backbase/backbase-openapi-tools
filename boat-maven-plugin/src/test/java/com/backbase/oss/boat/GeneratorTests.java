@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GeneratorTests {
 
     @Test
-    public void testHtml2() throws MojoExecutionException {
+    void testHtml2() throws MojoExecutionException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
@@ -83,7 +83,7 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
+    void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -123,7 +123,7 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testAngular() {
+    void testAngular() {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -162,7 +162,7 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testBeanValidation() throws MojoExecutionException {
+    void testBeanValidation() throws MojoExecutionException {
         GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
@@ -202,7 +202,7 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testWebClient() throws MojoExecutionException {
+    void testWebClient() throws MojoExecutionException {
         GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
@@ -231,7 +231,7 @@ public class GeneratorTests {
     }
 
     @Test
-    public void testJavaClient() throws MojoExecutionException, MavenInvocationException {
+    void testJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());

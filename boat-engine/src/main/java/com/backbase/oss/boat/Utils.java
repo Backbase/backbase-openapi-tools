@@ -4,6 +4,7 @@ import static com.backbase.oss.boat.JsonSchemaToOpenApi.X_JAVA_ENUM_NAMES;
 import static com.backbase.oss.boat.JsonSchemaToOpenApi.X_JAVA_TYPE;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -104,7 +105,9 @@ public class Utils {
 
     static Schema resolveSchemaByJavaType(JsonNode type, Components components) {
         if (type.hasNonNull(JAVA_TYPE) && !type.get(JAVA_TYPE).textValue().startsWith("java")) {
-            log.debug("Resolving Schema Type from javaType: {}", type.get(JAVA_TYPE).textValue());
+            if(log.isDebugEnabled()){
+                log.debug("Resolving Schema Type from javaType: {}", type.get(JAVA_TYPE).textValue());
+            }
             final String javaType = type.get(JAVA_TYPE).textValue();
             Optional<io.swagger.v3.oas.models.media.Schema> first = components.getSchemas().values().stream()
                 .filter(schema -> schema.getExtensions() != null && javaType
@@ -120,7 +123,9 @@ public class Utils {
 
     static Optional<String> getSchemaNameFromJavaClass(JsonNode type) {
         if (type.hasNonNull(JAVA_TYPE)) {
-            log.debug("javaType: {}", type.get(JAVA_TYPE).textValue());
+            if(log.isDebugEnabled()){
+                log.debug("javaType: {}", type.get(JAVA_TYPE).textValue());
+            }
             final String javaType = type.get(JAVA_TYPE).textValue();
             if (!javaType.startsWith("java.")) {
                 return Optional.of(StringUtils.substringAfterLast(javaType, "."));
@@ -263,7 +268,7 @@ public class Utils {
 
     public static ObjectMapper createObjectMapper() {
         YAMLFactory yamlFactory = new YAMLFactory();
-        yamlFactory.enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
+        yamlFactory.enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature());
         return new ObjectMapper(yamlFactory);
     }
 
