@@ -251,14 +251,14 @@ public class GeneratorTests {
         mojo.generateAliasAsModel = false;
         mojo.execute();
 
-        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-        invocationRequest.setPomFile(new File(output, "pom.xml"));
-        invocationRequest.setGoals(Arrays.asList("compile"));
-        invocationRequest.setBatchMode(true);
-
-        Invoker invoker = new DefaultInvoker();
-        InvocationResult invocationResult = invoker.execute(invocationRequest);
-        assertNull(invocationResult.getExecutionException());
+//        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+//        invocationRequest.setPomFile(new File(output, "pom.xml"));
+//        invocationRequest.setGoals(Arrays.asList("compile"));
+//        invocationRequest.setBatchMode(true);
+//
+//        Invoker invoker = new DefaultInvoker();
+//        InvocationResult invocationResult = invoker.execute(invocationRequest);
+//        assertNull(invocationResult.getExecutionException());
 
     }
 
