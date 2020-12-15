@@ -229,9 +229,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            // XXX the model set baseType to the container type, why is this different?
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
                 p.baseType = "java.util.Set";
                 p.dataType = "java.util.Set<" + p.items.dataType + ">";
                 p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
