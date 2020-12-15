@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test
 import org.zalando.zally.core.DefaultContextFactory
 import org.zalando.zally.core.rulesConfig
 
-class InfoBlockTagsCheckerTest {
+class InfoBlockTitleCheckerTest {
 
-    private val cut = InfoBlockTagsChecker(rulesConfig)
+    private val cut = InfoBlockTitleChecker(rulesConfig)
+
 
     @Test
-    fun `incorrect value for tag`() {
+    fun `correct value for title`() {
         @Language("YAML")
         val context = DefaultContextFactory().getOpenApiContext(
                 """
@@ -19,29 +20,6 @@ class InfoBlockTagsCheckerTest {
             info:
               title: Thing API
               version: 1.0.0
-            tags:
-              - name: rendition service
-            """.trimIndent()
-        )
-
-        val violations = cut.validate(context)
-
-        ZallyAssertions
-                .assertThat(violations)
-                .isNotEmpty
-    }
-
-    @Test
-    fun `correct value for tag`() {
-        @Language("YAML")
-        val context = DefaultContextFactory().getOpenApiContext(
-                """
-            openapi: 3.0.3
-            info:
-              title: Thing API
-              version: 1.0.0
-            tags:
-              - name: Retail
             """.trimIndent()
         )
 
@@ -53,15 +31,13 @@ class InfoBlockTagsCheckerTest {
     }
 
     @Test
-    fun `tags are required`() {
+    fun `incorrect value for title max length`() {
         @Language("YAML")
         val context = DefaultContextFactory().getOpenApiContext(
                 """
             openapi: 3.0.3
             info:
-              title: Thing API
-              version: 1.0.0
-            
+              title: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
             """.trimIndent()
         )
 
@@ -71,4 +47,42 @@ class InfoBlockTagsCheckerTest {
                 .assertThat(violations)
                 .isNotEmpty
     }
+
+    @Test
+    fun `no value for title`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            info:
+              version: 1.0.0
+            """.trimIndent()
+        )
+
+        val violations = cut.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
+    @Test
+    fun `empty value for title`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            info:
+              title: ''
+              version: 1.0.0
+            """.trimIndent()
+        )
+
+        val violations = cut.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
 }
