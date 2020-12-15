@@ -3,7 +3,6 @@ package com.backbase.oss.boat;
 import static com.backbase.oss.boat.JsonSchemaToOpenApi.X_JAVA_ENUM_NAMES;
 import static com.backbase.oss.boat.JsonSchemaToOpenApi.X_JAVA_TYPE;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
