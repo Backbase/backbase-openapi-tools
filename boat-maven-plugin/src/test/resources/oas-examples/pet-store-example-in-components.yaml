@@ -9,6 +9,7 @@ servers:
 paths:
   /first:
     get:
+      operationId: getFirst
       responses:
         '200':
           description: Successful Response
@@ -18,6 +19,7 @@ paths:
                 $ref: '#/components/schemas/LegalEntity'
   /second:
     get:
+      operationId: getSecond
       responses:
         '200':
           description: Successful response
