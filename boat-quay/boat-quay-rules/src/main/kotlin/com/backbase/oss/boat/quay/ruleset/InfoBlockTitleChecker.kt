@@ -10,7 +10,7 @@ import org.zalando.zally.rule.api.*
         severity = Severity.MUST,
         title = "Check info block title format."
 )
-class InfoBlockTitleChecker(config: Config) {
+class InfoBlockTitleChecker {
 
     private val MAX_TITLE_LENGTH = 35
 
