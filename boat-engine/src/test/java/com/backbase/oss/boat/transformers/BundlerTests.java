@@ -19,6 +19,7 @@ import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
@@ -54,12 +55,12 @@ public class BundlerTests {
 
     @Test
     public void testBoatCache() throws OpenAPILoaderException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
 
-        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, spec));
+        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, input.toURI().toString()));
         assertThrows(TransformerException.class, () -> boatCache.loadRef("not exists", RefFormat.RELATIVE, Example.class));
 
 
@@ -67,7 +68,7 @@ public class BundlerTests {
 
     @Test
     public void testBundleExamples() throws OpenAPILoaderException, IOException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
