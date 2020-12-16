@@ -113,6 +113,7 @@ class BoatSpringTemplatesTests {
             }
 
             // generate all combinations
+            // TODO find a better way to keep only the relevant combinations
             for (int mask = 0; mask < 1 << CASES.size(); mask++) {
                 if (minimal && Integer.bitCount(mask) != 1) {
                     continue;
