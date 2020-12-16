@@ -2,10 +2,16 @@ package com.backbase.oss.boat;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.AssertFalse;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
  class UtilTests {
@@ -39,6 +45,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         actual = Utils.getSchemaNameFromReference(unusual, "unusual", referenceNames);
         assertEquals("UnusualUnusual",actual);
     }
+
+    @Test
+    void testUtilsDirectory() throws MalformedURLException {
+       URL url = new URL("file://test.json");
+       assertFalse(Utils.isDirectory(url,"test"));
+
+    }
+
 
 
 }
