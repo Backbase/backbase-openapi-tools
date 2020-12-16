@@ -164,6 +164,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
             this.useSetForUniqueItems = false;
         }
 
+        // Whether it's using ApiUtil or not.
+        // Developers can enable or disable it by specifying it in the list of supporting files.
         writePropertyBack("useApiUtil",
             ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
                 .map(StringUtils::trimToNull)
