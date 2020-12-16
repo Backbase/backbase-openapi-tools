@@ -13,10 +13,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 import org.junit.jupiter.api.Test;
 import org.raml.yagi.framework.util.DateType;
@@ -24,10 +21,7 @@ import org.raml.yagi.framework.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ExporterTests extends AbstractBoatEngineTestBase {
@@ -118,6 +112,9 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
 
     @Test
     public void testDateFormat() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+
         Date date = new Date();
         SimpleDateFormat usDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
         SimpleDateFormat nlDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.forLanguageTag("nl"));
@@ -126,6 +123,8 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
         String nlDate = nlDateFormat.format(date);
         String systemDate = systemDateFormat.format(date);
 
+
+
         System.out.println("US      : " + usDate);
         System.out.println("NL      : " + nlDate);
         System.out.println("System  : " + systemDate);
@@ -133,7 +132,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
 
         DateUtils strictDateUtils = DateUtils.createStrictDateUtils();
         assertTrue(strictDateUtils.isValidDate(usDate, DateType.datetime, "rfc2616"), usDate);
-        assertTrue(strictDateUtils.isValidDate(nlDate, DateType.datetime, "rfc2616"), nlDate);
+        assertFalse(strictDateUtils.isValidDate(nlDate, DateType.datetime, "rfc2616"), nlDate);
         assertTrue(strictDateUtils.isValidDate(systemDate, DateType.datetime, "rfc2616"), systemDate);
 
     }
