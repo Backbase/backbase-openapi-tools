@@ -101,7 +101,7 @@ public interface {{classname}} {
 {{#jdk8-default-interface}}
 {{^useApiUtil}}
 {{^reactive}}
-    public static void setExampleResponse(NativeWebRequest req, String contentType, String example) {
+    static void setExampleResponse(NativeWebRequest req, String contentType, String example) {
         try {
             HttpServletResponse res = req.getNativeResponse(HttpServletResponse.class);
             res.setCharacterEncoding("UTF-8");
@@ -113,7 +113,7 @@ public interface {{classname}} {
     }
 {{/reactive}}
 {{#reactive}}
-    public static Mono<Void> getExampleResponse(ServerWebExchange exchange, String example) {
+    static Mono<Void> getExampleResponse(ServerWebExchange exchange, String example) {
         return exchange.getResponse().writeWith(Mono.just(new DefaultDataBufferFactory().wrap(example.getBytes(StandardCharsets.UTF_8))));
     }
 {{/reactive}}
