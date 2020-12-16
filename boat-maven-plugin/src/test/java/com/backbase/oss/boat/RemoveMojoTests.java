@@ -19,7 +19,7 @@ public class RemoveMojoTests {
     void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
 
         File output = getFile("/readWriteFiles/output.yaml");
-        File input = getFile("/oas-examples/petstore-deprecated.yaml");
+        File input = getFile("/bundler/petstore-deprecated.yaml");
         RemoveDeprecatedMojo removeDeprecatedMojo = new RemoveDeprecatedMojo();
         removeDeprecatedMojo.setInput(input);
         removeDeprecatedMojo.setOutput(output);
