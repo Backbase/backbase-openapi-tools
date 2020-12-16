@@ -1,11 +1,13 @@
 package com.backbase.oss.boat;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -16,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class GeneratorTests {
+
+    @BeforeAll
+    static void setupLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
 
     @Test
     public void testHtml2() throws MojoExecutionException {
@@ -40,10 +48,8 @@ public class GeneratorTests {
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
-        String[] expectedGeneratedDocs = {"index.html",
-                ".openapi-generator-ignore", ".openapi-generator"};
-        assertArrayEquals(expectedGeneratedDocs, output.list());
 
+        assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
     @Test
@@ -74,9 +80,7 @@ public class GeneratorTests {
         mojo.dereferenceComponents = true;
         mojo.execute();
 
-        String[] expectedGeneratedDocs = {"index.html",
-                ".openapi-generator-ignore", ".openapi-generator"};
-        assertArrayEquals(expectedGeneratedDocs, output.list());
+        assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
     @Test
