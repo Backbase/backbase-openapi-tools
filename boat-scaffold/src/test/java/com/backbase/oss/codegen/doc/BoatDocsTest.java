@@ -6,81 +6,53 @@ import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
-
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@SuppressWarnings("InfiniteLoopStatement")
 @Slf4j
-public class BoatDocsTest {
+class BoatDocsTest {
 
-    public static void main(String[] args) {
-
-        try {
-
-            WatchService watcher = FileSystems.getDefault().newWatchService();
-            File templates = new File(System.getProperty("templates"));
-
-            templates.toPath().register(watcher, ENTRY_CREATE,
-                ENTRY_DELETE,
-                ENTRY_MODIFY);
-
-            generateDocs();
-
-            WatchKey key;
-            while ((key = watcher.take()) != null) {
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    System.out.println("Event kind:" + event.kind() + ". File affected: " + event.context() + ".");
-                    new Thread(BoatDocsTest::generateDocs).start();
-
-                }
-                key.reset();
-
-            }
-
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+    @Test
+    void testGenerate()  {
+        String spec = System.getProperty("spec");
+        if (spec != null) {
+            generateDocs(new File(spec));
+        } else {
+            generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
-
     }
 
     @Test
-    public void testGenerateDocs() throws IOException {
-        System.setProperty("spec", getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml").getAbsolutePath());
-        generateDocs();
+    void testGenerateDocs() throws IOException {
+        generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
 
         File output = new File("target/docs/");
-        String[] actualDirectorySorted =output.list();
+        String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory= {".openapi-generator",".openapi-generator-ignore","index.html"};
-        assertArrayEquals(expectedDirectory,actualDirectorySorted);
+        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
+        assertArrayEquals(expectedDirectory, actualDirectorySorted);
         File index = new File("target/docs/index.html");
-        String generated = String.join( " ", Files.readAllLines(Paths.get(index.getPath())));
+        String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
         assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
     }
 
     @Test
-    public void testGenerateDocsQuery() throws IOException {
-        System.setProperty("spec", getFile("/oas-examples/petstore-query-string-array.yaml").getAbsolutePath());
-        generateDocs();
+    void testGenerateDocsQuery() throws IOException {
+        generateDocs(getFile("/oas-examples/petstore-query-string-array.yaml"));
         File output = new File("target/docs/");
-        String[] actualDirectorySorted =output.list();
+        String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory= {".openapi-generator",".openapi-generator-ignore","index.html"};
-        assertArrayEquals(expectedDirectory,actualDirectorySorted);
+        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
+        assertArrayEquals(expectedDirectory, actualDirectorySorted);
         File index = new File("target/docs/index.html");
-        String generated = String.join( " ", Files.readAllLines(Paths.get(index.getPath())));
+        String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
         assertTrue(generated.contains("<title>Swagger Petstore</title>"));
     }
 
@@ -92,11 +64,8 @@ public class BoatDocsTest {
     }
 
 
-    private static void generateDocs() {
-
-
-        File spec = new File(System.getProperty("spec"));
-
+    private static void generateDocs(File spec) {
+        log.info("Generate docs for: {}", spec);
         OpenAPI openAPI = null;
         try {
             openAPI = OpenAPILoader.load(spec, true, true);
@@ -112,7 +81,6 @@ public class BoatDocsTest {
 
         File output = new File(codegenConfig.getOutputDir());
         output.mkdirs();
-
 
 
 //        log.info("Clearing output: {}, {}", output);
