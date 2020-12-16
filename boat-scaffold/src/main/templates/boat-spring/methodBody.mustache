@@ -9,7 +9,7 @@ return CompletableFuture.supplyAsync(()-> {
     {{/-first}}
 {{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}            if (mediaType.isCompatibleWith(MediaType.valueOf("{{{contentType}}}"))) {
 {{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                String exampleString = {{>exampleString}};
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                setExampleResponse(request, "{{{contentType}}}", exampleString);
+{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                {{#useApiUtil}}ApiUtil.{{/useApiUtil}}setExampleResponse(request, "{{{contentType}}}", exampleString);
 {{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                break;
 {{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}            }
     {{#-last}}
@@ -38,7 +38,7 @@ Mono<Void> result = Mono.empty();
         {{/-first}}
             if (mediaType.isCompatibleWith(MediaType.valueOf("{{{contentType}}}"))) {
                 String exampleString = {{>exampleString}};
-                result = getExampleResponse(exchange, exampleString);
+                result = {{#useApiUtil}}ApiUtil.{{/useApiUtil}}getExampleResponse(exchange, exampleString);
                 break;
             }
         {{#-last}}

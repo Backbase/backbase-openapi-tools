@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import static java.util.Optional.ofNullable;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import java.io.IOException;
@@ -9,9 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
@@ -161,10 +164,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
             this.useSetForUniqueItems = false;
         }
 
-        this.supportingFiles.stream()
-            .filter(sf -> "apiUtil.mustache".equals(sf.templateFile))
-            .findAny()
-            .ifPresent(this.supportingFiles::remove);
+        // Whether it's using ApiUtil or not.
+        // Developers can enable or disable it by specifying it in the list of supporting files.
+        writePropertyBack("useApiUtil",
+            ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
+                .map(StringUtils::trimToNull)
+                .map(s -> s.contains("ApiUtil.java"))
+                .orElse(true));
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -225,9 +231,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            // XXX the model set baseType to the container type, why is this different?
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
                 p.baseType = "java.util.Set";
                 p.dataType = "java.util.Set<" + p.items.dataType + ">";
                 p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
