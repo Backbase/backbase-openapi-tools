@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -17,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class GeneratorTests {
+
+    @BeforeAll
+    static void setupLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
 
     @Test
     public void testHtml2() throws MojoExecutionException {
