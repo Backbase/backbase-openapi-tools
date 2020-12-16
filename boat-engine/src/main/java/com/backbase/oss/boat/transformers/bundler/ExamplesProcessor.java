@@ -14,9 +14,9 @@ import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.parser.models.RefFormat;
-import io.swagger.v3.parser.util.PathUtils;
 import io.swagger.v3.parser.util.RefUtils;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,13 +37,20 @@ public class ExamplesProcessor {
     ObjectMapper jsonObjectMapper = new ObjectMapper();
 
     private final OpenAPI openAPI;
-    private final Path rootDir;
+    private final URI rootUri;
     private final Map<String, ExampleHolder> cache = new LinkedHashMap<>();
 
     public ExamplesProcessor(OpenAPI openAPI, String inputFile) {
         super();
         this.openAPI = openAPI;
-        this.rootDir = PathUtils.getParentDirectoryOfFile(inputFile);
+
+        try {
+            // Resolve the directory containing the file
+            this.rootUri = URI.create(inputFile).resolve(".");
+        } catch (RuntimeException e) {
+            log.error("Unable to create URI from \"{}\"", inputFile);
+            throw e;
+        }
     }
 
     public void processExamples(OpenAPI openAPI) {
@@ -131,7 +138,7 @@ public class ExamplesProcessor {
     }
 
     private void fixInlineExamples(ExampleHolder exampleHolder, String relativePath, boolean derefenceExamples) {
-        log.debug("fixInlineExamples: '{}', relative path '{}'", exampleHolder, relativePath);
+        log.debug("fixInlineExamples: '{}', relative resolvedUri '{}'", exampleHolder, relativePath);
 
         if (exampleHolder.getRef() == null) {
             log.debug("not fixing (ref not found): {}", exampleHolder);
@@ -144,11 +151,11 @@ public class ExamplesProcessor {
         }
 
         if (refPath.startsWith(COMPONENTS_EXAMPLES)) {
-            log.debug("Ref path already points to examples. Leave it as it is");
+            log.debug("Ref resolvedUri already points to examples. Leave it as it is");
             return;
         }
 
-        Path path;
+        URI resolvedUri;
         Optional<String> fragment;
         if (refPath.contains("#") && !refPath.startsWith("#/components/examples")) {
             fragment = Optional.of(StringUtils.substringAfter(refPath, "#"));
@@ -157,9 +164,9 @@ public class ExamplesProcessor {
             fragment = Optional.empty();
         }
 
-        path = resolvePath(relativePath, refPath);
+        resolvedUri = resolveUri(relativePath, refPath);
         try {
-            String content = readContent(path);
+            String content = readContent(Paths.get(resolvedUri));
 
             if (fragment.isPresent()) {
                 String exampleName = StringUtils.substringAfterLast(fragment.get(), "/");
@@ -169,7 +176,7 @@ public class ExamplesProcessor {
                 JsonNode exampleNode = jsonNode.at(jsonPointer);
 
                 if (exampleNode.has("$ref")) {
-                    processExample(exampleHolder, relativePath, exampleName, exampleNode);
+                    processExample(exampleHolder,relativePath,exampleName,exampleNode, content,resolvedUri,refPath);
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
                 }
@@ -185,16 +192,13 @@ public class ExamplesProcessor {
             throw new TransformerException("Unable to fix inline examples", e);
         }
     }
+    private void processExample(ExampleHolder exampleHolder, String relativePath, String exampleName, JsonNode exampleNode, String content, URI resolvedUri,String refPath) throws IOException {
 
-    private void processExample(ExampleHolder exampleHolder, String relativePath, String exampleName, JsonNode exampleNode) throws IOException {
-        String refPath;
-        Path path;
-        String content;
         refPath = exampleNode.get("$ref").asText();
         exampleHolder.replaceRef(refPath);
-        path = resolvePath(relativePath, refPath);
-        resolvePath(relativePath, refPath);
-        content = readContent(path);
+        resolvedUri = resolveUri(relativePath, refPath);
+        resolveUri(relativePath, refPath);
+        content = readContent(Paths.get(resolvedUri));
 
         exampleHolder.setContent(content);
         if (exampleName != null) {
@@ -208,10 +212,9 @@ public class ExamplesProcessor {
         } else {
             log.debug("Adding Example: {} to components/examples", exampleName);
             putComponentExample(exampleName,
-                new Example().value(convertExampleContent(exampleHolder, refPath)));
+                    new Example().value(convertExampleContent(exampleHolder, refPath)));
         }
     }
-
     private String readContent(Path path) throws IOException {
         String content;
         content = StringUtils.strip(StringUtils.replaceEach(
@@ -221,14 +224,15 @@ public class ExamplesProcessor {
         return content;
     }
 
-    private Path resolvePath(String relativePath, String refPath) {
-        Path path;
+    private URI resolveUri(String relativePath, String refPath) {
+        URI resolvedUri;
         if (relativePath == null) {
-            path = rootDir.resolve(StringUtils.strip(refPath, "./"));
+            resolvedUri = rootUri.resolve(StringUtils.strip(refPath, "./"));
         } else {
-            path = Paths.get(rootDir.toString(), relativePath, refPath);
+            resolvedUri = rootUri.resolve(checkTrailingSlash(relativePath.replace("\\", "/")))
+                .resolve(refPath.replace("\\", "/"));
         }
-        return path;
+        return resolvedUri;
     }
 
     private void dereferenceExample(ExampleHolder exampleHolder) {
@@ -263,5 +267,13 @@ public class ExamplesProcessor {
         return count == 0 ? s : s + "-" + count;
     }
 
+    /**
+     * Ensures the string ends in a "/". A trailing slash on a pathname identifies the path as pointing to a folder (aka
+     * directory). If a pathname does not have a trailing slash then it points to a file. Use this when we know the
+     * reference forms part of the path before the file resolution.
+     */
+    private String checkTrailingSlash(String uri) {
+        return uri.endsWith("/") ? uri : uri + "/";
+    }
 
 }

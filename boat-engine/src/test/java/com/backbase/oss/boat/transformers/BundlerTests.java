@@ -4,7 +4,6 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.bundler.BoatCache;
-import com.backbase.oss.boat.transformers.bundler.ExampleHolder;
 import com.backbase.oss.boat.transformers.bundler.ExamplesProcessor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
@@ -20,10 +19,10 @@ import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.BaseMatcher;
@@ -36,7 +35,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-class BundlerTests {
+public class BundlerTests {
 
     private static final String APPLICATION_JSON = "application/json";
     private static final org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {
@@ -54,12 +53,12 @@ class BundlerTests {
 
     @Test
     void testBoatCache() throws OpenAPILoaderException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
 
-        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, spec));
+        BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, input.toURI().toString()));
 
         try{
             boatCache.loadRef("doesn't exist", RefFormat.RELATIVE, Example.class);
@@ -72,7 +71,7 @@ class BundlerTests {
 
     @Test
     void testBundleExamples() throws OpenAPILoaderException, IOException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
