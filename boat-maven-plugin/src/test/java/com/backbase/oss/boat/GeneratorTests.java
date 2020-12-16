@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -40,10 +41,8 @@ public class GeneratorTests {
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
-        String[] expectedGeneratedDocs = {"index.html",
-                ".openapi-generator-ignore", ".openapi-generator"};
-        assertArrayEquals(expectedGeneratedDocs, output.list());
 
+        assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
     @Test
@@ -74,9 +73,7 @@ public class GeneratorTests {
         mojo.dereferenceComponents = true;
         mojo.execute();
 
-        String[] expectedGeneratedDocs = {"index.html",
-                ".openapi-generator-ignore", ".openapi-generator"};
-        assertArrayEquals(expectedGeneratedDocs, output.list());
+        assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
     @Test

@@ -79,6 +79,6 @@ public class BoatSpringCodeGenTests {
 
         indent.execute(frag, output);
 
-        assertThat(output.toString(), equalTo("__\n__Good\n__  morning,\n__ Dave\n"));
+        assertThat(output.toString(), equalTo(String.format("__%n__Good%n__  morning,%n__ Dave%n")));
     }
 }

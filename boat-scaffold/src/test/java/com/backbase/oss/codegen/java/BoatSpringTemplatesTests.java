@@ -70,7 +70,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nul", "wth");
+        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nbl", "wth");
 
         final String name;
 
@@ -97,7 +97,7 @@ class BoatSpringTemplatesTests {
             this.useOptional = (mask & 1 << CASES.indexOf("opt")) != 0;
             this.addServletRequest = (mask & 1 << CASES.indexOf("req")) != 0;
             this.useLombokAnnotations = (mask & 1 << CASES.indexOf("lmb")) != 0;
-            this.openApiNullable = (mask & 1 << CASES.indexOf("nul")) != 0;
+            this.openApiNullable = (mask & 1 << CASES.indexOf("nbl")) != 0;
             this.useSetForUniqueItems = (mask & 1 << CASES.indexOf("unq")) != 0;
             this.useWithModifiers = (mask & 1 << CASES.indexOf("wth")) != 0;
             this.reactive = (mask & 1 << CASES.indexOf("flx")) != 0;
