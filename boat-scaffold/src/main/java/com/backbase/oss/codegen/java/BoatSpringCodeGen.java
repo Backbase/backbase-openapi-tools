@@ -231,7 +231,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+            if (!this.reactive) {
+                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+            }
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.baseType = "java.util.Set";

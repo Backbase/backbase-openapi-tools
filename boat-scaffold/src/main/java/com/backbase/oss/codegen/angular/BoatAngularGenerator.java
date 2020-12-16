@@ -260,16 +260,13 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return new BoatAngularCodegenOperation(codegenOperation);
     }
 
-    private void addProducesReturnType(ApiResponse apiResponse, CodegenOperation codegenOperation) {
-        ApiResponse response = ModelUtils.getReferencedApiResponse(this.openAPI, apiResponse);
+    private void addProducesReturnType(ApiResponse inputResponse, CodegenOperation codegenOperation) {
+        ApiResponse response = ModelUtils.getReferencedApiResponse(this.openAPI, inputResponse);
         if (response == null || response.getContent() == null || response.getContent().isEmpty() || codegenOperation.produces == null) {
             return;
         }
 
-        apiResponse.getContent().forEach((contentType, mediaType) -> {
-            if(Objects.isNull(mediaType.getSchema()))
-                return;
-
+        inputResponse.getContent().forEach((contentType, mediaType) -> {
             String typeDeclaration = getTypeDeclaration(ModelUtils.unaliasSchema(this.openAPI, mediaType.getSchema()));
             codegenOperation.produces.stream()
                     .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))
