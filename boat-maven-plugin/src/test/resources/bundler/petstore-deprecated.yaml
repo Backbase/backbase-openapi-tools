@@ -62,8 +62,8 @@ paths:
       tags:
         - pets
       parameters:
-        - name: petId
-          in: path
+        - in: path
+          name: petId
           required: true
           description: The id of the pet to retrieve
           schema:
@@ -108,8 +108,8 @@ paths:
         tags:
           - pets
         parameters:
-          - name: name
-            in: body
+          - in: body
+            name: name
             description: The name of the pet to retrieve
             schema:
               type: string
