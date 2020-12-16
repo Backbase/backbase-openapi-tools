@@ -2,6 +2,9 @@ package com.backbase.oss.boat;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -11,6 +14,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -18,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class ExportDependencyMojoTests {
+
+    @BeforeAll
+    static void setupLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
 
     @Test
     public void testAggregatedInputFile() throws MojoExecutionException, ExportException {

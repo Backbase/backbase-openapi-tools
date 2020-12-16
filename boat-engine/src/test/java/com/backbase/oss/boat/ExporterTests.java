@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ExporterTests extends AbstractBoatEngineTestBase {
 
     Logger log = LoggerFactory.getLogger(ExporterTests.class);
+
+    @BeforeAll
+    static void setupLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
 
     @Test
     public void testHelloWorld() throws Exception {

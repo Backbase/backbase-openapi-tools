@@ -4,11 +4,15 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -17,6 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class ExportMojoTests {
+
+    @BeforeAll
+    static void setupLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+    }
 
     @Test
     public void testInputFile() throws MojoExecutionException {
