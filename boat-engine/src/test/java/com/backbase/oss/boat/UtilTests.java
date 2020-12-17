@@ -43,7 +43,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         assertEquals("Other",actual);
         referenceNames.put("file://unusual.json", "differentToUrl");
         actual = Utils.getSchemaNameFromReference(unusual, "unusual", referenceNames);
+        referenceNames.put("reference.json", "reference");
         assertEquals("UnusualUnusual",actual);
+        actual = Utils.getSchemaNameFromReference("reference.json","reference",referenceNames);
+        assertEquals("ReferenceDuplicate", actual);
     }
 
     @Test
