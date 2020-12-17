@@ -4,13 +4,13 @@ import ch.qos.logback.classic.Level;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoatTerminalTest {
 
@@ -27,6 +27,12 @@ class BoatTerminalTest {
 
         assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=src/test/resources/raml-examples/converted","-o=src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples=false"}), is(0));
         assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=src/test/resources/raml-examples/converted","-v"}),is(0));
+    }
+
+    @Test
+    void testCLIErrorCatching(){
+        assertThat( BoatTerminal.run(new String[]{"-f=src/test/resources/raml-examples/backbase-wallet/file-not-found ","--directory=src/test/resources/raml-examples/converted","--output=src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples=false"}),is(0));
+        assertThat(BoatTerminal.run(new String[]{"-f src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","--directory src/test/resources/raml-examples/converted","--output src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples false"}), is(2));
     }
 
 

@@ -176,7 +176,26 @@ public class ExamplesProcessor {
                 JsonNode exampleNode = jsonNode.at(jsonPointer);
 
                 if (exampleNode.has("$ref")) {
-                    processExample(exampleHolder,relativePath,exampleName,exampleNode, content,resolvedUri,refPath);
+                    refPath = exampleNode.get("$ref").asText();
+                    exampleHolder.replaceRef(refPath);
+                    resolvedUri = resolveUri(relativePath, refPath);
+                    resolveUri(relativePath, refPath);
+                    content = readContent(Paths.get(resolvedUri));
+
+                    exampleHolder.setContent(content);
+                    if (exampleName != null) {
+                        exampleHolder.setExampleName(exampleName);
+                        exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
+                    }
+
+                    if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
+                        log.debug("Updating example: {} in components/examples", exampleName);
+                        // Check whether example is already dereferenced
+                    } else {
+                        log.debug("Adding Example: {} to components/examples", exampleName);
+                        putComponentExample(exampleName,
+                                new Example().value(convertExampleContent(exampleHolder, refPath)));
+                    }
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));
                 }
@@ -192,29 +211,7 @@ public class ExamplesProcessor {
             throw new TransformerException("Unable to fix inline examples", e);
         }
     }
-    private void processExample(ExampleHolder exampleHolder, String relativePath, String exampleName, JsonNode exampleNode, String content, URI resolvedUri,String refPath) throws IOException {
 
-        refPath = exampleNode.get("$ref").asText();
-        exampleHolder.replaceRef(refPath);
-        resolvedUri = resolveUri(relativePath, refPath);
-        resolveUri(relativePath, refPath);
-        content = readContent(Paths.get(resolvedUri));
-
-        exampleHolder.setContent(content);
-        if (exampleName != null) {
-            exampleHolder.setExampleName(exampleName);
-            exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
-        }
-
-        if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
-            log.debug("Updating example: {} in components/examples", exampleName);
-            // Check whether example is already dereferenced
-        } else {
-            log.debug("Adding Example: {} to components/examples", exampleName);
-            putComponentExample(exampleName,
-                    new Example().value(convertExampleContent(exampleHolder, refPath)));
-        }
-    }
     private String readContent(Path path) throws IOException {
         String content;
         content = StringUtils.strip(StringUtils.replaceEach(
