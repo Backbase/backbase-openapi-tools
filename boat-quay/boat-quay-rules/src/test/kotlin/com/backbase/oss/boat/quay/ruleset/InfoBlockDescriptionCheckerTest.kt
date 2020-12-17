@@ -4,10 +4,11 @@ import com.backbase.oss.boat.quay.ruleset.test.ZallyAssertions
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.zalando.zally.core.DefaultContextFactory
+import org.zalando.zally.core.rulesConfig
 
 class InfoBlockDescriptionCheckerTest {
 
-    private val cut = InfoBlockDescriptionChecker()
+    private val cut = InfoBlockDescriptionChecker(rulesConfig)
 
 
     @Test
