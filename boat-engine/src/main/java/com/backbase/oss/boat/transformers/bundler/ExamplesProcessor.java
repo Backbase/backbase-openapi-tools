@@ -166,7 +166,7 @@ public class ExamplesProcessor {
 
         resolvedUri = resolveUri(relativePath, refPath);
         try {
-            String content = readContent(Paths.get(resolvedUri));
+            String content = readContent(Paths.get(resolvedUri.getPath()));
 
             if (fragment.isPresent()) {
                 String exampleName = StringUtils.substringAfterLast(fragment.get(), "/");
@@ -180,7 +180,7 @@ public class ExamplesProcessor {
                     exampleHolder.replaceRef(refPath);
                     resolvedUri = resolveUri(relativePath, refPath);
                     resolveUri(relativePath, refPath);
-                    content = readContent(Paths.get(resolvedUri));
+                    content = readContent(Paths.get(resolvedUri.getPath()));
 
                     exampleHolder.setContent(content);
                     if (exampleName != null) {
