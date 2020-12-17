@@ -10,15 +10,15 @@ import org.zalando.zally.rule.api.*
         severity = Severity.MUST,
         title = "Check info block title format."
 )
-class InfoBlockTitleChecker {
+class InfoBlockTitleChecker(config: Config) {
 
-    private val MAX_TITLE_LENGTH = 35
+    private val maxTitleLength = config.getInt("InfoBlockTitleChecker.maxTitleLength")
 
     @Check(Severity.MUST)
     fun validate(context: Context) = when (val title = context.api.info.title) {
         null -> listOf(Violation("title is a required value", "/openapi/info/title".toJsonPointer()))
         ""  -> listOf(Violation("title can not be empty", "/openapi/info/title".toJsonPointer()))
-        else -> if (title.length > MAX_TITLE_LENGTH) listOf(Violation("title can not be longer than $MAX_TITLE_LENGTH", "/openapi/info/title".toJsonPointer())) else emptyList()
+        else -> if (title.length > maxTitleLength) listOf(Violation("title can not be longer than $maxTitleLength", "/openapi/info/title".toJsonPointer())) else emptyList()
     }
 
 }
