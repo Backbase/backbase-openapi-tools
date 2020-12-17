@@ -28,7 +28,7 @@ class PrefixPathRule(config: Config) {
                     !validPathPrefixes.contains(it.first)
                 }
                 .map {
-                    context.violation("Incorrect path prefix: ${it.first}", it.second)
+                    context.violation("Incorrect path prefix: ${it.first}. Correct values are $validPathPrefixes", it.second)
                 }
 
 
