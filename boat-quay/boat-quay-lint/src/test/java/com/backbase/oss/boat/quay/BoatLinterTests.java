@@ -44,7 +44,7 @@ public class BoatLinterTests {
         Optional<BoatViolation> testDisplay = boatLintReport.getViolations().stream()
             .filter(t -> t.displayString().contains("[B007]")).findFirst();
         assertTrue(testDisplay.isPresent());
-        assertEquals("[B007] MUST - Check prefix for paths: Incorrect path prefix: wallet",testDisplay.get().displayString());
+        assertEquals("[B007] MUST - Check prefix for paths: Incorrect path prefix: wallet. Correct values are [client-api, service-api, integration-api]", testDisplay.get().displayString());
     }
 
     @Test
