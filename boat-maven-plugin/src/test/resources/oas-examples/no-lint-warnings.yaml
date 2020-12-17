@@ -4,6 +4,7 @@ info:
   title: Swagger Petstore
   description: An API
   x-api-id: provider
+  x-icon: pet
   contact:
     name: John
     url: https://john.no
