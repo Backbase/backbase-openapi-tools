@@ -19,7 +19,7 @@ public class LintMojoTests {
     @Test
     void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
-        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151"));
+        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151", "134"));
         lintMojo.setInput(getFile("/oas-examples/no-lint-warnings.yaml"));
         lintMojo.setFailOnWarning(true);
         lintMojo.execute();
@@ -30,6 +30,8 @@ public class LintMojoTests {
     @ValueSource(booleans = {true, false})
     void testsFailOnWarningWithReport(boolean report) throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
+        lintMojo.setIgnoreRules(new String[]{"219", "105", "M008", "M009", "M010", "M011", "H001", "H002",
+            "S005", "S006", "S007"});
         lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
         lintMojo.setFailOnWarning(true);
         lintMojo.setWriteLintReport(report);
