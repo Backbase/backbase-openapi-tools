@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 @Slf4j
+@SuppressWarnings({"rawtypes","java:S3740"})
 public class ExamplesProcessor {
 
     public static final String COMPONENTS_EXAMPLES = "#/components/examples/";
@@ -91,7 +92,6 @@ public class ExamplesProcessor {
             log.debug("Processing Consent for: {} with relative path: {}", s, relativePath);
             processMediaType(mediaType, relativePath, true);
         });
-
 
     }
 
@@ -166,7 +166,7 @@ public class ExamplesProcessor {
 
         resolvedUri = resolveUri(relativePath, refPath);
         try {
-            String content = readContent(Paths.get(resolvedUri));
+            String content = readContent(Paths.get(resolvedUri.getPath()));
 
             if (fragment.isPresent()) {
                 String exampleName = StringUtils.substringAfterLast(fragment.get(), "/");
@@ -180,7 +180,7 @@ public class ExamplesProcessor {
                     exampleHolder.replaceRef(refPath);
                     resolvedUri = resolveUri(relativePath, refPath);
                     resolveUri(relativePath, refPath);
-                    content = readContent(Paths.get(resolvedUri));
+                    content = readContent(Paths.get(resolvedUri.getPath()));
 
                     exampleHolder.setContent(content);
                     if (exampleName != null) {
@@ -194,7 +194,7 @@ public class ExamplesProcessor {
                     } else {
                         log.debug("Adding Example: {} to components/examples", exampleName);
                         putComponentExample(exampleName,
-                            new Example().value(convertExampleContent(exampleHolder, refPath)));
+                                new Example().value(convertExampleContent(exampleHolder, refPath)));
                     }
                 } else {
                     exampleHolder.setContent(jsonObjectMapper.writeValueAsString(exampleNode));

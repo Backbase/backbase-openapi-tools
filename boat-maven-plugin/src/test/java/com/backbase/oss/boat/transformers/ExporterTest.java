@@ -29,7 +29,7 @@ public class ExporterTest extends AbstractBoatEngineTests {
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 
     @Test
-    public void testBackbaseWalletApi() throws Exception {
+    void testBackbaseWalletApi() throws Exception {
 
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));

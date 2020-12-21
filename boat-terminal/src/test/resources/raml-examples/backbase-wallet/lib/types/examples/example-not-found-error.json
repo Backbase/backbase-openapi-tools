@@ -1,0 +1,12 @@
+{
+  "message": "Resource not found.",
+  "errors": [
+    {
+      "message": "Unable to find the resource requested resource: {resource}.",
+      "key": "common.api.resource",
+      "context": {
+        "resource": "aResource"
+      }
+    }
+  ]
+}
