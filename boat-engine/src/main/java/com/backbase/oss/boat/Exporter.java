@@ -71,6 +71,7 @@ import org.raml.v2.api.model.v10.system.types.AnnotableStringType;
 import org.raml.v2.api.model.v10.system.types.MarkdownString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import static com.backbase.oss.boat.ExampleUtils.getExampleObject;
 
