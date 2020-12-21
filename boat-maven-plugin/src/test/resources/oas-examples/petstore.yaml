@@ -90,6 +90,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /no-schema:
+    get:
+      summary: No Schema
+      operationId: getNoSchema
+      tags:
+        - pets
+      responses:
+        200:
+          description: A response that does not specify a schema
+          content:
+            application/json: {}
 components:
   schemas:
     Pet:
