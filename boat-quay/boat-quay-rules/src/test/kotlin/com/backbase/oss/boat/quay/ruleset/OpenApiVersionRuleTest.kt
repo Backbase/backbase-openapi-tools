@@ -11,7 +11,7 @@ class OpenApiVersionRuleTest {
     private val cut = OpenApiVersionRule(rulesConfig)
 
     @Test
-    fun `check open api version return no validatons`() {
+    fun `check open api version return no validations`() {
         @Language("YAML")
         val context = DefaultContextFactory().getOpenApiContext(
                 """

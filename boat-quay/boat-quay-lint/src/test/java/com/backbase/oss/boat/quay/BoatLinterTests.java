@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,11 +41,10 @@ public class BoatLinterTests {
     public void testBoatViolationDisplay() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
-        BoatViolation testDisplay = boatLintReport.getViolations().get(0);
-        if (!testDisplay.displayString().contains("[219]")){
-            testDisplay = boatLintReport.getViolations().get(2);
-        }
-        assertEquals("[219] MUST - Provide API Audience: API Audience must be provided",testDisplay.displayString());
+        Optional<BoatViolation> testDisplay = boatLintReport.getViolations().stream()
+            .filter(t -> t.displayString().contains("[B007]")).findFirst();
+        assertTrue(testDisplay.isPresent());
+        assertEquals("[B007] MUST - Check prefix for paths: Incorrect path prefix: wallet. Correct values are [client-api, service-api, integration-api]", testDisplay.get().displayString());
     }
 
     @Test
