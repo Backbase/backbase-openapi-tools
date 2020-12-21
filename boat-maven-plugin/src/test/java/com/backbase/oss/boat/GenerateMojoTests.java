@@ -22,12 +22,12 @@ public class GenerateMojoTests {
     private final MavenProject project = new MavenProject();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         buildContext.enableLogging(new ConsoleLogger());
     }
 
     @Test
-    public void addTestCompileSourceRoot() throws MojoExecutionException {
+    void addTestCompileSourceRoot() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateMojo(), DefaultCodegen.class.getName());
 
         mojo.addCompileSourceRoot = false;
@@ -46,7 +46,7 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useJavaBoat() throws MojoExecutionException {
+    void useJavaBoat() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateMojo(), "java");
 
         mojo.execute();
@@ -55,7 +55,7 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useSpringBoat() throws MojoExecutionException {
+    void useSpringBoat() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateMojo(), "spring");
 
         mojo.execute();
@@ -64,7 +64,7 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useJavaBoatForRestTemplateEmbedded() throws MojoExecutionException {
+    void useJavaBoatForRestTemplateEmbedded() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateRestTemplateEmbeddedMojo(), null);
 
         mojo.execute();
@@ -73,7 +73,7 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useSpringBoatForSpringBootEmbedded() throws MojoExecutionException {
+    void useSpringBoatForSpringBootEmbedded() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateSpringBootEmbeddedMojo(), null);
 
         mojo.execute();
@@ -82,7 +82,7 @@ public class GenerateMojoTests {
     }
 
     @Test
-    public void useJavaBoatForWebClientEmbedded() throws MojoExecutionException {
+    void useJavaBoatForWebClientEmbedded() throws MojoExecutionException {
         GenerateMojo mojo = configure(new GenerateWebClientEmbeddedMojo(), null);
 
         mojo.execute();

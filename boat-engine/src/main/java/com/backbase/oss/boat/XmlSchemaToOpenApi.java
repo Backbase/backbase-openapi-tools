@@ -21,10 +21,11 @@ import org.w3c.dom.NodeList;
 import java.nio.charset.StandardCharsets;
 
 @Log
+@SuppressWarnings({"java:S3740", "rawtypes"})
 public class XmlSchemaToOpenApi {
     public static final String NAME = "name";
     public static final String TYPE = "type";
-    private static DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    private static final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
     private XmlSchemaToOpenApi(){
             throw new AssertionError("Private constructor");

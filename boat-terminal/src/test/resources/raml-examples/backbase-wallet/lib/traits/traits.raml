@@ -1,0 +1,132 @@
+#%RAML 1.0 Library
+schemas:
+  Bad-Request-Error: !include ../types/schemas/bad-request-error.json
+  Unauthorized-Error: !include ../types/schemas/unauthorized-error.json
+  Unauthorized-Alt-Error: !include ../types/schemas/unauthorized-alt-error.json  
+  Not-Acceptable-Error: !include ../types/schemas/not-acceptable-error.json
+  Internal-Server-Error: !include ../types/schemas/internal-server-error.json
+  Forbidden-Error: !include ../types/schemas/forbidden-error.json  
+  Not-Found-Error: !include ../types/schemas/not-found-error.json
+  Unsupported-Media-Type-Error: !include ../types/schemas/unsupported-media-type-error.json  
+traits:
+  idempotent:
+    headers:
+      X-Request-Id:
+        description: Correlates HTTP requests between a client and server.
+        required: false
+        example: f058ebd6-02f7-4d3f-942e-904344e8cde5
+  pageable:
+     queryParameters:
+       from:
+         description: Page Number. Skip over pages of elements by specifying a start value for the query
+         type: integer
+         required: false
+         example: 20
+         default: 0
+       cursor:
+         description: |
+           Record UUID. As an alternative for specifying 'from' this allows to point to the record to start the selection from.
+         type: string
+         required: false
+         example: 76d5be8b-e80d-4842-8ce6-ea67519e8f74
+         default: ""
+       size:
+         description: |
+           Limit the number of elements on the response. When used in combination with cursor, the value
+           is allowed to be a negative number to indicate requesting records upwards from the starting point indicated
+           by the cursor.
+         type: integer
+         required: false
+         example: 80
+         default: 10
+  orderable:
+     queryParameters:
+       orderBy:
+         description: |
+           Order by field: <<fieldsList>>
+         type: string
+         required: false
+       direction:
+         description: Direction
+         enum: [ASC, DESC]
+         default: DESC
+         required: false
+  challengeable:
+    headers:
+      X-MFA:
+        description: Challenge payload response
+        required: false
+        example: sms challenge="123456789"
+    responses:
+      401:
+        description: Unauthorized
+        headers:
+          WWW-Authenticate:
+            description: Comma separated challenges
+            required: false
+            example: sms challenge="", pki challenge="Z8nlwZe0daUNWCWIbfJe3iIgauh"
+        body:
+          application/json:
+            type: Unauthorized-Error
+  BadRequestError:
+    responses:
+      400:
+        description: BadRequest
+        body:
+          application/json:
+            type: Bad-Request-Error
+            example: !include ../types/examples/example-bad-request-error.json
+  UnauthorizedError:
+    responses:
+      401:
+        description: Unauthorized
+        headers:
+          WWW-Authenticate:
+            description: Indicates the authentication scheme(s) and parameters applicable to the target resource
+            required: false
+            example: |
+              WWW-Authenticate: Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"  
+        body:
+          application/json:
+            type: Unauthorized-Alt-Error
+            example: !include ../types/examples/example-unauthorized-alt-error.json            
+  ForbiddenError:
+    responses:
+      403:
+        description: Forbidden
+        body:
+          application/json:
+            type: Forbidden-Error
+            example: !include ../types/examples/example-forbidden-error.json
+  NotFoundError:
+    responses:
+      404:
+        description: NotFound
+        body:
+          application/json:
+            type: Not-Found-Error
+            example: !include ../types/examples/example-not-found-error.json            
+  NotAcceptableError:
+    responses:
+      406:
+        description: NotAcceptable
+        body:
+          application/json:
+            type: Not-Acceptable-Error
+            example: !include ../types/examples/example-not-acceptable-error.json
+  UnsupportedMediaTypeError:
+    responses:
+      415:
+        description: UnsupportedMediaType
+        body:
+          application/json:
+            type: Unsupported-Media-Type-Error
+            example: !include ../types/examples/example-unsupported-media-type-error.json        
+  InternalServerError:
+    responses:
+      500:
+        description: InternalServerError
+        body:
+          application/json:
+            type: Internal-Server-Error
+            example: !include ../types/examples/example-internal-server-error.json

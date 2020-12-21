@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 
+@SuppressWarnings({"rawtypes", "java:S3740"})
 @Slf4j
 public class UnAliasTransformer implements Transformer {
 
@@ -96,7 +97,7 @@ public class UnAliasTransformer implements Transformer {
         oSet.accept(aGet.get());
     }
 
-    private static Boolean isAliasOfSimpleTypes(Schema schema) {
+    private static boolean isAliasOfSimpleTypes(Schema schema) {
         if (schema.getType() == null) {
             // is this an object - because then it is not an alias for a simple type?
             return !(schema.getProperties() != null && !schema.getProperties().isEmpty());

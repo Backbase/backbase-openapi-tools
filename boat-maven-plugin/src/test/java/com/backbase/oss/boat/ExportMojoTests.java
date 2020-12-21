@@ -16,8 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class ExportMojoTests {
@@ -29,7 +28,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testInputFile() throws MojoExecutionException {
+    void testInputFile() throws MojoExecutionException {
 
         ExportMojo mojo = new ExportMojo();
 
@@ -56,7 +55,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testLicenceAdder() throws MojoExecutionException, OpenAPILoaderException {
+    void testLicenceAdder() throws MojoExecutionException, OpenAPILoaderException {
 
         ExportMojo mojo = new ExportMojo();
 
@@ -87,7 +86,7 @@ public class ExportMojoTests {
     }
 
     @Test
-    public void testInputDir() throws MojoExecutionException {
+    void testInputDir() throws MojoExecutionException {
         ExportMojo mojo = new ExportMojo();
 
         File input = getFile("/raml-examples/backbase-wallet");
@@ -108,6 +107,23 @@ public class ExportMojoTests {
         assertTrue(new File("target/presentation-client-api/openapi.yaml").exists());
         assertTrue(new File("target/presentation-integration-api/openapi.yaml").exists());
         assertTrue(new File("target/presentation-service-api/openapi.yaml").exists());
+
+    }
+
+    @Test
+    void testErrorCatching(){
+        ExportMojo mojo = new ExportMojo();
+        mojo.inputFile=null;
+        // tests for valid file path that contains no raml spec
+        mojo.input=getFile("/raml-examples/export-mojo-error-catching/error");
+
+        assertThrows(MojoExecutionException.class,mojo::execute);
+        // tests for invalid path
+        mojo.input = new File("bad-file-path");
+        assertThrows(MojoExecutionException.class,mojo::execute);
+
+        mojo.inputFile = getFile("/raml-examples/export-mojo-error-catching/invalid-presentation-client-api.raml");
+        assertThrows(MojoExecutionException.class,mojo::execute);
 
     }
 

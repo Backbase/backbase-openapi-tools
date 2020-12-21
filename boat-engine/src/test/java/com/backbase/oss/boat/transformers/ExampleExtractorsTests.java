@@ -16,24 +16,24 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExampleExtractorsTests {
+class ExampleExtractorsTests {
 
     @Test
-    public void test_headerExamples_noExample() {
+    void test_headerExamples_noExample() {
         Header header = new Header();
         List<NamedExample> examples = ExampleExtractors.headerExamples(header);
         assertTrue(examples.isEmpty());
     }
 
     @Test
-    public void test_headerExamples_nullExamplesMap() {
+    void test_headerExamples_nullExamplesMap() {
         Header header = new Header().examples(null);
         List<NamedExample> examples = ExampleExtractors.headerExamples(header);
         assertTrue(examples.isEmpty());
     }
 
     @Test
-    public void test_headerExamples_examplesMapNotEmpty() {
+    void test_headerExamples_examplesMapNotEmpty() {
         Schema<?> schema = new Schema<>().name("MySchema");
         String key = "example-1";
         Example example = new Example().value("1234");
@@ -48,14 +48,14 @@ public class ExampleExtractorsTests {
     }
 
     @Test
-    public void test_parameterExamples_nullExamples() {
+    void test_parameterExamples_nullExamples() {
         Parameter parameter = new Parameter();
         List<NamedExample> examples = ExampleExtractors.parameterExamples(parameter);
         assertTrue(examples.isEmpty());
     }
 
     @Test
-    public void test_parameterExamples_examplesMapNotEmpty() {
+    void test_parameterExamples_examplesMapNotEmpty() {
         Example example = new Example().value("some-value");
         Parameter parameter = new Parameter()
                 .name("accountId")
@@ -67,7 +67,7 @@ public class ExampleExtractorsTests {
     }
 
     @Test
-    public void test_parameterExamples_examplesMapNotEmptyAndContentExamples() {
+    void test_parameterExamples_examplesMapNotEmptyAndContentExamples() {
         Example example = new Example().value("some-value");
         String mediaTypeExampleName = "MediaTypeExampleName1";
         String mediaType$ref = "../openapi.yaml#/components/schemas/SomeName";
@@ -91,14 +91,14 @@ public class ExampleExtractorsTests {
     }
 
     @Test
-    public void test_contentExamples_noMediaType() {
+    void test_contentExamples_noMediaType() {
         Content content = new Content();
         List<NamedExample> examples = ExampleExtractors.contentExamples(content);
         assertTrue(examples.isEmpty());
     }
 
     @Test
-    public void test_contentExamples_mediaTypeAndItsEncodingPresent() {
+    void test_contentExamples_mediaTypeAndItsEncodingPresent() {
         String encodingExampleName = "jim";
         Example encodingExample = new Example().value("blacksmith");
         String headerSchemaName = "MySchema";
