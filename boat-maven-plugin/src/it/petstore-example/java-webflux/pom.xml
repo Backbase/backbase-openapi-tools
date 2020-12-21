@@ -36,7 +36,7 @@
                         <id>backbase.stream.start</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>generate-webclient-embedded</goal>
+                            <goal>start-webflux</goal>
                         </goals>
                         <configuration>
                             <inputSpec>https://github.com/OAI/OpenAPI-Specification/blob/master/examples/v3.0/petstore.yaml</inputSpec>
