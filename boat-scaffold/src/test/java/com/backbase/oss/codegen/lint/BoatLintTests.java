@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BoatLintTests {
+class BoatLintTests {
 
     @Test
-    public void testBoatLint() throws IOException {
+    void testBoatLint() throws IOException {
 
         File input = getFile("/oas-examples/petstore.yaml");
         File output = new File("target/boat-lint");

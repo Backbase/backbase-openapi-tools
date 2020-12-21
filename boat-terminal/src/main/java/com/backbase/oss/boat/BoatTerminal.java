@@ -2,6 +2,7 @@ package com.backbase.oss.boat;
 
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
+import ch.qos.logback.classic.Level;
 import com.backbase.oss.boat.BoatTerminal.VersionProvider;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.OpenAPIExtractor;
@@ -71,6 +72,10 @@ public class BoatTerminal implements Runnable {
     }
 
     private final Logger root;
+
+    public Level getRootLevel() {
+        return root.getLevel();
+    }
 
     public BoatTerminal() {
         this.root = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);

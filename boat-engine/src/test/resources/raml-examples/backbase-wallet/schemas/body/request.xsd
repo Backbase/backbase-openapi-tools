@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/customer_inquiry_request_schema" xmlns:tns="http://www.example.org/customer_inquiry_request_schema" elementFormDefault="qualified">
+
+    <element name="customerInquiryRequest" type="tns:requestType"></element>
+
+
+    <complexType name="requestType">
+        <sequence>
+            <element name="customer" type="tns:customerType" maxOccurs="unbounded" minOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="customerType">
+        <sequence>
+            <element name="customerId" type="string"></element>
+        </sequence>
+    </complexType>
+</schema>

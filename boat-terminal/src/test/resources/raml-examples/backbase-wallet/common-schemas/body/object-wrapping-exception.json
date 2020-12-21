@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.backbase.buildingblocks.test.exceptions.ObjectWrappingException",
+  "properties": {
+    "message": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object"
+    }
+  }
+}

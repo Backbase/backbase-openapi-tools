@@ -2,17 +2,23 @@ package com.backbase.oss.boat;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.AssertFalse;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UtilTests {
+ class UtilTests {
 
     @SneakyThrows
     @Test
-    public void testUtils() {
+     void testUtils() {
         URL url = new URL("file://test.json");
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
@@ -21,9 +27,10 @@ public class UtilTests {
 
     @SneakyThrows
     @Test
-    public void testUtils2() {
+     void testUtils2() {
         URL url = new URL("file://test.json");
         URL other = new URL("file://other.json");
+        URL unusual = new URL("file://unusual.json");
         BiMap<String, String> referenceNames = HashBiMap.create();
         String actual;
         actual = Utils.getSchemaNameFromReference(url, "test", referenceNames);
@@ -34,7 +41,21 @@ public class UtilTests {
         assertEquals("Test", actual);
         actual = Utils.getSchemaNameFromReference(other, "other", referenceNames);
         assertEquals("Other",actual);
+        referenceNames.put("file://unusual.json", "differentToUrl");
+        actual = Utils.getSchemaNameFromReference(unusual, "unusual", referenceNames);
+        referenceNames.put("reference.json", "reference");
+        assertEquals("UnusualUnusual",actual);
+        actual = Utils.getSchemaNameFromReference("reference.json","reference",referenceNames);
+        assertEquals("ReferenceDuplicate", actual);
     }
+
+    @Test
+    void testUtilsDirectory() throws MalformedURLException {
+       URL url = new URL("file://test.json");
+       assertFalse(Utils.isDirectory(url,"test"));
+
+    }
+
 
 
 }
