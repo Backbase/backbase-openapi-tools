@@ -504,6 +504,8 @@ public class GenerateMojo extends AbstractMojo {
             return;
         }
 
+
+
         File inputSpecFile = new File(inputSpec);
         File inputParent = inputSpecFile.getParentFile();
 
