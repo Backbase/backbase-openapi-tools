@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AbstractBoatEngineTestBase {
+class AbstractBoatEngineTestBase {
 
 
     protected File getFile(String name) {

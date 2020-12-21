@@ -42,6 +42,7 @@ paths:
     post:
       summary: Create a pet
       operationId: createPets
+      deprecated: true
       tags:
         - pets
       responses:
@@ -61,8 +62,8 @@ paths:
       tags:
         - pets
       parameters:
-        - name: petId
-          in: path
+        - in: path
+          name: petId
           required: true
           description: The id of the pet to retrieve
           schema:
@@ -80,6 +81,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    delete:
+      deprecated: true
+      summary: deletePet
+      operationId: deleteByPetId
+      tags:
+        - pets
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pet/update:
+      put:
+        deprecated: true
+        summary: update pet
+        operationId: putPetById
+        tags:
+          - pets
+        parameters:
+          - in: body
+            name: name
+            description: The name of the pet to retrieve
+            schema:
+              type: string
+          - name: tag
+            in: body
+            description: Pet tag
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Expected response to a valid request
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Pet"
+          default:
+            description: unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
 components:
   schemas:
     Pet:

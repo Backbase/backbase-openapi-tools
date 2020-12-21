@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.backbase.buildingblocks.presentation.errors.NotAcceptableException",
+  "properties": {
+    "message": {
+      "type": "string"
+    },
+    "supportedMediaTypes": {
+      "type": "array",
+      "description": "List of supported media types for this endpoint",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

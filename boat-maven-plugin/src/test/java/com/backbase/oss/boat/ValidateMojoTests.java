@@ -6,12 +6,13 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ValidateMojoTests {
+class ValidateMojoTests {
 
     @Test
-    public void testValidation() throws MojoFailureException {
+    void testValidation() throws MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -21,12 +22,12 @@ public class ValidateMojoTests {
         mojo.setInput(input);
         mojo.setFailOnWarning(true);
 
-        mojo.execute();
+        assertDoesNotThrow(mojo::execute);
 
     }
 
     @Test
-    public void testValidationCatches() throws MojoFailureException, MojoExecutionException{
+    void testValidationCatches() throws MojoFailureException, MojoExecutionException{
 
 
         ValidateMojo mojo = new ValidateMojo();
@@ -34,6 +35,34 @@ public class ValidateMojoTests {
         mojo.setFailOnWarning(true);
 
         assertThrows(MojoFailureException.class, mojo::execute);
+
+        String spec = System.getProperty("spec", getClass().getResource("/raml-examples/export-mojo-error-catching/error").getFile());
+
+        File input = new File(spec);
+
+
+        mojo.setInput(input);
+        mojo.setFailOnWarning(true);
+
+        assertThrows(MojoFailureException.class, mojo::execute);
+        mojo.setFailOnWarning(false);
+        assertDoesNotThrow(()->mojo.execute());
+
+
+    }
+
+    @Test
+    void testValidatingDirectory() throws MojoFailureException {
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/").getFile());
+
+        File input = new File(spec);
+
+        ValidateMojo mojo = new ValidateMojo();
+        mojo.setInput(input);
+        mojo.setFailOnWarning(true);
+
+
+        assertDoesNotThrow(()-> mojo.execute());
 
 
     }
