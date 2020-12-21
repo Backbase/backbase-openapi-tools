@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ValidateMojoTests {
+class ValidateMojoTests {
 
     @Test
     void testValidation() throws MojoFailureException {
@@ -22,7 +22,7 @@ public class ValidateMojoTests {
         mojo.setInput(input);
         mojo.setFailOnWarning(true);
 
-        mojo.execute();
+        assertDoesNotThrow(mojo::execute);
 
     }
 
