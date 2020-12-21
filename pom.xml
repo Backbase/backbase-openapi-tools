@@ -382,12 +382,6 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco-maven-plugin.version}</version>
                 </plugin>
-
-                <plugin>
-
-
-
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
