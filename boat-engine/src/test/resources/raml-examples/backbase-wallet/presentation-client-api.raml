@@ -68,7 +68,8 @@ securedBy: [ bb.bbAccessControl ]
           body:
             application/json:
               type: common.PaymentCards
-              example: !include examples/body/paymentcards-get.json
+              examples:
+               example: !include examples/body/paymentcards-get.json
             text/csv:
             application/xml:
     post:

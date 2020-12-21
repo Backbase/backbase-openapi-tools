@@ -1,0 +1,12 @@
+{
+  "message": "Unsupported media type.",
+  "errors": [
+    {
+      "message": "The request entity has a media type {mediaType} which the resource does not support.",
+      "key": "common.api.mediaType",
+      "context": {
+        "mediaType": "application/javascript"
+      }
+    }
+  ]
+}

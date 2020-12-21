@@ -579,8 +579,8 @@ public class GenerateMojo extends AbstractMojo {
                 configurator.setRemoveOperationIdPrefix(removeOperationIdPrefix);
             }
 
-            if (inputSpecFile.exists()) {
-                configurator.setInputSpec(inputSpecFile.getAbsoluteFile().toURI().toString());
+            if (isNotEmpty(inputSpec)) {
+                configurator.setInputSpec(inputSpec);
             }
 
             if (isNotEmpty(gitHost)) {

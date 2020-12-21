@@ -15,23 +15,10 @@ baseUri: "client-api/{version}"
 mediaType:  [application/json, application/xml]
 protocols: [ HTTP, HTTPS ]
 types:
-  Song:
-    properties:
-      title: string
-      length: number
-    examples:
-      song1:
-        strict: false
-        value:
-          title: "My Song"
-          length: 12
-      song2:
-        title: "Last"
-        length: 3
+  Song: !include schemas/body/song-type.xsd
   Person:
     properties:
       name:
-        type: string
         xml:
           attribute: true # serialize it as an XML attribute
           name: "fullname" # attribute should be called fullname
@@ -39,16 +26,33 @@ types:
         type: Address[]
         xml:
           wrapped: true # serialize it into its own <addresses>...</addresses> XML element
+      age: number
+      birthday: date-only
+      other: any
   Address:
     properties:
       street: string
       city: string
+    examples:
+      example1:
+        strict: false
+        value:
+          street: "sweetums"
+          city: "Pawnee"
+      example2:
+        strict: false
+        value:
+          street: "copy paper"
+          city: "Staples"
   customFile:
       type: file
       fileTypes: ['*/*'] # any file type allowed
       maxLength: 1048576
+  unionType:
+    type: integer|boolean
+
   CustomDate:
-      type: date-only
+      type: datetime-only
       facets:
         onlyFutureDates?: boolean # optional  in `PossibleMeetingDate`
         noHolidays: boolean # required in `PossibleMeetingDate`
@@ -56,9 +60,14 @@ types:
       properties:
         firstname: string
         lastname:
-          type: string
+          type: string|nil
           example: Doe
           required: false
+  songId:
+    type: string
+    maxLength: 15
+    examples:
+     example: "1890-8541-0423"
 annotationTypes:
   deprecated:
     properties:
@@ -77,7 +86,7 @@ securedBy: [ bb.bbAccessControl ]
     description: Create a Job
     body:
       application/xml:
-        type: |
+        schema: |
           <xs:schema attributeFormDefault="unqualified"
                      elementFormDefault="qualified"
                      xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -89,7 +98,8 @@ securedBy: [ bb.bbAccessControl ]
               </xs:complexType>
             </xs:element>
           </xs:schema>
-        example: |
+        examples:
+         example: |
           <api-request>
             <input>Test Input</input>
           </api-request>
@@ -98,13 +108,11 @@ securedBy: [ bb.bbAccessControl ]
         body:
           application/xml:
             schema: !include common-schemas/body/content.xml
-
-
 /customer:
   post:
     body:
       application/xml:
-        type: !include datatypes/Content.raml
+        schema: !include schemas/body/request.xsd
     responses:
       200:
         body:
@@ -113,18 +121,15 @@ securedBy: [ bb.bbAccessControl ]
 /songs:
   displayName: Songs
   description:  Access to all songs inside the music world library.
-  post:
   /{songId}:
+    uriParameters:
+      songId:
+        type: string
+        examples:
+          example: "1890-8541-0423"
     get:
-      (deprecated):
-        date: 2016-02-28T16:41:41.090Z
-        deprecatedBy:
-          firstname: Christian
-        comment: no comment
       responses:
         200:
           body:
-            application/json:
-              type: Song
             application/xml:
-              schema: !include schemas/body/song.xml
+              schema: !include schemas/body/song.xsd
