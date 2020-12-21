@@ -46,7 +46,7 @@ class ValidateMojoTests {
 
         assertThrows(MojoFailureException.class, mojo::execute);
         mojo.setFailOnWarning(false);
-        mojo.execute();
+        assertDoesNotThrow(()->mojo.execute());
 
 
     }
