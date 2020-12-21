@@ -4,6 +4,7 @@ info:
   title: Swagger Petstore
   description: An API
   x-api-id: provider
+  x-icon: pet
   contact:
     name: John
     url: https://john.no
@@ -11,15 +12,15 @@ info:
 servers:
   - url: http://petstore.swagger.io/
 tags:
-  - name: pets
-    description: Pets tags
+  - name: Retail
+    description: Retail pets tags
 paths:
-  /pets:
+  /client-api/pets:
     get:
       summary: List all pets
       operationId: listPets
       tags:
-        - pets
+        - Retail
       responses:
         '200':
           description: A paged array of pets
