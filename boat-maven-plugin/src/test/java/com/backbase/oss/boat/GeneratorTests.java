@@ -10,10 +10,8 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
-
 import java.io.File;
 import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
@@ -288,6 +286,44 @@ public class GeneratorTests {
         defaultBuildContext.enableLogging(new ConsoleLogger());
         mojo.generatorName = "java";
         mojo.library = "native";
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.skipOverwrite = false;
+        mojo.generateAliasAsModel = false;
+        mojo.execute();
+
+        InvocationRequest invocationRequest = new DefaultInvocationRequest();
+        invocationRequest.setPomFile(new File(output, "pom.xml"));
+        invocationRequest.setGoals(Arrays.asList("compile"));
+        invocationRequest.setBatchMode(true);
+
+        Invoker invoker = new DefaultInvoker();
+        InvocationResult invocationResult = invoker.execute(invocationRequest);
+        assertNull(invocationResult.getExecutionException());
+
+    }
+
+    @Test
+    public void testReactiveJavaClient() throws MojoExecutionException, MavenInvocationException {
+        GenerateMojo mojo = new GenerateMojo();
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        File input = new File(spec);
+        File output = new File("target/webclient");
+        if (output.exists()) {
+            output.delete();
+        }
+        output.mkdirs();
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+        mojo.generatorName = "java";
+        mojo.library = "webclient";
         mojo.buildContext = defaultBuildContext;
         mojo.project = new MavenProject();
         mojo.inputSpec = input.getAbsolutePath();

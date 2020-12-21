@@ -30,7 +30,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -72,6 +71,7 @@ import org.raml.v2.api.model.v10.system.types.AnnotableStringType;
 import org.raml.v2.api.model.v10.system.types.MarkdownString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import static com.backbase.oss.boat.ExampleUtils.getExampleObject;
 
@@ -147,7 +147,7 @@ public class Exporter {
             String ramlAsString = new String(Files.readAllBytes(inputFile.toPath()), Charset.defaultCharset());
             JsonNode jsonNode = mapper.readTree(ramlAsString);
             parseRamlTypeReferences(baseUrl, ramlTypeReferences, jsonNode);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new ExportException("Failed to export ramlTypes", e);
         }
 
@@ -331,7 +331,7 @@ public class Exporter {
         return Collections.singletonList(new Tag().name(title));
     }
 
-    private String cleanupMarkdownString(String value) {
+    protected static String cleanupMarkdownString(String value) {
         StringBuilder stringBuilder = new StringBuilder();
         String[] lines = value.split(NEW_LINE);
         for (int i = 0; i < lines.length; i++) {
@@ -651,8 +651,9 @@ public class Exporter {
                     operationId += suffix;
                 }
             }
-
-            log.warn("Operation {} for path: {}  already exists! using: {}", finalOperationId, resource.resourcePath(), operationId);
+            if(log.isWarnEnabled()) {
+                log.warn("Operation {} for path: {}  already exists! using: {}", finalOperationId, resource.resourcePath(), operationId);
+            }
         }
 
         if (operationIdExists(operations, finalOperationId)) {

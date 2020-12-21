@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType":"com.backbase.buildingblocks.test.data.DateTimeTestResponse",
+  "properties": {
+    "dateTimeOnly": {
+      "type": "string"
+    },
+    "dateTimeOnlyParsedValue": {
+      "type": "string"
+    },
+    "dateTime": {
+      "type": "string"
+    },
+    "dateTimeParsedValue": {
+      "type": "string"
+    },
+    "dateTime2616": {
+      "type": "string"
+    },
+    "dateTime2616ParsedValue": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "dateParsedValue": {
+      "type": "string"
+    },
+    "time": {
+      "type": "string"
+    },
+    "timeParsedValue": {
+      "type": "string"
+    },
+    "formatDateTime": {
+      "description": "The dateTime parameter formatted as 'date-time', java.util.Date or java.time.ZoneDateTime",
+      "type": "string",
+      "format": "date-time"
+    },
+    "formatDate": {
+      "description": "The date parameter formatted as 'date', String or java.time.LocalDate",
+      "type": "string",
+      "format": "date"
+    },
+    "formatTime": {
+      "description": "The time parameter formatted as 'time', String or java.time.LocalTime",
+      "type": "string",
+      "format": "time"
+    },
+    "formatUtcMillisec": {
+      "description": "The dateTime parameter formatted as 'date', long",
+      "type": "string",
+      "format": "utc-millisec"
+    }
+  }
+}

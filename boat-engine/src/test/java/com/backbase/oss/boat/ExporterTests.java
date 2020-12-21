@@ -16,16 +16,16 @@ import java.util.TimeZone;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class ExporterTests extends AbstractBoatEngineTestBase {
+class ExporterTests extends AbstractBoatEngineTestBase {
 
     Logger log = LoggerFactory.getLogger(ExporterTests.class);
 
@@ -36,7 +36,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testHelloWorld() throws Exception {
+    void testHelloWorld() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
@@ -44,7 +44,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testUnusualTypesSchemaConversion() throws ExportException, IOException {
+    void testUnusualTypesSchemaConversion() throws ExportException, IOException {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
@@ -52,7 +52,16 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void normalizeNameTests() {
+    void testDuplicateOperation() throws ExportException, IOException {
+        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api-duplicate-operation-id.raml");
+        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
+        String export = SerializerUtils.toYamlString(openAPI);
+        validateExport(export);
+    }
+
+
+    @Test
+    void normalizeNameTests() {
         String s = Utils.normalizeSchemaName("BatchUpload-GET-Response");
         assertEquals("BatchuploadGetResponse", s);
         s = Utils.normalizeSchemaName("batchUpload-GET-Response");
@@ -60,7 +69,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testWalletPresentation() throws Exception {
+    void testWalletPresentation() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -73,52 +82,54 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
         assertNotNull(swaggerParseResult.getOpenAPI().getPaths().get("/client-api/v1/patch"));
     }
 
-    @Test
-    public void testInvalidFile() {
-        File inputFile = getFile("/raml-examples/invalid-ramls/empty.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
-            .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer()))));
-    }
+
 
     @Test
-    public void testWrongTypes() {
-        File inputFile = getFile("/raml-examples/invalid-ramls/invalid-types.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
-            .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer()))));
-    }
-
-    @Test
-    public void testMarkupDocumentation() throws IOException, ExportException {
+    void testMarkupDocumentation() throws IOException, ExportException {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-markup-documentation-client.raml");
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
+
+         String cleanmarkup = Exporter.cleanupMarkdownString(markup());
+         assertFalse(cleanmarkup.startsWith("##"));
     }
-    
-    @Test
-    public void testWalletPresentationMissingRef() {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
-            .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer()))));
+
+    private String markup(){
+        return "## Innovation Layer / Bi-Modal\n" +
+                "    Web API facade on to Alainn's SOA Architecture. Designed to be the central point of access to all business process level SOAP services.\n" +
+                "\n" +
+                "    # Resource Hierarchy\n" +
+                "\n" +
+                "    The resources are in part independent of the user browsing them\n" +
+                "\n" +
+                "    * /items\n" +
+                "    * /brands";
+    }
+
+    @ParameterizedTest
+    @CsvSource( {
+            "/raml-examples/invalid-ramls/empty.raml, Error validation RAML",
+            "/raml-examples/invalid-ramls/invalid-types.raml, Error validation RAML",
+            "/raml-examples/backbase-wallet/presentation-service-api-invalid-missing-ref.raml, Cannot dereference json schema from type: application/json",
+            "/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml, Cannot dereference json schema from type: application/json"
+    })
+    void testErrorCatching(String inputFileName, String expected) {
+        File inputFile = getFile(inputFileName);
+
+        try {
+            Exporter.export(inputFile, new ExporterOptions()
+                    .addJavaTypeExtensions(true)
+                    .convertExamplesToYaml(true)
+                    .transformers(Collections.singletonList(new Decomposer())));
+            fail("expected ExportException to be thrown");
+        } catch (ExportException e){
+            assertEquals(expected,e.getMessage());
+        }
     }
 
     @Test
-    public void testWalletPresentationInvalidRef() throws Exception {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api-invalid-ref.raml");
-        assertThrows(ExportException.class,() -> Exporter.export(inputFile, new ExporterOptions()
-            .addJavaTypeExtensions(true)
-            .convertExamplesToYaml(true)
-            .transformers(Collections.singletonList(new Decomposer()))));
-    }
-
-    @Test
-    public void testWalletIntegration() throws Exception {
+    void testWalletIntegration() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-integration-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -130,7 +141,7 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testWalletService() throws Exception {
+    void testWalletService() throws Exception {
         File inputFile = getFile("/raml-examples/backbase-wallet/presentation-service-api.raml");
         OpenAPI openAPI = Exporter.export(inputFile, new ExporterOptions()
             .addJavaTypeExtensions(true)
@@ -143,24 +154,38 @@ public class ExporterTests extends AbstractBoatEngineTestBase {
     }
 
 
-    @Test
-    public void testBankingApi() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/raml-examples/others/banking-api/api.raml",
+            "/raml-examples/backbase-wallet/presentation-client-api.raml",
+            "/raml-examples/backbase-wallet/presentation-client-api-extension.raml"})
+    void testExportWithDifferentApis(String apiFile) throws Exception {
 
-        File inputFile = getFile("/raml-examples/others/banking-api/api.raml");
+        File inputFile = getFile(apiFile);
         OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
     }
 
-    @Test
-    public void testBackbaseWalletApi() throws Exception {
 
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
-        String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
+    @ParameterizedTest
+    @CsvSource({
+            "/openapi/error-catching/bad-export-api/openapi.yaml, Error validation RAML",
+            "/raml-examples/invalid-ramls, Failed to export ramlTypes"
+    })
+    void testExportErrorCatching(String fileName, String expected) throws IOException {
+        File inputFile = getFile(fileName);
+        try{
+            Exporter.export(inputFile, true, Collections.singletonList(new Decomposer()));
+            fail("expected ExportExpectation to be thrown");
+        }catch (ExportException e){
+            assertEquals(expected,e.getMessage());
+        }
+
     }
 
+//    void testExporterBodyConversion(){
+//        new Exporter().convertExamples();
+//    }
 
     protected SwaggerParseResult validateExport(String export) throws IOException, ExportException {
         if (export == null) {

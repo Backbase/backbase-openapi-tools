@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TransformerTests extends AbstractBoatEngineTestBase {
+class TransformerTests extends AbstractBoatEngineTestBase {
 
     @Test
-    public void testNormalizer() throws OpenAPILoaderException, IOException {
+    void testNormalizer() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"), false);
         new Normaliser().transform(openAPI, null);
@@ -37,7 +37,7 @@ public class TransformerTests extends AbstractBoatEngineTestBase {
     }
 
     @Test
-    public void testDeprecator() throws OpenAPILoaderException, IOException {
+    void testDeprecator() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"), false);
 
@@ -54,8 +54,9 @@ public class TransformerTests extends AbstractBoatEngineTestBase {
 
     }
 
+
     @Test
-    public void testDirectoryExploder() throws OpenAPILoaderException, IOException {
+    void testDirectoryExploder() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-service-api/openapi.yaml"), false);
 
@@ -84,7 +85,7 @@ public class TransformerTests extends AbstractBoatEngineTestBase {
 
 
     @Test
-    public void testPropertiesAdder() throws OpenAPILoaderException, IOException {
+    void testPropertiesAdder() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-client-api/openapi.yaml"), false);
         new AdditionalPropertiesAdder(Arrays.asList("PaymentCard", "TestValuesGetResponseBody"), "test")
@@ -98,7 +99,7 @@ public class TransformerTests extends AbstractBoatEngineTestBase {
 
 
     @Test
-    public void testCaseFormatTransformer() throws OpenAPILoaderException, IOException {
+    void testCaseFormatTransformer() throws OpenAPILoaderException, IOException {
 
         OpenAPI openAPI = OpenAPILoader.load(getFile("/openapi/presentation-client-api/openapi.yaml"), true);
         new CaseFormatTransformer().transform(openAPI, null);

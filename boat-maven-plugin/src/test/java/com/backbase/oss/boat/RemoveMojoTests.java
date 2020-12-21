@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RemoveMojoTests {
 
     @Test
-    public void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
+    void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
 
         File output = getFile("/readWriteFiles/output.yaml");
-        File input = getFile("/oas-examples/petstore-deprecated.yaml");
+        File input = getFile("/bundler/petstore-deprecated.yaml");
         RemoveDeprecatedMojo removeDeprecatedMojo = new RemoveDeprecatedMojo();
         removeDeprecatedMojo.setInput(input);
         removeDeprecatedMojo.setOutput(output);
@@ -32,7 +32,7 @@ public class RemoveMojoTests {
     }
 
     @Test
-    public void testDecomposeMojo() throws MojoFailureException, MojoExecutionException, IOException {
+    void testDecomposeMojo() throws MojoFailureException, MojoExecutionException, IOException {
         File output = getFile("/readWriteFiles/output.yaml");
         File input = getFile("/oas-examples/petstore-composed.yaml");
         DecomposeMojo decomposeMojo = new DecomposeMojo();

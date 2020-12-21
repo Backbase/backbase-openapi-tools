@@ -25,8 +25,9 @@ public abstract class AbstractLintMojo extends AbstractMojo {
     protected boolean failOnWarning;
 
     @Parameter(name = "ignoreRules")
-    protected String[] ignoreRules = new String[]{"219", "105", "M008", " M009", " M010", " M011", " H001", " H002", " S005", " S006", " S007"};
-
+    protected String[] ignoreRules = new String[]{"219","215","218","166","136","174","235","107","171","224","143",
+        "151","129","146","147","172","145","115","132","120", "134","183","154","105","104","130","118","110","153",
+        "101","176","150","116","M009","H002","M010","H001","M008","S005","S006","S007","M011"};
 
     protected List<BoatLintReport> lint() throws MojoExecutionException {
         List<BoatLintReport> boatLintReports = new ArrayList<>();

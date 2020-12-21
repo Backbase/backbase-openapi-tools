@@ -137,18 +137,19 @@ public class BundleMojo extends AbstractMojo {
         }
     }
 
+
     String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
-        String version = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
-        if (version == null) {
+        String openApiVersion = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
+        if (openApiVersion == null) {
             throw new MojoExecutionException("Configured to use version in filename, but no version set.");
         }
         String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
-        String majorFromVersion = version.substring(0, version.indexOf("."));
+        String majorFromVersion = openApiVersion.substring(0, openApiVersion.indexOf("."));
         if (!majorFromFileName.equals(majorFromVersion)) {
-            throw new MojoExecutionException("Invalid version " + version + " in file " + originalFileName);
+            throw new MojoExecutionException("Invalid version " + openApiVersion + " in file " + originalFileName);
         }
         // payment-order-client-api-v2.yaml
-        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + version + "$3");
+        return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + openApiVersion + "$3");
     }
 
 }
