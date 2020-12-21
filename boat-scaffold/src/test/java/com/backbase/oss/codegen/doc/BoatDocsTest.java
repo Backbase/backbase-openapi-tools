@@ -18,7 +18,6 @@ import org.openapitools.codegen.DefaultGenerator;
 
 @Slf4j
 class BoatDocsTest {
-
     @Test
     void testGenerate()  {
         String spec = System.getProperty("spec");
@@ -28,7 +27,6 @@ class BoatDocsTest {
             generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
     }
-
     @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));

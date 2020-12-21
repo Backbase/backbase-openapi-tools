@@ -113,6 +113,7 @@ public class ExampleExtractors {
     }
 
     @NotNull
+    @SuppressWarnings("java:S5998")
     private static String prefixFromSchema(@Nullable Schema<?> optSchema) {
         return Optional.ofNullable(optSchema).map(schema ->
                 Optional.ofNullable(schema.getName()).orElse(

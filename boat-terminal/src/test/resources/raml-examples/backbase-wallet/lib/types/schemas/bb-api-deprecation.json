@@ -1,0 +1,28 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"deprecatedFromVersion": {
+			"type": "string",
+			"description": "Version of the product from which the endpoint has been deprecated and should no longer be used"
+		},
+        "removedFromVersion": {
+          "type": "string",
+          "description": "Version of the product from which the API endpoint will be removed"
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason the API endpoint was deprecated"
+        },
+        "description": {
+          "type": "string",
+          "description": "Any further information, e.g. migration information"
+        }
+	},
+	"required": [
+      "deprecatedFromVersion",
+      "removedFromVersion",
+      "reason",
+      "description"
+	]
+}

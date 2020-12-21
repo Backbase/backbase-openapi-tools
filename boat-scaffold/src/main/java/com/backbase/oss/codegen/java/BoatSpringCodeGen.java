@@ -1,10 +1,12 @@
 package com.backbase.oss.codegen.java;
 
-import static java.util.Optional.ofNullable;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import java.io.IOException;
 import java.io.Writer;
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +19,6 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
@@ -215,14 +214,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer) {
-            if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.containerType = "set";
-                p.baseType = "java.util.Set";
-                p.dataType = "java.util.Set<" + p.items.dataType + ">";
-                p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
-                p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-            }
+        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
+            p.containerType = "set";
+            p.baseType = "java.util.Set";
+            p.dataType = "java.util.Set<" + p.items.dataType + ">";
+            p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
+            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
         }
     }
 
@@ -231,7 +228,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         super.postProcessParameter(p);
 
         if (p.isContainer) {
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+            if (!this.reactive) {
+                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+            }
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.baseType = "java.util.Set";
