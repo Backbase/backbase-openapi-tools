@@ -19,7 +19,7 @@ public class BatchDiffMojoTests {
 
     @SneakyThrows
     @Test
-    public void testBatchDiff() {
+    void testBatchDiff() {
         File specDirectory = getFile("/oas-examples");
         File tempSpecDirectory = new File(new File("target"), "oas-examples-diff");
         FileUtils.copyDirectory(specDirectory, tempSpecDirectory);

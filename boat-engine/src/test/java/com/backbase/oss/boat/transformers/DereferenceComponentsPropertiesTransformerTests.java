@@ -8,21 +8,22 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.File;
 import java.util.Arrays;
+import static java.util.Collections.emptyMap;
+import java.util.HashMap;
+import java.util.Map;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-
-public class DereferenceComponentsPropertiesTransformerTests {
+class DereferenceComponentsPropertiesTransformerTests {
 
     private static final String APPLICATION_JSON = "application/json";
 
     @Test
-    public void testDereferenceComponentsPropertiesApi() throws OpenAPILoaderException {
+    void testDereferenceComponentsPropertiesApi() throws OpenAPILoaderException {
 
         File input = new File("src/test/resources/openapi/decomposer-test-api/openapi.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);
@@ -81,7 +82,7 @@ public class DereferenceComponentsPropertiesTransformerTests {
     }
 
     @Test
-    public void testNullComponentsShouldNotFailWithNPE() {
+    void testNullComponentsShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
         try {
             new DereferenceComponentsPropertiesTransformer().transform(openAPI, emptyMap());
@@ -92,7 +93,7 @@ public class DereferenceComponentsPropertiesTransformerTests {
     }
 
     @Test
-    public void testNullComponentSchemasShouldNotFailWithNPE() {
+    void testNullComponentSchemasShouldNotFailWithNPE() {
         OpenAPI openAPI = new OpenAPI();
         openAPI.setComponents(new Components());
         try {
@@ -101,6 +102,30 @@ public class DereferenceComponentsPropertiesTransformerTests {
             fail("Unexpected NullPointerException");
         }
     }
+
+    @Test
+    void testThrows(){
+        OpenAPI openAPI = new OpenAPI();
+
+        Map<String, Schema> properties = new HashMap<>();
+        properties.put("test-property", new Schema().name("test-property").$ref("ref"));
+
+        Map<String, Schema> schemas = new HashMap<>();
+        Schema schema = new Schema().name("test-schema2").properties(properties);
+        schemas.put("test-schema",schema);
+
+        openAPI.setComponents(new Components().schemas(schemas));
+        DereferenceComponentsPropertiesTransformer transformer =new DereferenceComponentsPropertiesTransformer();
+        Map<String,Object> map = emptyMap();
+        try {
+            transformer.transform(openAPI, map);
+            fail("expected TransformerException to be thrown");
+        }catch (TransformerException e){
+            assertEquals("No component schema found by name #/components/schemas/ref",e.getMessage());
+        }
+    }
+
+
 
     private Schema getProperty(OpenAPI openAPI, String direct, String component) {
         return (Schema) openAPI.getComponents().getSchemas().get(component).getProperties().get(direct);
