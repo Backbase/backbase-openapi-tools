@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.Assert;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
@@ -114,9 +115,14 @@ class DereferenceComponentsPropertiesTransformerTests {
         schemas.put("test-schema",schema);
 
         openAPI.setComponents(new Components().schemas(schemas));
-        Map<String, Object> map = emptyMap();
         DereferenceComponentsPropertiesTransformer transformer =new DereferenceComponentsPropertiesTransformer();
-        Assert.assertThrows(TransformerException.class, () -> transformer.transform(openAPI, map));
+        Map<String,Object> map = emptyMap();
+        try {
+            transformer.transform(openAPI, map);
+            fail("expected TransformerException to be thrown");
+        }catch (TransformerException e){
+            assertEquals("No component schema found by name #/components/schemas/ref",e.getMessage());
+        }
     }
 
 
