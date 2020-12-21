@@ -31,8 +31,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/${git.repository}.git</connection>
-        <developerConnection>scm:git:https://github.com/${git.repository}.git</developerConnection>
+        <connection>scm:git:https://github.com/Backbase/backbase-openapi-tools.git</connection>
+        <developerConnection>scm:git:https://github.com/Backbase/backbase-openapi-tools.git</developerConnection>
     </scm>
 
     <distributionManagement>
