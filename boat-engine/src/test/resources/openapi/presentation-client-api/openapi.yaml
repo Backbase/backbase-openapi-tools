@@ -1199,6 +1199,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DateQueryParamGetResponseBody'
+
 components:
   schemas:
     BadRequestError:

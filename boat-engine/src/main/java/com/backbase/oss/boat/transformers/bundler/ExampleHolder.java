@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
+@SuppressWarnings({"rawtypes","java:S3740"})
 public abstract class ExampleHolder<T> {
 
     private static final String FIXING_INVALID_EXAMPLE_WARNING = "%1$s is an invalid example. \n"
