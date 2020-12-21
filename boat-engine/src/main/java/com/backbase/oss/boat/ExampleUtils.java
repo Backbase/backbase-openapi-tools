@@ -6,13 +6,12 @@ import java.util.stream.Collectors;
 import org.raml.v2.api.model.v10.datamodel.ExampleSpec;
 import org.raml.v2.api.model.v10.datamodel.TypeInstance;
 import org.raml.v2.api.model.v10.datamodel.TypeInstanceProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("java:S5411")
 class ExampleUtils {
 
 
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private ExampleUtils() {
         throw new AssertionError("Private constructor");

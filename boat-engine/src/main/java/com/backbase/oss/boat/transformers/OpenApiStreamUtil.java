@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
+@SuppressWarnings({"rawtypes", "java:S3740"})
 @UtilityClass
 public class OpenApiStreamUtil {
 

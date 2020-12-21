@@ -29,12 +29,10 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class BundlerTests {
@@ -54,20 +52,25 @@ public class BundlerTests {
     };
 
     @Test
-    public void testBoatCache() throws OpenAPILoaderException {
+    void testBoatCache() throws OpenAPILoaderException {
         String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
 
         BoatCache boatCache = new BoatCache(openAPI, null, spec, new ExamplesProcessor(openAPI, input.toURI().toString()));
-        assertThrows(TransformerException.class, () -> boatCache.loadRef("not exists", RefFormat.RELATIVE, Example.class));
 
+        try{
+            boatCache.loadRef("doesn't exist", RefFormat.RELATIVE, Example.class);
+            fail("expects TransformerException to be thrown");
+        }catch (TransformerException e){
+            assertEquals("Reference: doesn't exist cannot be loaded", e.getMessage());
+        }
 
     }
 
     @Test
-    public void testBundleExamples() throws OpenAPILoaderException, IOException {
+    void testBundleExamples() throws OpenAPILoaderException, IOException {
         String file = Paths.get("src/test/resources/openapi/bundler-examples-test-api/openapi.yaml").toAbsolutePath().toString();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -80,7 +83,7 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleHttp() throws OpenAPILoaderException, IOException {
+    void testBundleHttp() throws OpenAPILoaderException, IOException {
 
         String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml";
         OpenAPI openAPI = OpenAPILoader.load(url);
@@ -92,18 +95,52 @@ public class BundlerTests {
     }
 
     @Test
-    public void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
+    void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
         OpenAPI openAPI = OpenAPILoader.load(input);
+        Bundler bundler = new Bundler(input);
+        try {
+            bundler.transform(openAPI, Collections.EMPTY_MAP);
+            fail("Expected TransformerException");
+        }catch (TransformerException e){
+            assertEquals("Unable to fix inline examples",e.getMessage());
+        }
 
-        assertThrows(TransformerException.class, () ->
-            new Bundler(input).transform(openAPI, Collections.emptyMap()));
     }
 
     @Test
-    public void testBundleApi() throws OpenAPILoaderException, IOException {
+    void testExamplesProcessor() throws OpenAPILoaderException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+        OpenAPI openAPIUnproccessed = openAPI;
+        new ExamplesProcessor(openAPI,file).processExamples(openAPI);
+        assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    void testExamplesProcessorComponentError() throws OpenAPILoaderException {
+        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-component-example-error.yaml").getFile();
+        String spec = System.getProperty("spec", file);
+        File input = new File(spec);
+        OpenAPI openAPI = OpenAPILoader.load(input);
+        ExamplesProcessor examplesProcessor = new ExamplesProcessor(openAPI,file);
+        try {
+            examplesProcessor.processExamples(openAPI);
+            fail("Expected TransformerException");
+        }catch (TransformerException e){
+            assertEquals("Failed to process example content for ExampleHolder{name='example-in-components', ref=null}",e.getMessage());
+        }
+
+
+    }
+
+
+    @Test
+    void testBundleApi() throws OpenAPILoaderException, IOException {
         String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
         String spec = System.getProperty("spec", file);
         File input = new File(spec);
@@ -184,7 +221,7 @@ public class BundlerTests {
     }
 
     // @Test - not really a test.
-    public void testDraftsApi() throws OpenAPILoaderException, IOException {
+    void testDraftsApi() throws OpenAPILoaderException, IOException {
 
         File input = new File("/Users/jasper/git/jasper/collect-specs/projects/payment-order-a2a-id-provider-spec/src/main/resources/payment-order-a2a-id-provider-service-api-v1.yaml");
         OpenAPI openAPI = OpenAPILoader.load(input);

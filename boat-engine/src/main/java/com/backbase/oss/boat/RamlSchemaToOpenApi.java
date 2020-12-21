@@ -15,6 +15,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import org.raml.v2.api.model.v10.datamodel.AnyTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.BooleanTypeDeclaration;
@@ -34,39 +35,22 @@ import org.raml.v2.api.model.v10.datamodel.XMLTypeDeclaration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"java:S3776","java:S3740", "rawtypes"})
+@UtilityClass
 public class RamlSchemaToOpenApi {
-
-    private RamlSchemaToOpenApi() {
-        throw new IllegalStateException("Utility class");
-    }
 
     private static final Logger log = LoggerFactory.getLogger(RamlSchemaToOpenApi.class);
 
     public static Schema convert(String name, TypeDeclaration type, Components components) {
-        log.debug("Creating Schema: {} from RAML type: {}", name, type.type());
+        if (log.isDebugEnabled()){
+            log.debug("Creating Schema: {} from RAML type: {}", name, type.type());
+        }
 
         Schema schema;
         if (type instanceof ArrayTypeDeclaration) {
-            schema = new ArraySchema();
-            ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) type;
-            Schema itemSchema = convert(name, arrayTypeDeclaration.items(), components);
-            ((ArraySchema) schema).setItems(itemSchema);
-            if (arrayTypeDeclaration.maxItems() != null) {
-                ((ArraySchema) schema).setMaximum(new BigDecimal(arrayTypeDeclaration.maxItems()));
-            }
-            if (arrayTypeDeclaration.minItems() != null) {
-                ((ArraySchema) schema).setMinimum(new BigDecimal(arrayTypeDeclaration.minItems()));
-            }
+            schema = arrayDeclaration(name,type,components);
         } else if (type instanceof StringTypeDeclaration) {
-            schema = new StringSchema();
-            StringTypeDeclaration stringTypeDeclaration = (StringTypeDeclaration) type;
-            schema.setPattern(stringTypeDeclaration.pattern());
-            schema.setMaxLength(stringTypeDeclaration.maxLength());
-            schema.setMinLength(stringTypeDeclaration.minLength());
-
-            if (!stringTypeDeclaration.enumValues().isEmpty()) {
-                schema.setEnum(stringTypeDeclaration.enumValues());
-            }
+            schema = stringDeclaration(type);
         } else if (type instanceof BooleanTypeDeclaration) {
             schema = new BooleanSchema();
         } else if ((type instanceof DateTimeOnlyTypeDeclaration)
@@ -80,14 +64,7 @@ public class RamlSchemaToOpenApi {
         } else if (type instanceof NumberTypeDeclaration) {
             schema = new NumberSchema();
         } else if (type instanceof ObjectTypeDeclaration) {
-            schema = new ObjectSchema();
-            schema.setName(name);
-            ObjectSchema objectSchema = (ObjectSchema) schema;
-            ObjectTypeDeclaration objectTypeDeclaration = (ObjectTypeDeclaration) type;
-            objectTypeDeclaration.properties().forEach(typeDeclaration -> {
-                Schema propertySchmea = convert(typeDeclaration.name(), typeDeclaration, components);
-                objectSchema.addProperties(typeDeclaration.name(), propertySchmea);
-            });
+            schema = objectDeclaration(name,type,components);
         } else if (type instanceof AnyTypeDeclaration) {
             schema = new Schema().type("string").nullable(true);
         } else if (type instanceof NullTypeDeclaration) {
@@ -105,21 +82,74 @@ public class RamlSchemaToOpenApi {
             schema = XmlSchemaToOpenApi.convert(name, schemaContent, components);
             schema.setDescription(xmlTypeDeclaration.description() != null ? xmlTypeDeclaration.description().value() : null);
         } else if (type instanceof UnionTypeDeclaration) {
-            UnionTypeDeclaration unionTypeDeclaration = (UnionTypeDeclaration) type;
 
-            List<Schema> of = unionTypeDeclaration.of().stream().map(typeDeclaration ->
-                convert(typeDeclaration.name(), typeDeclaration, components))
-                .collect(Collectors.toList());
-
-            schema = new ComposedSchema();
-            ((ComposedSchema) schema).setAnyOf(of);
-            schema.setName(unionTypeDeclaration.name());
-            schema.setDescription(unionTypeDeclaration.description() != null ? unionTypeDeclaration.description().value() : null);
+            schema = unionDeclaration(type,components);
 
         } else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
+
+        return depreciate(schema,name,type);
+    }
+
+    private static Schema arrayDeclaration(String name, TypeDeclaration type, Components components){
+        Schema schema = new ArraySchema();
+        ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) type;
+        Schema itemSchema = convert(name, arrayTypeDeclaration.items(), components);
+        ((ArraySchema) schema).setItems(itemSchema);
+        if (arrayTypeDeclaration.maxItems() != null) {
+            ((ArraySchema) schema).setMaximum(new BigDecimal(arrayTypeDeclaration.maxItems()));
+        }
+        if (arrayTypeDeclaration.minItems() != null) {
+            ((ArraySchema) schema).setMinimum(new BigDecimal(arrayTypeDeclaration.minItems()));
+        }
+        return schema;
+    }
+
+    private static Schema stringDeclaration( TypeDeclaration type){
+        Schema schema = new StringSchema();
+        StringTypeDeclaration stringTypeDeclaration = (StringTypeDeclaration) type;
+        schema.setPattern(stringTypeDeclaration.pattern());
+        schema.setMaxLength(stringTypeDeclaration.maxLength());
+        schema.setMinLength(stringTypeDeclaration.minLength());
+
+        if (!stringTypeDeclaration.enumValues().isEmpty()) {
+            schema.setEnum(stringTypeDeclaration.enumValues());
+        }
+        return schema;
+    }
+
+    private static Schema objectDeclaration(String name, TypeDeclaration type, Components components){
+        Schema schema = new ObjectSchema();
+        schema.setName(name);
+        ObjectSchema objectSchema = (ObjectSchema) schema;
+        ObjectTypeDeclaration objectTypeDeclaration = (ObjectTypeDeclaration) type;
+        objectTypeDeclaration.properties().forEach(typeDeclaration -> {
+            Schema propertySchmea = convert(typeDeclaration.name(), typeDeclaration, components);
+            objectSchema.addProperties(typeDeclaration.name(), propertySchmea);
+        });
+
+        return schema;
+    }
+
+    private static Schema unionDeclaration(TypeDeclaration type, Components components){
+        UnionTypeDeclaration unionTypeDeclaration = (UnionTypeDeclaration) type;
+
+        List<Schema> of = unionTypeDeclaration.of().stream().map(typeDeclaration ->
+                convert(typeDeclaration.name(), typeDeclaration, components))
+                .collect(Collectors.toList());
+
+        Schema schema = new ComposedSchema();
+        ((ComposedSchema) schema).setAnyOf(of);
+        schema.setName(unionTypeDeclaration.name());
+        schema.setDescription(unionTypeDeclaration.description() != null ? unionTypeDeclaration.description().value() : null);
+        return schema;
+    }
+
+
+
+    private static Schema depreciate(Schema schema, String name, TypeDeclaration type){
         schema.setName(name);
         String description = type.description() != null ? type.description().value() : null;
         if (description != null && (description.contains("deprecated") || (description.contains("@deprecated")))) {
@@ -129,7 +159,8 @@ public class RamlSchemaToOpenApi {
         if (type.defaultValue() != null) {
             schema.setDefault(type.defaultValue());
         }
-
         return schema;
     }
+
+
 }
