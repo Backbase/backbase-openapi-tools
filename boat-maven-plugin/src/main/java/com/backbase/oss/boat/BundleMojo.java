@@ -30,7 +30,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 @Mojo(name = "bundle", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
-/*
+/**
   Bundles all references in the OpenAPI specification into one file.
  */
 @Getter
