@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.backbase.oss.boat</groupId>
-    <artifactId>petstore-openapi-generate-webflux</artifactId>
+    <artifactId>petstore-openapi-generate-native-client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
@@ -33,10 +33,10 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>backbase.stream.start</id>
+                        <id>quarkus-maven-plugin</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>start-webflux</goal>
+                            <goal>native-image</goal>
                         </goals>
                         <configuration>
                             <inputSpec>https://github.com/OAI/OpenAPI-Specification/blob/master/examples/v3.0/petstore.yaml</inputSpec>
@@ -48,6 +48,29 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>
+<!--<execution>-->
+<!--<id>generate-transactions-client-api</id>-->
+<!--<phase>generate-sources</phase>-->
+<!--<goals>-->
+<!--    <goal>generate</goal>-->
+<!--</goals>-->
+<!--<configuration>-->
+<!--    <generatorName>java</generatorName>-->
+<!--    <library>native</library>-->
+<!--    <configOptions>-->
+<!--        <dateLibrary>java8</dateLibrary>-->
+<!--        <generateApiTests>false</generateApiTests>-->
+<!--        <generateApiDocumentation>false</generateApiDocumentation>-->
+<!--    </configOptions>-->
+<!--    <inputSpec>${project.basedir}/src/main/resources/transaction-manager-client-api-v2.0.0.yaml</inputSpec>-->
+<!--    <modelPackage>com.backbase.oss.backbot.dbs.transactions.client.model</modelPackage>-->
+<!--    <apiPackage>com.backbase.oss.backbot.dbs.transactions.client.api</apiPackage>-->
+<!--    <generateApiTests>false</generateApiTests>-->
+<!--    <generateModelTests>false</generateModelTests>-->
+<!--    <generateModelDocumentation>false</generateModelDocumentation>-->
+<!--    <generateApiDocumentation>false</generateApiDocumentation>-->
+<!--    <generateSupportingFiles>true</generateSupportingFiles>-->
+<!--    <supportingFilesToGenerate>${boat-maven-plugin.supportingFilesToGenerate}</supportingFilesToGenerate>-->
+<!--</configuration>-->
+<!--</execution>-->
