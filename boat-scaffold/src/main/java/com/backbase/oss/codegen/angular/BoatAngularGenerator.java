@@ -268,6 +268,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         }
 
         inputResponse.getContent().forEach((contentType, mediaType) -> {
+            if (Objects.isNull(mediaType.getSchema())) return;
             String typeDeclaration = getTypeDeclaration(ModelUtils.unaliasSchema(this.openAPI, mediaType.getSchema()));
             codegenOperation.produces.stream()
                     .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))
