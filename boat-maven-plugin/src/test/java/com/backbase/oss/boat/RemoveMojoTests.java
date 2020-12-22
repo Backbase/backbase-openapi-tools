@@ -7,10 +7,8 @@ import java.nio.file.Paths;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 class RemoveMojoTests {

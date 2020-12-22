@@ -29,7 +29,7 @@ import org.openapitools.codegen.ignore.CodegenIgnoreProcessor;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 
 @Slf4j
-public abstract class AbstractDocumentationGenerator  extends AbstractGenerator implements Generator {
+public abstract class AbstractDocumentationGenerator extends AbstractGenerator implements Generator {
 
     protected final CodegenConfig config;
     protected final String input;
@@ -72,7 +72,7 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
 
         for (SupportingFile support : config.supportingFiles()) {
             try {
-                processSupport(support,supportingFilesToGenerate,bundle,files);
+                processSupport(support, supportingFilesToGenerate, bundle, files);
             } catch (Exception e) {
                 throw new CodegenException("Could not generate supporting file '" + support + "'", e);
             }
@@ -81,19 +81,19 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
     }
 
 
-    private void processSupport(SupportingFile support,Set<String> supportingFilesToGenerate, Map<String, Object> bundle, List<File> files) throws IOException {
+    private void processSupport(SupportingFile support, Set<String> supportingFilesToGenerate, Map<String, Object> bundle, List<File> files) throws IOException {
         String outputFolder = config.outputFolder();
         if (StringUtils.isNotEmpty(support.folder)) {
             outputFolder += File.separator + support.folder;
         }
         File of = new File(outputFolder);
         if (!of.isDirectory() && !of.mkdirs()) {
-                log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
+            log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
 
         }
         String outputFilename = new File(support.destinationFilename).isAbsolute() // split
-                ? support.destinationFilename
-                : outputFolder + File.separator + support.destinationFilename.replace('/', File.separatorChar);
+            ? support.destinationFilename
+            : outputFolder + File.separator + support.destinationFilename.replace('/', File.separatorChar);
         if (!config.shouldOverwrite(outputFilename)) {
             log.info("Skipped overwriting {}", outputFilename);
             return;
@@ -105,19 +105,19 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
             templateFile = getFullTemplateFile(config, support.templateFile);
         }
 
-        if (!shouldGenerate(supportingFilesToGenerate,support)) {
+        if (!shouldGenerate(supportingFilesToGenerate, support)) {
             return;
         }
 
         if (ignoreProcessor.allowsFile(new File(outputFilename))) {
-            ignoreProcessorAllowsFile(support,outputFilename,bundle,files,templateFile);
+            ignoreProcessorAllowsFile(support, outputFilename, bundle, files, templateFile);
 
         } else {
             log.info("Skipped generation of {} due to rule in .openapi-generator-ignore", outputFilename);
         }
     }
 
-    private boolean shouldGenerate(Set<String> supportingFilesToGenerate, SupportingFile support){
+    private boolean shouldGenerate(Set<String> supportingFilesToGenerate, SupportingFile support) {
         boolean shouldGenerate = true;
         if (supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
             shouldGenerate = supportingFilesToGenerate.contains(support.destinationFilename);
@@ -125,7 +125,7 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
         return shouldGenerate;
     }
 
-    private void ignoreProcessorAllowsFile(SupportingFile support, String outputFilename, Map<String, Object> bundle, List<File> files,String templateFile) throws IOException {
+    private void ignoreProcessorAllowsFile(SupportingFile support, String outputFilename, Map<String, Object> bundle, List<File> files, String templateFile) throws IOException {
         // support.templateFile is the unmodified/original supporting file name (e.g. build.sh.mustache)
         // templatingEngine.templateExists dispatches resolution to this, performing template-engine specific inspect of support file extensions.
         if (templatingEngine.templateExists(this, support.templateFile)) {
