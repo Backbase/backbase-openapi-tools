@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class BundlerTests {
+class BundlerTests {
 
     private static final String APPLICATION_JSON = "application/json";
     private static final org.hamcrest.Matcher<java.lang.String> isComponentExample = new BaseMatcher<String>() {

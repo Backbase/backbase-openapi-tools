@@ -1,27 +1,23 @@
 package com.backbase.oss.boat;
 
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
-
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.backbase.oss.boat.BoatTerminal.VersionProvider;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.OpenAPIExtractor;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
+import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-import io.swagger.v3.oas.models.OpenAPI;
 import lombok.extern.slf4j.Slf4j;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+import org.slf4j.LoggerFactory;
 import picocli.AutoComplete.GenerateCompletion;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
@@ -54,10 +50,10 @@ public class BoatTerminal implements Runnable {
         private File inputOpt;
 
         @Parameters(description = "Input RAML 1.0 file.")
-        private File input;
+        private File inputFile;
 
         File get() {
-            return this.input != null ? this.input : this.inputOpt;
+            return this.inputFile != null ? this.inputFile : this.inputOpt;
         }
     }
 
@@ -153,7 +149,7 @@ public class BoatTerminal implements Runnable {
                 .serializeIntoDirectory(this.directory);
 
             Files.write(this.directory.resolve("openapi.yaml"),
-                yaml.getBytes(Charset.forName("UTF-8")));
+                yaml.getBytes(StandardCharsets.UTF_8));
         }
         if (this.output != null) {
             final Path parent = this.output.getParent();
@@ -163,10 +159,10 @@ public class BoatTerminal implements Runnable {
             }
 
             Files.write(this.output,
-                yaml.getBytes(Charset.forName("UTF-8")));
+                yaml.getBytes(StandardCharsets.UTF_8));
         }
         if (this.output == null && this.directory == null) {
-            System.out.print(yaml);
+            log.warn("Output path for {}, is null", yaml);
         }
     }
 }

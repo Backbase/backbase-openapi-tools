@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SuppressWarnings("java:S2699")
-public class LintMojoTests {
+class LintMojoTests {
 
     @Test
     void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
