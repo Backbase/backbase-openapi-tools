@@ -31,8 +31,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:{organization}/{project}.git</connection>
-        <developerConnection>scm:git:git@github.com:{organization}/{project}.git</developerConnection>
+        <connection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</connection>
+        <developerConnection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
         <tag>HEAD</tag>
     </scm>
@@ -46,9 +46,6 @@
 
 
     <properties>
-
-        <organization>backbase</organization>
-        <project>backbase-openapi-tools</project>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -456,7 +453,6 @@
                         <version>3.0.0-M1</version>
                         <configuration>
                             <scmCommentPrefix>[ci skip]</scmCommentPrefix>
-                            <goals>install</goals>
                         </configuration>
                     </plugin>
 
