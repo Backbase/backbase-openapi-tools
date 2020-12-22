@@ -18,6 +18,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+@SuppressWarnings("java:S3740")
 public class VendorExtensionFilter implements Transformer {
 
     @Override

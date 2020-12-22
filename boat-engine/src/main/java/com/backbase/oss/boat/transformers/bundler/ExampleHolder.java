@@ -123,8 +123,6 @@ public abstract class ExampleHolder<T> {
 
     private final String name;
 
-    private String exampleName;
-
     private T example;
     private String content;
 
@@ -142,14 +140,6 @@ public abstract class ExampleHolder<T> {
         this.example = example;
     }
 
-    public void setExampleName(String exampleName) {
-        this.exampleName = exampleName;
-    }
-
-    public String getExampleNmae() {
-        return this.exampleName;
-    }
-
     abstract String getRef();
 
     abstract void replaceRef(String ref);
@@ -158,7 +148,7 @@ public abstract class ExampleHolder<T> {
         return new ExampleExampleHolder(name, example, isComponentExample);
     }
 
-    public static ExampleHolder<? extends Object> of(String name, Object o) {
+    public static ExampleHolder of(String name, Object o) {
         if (o instanceof ObjectNode) {
             return new ObjectNodeExampleHolder(name, (ObjectNode) o);
         } else if (o instanceof Map) {
