@@ -10,10 +10,10 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>boat-lint</artifactId>
+    <artifactId>boat-yard</artifactId>
     <packaging>pom</packaging>
 
-    <name>BOAT :: LINT</name>
+    <name>BOAT :: YARD</name>
 
     <build>
         <plugins>
@@ -25,17 +25,16 @@
                         <id>lint</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>lint</goal>
+                            <goal>yard</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/api-with-examples.yaml</inputSpec>
+                            <model>${basedir}/src/main/resources/example-portal.yaml</model>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 
 </project>
 
