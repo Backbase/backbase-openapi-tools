@@ -49,7 +49,7 @@ jobs:
       run: mvn -B verify sonar:sonar
 
   publish:
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    if: "!contains(github.event.head_commit.message, '[version bump]') && contains(github.ref, 'release')"
     runs-on: ubuntu-latest
     needs: [test, sonar]
     steps:
@@ -70,15 +70,52 @@ jobs:
       run: |
         git config user.email "actions@github.com"
         git config user.name "GitHub Actions"
+    - name: Get version from POM without SNAPSHOT
+      run: |
+        VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout |  cut -d- -f1 |  tr "." "\n"))
+        echo "MAJOR=${VERSION_PARTS[0]}" >> $GITHUB_ENV
+        echo "MINOR=${VERSION_PARTS[1]}" >> $GITHUB_ENV
+        echo "PATCH=${VERSION_PARTS[2]}" >> $GITHUB_ENV
+    - name: Setup release version
+      if: contains(github.ref, 'master')
+      run: |
+        NEW_VERSION="$((MAJOR)).$((MINOR)).$((PATCH))"
+        echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+    - name: Update POM Version
+      run: |
+        echo "New version  is: $NEW_VERSION"
+        mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
 
-    - name: Build and Publish
-      uses: samuelmeuli/action-maven-publish@v1
+#    - name: Build and Publish
+#      uses: samuelmeuli/action-maven-publish@v1
+#      with:
+#        maven_args: "-DskipTests=true"
+#        gpg_private_key: ${{ secrets.gpg_private_key }}
+#        gpg_passphrase: ${{ secrets.gpg_passphrase }}
+#        nexus_username: ${{ secrets.nexus_username }}
+#        nexus_password: ${{ secrets.nexus_password }}
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit files
+      run: |
+        git commit -m "[version bump]" -a
+        git tag -a release-$NEW_VERSION -m "[version bump]"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
       with:
-        maven_goals_phases: "release:prepare release:perform"
-        maven_args: "-DskipTests"
-        gpg_private_key: ${{ secrets.gpg_private_key }}
-        gpg_passphrase: ${{ secrets.gpg_passphrase }}
-        nexus_username: ${{ secrets.nexus_username }}
-        nexus_password: ${{ secrets.nexus_password }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Bump And Update POM Version
+      if: contains(github.ref, 'release')
+      run: |
+        NEW_VERSION="$((MAJOR)).$((MINOR+1)).$((PATCH))-SNAPSHOT"
+        git checkout main
+        mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
+        git commit -m "[version bump] Setup new Development Version" -a
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
