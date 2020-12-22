@@ -188,19 +188,17 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
         Object example = parameter.getExample();
 
-        if (parameter.getStyle() != null) {
-            if (parameter.getStyle() == Parameter.StyleEnum.FORM) {
-                if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
-                    try {
-                        List<String> values = paramReader.readValue((ArrayNode) example);
-                        List<BasicNameValuePair> params = values.stream()
-                                .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
-                                .collect(Collectors.toList());
-                        codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
-                    } catch (IOException e) {
-                        log.warn("Failed to format query string parameter: {}", codegenParameter.example);
-                    }
-                }
+        if (parameter.getStyle() != null
+            && parameter.getStyle() == Parameter.StyleEnum.FORM
+            && example instanceof ArrayNode && codegenParameter.isQueryParam) {
+            try {
+                List<String> values = paramReader.readValue((ArrayNode) example);
+                List<BasicNameValuePair> params = values.stream()
+                    .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
+                    .collect(Collectors.toList());
+                codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
+            } catch (IOException e) {
+                log.warn("Failed to format query string parameter: {}", codegenParameter.example);
             }
         }
     }

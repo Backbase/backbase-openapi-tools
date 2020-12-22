@@ -33,13 +33,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String BASE_TYPE = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
-        private final int level;
+
         private final String prefix;
-        private static final String regex = "\\s+$";
+        private static final String REGEX = "\\s+$";
 
         NewLineIndent(int level, String space) {
-            this.level = level;
-            this.prefix = IntStream.range(0, this.level).mapToObj(n -> space).collect(joining());
+            this.prefix = IntStream.range(0, level).mapToObj(n -> space).collect(joining());
         }
 
         @Override
@@ -62,14 +61,14 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         private String[] splitLines(final String text) {
             return stream(text.split("\\r\\n|\\n"))
-                .map(s -> s.replaceFirst(regex, ""))
+                .map(s -> s.replaceFirst(REGEX, ""))
                 .toArray(String[]::new);
         }
 
         private int minIndent(String[] lines) {
             return stream(lines)
                 .filter(StringUtils::isNotBlank)
-                .map(s -> s.replaceFirst(regex, ""))
+                .map(s -> s.replaceFirst(REGEX, ""))
                 .map(NewLineIndent::indentLevel)
                 .min(Integer::compareTo)
                 .orElse(0);
@@ -77,7 +76,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         static int indentLevel(String text) {
             return IntStream
-                .range(0, text.replaceFirst(regex, text).length())
+                .range(0, text.replaceFirst(REGEX, text).length())
                 .filter(n -> !Character.isWhitespace(text.charAt(n)))
                 .findFirst().orElse(0);
         }
