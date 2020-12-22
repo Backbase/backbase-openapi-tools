@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-public class GenerateMojoTests {
+class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
     private final MavenProject project = new MavenProject();
 
@@ -94,6 +94,15 @@ public class GenerateMojoTests {
         mojo.buildContext = buildContext;
         mojo.project = project;
         mojo.inputSpec = "src/test/resources/oas-examples/petstore.yaml";
+        mojo.output = new File("target/generate-mojo-tests");
+        mojo.generatorName = generatorName;
+
+        return mojo;
+    }
+    private <T extends GenerateMojo> T configureUrl(T mojo, String generatorName) {
+        mojo.buildContext = buildContext;
+        mojo.project = project;
+        mojo.inputSpec = "examples/v3.0/api-with-examples.yaml";
         mojo.output = new File("target/generate-mojo-tests");
         mojo.generatorName = generatorName;
 
