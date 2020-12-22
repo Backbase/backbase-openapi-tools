@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-class ExporterTest extends AbstractBoatEngineTestbase {
+class ExporterTest extends AbstractBoatEngineTests {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 

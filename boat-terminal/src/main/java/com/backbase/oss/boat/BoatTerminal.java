@@ -1,28 +1,23 @@
 package com.backbase.oss.boat;
 
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
-
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.backbase.oss.boat.BoatTerminal.VersionProvider;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.OpenAPIExtractor;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
+import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-import io.swagger.v3.oas.models.OpenAPI;
 import lombok.extern.slf4j.Slf4j;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+import org.slf4j.LoggerFactory;
 import picocli.AutoComplete.GenerateCompletion;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
@@ -167,7 +162,7 @@ public class BoatTerminal implements Runnable {
                 yaml.getBytes(StandardCharsets.UTF_8));
         }
         if (this.output == null && this.directory == null) {
-            log.debug("Output path for {}, is null", yaml);
+            log.warn("Output path for {}, is null", yaml);
         }
     }
 }
