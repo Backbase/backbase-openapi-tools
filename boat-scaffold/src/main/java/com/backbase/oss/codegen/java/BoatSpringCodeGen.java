@@ -165,12 +165,18 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
 
         // Whether it's using ApiUtil or not.
-        // Developers can enable or disable it by specifying it in the list of supporting files.
-        writePropertyBack("useApiUtil",
-            ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
-                .map(StringUtils::trimToNull)
-                .map(s -> s.contains("ApiUtil.java"))
-                .orElse(true));
+        // Developers can enable or disable it by just specifying it in the list of supporting files.
+        final boolean useApiUtil = ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
+            .map(StringUtils::trimToEmpty)
+            .map(s -> s.contains("ApiUtil.java"))
+            .orElse(false);
+
+        if (!useApiUtil) {
+            this.supportingFiles
+                .removeIf(sf -> "apiUtil.mustache".equals(sf.templateFile));
+        }
+
+        writePropertyBack("useApiUtil", useApiUtil);
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
