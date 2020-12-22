@@ -31,7 +31,7 @@ jobs:
           git config user.name "GitHub Actions"
 
       - name: Publish JAR
-        run: mvn -B release:prepare release:perform -DskipTests=true
+        run: mvn -B -DskipTests=true release:prepare release:perform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - name: Sending new BOAT into the Maven Ocean
