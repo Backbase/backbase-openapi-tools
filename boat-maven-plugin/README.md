@@ -22,7 +22,7 @@ The `boat` plugin has multiple goals:
     
     Open API Generator based on https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin. All configuration options as 
     defined on openapi-generator-maven-plugin can be applied here too. 
-    boat-maven-plugin uses slightly modified templates for html, java and webclient that help genereate specs and clients that work best in a Backbase projects.
+    boat-maven-plugin uses slightly modified templates for html, java and webclient that help generate specs and clients that work best in a Backbase projects.
    
 - `generate-spring-boot-embedded`, `generate` but with opinionated defaults
 
@@ -133,6 +133,49 @@ The `boat` plugin has multiple goals:
     </configuration>
     ```
 
+- `boat:lint`
+
+   API lint which provides checks for compliance with many of Backbase's API standards
+   
+    Available parameters:
+   
+       failOnWarning (Default: false)
+         Set this to true to fail in case a warning is found.
+   
+       ignoreRules
+         List of rules ids which will be ignored.
+   
+       inputSpec
+         Required: true
+         Input spec directory or file.
+   
+       output (Default:
+       ${project.build.directory}/boat-lint-reports)
+         Output directory for lint reports.
+   
+       showIgnoredRules (Default: false)
+         Set this to true to show the list of ignored rules..
+   
+       writeLintReport (Default: true)
+         Set this to true to generate lint report.
+ 
+   Example:
+    
+   ```
+   <configuration>
+       <inputSpec>${unversioned-filename-spec-dir}/</inputSpec>
+       <output>${project.build.directory}/boat-lint-reports</output>
+       <writeLintReport>true</writeLintReport>
+       <ignoreRules>${ignored-lint-rules}</ignoreRules>
+       <showIgnoredRules>true</showIgnoredRules>
+    </configuration>
+   ```
+  
+  To see details about this goal:
+  
+`mvn help:describe -DgroupId=com.backbase.oss -DartifactId=boat-maven-plugin  -Dgoal=lint -Ddetail`
+  
+  
 - `boat:bundle`
     
     Bundles a spec by resolving external references.
