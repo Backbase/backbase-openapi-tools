@@ -35,12 +35,10 @@ paths:
                 $ref: "#/components/schemas/Pets"
             text/csv:
               schema:
-                type: file
+                type: string
         500:
           content:
             application/json:
-              example:
-                $ref: '#/components/examples/InternalServerError'
               schema:
                 $ref: '#/components/schemas/InternalServerError'
           description: InternalServerError
