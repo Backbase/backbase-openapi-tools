@@ -4,7 +4,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.12.1-SNAPSHOT</version>
+    <version>0.12.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
@@ -33,8 +33,6 @@
     <scm>
         <connection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</connection>
         <developerConnection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</developerConnection>
-        <url>git@github.com:idhub-io/idhub-api.git</url>
-        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
@@ -527,7 +525,6 @@
                         <groupId>org.sonarsource.scanner.maven</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
