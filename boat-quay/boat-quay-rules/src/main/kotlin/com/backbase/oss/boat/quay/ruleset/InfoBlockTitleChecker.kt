@@ -15,10 +15,15 @@ class InfoBlockTitleChecker(config: Config) {
     private val maxTitleLength = config.getInt("InfoBlockTitleChecker.maxTitleLength")
 
     @Check(Severity.MUST)
-    fun validate(context: Context) = when (val title = context.api.info.title) {
-        null -> listOf(Violation("title is a required value", "/openapi/info/title".toJsonPointer()))
-        ""  -> listOf(Violation("title can not be empty", "/openapi/info/title".toJsonPointer()))
-        else -> if (title.length > maxTitleLength) listOf(Violation("title can not be longer than $maxTitleLength", "/openapi/info/title".toJsonPointer())) else emptyList()
+    fun validate(context: Context): List<Violation> {
+        val titlePointer = "/openapi/info/title".toJsonPointer()
+        return when (val title = context.api.info.title) {
+            null -> listOf(Violation("title is a required value", titlePointer))
+            ""  -> listOf(Violation("title can not be empty", titlePointer))
+            else -> if (title.length > maxTitleLength) listOf(Violation("title can not be longer than $maxTitleLength",
+                titlePointer
+            )) else emptyList()
+        }
     }
 
 }

@@ -11,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @SuppressWarnings("java:S2699")
-public class DiffMojoTests {
+class DiffMojoTests {
 
     @SneakyThrows
     @Test
-    public void testNonBreakingChange() {
+    void testNonBreakingChange() {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-non-breaking.yaml"));
@@ -28,7 +28,7 @@ public class DiffMojoTests {
     }
 
     @Test
-    public void testBreakingChange() throws MojoExecutionException {
+    void testBreakingChange() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
@@ -40,7 +40,7 @@ public class DiffMojoTests {
     }
 
     @Test
-    public void testBreakingChangeWithBreaking() throws MojoExecutionException {
+    void testBreakingChangeWithBreaking() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));

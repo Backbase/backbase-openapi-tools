@@ -29,7 +29,7 @@ import org.openapitools.codegen.ignore.CodegenIgnoreProcessor;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 
 @Slf4j
-public abstract class AbstractDocumentationGenerator  extends AbstractGenerator implements Generator {
+public abstract class AbstractDocumentationGenerator extends AbstractGenerator implements Generator {
 
     protected final CodegenConfig config;
     protected final String input;
@@ -40,7 +40,7 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
     protected CodegenIgnoreProcessor ignoreProcessor;
     private final TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
 
-    public AbstractDocumentationGenerator(CodegenConfig config) {
+    protected AbstractDocumentationGenerator(CodegenConfig config) {
         this.config = config;
         this.input = config.getInputSpec();
         this.output = config.getOutputDir();
@@ -70,77 +70,89 @@ public abstract class AbstractDocumentationGenerator  extends AbstractGenerator 
             supportingFilesToGenerate = new HashSet<>(Arrays.asList(supportingFiles.split(",")));
         }
 
-
         for (SupportingFile support : config.supportingFiles()) {
             try {
-                String outputFolder = config.outputFolder();
-                if (StringUtils.isNotEmpty(support.folder)) {
-                    outputFolder += File.separator + support.folder;
-                }
-                File of = new File(outputFolder);
-                if (!of.isDirectory()) {
-                    if (!of.mkdirs()) {
-                        log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
-                    }
-                }
-                String outputFilename = new File(support.destinationFilename).isAbsolute() // split
-                    ? support.destinationFilename
-                    : outputFolder + File.separator + support.destinationFilename.replace('/', File.separatorChar);
-                if (!config.shouldOverwrite(outputFilename)) {
-                    log.info("Skipped overwriting {}", outputFilename);
-                    continue;
-                }
-                String templateFile;
-                if (support instanceof GlobalSupportingFile) {
-                    templateFile = config.getCommonTemplateDir() + File.separator + support.templateFile;
-                } else {
-                    templateFile = getFullTemplateFile(config, support.templateFile);
-                }
-                boolean shouldGenerate = true;
-                if (supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
-                    shouldGenerate = supportingFilesToGenerate.contains(support.destinationFilename);
-                }
-                if (!shouldGenerate) {
-                    continue;
-                }
-
-                if (ignoreProcessor.allowsFile(new File(outputFilename))) {
-                    // support.templateFile is the unmodified/original supporting file name (e.g. build.sh.mustache)
-                    // templatingEngine.templateExists dispatches resolution to this, performing template-engine specific inspect of support file extensions.
-                    if (templatingEngine.templateExists(this, support.templateFile)) {
-                        String templateContent = templatingEngine.compileTemplate(this, bundle, support.templateFile);
-                        writeToFile(outputFilename, templateContent);
-                        File written = new File(outputFilename);
-                        files.add(written);
-                        if (config.isEnablePostProcessFile()) {
-                            config.postProcessFile(written, "supporting-mustache");
-                        }
-                    } else {
-                        InputStream in = null;
-
-                        try {
-                            in = new FileInputStream(templateFile);
-                        } catch (Exception e) {
-                            // continue
-                        }
-                        if (in == null) {
-                            in = this.getClass().getClassLoader().getResourceAsStream(getCPResourcePath(templateFile));
-                        }
-                        File outputFile = writeInputStreamToFile(outputFilename, in, templateFile);
-                        files.add(outputFile);
-                        if (config.isEnablePostProcessFile() && !dryRun) {
-                            config.postProcessFile(outputFile, "supporting-common");
-                        }
-                    }
-
-                } else {
-                    log.info("Skipped generation of {} due to rule in .openapi-generator-ignore", outputFilename);
-                }
+                processSupport(support, supportingFilesToGenerate, bundle, files);
             } catch (Exception e) {
-                throw new RuntimeException("Could not generate supporting file '" + support + "'", e);
+                throw new CodegenException("Could not generate supporting file '" + support + "'", e);
             }
         }
         return files;
+    }
+
+
+    private void processSupport(SupportingFile support, Set<String> supportingFilesToGenerate, Map<String, Object> bundle, List<File> files) throws IOException {
+        String outputFolder = config.outputFolder();
+        if (StringUtils.isNotEmpty(support.folder)) {
+            outputFolder += File.separator + support.folder;
+        }
+        File of = new File(outputFolder);
+        if (!of.isDirectory() && !of.mkdirs()) {
+            log.debug("Output directory {} not created. It {}.", outputFolder, of.exists() ? "already exists." : "may not have appropriate permissions.");
+
+        }
+        String outputFilename = new File(support.destinationFilename).isAbsolute() // split
+            ? support.destinationFilename
+            : outputFolder + File.separator + support.destinationFilename.replace('/', File.separatorChar);
+        if (!config.shouldOverwrite(outputFilename)) {
+            log.info("Skipped overwriting {}", outputFilename);
+            return;
+        }
+        String templateFile;
+        if (support instanceof GlobalSupportingFile) {
+            templateFile = config.getCommonTemplateDir() + File.separator + support.templateFile;
+        } else {
+            templateFile = getFullTemplateFile(config, support.templateFile);
+        }
+
+        if (!shouldGenerate(supportingFilesToGenerate, support)) {
+            return;
+        }
+
+        if (ignoreProcessor.allowsFile(new File(outputFilename))) {
+            ignoreProcessorAllowsFile(support, outputFilename, bundle, files, templateFile);
+
+        } else {
+            log.info("Skipped generation of {} due to rule in .openapi-generator-ignore", outputFilename);
+        }
+    }
+
+    private boolean shouldGenerate(Set<String> supportingFilesToGenerate, SupportingFile support) {
+        boolean shouldGenerate = true;
+        if (supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
+            shouldGenerate = supportingFilesToGenerate.contains(support.destinationFilename);
+        }
+        return shouldGenerate;
+    }
+
+    private void ignoreProcessorAllowsFile(SupportingFile support, String outputFilename, Map<String, Object> bundle, List<File> files, String templateFile) throws IOException {
+        // support.templateFile is the unmodified/original supporting file name (e.g. build.sh.mustache)
+        // templatingEngine.templateExists dispatches resolution to this, performing template-engine specific inspect of support file extensions.
+        if (templatingEngine.templateExists(this, support.templateFile)) {
+            String templateContent = templatingEngine.compileTemplate(this, bundle, support.templateFile);
+            writeToFile(outputFilename, templateContent);
+            File written = new File(outputFilename);
+            files.add(written);
+            if (config.isEnablePostProcessFile()) {
+                config.postProcessFile(written, "supporting-mustache");
+            }
+        } else {
+            InputStream in = null;
+
+            try {
+                in = new FileInputStream(templateFile);
+            } catch (Exception e) {
+                // continue
+            }
+            if (in == null) {
+                in = this.getClass().getClassLoader().getResourceAsStream(getCPResourcePath(templateFile));
+            }
+            File outputFile = writeInputStreamToFile(outputFilename, in, templateFile);
+            files.add(outputFile);
+            if (config.isEnablePostProcessFile() && !dryRun) {
+                config.postProcessFile(outputFile, "supporting-common");
+            }
+        }
     }
 
     protected File writeInputStreamToFile(String filename, InputStream in, String templateFile) throws IOException {

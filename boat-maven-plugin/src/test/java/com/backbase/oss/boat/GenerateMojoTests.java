@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-public class GenerateMojoTests {
+class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
     private final MavenProject project = new MavenProject();
 

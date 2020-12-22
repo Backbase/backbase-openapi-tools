@@ -21,7 +21,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-public class ExportDependencyMojoTests {
+class ExportDependencyMojoTests {
 
     @BeforeAll
     static void setupLocale() {
