@@ -950,7 +950,7 @@ public class GenerateMojo extends AbstractMojo {
             inputSpecTempFile.exists()
                 ? Files.asByteSource(inputSpecTempFile)
                 : CharSource
-                .wrap(ClasspathHelper.loadFileFromClasspath(inputSpecTempFile.toString().replaceAll("\\\\", "/")))
+                .wrap(ClasspathHelper.loadFileFromClasspath(inputSpecTempFile.toString().replaceAll("\\{2}", "/")))
                 .asByteSource(StandardCharsets.UTF_8);
 
         return inputSpecByteSource.hash(Hashing.sha256()).toString();
@@ -1002,7 +1002,7 @@ public class GenerateMojo extends AbstractMojo {
         return output.toString() + "/" + sourceFolder;
     }
 
-    private void addCompileSourceRootIfConfigured() throws MojoExecutionException {
+    private void addCompileSourceRootIfConfigured() {
         if (addTestCompileSourceRoot) {
             project.addTestCompileSourceRoot(getCompileSourceRoot());
         } else if (addCompileSourceRoot) {
