@@ -15,14 +15,20 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
-/*
-  Lint Specification
+/**
+ * API lint which provides checks for compliance with many of Backbase's API standards.
  */
 public class LintMojo extends AbstractLintMojo {
 
+    /**
+     * Output directory for lint reports.
+     */
     @Parameter(name = "output", defaultValue = "${project.build.directory}/boat-lint-reports")
     public File output;
 
+    /**
+     * Set this to <code>true</code> to generate lint report.
+     */
     @Parameter(name = "writeLintReport", defaultValue = "true")
     private boolean writeLintReport;
 
