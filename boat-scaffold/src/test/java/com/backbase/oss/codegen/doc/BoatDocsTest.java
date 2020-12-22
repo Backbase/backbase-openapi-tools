@@ -19,13 +19,15 @@ import org.openapitools.codegen.DefaultGenerator;
 @Slf4j
 class BoatDocsTest {
     @Test
-    void testGenerate()  {
+    void testGenerate() throws IOException {
         String spec = System.getProperty("spec");
         if (spec != null) {
             generateDocs(new File(spec));
         } else {
             generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
+        String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
+        assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
     }
     @Test
     void testGenerateDocs() throws IOException {

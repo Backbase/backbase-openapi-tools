@@ -19,7 +19,7 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class ExportMojoTests {
+class ExportMojoTests {
 
     @BeforeAll
     static void setupLocale() {

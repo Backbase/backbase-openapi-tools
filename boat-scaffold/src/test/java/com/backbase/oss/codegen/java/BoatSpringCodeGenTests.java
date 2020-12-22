@@ -19,19 +19,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class BoatSpringCodeGenTests {
+class BoatSpringCodeGenTests {
 
     @Test
-    public void clientOptsUnicity() {
+    void clientOptsUnicity() {
         final BoatSpringCodeGen gen = new BoatSpringCodeGen();
         gen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> assertEquals(v.size(), 1, k + " is described multiple times"));
+            .forEach((k, v) -> assertEquals( 1,v.size(), k + " is described multiple times"));
     }
 
     @Test
-    public void uniquePropertyToSet() {
+    void uniquePropertyToSet() {
         final BoatSpringCodeGen gen = new BoatSpringCodeGen();
         final CodegenProperty prop = new CodegenProperty();
 
@@ -51,7 +51,7 @@ public class BoatSpringCodeGenTests {
     }
 
     @Test
-    public void uniqueParameterToSet() {
+    void uniqueParameterToSet() {
         final BoatSpringCodeGen gen = new BoatSpringCodeGen();
         final CodegenParameter param = new CodegenParameter();
 
@@ -70,7 +70,7 @@ public class BoatSpringCodeGenTests {
     }
 
     @Test
-    public void newLineIndent() throws IOException {
+    void newLineIndent() throws IOException {
         final NewLineIndent indent = new BoatSpringCodeGen.NewLineIndent(2, "_");
         final StringWriter output = new StringWriter();
         final Fragment frag = mock(Fragment.class);

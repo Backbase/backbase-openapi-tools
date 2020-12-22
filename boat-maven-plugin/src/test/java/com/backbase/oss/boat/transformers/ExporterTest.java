@@ -2,8 +2,6 @@ package com.backbase.oss.boat.transformers;
 
 import com.backbase.oss.boat.ExportException;
 import com.backbase.oss.boat.Exporter;
-import com.backbase.oss.boat.ExporterOptions;
-import com.backbase.oss.boat.Utils;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
@@ -14,7 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class ExporterTest extends AbstractBoatEngineTests {
+class ExporterTest extends AbstractBoatEngineTestbase {
 
     Logger log = LoggerFactory.getLogger(ExporterTest.class);
 

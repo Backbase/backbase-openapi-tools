@@ -17,17 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BoatLinterTests {
+class BoatLinterTests {
 
     BoatLinter boatLinter;
 
     @BeforeEach
-    public void setupBoatLinter() {
+    void setupBoatLinter() {
         boatLinter = new BoatLinter();
     }
 
     @Test
-    public void testRules() throws IOException {
+    void testRules() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
 
@@ -38,17 +38,17 @@ public class BoatLinterTests {
     }
 
     @Test
-    public void testBoatViolationDisplay() throws IOException {
+    void testBoatViolationDisplay() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
         Optional<BoatViolation> testDisplay = boatLintReport.getViolations().stream()
-            .filter(t -> t.displayString().contains("[B007]")).findFirst();
+            .filter(t -> t.displayString().contains("[219]")).findFirst();
         assertTrue(testDisplay.isPresent());
-        assertEquals("[B007] MUST - Check prefix for paths: Incorrect path prefix: wallet. Correct values are [client-api, service-api, integration-api]", testDisplay.get().displayString());
+        assertEquals("[219] MUST - Provide API Audience: API Audience must be provided", testDisplay.get().displayString());
     }
 
     @Test
-    public void testRulesWithFile() throws IOException {
+    void testRulesWithFile() throws IOException {
         // Can't ret relative file from class path resources. Copy into new file
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
 
@@ -64,7 +64,7 @@ public class BoatLinterTests {
     }
 
     @Test
-    public void ruleManager() {
+    void ruleManager() {
         List<BoatLintRule> availableRules = boatLinter.getAvailableRules();
         availableRules.forEach(ruleDetails -> {
             System.out.println(ruleDetails.toString());

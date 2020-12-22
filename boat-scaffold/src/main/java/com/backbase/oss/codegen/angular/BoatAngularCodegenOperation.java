@@ -3,7 +3,20 @@ package com.backbase.oss.codegen.angular;
 import org.openapitools.codegen.*;
 
 public class BoatAngularCodegenOperation extends CodegenOperation {
+
     public String pattern;
+
+    @Override
+    public boolean equals(Object obj){
+        if(! super.equals(obj)){
+            return false;
+        }
+        BoatAngularCodegenOperation bobj= (BoatAngularCodegenOperation) obj;
+        if(pattern.equals(bobj.pattern)){
+            return true;
+        }
+        return false;
+    }
 
     public BoatAngularCodegenOperation(CodegenOperation o) {
         this.responseHeaders.addAll(o.responseHeaders);

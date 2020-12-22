@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -54,10 +55,10 @@ public class BoatTerminal implements Runnable {
         private File inputOpt;
 
         @Parameters(description = "Input RAML 1.0 file.")
-        private File input;
+        private File inputFile;
 
         File get() {
-            return this.input != null ? this.input : this.inputOpt;
+            return this.inputFile != null ? this.inputFile : this.inputOpt;
         }
     }
 
@@ -153,7 +154,7 @@ public class BoatTerminal implements Runnable {
                 .serializeIntoDirectory(this.directory);
 
             Files.write(this.directory.resolve("openapi.yaml"),
-                yaml.getBytes(Charset.forName("UTF-8")));
+                yaml.getBytes(StandardCharsets.UTF_8));
         }
         if (this.output != null) {
             final Path parent = this.output.getParent();
@@ -163,10 +164,10 @@ public class BoatTerminal implements Runnable {
             }
 
             Files.write(this.output,
-                yaml.getBytes(Charset.forName("UTF-8")));
+                yaml.getBytes(StandardCharsets.UTF_8));
         }
         if (this.output == null && this.directory == null) {
-            System.out.print(yaml);
+            log.debug("Output path for {}, is null", yaml);
         }
     }
 }
