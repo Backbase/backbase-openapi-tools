@@ -99,6 +99,15 @@ public class GenerateMojoTests {
 
         return mojo;
     }
+    private <T extends GenerateMojo> T configureUrl(T mojo, String generatorName) {
+        mojo.buildContext = buildContext;
+        mojo.project = project;
+        mojo.inputSpec = "examples/v3.0/api-with-examples.yaml";
+        mojo.output = new File("target/generate-mojo-tests");
+        mojo.generatorName = generatorName;
+
+        return mojo;
+    }
 }
 
 
