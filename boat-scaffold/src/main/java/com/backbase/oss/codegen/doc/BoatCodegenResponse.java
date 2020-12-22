@@ -4,18 +4,21 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.CodegenResponse;
 
-@Data
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
+@ToString
+@SuppressWarnings("java:S2387")
 public class BoatCodegenResponse extends CodegenResponse {
 
-    private List<BoatExample> examples;
+    private final List<BoatExample> examples = new ArrayList<>();
 
     public boolean hasExamples() {
-        return examples != null && !examples.isEmpty();
+        return !examples.isEmpty();
     }
 
     public boolean hasEmptyBody() {
@@ -77,14 +80,14 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.pattern = o.pattern;
         this.multipleOf = o.multipleOf;
 
-        List<BoatExample> examples = new ArrayList<>();
         if (response.getContent() != null) {
-            response.getContent().forEach((contentType, mediaType) -> {
-                BoatExampleUtils.convertExamples(openAPI, mediaType, contentType, examples);
-            });
+            response.getContent().forEach((contentType, mediaType) ->
+                BoatExampleUtils.convertExamples(openAPI, mediaType, responseCode, contentType, examples));
             BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
-
-            this.examples = examples;
         }
+    }
+
+    public List<BoatExample> getExamples() {
+        return examples;
     }
 }
