@@ -35,12 +35,10 @@ paths:
                 $ref: "#/components/schemas/Pets"
             text/csv:
               schema:
-                type: file
+                type: string
         500:
           content:
             application/json:
-              example:
-                $ref: '#/components/examples/InternalServerError'
               schema:
                 $ref: '#/components/schemas/InternalServerError'
           description: InternalServerError
@@ -90,6 +88,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /no-schema:
+    get:
+      summary: No Schema
+      operationId: getNoSchema
+      tags:
+        - pets
+      responses:
+        200:
+          description: A response that does not specify a schema
+          content:
+            application/json: {}
 components:
   schemas:
     Pet:
