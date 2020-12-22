@@ -82,16 +82,15 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
 
         if (openAPI.getPaths() != null)
             // Ensure single tags for operations
-            openAPI.getPaths().forEach((path, pathItem) -> {
-                pathItem.readOperations().forEach(operation -> {
-                    if (operation.getTags() != null && operation.getTags().size() > 1) {
-                        String tag = operation.getTags().get(operation.getTags().size() -1 );
-                        log.warn("Operation: {} contains multiple tags {} which hinders rendering documentation. Rep" +
-                            "lacing it with a single tag: {}", operation.getOperationId(), operation.getTags(), tag);
-                        operation.tags(Collections.singletonList(tag));
-                    }
-                });
-            });
+            openAPI.getPaths().forEach((path, pathItem) ->
+                    pathItem.readOperations().forEach(operation -> {
+                if (operation.getTags() != null && operation.getTags().size() > 1) {
+                    String tag = operation.getTags().get(operation.getTags().size() -1 );
+                    log.warn("Operation: {} contains multiple tags {} which hinders rendering documentation. Rep" +
+                        "lacing it with a single tag: {}", operation.getOperationId(), operation.getTags(), tag);
+                    operation.tags(Collections.singletonList(tag));
+                }
+            }));
     }
 
     private CodegenParameter mapComponentRequestBody(Set<String> imports, java.util.Map.Entry<String, RequestBody> namedRequestBody) {
@@ -183,29 +182,25 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
         return codegenModel;
     }
 
-    //    @Override
+    @Override
     public void setParameterExampleValue(CodegenParameter codegenParameter, Parameter parameter) {
         super.setParameterExampleValue(codegenParameter, parameter);
 
         Object example = parameter.getExample();
 
         if (parameter.getStyle() != null) {
-            switch (parameter.getStyle()) {
-                case FORM:
-                    if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
-                        try {
-                            List<String> values = paramReader.readValue((ArrayNode) example);
-                            List<BasicNameValuePair> params = values.stream()
+            if (parameter.getStyle() == Parameter.StyleEnum.FORM) {
+                if (example instanceof ArrayNode && codegenParameter.isQueryParam) {
+                    try {
+                        List<String> values = paramReader.readValue((ArrayNode) example);
+                        List<BasicNameValuePair> params = values.stream()
                                 .map(value -> new BasicNameValuePair(codegenParameter.paramName, value))
                                 .collect(Collectors.toList());
-                            codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
-                        } catch (IOException e) {
-                            log.warn("Failed to format query string parameter: {}", codegenParameter.example);
-                        }
+                        codegenParameter.example = URLEncodedUtils.format(params, Charset.defaultCharset());
+                    } catch (IOException e) {
+                        log.warn("Failed to format query string parameter: {}", codegenParameter.example);
                     }
-                    break;
-                default:
-                    break;
+                }
             }
         }
     }

@@ -40,23 +40,9 @@ public class ExportMojo extends AbstractRamlToOpenApi {
             files = new File[]{inputFile};
         } else {
             getLog().info("Converting RAML specs from Input Directory: " + input);
-            if (!input.exists()) {
-                String msg = "Input does not exist: " + input.getAbsolutePath();
-                getLog().error(msg);
-                if (failOnError) {
-                    throw new MojoExecutionException(msg);
-                }
-            }
-
-            files = input.listFiles(this::isRamlSpec);
-            if (files == null || files.length == 0) {
-                String msg = "Failed to find raml files in " + input.getAbsolutePath();
-                getLog().error(msg);
-                if (failOnError) {
-                    throw new MojoExecutionException(msg);
-                }
+            files = inputFileIsDirectory();
+            if(files == null)
                 return;
-            }
         }
 
         for (File file : files) {
@@ -77,6 +63,28 @@ public class ExportMojo extends AbstractRamlToOpenApi {
         }
 
         writeSummary("Converted RAML Specs to OpenAPI Summary");
+    }
+
+
+    private File[] inputFileIsDirectory() throws MojoExecutionException {
+        if (!input.exists()) {
+            String msg = "Input does not exist: " + input.getAbsolutePath();
+            getLog().error(msg);
+            if (failOnError) {
+                throw new MojoExecutionException(msg);
+            }
+        }
+
+        File[] files = input.listFiles(this::isRamlSpec);
+        if (files == null || files.length == 0) {
+            String msg = "Failed to find raml files in " + input.getAbsolutePath();
+            getLog().error(msg);
+            if (failOnError) {
+                throw new MojoExecutionException(msg);
+            }
+            return null;
+        }
+        return files;
     }
 
     public File getInput() {

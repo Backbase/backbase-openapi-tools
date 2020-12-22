@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -68,24 +67,28 @@ public class ValidateMojo extends AbstractMojo {
             log.info("OpenAPI: {} is valid", swaggerParseResult.getOpenAPI().getInfo().getTitle());
         } else {
             for (String message : swaggerParseResult.getMessages()) {
-                if (failOnWarning) {
-                    log.error("Validation errors while parsing OpenAPI: {}", inputFile.getName());
-                    log.error(message);
-                } else {
-                    log.warn("Validation errors while parsing OpenAPI: {}", inputFile.getName());
-                    log.warn(message);
-                }
-                if (log.isDebugEnabled()) {
-                    try {
-                        log.debug("Dumping open api");
-                        log.debug(SerializerUtils.toYamlString(swaggerParseResult.getOpenAPI()));
-                    } catch (RuntimeException e) {
-                        log.debug("That did not end well: ", e);
-                    }
-                }
+                processMessages(message, inputFile, swaggerParseResult);
             }
             if (failOnWarning) {
                 throw new MojoFailureException("Validation errors validating OpenAPI");
+            }
+        }
+    }
+
+    private void processMessages(String message,File inputFile, SwaggerParseResult swaggerParseResult){
+        if (failOnWarning) {
+            log.error("Validation errors while parsing OpenAPI: {}", inputFile.getName());
+            log.error(message);
+        } else {
+            log.warn("Validation errors while parsing OpenAPI: {}", inputFile.getName());
+            log.warn(message);
+        }
+        if (log.isDebugEnabled()) {
+            try {
+                log.debug("Dumping open api");
+                log.debug(SerializerUtils.toYamlString(swaggerParseResult.getOpenAPI()));
+            } catch (RuntimeException e) {
+                log.debug("That did not end well: ", e);
             }
         }
     }
