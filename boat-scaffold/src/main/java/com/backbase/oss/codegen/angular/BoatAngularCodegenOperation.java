@@ -1,22 +1,14 @@
 package com.backbase.oss.codegen.angular;
 
-import org.openapitools.codegen.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.openapitools.codegen.CodegenOperation;
 
+@EqualsAndHashCode(callSuper = true)
+@Getter
 public class BoatAngularCodegenOperation extends CodegenOperation {
 
-    public String pattern;
-
-    @Override
-    public boolean equals(Object obj){
-        if(! super.equals(obj)){
-            return false;
-        }
-        BoatAngularCodegenOperation bobj= (BoatAngularCodegenOperation) obj;
-        if(pattern.equals(bobj.pattern)){
-            return true;
-        }
-        return false;
-    }
+    public final String pattern;
 
     public BoatAngularCodegenOperation(CodegenOperation o) {
         this.responseHeaders.addAll(o.responseHeaders);
