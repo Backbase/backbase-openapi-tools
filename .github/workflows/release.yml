@@ -105,15 +105,16 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Bump And Update POM Version
+        branch: ${{ github.ref }}
+    - name: Bump And Update POM Version to new development version
       run: |
         NEW_VERSION="$((MAJOR)).$((MINOR+1)).$((PATCH))-SNAPSHOT"
         git checkout main
         mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
         git commit -m "[version bump] Setup new Development Version" -a
 
-    - name: Push changes
+    - name: Push Development Version to Main
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main
