@@ -10,8 +10,8 @@
 
     <properties>
 
-        <boat-maven-plugin.version>@pom.version@</boat-maven-plugin.version>
-<!--        <boat-maven-plugin.version>0.12.0-SNAPSHOT</boat-maven-plugin.version>-->
+<!--        <boat-maven-plugin.version>@pom.version@</boat-maven-plugin.version>-->
+        <boat-maven-plugin.version>0.12.0-SNAPSHOT</boat-maven-plugin.version>
         <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
 
         <jackson.version>2.11.3</jackson.version>
