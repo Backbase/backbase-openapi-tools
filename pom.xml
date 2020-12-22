@@ -31,8 +31,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:${project.scm.url}</connection>
-        <developerConnection>scm:git:${project.scm.url}</developerConnection>
+        <connection>scm:git:git@github.com:{organization}/{project}.git</connection>
+        <developerConnection>scm:git:git@github.com:{organization}/{project}.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
         <tag>HEAD</tag>
     </scm>
@@ -46,9 +46,13 @@
 
 
     <properties>
+
+        <organization>backbase</organization>
+        <project>backbase-openapi-tools</project>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <project.scm.url>Backbase/backbase-openapi-tools</project.scm.url>
+
         <jacoco.version>0.8.6</jacoco.version>
 
         <sonar.organization>backbase-technology-prototyping</sonar.organization>
