@@ -33,16 +33,6 @@ class BoatDocsTest {
     }
 
     @Test
-    void testPresentationClient() throws OpenAPILoaderException {
-        assertDoesNotThrow(() -> generateDocs(getFile("/openapi/presentation-client-api/openapi.yaml")));
-    }
-
-    @Test
-    void testOpenAPiWithJsonExamples() throws OpenAPILoaderException {
-        assertDoesNotThrow(() -> generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml")));
-    }
-
-    @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
 
