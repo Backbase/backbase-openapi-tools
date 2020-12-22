@@ -31,11 +31,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:Backbase/backbase-openapi-tools.git</connection>
-        <developerConnection>scm:git:ssh://github.com:Backbase/backbase-openapi-tools.git</developerConnection>
-        <url>https://github.com/Backbase/backbase-openapi-tools/tree/master</url>
-      <tag>backbase-openapi-tools-0.11.2</tag>
-  </scm>
+        <connection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</connection>
+        <developerConnection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</developerConnection>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
@@ -46,10 +44,11 @@
 
 
     <properties>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jacoco.version>0.8.4</jacoco.version>
+        <jacoco.version>0.8.6</jacoco.version>
 
         <sonar.organization>backbase-technology-prototyping</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -449,16 +448,9 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>2.5.2</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.scm</groupId>
-                                <artifactId>maven-scm-provider-gitexe</artifactId>
-                                <version>1.9.4</version>
-                            </dependency>
-                        </dependencies>
+                        <version>3.0.0-M1</version>
                         <configuration>
-                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <scmCommentPrefix>[ci skip]</scmCommentPrefix>
                         </configuration>
                     </plugin>
 
@@ -533,7 +525,6 @@
                         <groupId>org.sonarsource.scanner.maven</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
