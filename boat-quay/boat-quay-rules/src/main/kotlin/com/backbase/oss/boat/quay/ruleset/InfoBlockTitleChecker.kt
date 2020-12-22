@@ -16,11 +16,13 @@ class InfoBlockTitleChecker(config: Config) {
 
     @Check(Severity.MUST)
     fun validate(context: Context): List<Violation> {
-        val s = "/openapi/info/title"
+        val titlePointer = "/openapi/info/title".toJsonPointer()
         return when (val title = context.api.info.title) {
-            null -> listOf(Violation("title is a required value", s.toJsonPointer()))
-            ""  -> listOf(Violation("title can not be empty", s.toJsonPointer()))
-            else -> if (title.length > maxTitleLength) listOf(Violation("title can not be longer than $maxTitleLength", s.toJsonPointer())) else emptyList()
+            null -> listOf(Violation("title is a required value", titlePointer))
+            ""  -> listOf(Violation("title can not be empty", titlePointer))
+            else -> if (title.length > maxTitleLength) listOf(Violation("title can not be longer than $maxTitleLength",
+                titlePointer
+            )) else emptyList()
         }
     }
 

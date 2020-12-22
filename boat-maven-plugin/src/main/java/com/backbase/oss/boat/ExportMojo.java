@@ -40,7 +40,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
             files = new File[]{inputFile};
         } else {
             getLog().info("Converting RAML specs from Input Directory: " + input);
-            files = inputFileIsDirectory();
+            files = getFilesFromInputDirectoru();
             if(files == null)
                 return;
         }
@@ -66,7 +66,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
     }
 
 
-    private File[] inputFileIsDirectory() throws MojoExecutionException {
+    private File[] getFilesFromInputDirectoru() throws MojoExecutionException {
         if (!input.exists()) {
             String msg = "Input does not exist: " + input.getAbsolutePath();
             getLog().error(msg);
