@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
+import static org.openapitools.codegen.utils.StringUtils.underscore;
 
 @Slf4j
 public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
@@ -175,12 +176,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             additionalProperties.put("apiModuleClassName", value + API_MODULE);
             additionalProperties.put("configurationClassName", value + "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", value + "ConfigurationParameters");
-            additionalProperties.put(API_MODULE_PREFIX, true);
+            additionalProperties.put("basePathVariableName", underscore(value).toUpperCase() + "_BASE_PATH");
         }, () -> {
             additionalProperties.put("apiModuleClassName", API_MODULE);
             additionalProperties.put("configurationClassName", "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", "ConfigurationParameters");
-            additionalProperties.put(API_MODULE_PREFIX, false);
+            additionalProperties.put("basePathVariableName", "BASE_PATH");
         });
         processOpt(SERVICE_SUFFIX, value -> {
             serviceSuffix = value;
@@ -270,6 +271,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         }
 
         inputResponse.getContent().forEach((contentType, mediaType) -> {
+            if (Objects.isNull(mediaType.getSchema())) return;
             String typeDeclaration = getTypeDeclaration(ModelUtils.unaliasSchema(this.openAPI, mediaType.getSchema()));
             codegenOperation.produces.stream()
                     .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))

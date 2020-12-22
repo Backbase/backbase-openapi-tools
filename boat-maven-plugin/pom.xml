@@ -126,6 +126,8 @@
             <version>3.0.1</version>
             <scope>test</scope>
         </dependency>
+
+
     </dependencies>
 
     <build>
@@ -171,6 +173,7 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
+                    <skip>${skipTests}</skip>
                     <includes>com.backbase.oss.*</includes>
                 </configuration>
                 <executions>

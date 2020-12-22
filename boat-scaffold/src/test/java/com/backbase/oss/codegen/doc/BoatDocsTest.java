@@ -10,8 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
@@ -29,6 +28,12 @@ class BoatDocsTest {
         String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
         assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
     }
+
+    @Test
+    void testOpenAPiWithExamples() throws OpenAPILoaderException {
+        assertDoesNotThrow(() -> generateDocs(getFile("/openapi-with-examples/openapi.yaml")));
+    }
+
     @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
