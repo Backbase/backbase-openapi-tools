@@ -10,35 +10,29 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class BoatLinterTests {
+class BoatLinterTests {
 
     BoatLinter boatLinter;
 
     @BeforeEach
-    public void setupBoatLinter() {
+    void setupBoatLinter() {
         boatLinter = new BoatLinter();
     }
 
     @Test
-    public void testRules() throws IOException {
+    void testRules() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
 
-        for (BoatViolation result : boatLintReport.getViolations()) {
-            System.out.println(result.toString());
-        }
         assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
-    public void testBoatViolationDisplay() throws IOException {
+    void testBoatViolationDisplay() throws IOException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
         Optional<BoatViolation> testDisplay = boatLintReport.getViolations().stream()
@@ -48,7 +42,7 @@ public class BoatLinterTests {
     }
 
     @Test
-    public void testRulesWithFile() throws IOException {
+    void testRulesWithFile() throws IOException {
         // Can't ret relative file from class path resources. Copy into new file
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
 
@@ -57,18 +51,13 @@ public class BoatLinterTests {
 
         BoatLintReport boatLintReport = boatLinter.lint(inputFile);
 
-        for (BoatViolation result : boatLintReport.getViolations()) {
-            System.out.println(result.toString());
-        }
         assertTrue(boatLintReport.hasViolations());
     }
 
     @Test
-    public void ruleManager() {
+    void ruleManager() {
         List<BoatLintRule> availableRules = boatLinter.getAvailableRules();
-        availableRules.forEach(ruleDetails -> {
-            System.out.println(ruleDetails.toString());
-        });
+
 
         assertFalse(availableRules.isEmpty());
 

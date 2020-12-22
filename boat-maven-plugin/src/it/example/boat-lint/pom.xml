@@ -13,7 +13,7 @@
     <artifactId>boat-lint</artifactId>
     <packaging>pom</packaging>
 
-    <name>BOAT :: LINT</name>
+    <name>BOAT :: Lint</name>
 
     <build>
         <plugins>
@@ -28,7 +28,7 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/api-with-examples.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
                         </configuration>
                     </execution>
                 </executions>
