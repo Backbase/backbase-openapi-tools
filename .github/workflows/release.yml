@@ -112,12 +112,16 @@ jobs:
     - name: Checkout Main Branch
       uses: actions/checkout@v2
       with:
-        ref: my-branch
+        ref: main
 
-    - name: Bump And Update POM Version to new development version
+    - name: Configure Git user
+      run: |
+        git config user.email "actions@github.com"
+        git config user.name "GitHub Actions"
+
+    - name: Bump And Update POM Version to new Development version
       run: |
         NEW_VERSION="$((MAJOR)).$((MINOR+1)).$((PATCH))-SNAPSHOT"
-        echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
         echo "New development version is: $NEW_VERSION"
         mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
         git commit -m "[version bump] Setup new Development Version" -a
