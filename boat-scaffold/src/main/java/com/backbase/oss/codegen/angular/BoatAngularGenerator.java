@@ -25,21 +25,33 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenResponse;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.SemVer;
-
-import java.io.File;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
 
@@ -62,6 +74,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
     public static final String CLASSNAME_KEY = "classname";
     public static final String PATH_NAME_KEY = "pathName";
+    public static final String HAS_EXAMPLES = "hasExamples";
+    public static final String PATTERN = "pattern";
     protected String foundationVersion = "6.6.7";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
@@ -86,13 +100,13 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         modelPackage = "model";
 
         this.cliOptions.add(new CliOption(NPM_REPOSITORY,
-                "Use this property to set an url your private npmRepo in the package.json"));
+            "Use this property to set an url your private npmRepo in the package.json"));
         this.cliOptions.add(CliOption.newBoolean(WITH_MOCKS,
-                "Setting this property to true will generate mocks out of the examples.",
-                false));
+            "Setting this property to true will generate mocks out of the examples.",
+            false));
         this.cliOptions.add(CliOption.newBoolean(PROVIDED_IN_ROOT,
-                "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
-                false));
+            "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
+            false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
@@ -132,6 +146,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private void processBooleanOpt(String key, Consumer<Boolean> whenProvided) {
         processBooleanOpt(key, whenProvided, null);
     }
+
     private void processBooleanOpt(String key, Consumer<Boolean> whenProvided, Runnable notProvided) {
         if (additionalProperties.containsKey(key)) {
             whenProvided.accept(convertPropertyToBoolean(key));
@@ -146,18 +161,18 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         addSupportingFiles();
 
         processOpt(NG_VERSION,
-                value -> applyAngularVersion(new SemVer(value)),
-                () -> applyAngularVersion(new SemVer(this.ngVersion))
+            value -> applyAngularVersion(new SemVer(value)),
+            () -> applyAngularVersion(new SemVer(this.ngVersion))
         );
 
         processOpt(FOUNDATION_VERSION,
-                value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
-                () -> {
-                    SemVer version = new SemVer(this.foundationVersion);
-                    additionalProperties.put(FOUNDATION_VERSION, version);
-                    log.info("generating code with foundation-ang {} ...", version);
-                    log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
-                });
+            value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
+            () -> {
+                SemVer version = new SemVer(this.foundationVersion);
+                additionalProperties.put(FOUNDATION_VERSION, version);
+                log.info("generating code with foundation-ang {} ...", version);
+                log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
+            });
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
@@ -166,8 +181,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         });
 
         processBooleanOpt(PROVIDED_IN_ROOT,
-                value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
-                () -> additionalProperties.put(PROVIDED_IN_ROOT, true)
+            value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
+            () -> additionalProperties.put(PROVIDED_IN_ROOT, true)
         );
 
         processOpt(API_MODULE_PREFIX, value -> {
@@ -188,8 +203,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             validateClassSuffixArgument("Service", serviceSuffix);
         });
         processOpt(BUILD_DIST,
-                value -> additionalProperties.put(BUILD_DIST, value),
-                () -> additionalProperties.put(BUILD_DIST, "dist"));
+            value -> additionalProperties.put(BUILD_DIST, value),
+            () -> additionalProperties.put(BUILD_DIST, "dist"));
     }
 
     private void applyAngularVersion(SemVer angularVersion) {
@@ -212,7 +227,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     private void addSupportingFiles() {
         supportingFiles.add(
-                new SupportingFile("models.mustache", modelPackage().replace('.', File.separatorChar), "models.ts"));
+            new SupportingFile("models.mustache", modelPackage().replace('.', File.separatorChar), "models.ts"));
         supportingFiles.add(new SupportingFile("public_api.mustache", getIndexDirectory(), "public_api.ts"));
         supportingFiles.add(new SupportingFile("api.module.mustache", getIndexDirectory(), "api.module.ts"));
         supportingFiles.add(new SupportingFile("configuration.mustache", getIndexDirectory(), "configuration.ts"));
@@ -251,15 +266,15 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     public BoatAngularCodegenOperation fromOperation(String path,
-                                          String httpMethod,
-                                          Operation operation,
-                                          List<Server> servers) {
+                                                     String httpMethod,
+                                                     Operation operation,
+                                                     List<Server> servers) {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
 
         codegenOperation.responses.stream()
-                .filter(codegenResponse -> codegenResponse.is2xx)
-                .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
-                .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
+            .filter(codegenResponse -> codegenResponse.is2xx)
+            .map(codegenResponse -> operation.getResponses().get(codegenResponse.code))
+            .forEach(apiResponse -> addProducesReturnType(apiResponse, codegenOperation));
 
         return new BoatAngularCodegenOperation(codegenOperation);
     }
@@ -274,8 +289,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             if (Objects.isNull(mediaType.getSchema())) return;
             String typeDeclaration = getTypeDeclaration(ModelUtils.unaliasSchema(this.openAPI, mediaType.getSchema()));
             codegenOperation.produces.stream()
-                    .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))
-                    .forEach(codegenMediaType -> codegenMediaType.put("returnType", typeDeclaration));
+                .filter(codegenMediaType -> codegenMediaType.get("mediaType").equals(contentType))
+                .forEach(codegenMediaType -> codegenMediaType.put("returnType", typeDeclaration));
         });
     }
 
@@ -317,7 +332,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return operations;
     }
 
-    private void processCodgenOperation(CodegenOperation op, Map<String, Map<String, Object>> pathOperations, String operationkey){
+    private void processCodgenOperation(CodegenOperation op, Map<String, Map<String, Object>> pathOperations, String operationkey) {
 
         op.httpMethod = op.httpMethod.toLowerCase(Locale.ENGLISH);
 
@@ -329,21 +344,21 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         Map<String, Object> pathOp = new HashMap<>();
         pathOp.put(PATH_NAME_KEY, removeNonNameElementToCamelCase(op.path.replaceAll("[{}/]", "-")));
-        pathOp.put("pattern", op.path);
-        pathOp.put("hasExamples", op.examples != null && !op.examples.isEmpty());
+        pathOp.put(PATTERN, op.path);
+        pathOp.put(HAS_EXAMPLES, op.examples != null && !op.examples.isEmpty());
         pathOp.put(operationkey, Collections.singletonList(op));
         pathOperations.merge(op.path, pathOp, (o1, o2) -> {
-                    o1.put(operationkey, Stream.of(
-                            (List<CodegenOperation>) o1.get(operationkey),
-                            (List<CodegenOperation>) o2.get(operationkey)
-                    ).flatMap(Collection::stream)
-                            .collect(Collectors.toList()));
-                    o1.put("hasExamples",
-                            (boolean) o1.get("hasExamples") ||
-                                    (boolean) o2.get("hasExamples")
-                    );
+            o1.put(operationkey, Stream.of(
+                (List<CodegenOperation>) o1.get(operationkey),
+                (List<CodegenOperation>) o2.get(operationkey)
+            ).flatMap(Collection::stream)
+                .collect(Collectors.toList()));
+            o1.put(HAS_EXAMPLES,
+                (boolean) o1.get(HAS_EXAMPLES) ||
+                    (boolean) o2.get(HAS_EXAMPLES)
+            );
 
-                    return o1;
+            return o1;
 
         });
 
@@ -524,7 +539,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private void validateClassPrefixArgument(String value) {
         if (!value.matches(CLASS_NAME_PREFIX_PATTERN)) {
             throw new IllegalArgumentException(
-                    String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", API_MODULE)
+                String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", API_MODULE)
             );
         }
     }
@@ -539,7 +554,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private void validateClassSuffixArgument(String argument, String value) {
         if (!value.matches(CLASS_NAME_SUFFIX_PATTERN)) {
             throw new IllegalArgumentException(
-                    String.format(Locale.ROOT, "%s class suffix only allows alphanumeric characters.", argument)
+                String.format(Locale.ROOT, "%s class suffix only allows alphanumeric characters.", argument)
             );
         }
     }

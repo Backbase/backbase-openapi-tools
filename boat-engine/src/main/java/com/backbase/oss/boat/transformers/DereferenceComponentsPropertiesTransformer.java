@@ -120,6 +120,7 @@ public class DereferenceComponentsPropertiesTransformer implements Transformer {
         }
     }
 
+    @SuppressWarnings("java:S127")
     private Schema getSchemaByInternalReference(String internalReference, OpenAPI openAPI) {
         if (!internalReference.startsWith(COMPONENTS_SCHEMAS_PATH)) {
             throw new IllegalArgumentException(String.format("Not an internal ref %s", internalReference));
