@@ -132,6 +132,32 @@ class BoatAngularTemplatesTests {
     }
 
     @Check
+    public void apiModulePrefixConfiguration() {
+        assertThat(
+                findPattern("/configuration\\.ts$", "export class BoatConfiguration"),
+                equalTo(this.param.apiModulePrefix));
+        assertThat(
+                findPattern("/configuration\\.ts$", "export class Configuration"),
+                equalTo(!this.param.apiModulePrefix));
+        assertThat(
+                findPattern("/configuration\\.ts$", "export interface BoatConfigurationParameters"),
+                equalTo(this.param.apiModulePrefix));
+        assertThat(
+                findPattern("/configuration\\.ts$", "export interface ConfigurationParameters"),
+                equalTo(!this.param.apiModulePrefix));
+    }
+
+    @Check
+    public void apiModulePrefixBasePath() {
+        assertThat(
+                findPattern("/variables\\.ts$", "export const BOAT_BASE_PATH"),
+                equalTo(this.param.apiModulePrefix));
+        assertThat(
+                findPattern("/variables\\.ts$", "export const BASE_PATH"),
+                equalTo(!this.param.apiModulePrefix));
+    }
+
+    @Check
     public void serviceSuffix() {
         assertThat(
                 findPattern("/api/.+\\.service.ts$$", "export class .*Gateway "),
