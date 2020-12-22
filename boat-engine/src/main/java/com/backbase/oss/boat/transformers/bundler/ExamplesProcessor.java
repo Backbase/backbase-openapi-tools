@@ -200,10 +200,8 @@ public class ExamplesProcessor {
 
             exampleHolder.setContent(content);
             if (exampleName != null) {
-                exampleHolder.setExampleName(exampleName);
                 exampleHolder.replaceRef(COMPONENTS_EXAMPLES + exampleName);
             }
-
             if (getComponentExamplesFromOpenAPI().containsKey(exampleName)) {
                 log.debug("Updating example: {} in components/examples", exampleName);
                 // Check whether example is already dereferenced

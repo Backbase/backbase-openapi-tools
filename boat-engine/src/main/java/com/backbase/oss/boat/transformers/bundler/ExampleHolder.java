@@ -123,8 +123,6 @@ public abstract class ExampleHolder<T> {
 
     private final String name;
 
-    private String exampleName;
-
     private T example;
     private String content;
 
@@ -140,10 +138,6 @@ public abstract class ExampleHolder<T> {
 
     public void setExample(T example) {
         this.example = example;
-    }
-
-    public void setExampleName(String exampleName) {
-        this.exampleName = exampleName;
     }
 
     abstract String getRef();
