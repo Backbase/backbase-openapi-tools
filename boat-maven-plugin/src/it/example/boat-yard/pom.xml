@@ -22,8 +22,8 @@
                 <artifactId>boat-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>lint</id>
-                        <phase>validate</phase>
+                        <id>source</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>yard</goal>
                         </goals>
