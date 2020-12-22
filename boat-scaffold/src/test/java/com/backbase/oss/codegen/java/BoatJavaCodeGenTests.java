@@ -30,7 +30,7 @@ class BoatJavaCodeGenTests {
         gen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> assertEquals( v.size(), 1, k + " is described multiple times"));
+            .forEach((k, v) -> assertEquals( 1,v.size(), k + " is described multiple times"));
     }
 
     @Test
