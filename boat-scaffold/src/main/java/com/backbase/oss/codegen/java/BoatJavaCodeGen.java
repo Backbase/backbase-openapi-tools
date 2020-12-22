@@ -125,32 +125,29 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer) {
-            if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.containerType = "set";
-                p.baseType = JAVA_UTIL_SET;
-                p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-                p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-                p.defaultValue = JAVA_UTIL_SET_NEW;
-            }
+        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
+            p.containerType = "set";
+            p.baseType = JAVA_UTIL_SET;
+            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
+            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
+            p.defaultValue = JAVA_UTIL_SET_NEW;
         }
+
     }
 
     @Override
     public void postProcessParameter(CodegenParameter p) {
         super.postProcessParameter(p);
 
-        if (p.isContainer) {
+        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             // XXX the model set baseType to the container type, why is this different?
 
-
-            if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
                 p.baseType = JAVA_UTIL_SET;
                 p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
                 p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
                 p.defaultValue = JAVA_UTIL_SET_NEW;
-            }
+
         }
     }
 }

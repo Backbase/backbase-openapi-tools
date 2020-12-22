@@ -7,13 +7,11 @@ import java.nio.file.Paths;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @Slf4j
-public class RemoveMojoTests {
+class RemoveMojoTests {
 
     @Test
     void testRemoveDeprecatedMojo() throws MojoFailureException, MojoExecutionException, IOException {
