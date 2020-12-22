@@ -32,7 +32,7 @@ public class BoatExampleUtils {
             });
         }
 
-        Schema schema = mediaType.getSchema();
+        Schema<?> schema = mediaType.getSchema();
         if (schema != null && schema.get$ref() != null) {
             String ref = schema.get$ref();
             processRef(openAPI, contentType, examples, ref);

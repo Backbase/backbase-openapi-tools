@@ -30,10 +30,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
+    public static final String BASE_TYPE = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
         private final int level;
         private final String prefix;
+        private static final String regex = "\\s+$";
 
         NewLineIndent(int level, String space) {
             this.level = level;
@@ -60,14 +62,14 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         private String[] splitLines(final String text) {
             return stream(text.split("\\r\\n|\\n"))
-                .map(s -> s.replaceFirst("\\s+$", ""))
+                .map(s -> s.replaceFirst(regex, ""))
                 .toArray(String[]::new);
         }
 
         private int minIndent(String[] lines) {
             return stream(lines)
                 .filter(StringUtils::isNotBlank)
-                .map(s -> s.replaceFirst("\\s+$", ""))
+                .map(s -> s.replaceFirst(regex, ""))
                 .map(NewLineIndent::indentLevel)
                 .min(Integer::compareTo)
                 .orElse(0);
@@ -75,7 +77,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         static int indentLevel(String text) {
             return IntStream
-                .range(0, text.replaceFirst("\\s+$", text).length())
+                .range(0, text.replaceFirst(regex, text).length())
                 .filter(n -> !Character.isWhitespace(text.charAt(n)))
                 .findFirst().orElse(0);
         }
@@ -198,9 +200,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
         if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", "java.util.Set");
+            this.typeMapping.put("set", BASE_TYPE);
 
-            this.importMapping.put("Set", "java.util.Set");
+            this.importMapping.put("Set", BASE_TYPE);
             this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
         }
 
@@ -216,9 +218,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             p.containerType = "set";
-            p.baseType = "java.util.Set";
-            p.dataType = "java.util.Set<" + p.items.dataType + ">";
-            p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
+            p.baseType = BASE_TYPE;
+            p.dataType = BASE_TYPE+"<" + p.items.dataType + ">";
+            p.datatypeWithEnum = BASE_TYPE+"<" + p.items.datatypeWithEnum + ">";
             p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
         }
     }
@@ -233,9 +235,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
             }
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = "java.util.Set";
-                p.dataType = "java.util.Set<" + p.items.dataType + ">";
-                p.datatypeWithEnum = "java.util.Set<" + p.items.datatypeWithEnum + ">";
+                p.baseType = BASE_TYPE;
+                p.dataType = BASE_TYPE+"<" + p.items.dataType + ">";
+                p.datatypeWithEnum = BASE_TYPE+"<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
             }
         }

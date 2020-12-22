@@ -55,9 +55,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
+    public static final String API_MODULE = "ApiModule";
     private static final String DEFAULT_IMPORT_PREFIX = "./";
     private static final String CLASS_NAME_PREFIX_PATTERN = "^[a-zA-Z0-9]*$";
     private static final String CLASS_NAME_SUFFIX_PATTERN = "^[a-zA-Z0-9]*$";
+    public static final String CLASSNAME_KEY = "classname";
+    public static final String PATH_NAME_KEY = "pathName";
     protected String foundationVersion = "6.6.7";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
@@ -169,12 +172,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(API_MODULE_PREFIX, value -> {
             validateClassPrefixArgument(value);
 
-            additionalProperties.put("apiModuleClassName", value + "ApiModule");
+            additionalProperties.put("apiModuleClassName", value + API_MODULE);
             additionalProperties.put("configurationClassName", value + "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", value + "ConfigurationParameters");
             additionalProperties.put(API_MODULE_PREFIX, true);
         }, () -> {
-            additionalProperties.put("apiModuleClassName", "ApiModule");
+            additionalProperties.put("apiModuleClassName", API_MODULE);
             additionalProperties.put("configurationClassName", "Configuration");
             additionalProperties.put("configurationParametersInterfaceName", "ConfigurationParameters");
             additionalProperties.put(API_MODULE_PREFIX, false);
@@ -282,11 +285,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> operations, List<Object> allModels) {
-        Map<String, Object> objs = (Map<String, Object>) operations.get("operations");
+        String operationKey = "operations";
+        Map<String, Object> objs = (Map<String, Object>) operations.get(operationKey);
         Map<String, Map<String, Object>> pathOperations = new HashMap<>();
 
         // Add filename information for api imports
-        objs.put("apiFilename", getApiFilenameFromClassname(objs.get("classname").toString()));
+        objs.put("apiFilename", getApiFilenameFromClassname(objs.get(CLASSNAME_KEY).toString()));
 
         List<CodegenOperation> ops = (List<CodegenOperation>) objs.get("operation");
         boolean hasSomeFormParams = false;
@@ -294,69 +298,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             if (op.getHasFormParams()) {
                 hasSomeFormParams = true;
             }
-            op.httpMethod = op.httpMethod.toLowerCase(Locale.ENGLISH);
-
-
-            // Prep a string buffer where we're going to set up our new version of the string.
-            StringBuilder pathBuffer = new StringBuilder();
-            StringBuilder parameterName = new StringBuilder();
-            int insideCurly = 0;
-
-            Map<String, Object> pathOp = new HashMap<>();
-            pathOp.put("pathName", removeNonNameElementToCamelCase(op.path.replaceAll("[{}/]", "-")));
-            pathOp.put("pattern", op.path);
-            pathOp.put("hasExamples", op.examples != null && !op.examples.isEmpty());
-            pathOp.put("operations", Collections.singletonList(op));
-            pathOperations.merge(op.path, pathOp, (o1, o2) -> {
-                o1.put("operations", Stream.of(
-                        (List<CodegenOperation>) o1.get("operations"),
-                        (List<CodegenOperation>) o2.get("operations")
-                ).flatMap(Collection::stream)
-                        .collect(Collectors.toList()));
-                o1.put("hasExamples",
-                        (boolean) o1.get("hasExamples") ||
-                                (boolean) o2.get("hasExamples")
-                );
-
-                return o1;
-            });
-
-            // Iterate through existing string, one character at a time.
-            for (int i = 0; i < op.path.length(); i++) {
-                switch (op.path.charAt(i)) {
-                    case '{':
-                        // We entered curly braces, so track that.
-                        insideCurly++;
-
-                        // Add the more complicated component instead of just the brace.
-                        pathBuffer.append("${encodeURIComponent(String(_");
-                        break;
-                    case '}':
-                        // We exited curly braces, so track that.
-                        insideCurly--;
-
-                        // Add the more complicated component instead of just the brace.
-                        CodegenParameter parameter = findPathParameterByName(op, parameterName.toString());
-                        pathBuffer.append(toParamName(parameterName.toString()));
-                        if (parameter != null && parameter.isDateTime) {
-                            pathBuffer.append(".toISOString()");
-                        }
-                        pathBuffer.append("))}");
-                        parameterName.setLength(0);
-                        break;
-                    default:
-                        char nextChar = op.path.charAt(i);
-                        if (insideCurly > 0) {
-                            parameterName.append(nextChar);
-                        } else {
-                            pathBuffer.append(nextChar);
-                        }
-                        break;
-                }
-            }
-
-            // Overwrite path to TypeScript template string, after applying everything we just did.
-            op.path = pathBuffer.toString();
+            processCodgenOperation(op, pathOperations, operationKey);
         }
 
         operations.put("pathOperations", pathOperations.values());
@@ -367,10 +309,78 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         for (Map<String, Object> im : imports) {
             // This property is not used in the templates any more, subject for removal
             im.put("filename", im.get("import"));
-            im.put("classname", im.get("classname"));
+            im.put(CLASSNAME_KEY, im.get(CLASSNAME_KEY));
         }
 
         return operations;
+    }
+
+    private void processCodgenOperation(CodegenOperation op, Map<String, Map<String, Object>> pathOperations, String operationkey){
+
+        op.httpMethod = op.httpMethod.toLowerCase(Locale.ENGLISH);
+
+
+        // Prep a string buffer where we're going to set up our new version of the string.
+        StringBuilder pathBuffer = new StringBuilder();
+        StringBuilder parameterName = new StringBuilder();
+        int insideCurly = 0;
+
+        Map<String, Object> pathOp = new HashMap<>();
+        pathOp.put(PATH_NAME_KEY, removeNonNameElementToCamelCase(op.path.replaceAll("[{}/]", "-")));
+        pathOp.put("pattern", op.path);
+        pathOp.put("hasExamples", op.examples != null && !op.examples.isEmpty());
+        pathOp.put(operationkey, Collections.singletonList(op));
+        pathOperations.merge(op.path, pathOp, (o1, o2) -> {
+                    o1.put(operationkey, Stream.of(
+                            (List<CodegenOperation>) o1.get(operationkey),
+                            (List<CodegenOperation>) o2.get(operationkey)
+                    ).flatMap(Collection::stream)
+                            .collect(Collectors.toList()));
+                    o1.put("hasExamples",
+                            (boolean) o1.get("hasExamples") ||
+                                    (boolean) o2.get("hasExamples")
+                    );
+
+                    return o1;
+
+        });
+
+        // Iterate through existing string, one character at a time.
+        for (int i = 0; i < op.path.length(); i++) {
+            switch (op.path.charAt(i)) {
+                case '{':
+                    // We entered curly braces, so track that.
+                    insideCurly++;
+
+                    // Add the more complicated component instead of just the brace.
+                    pathBuffer.append("${encodeURIComponent(String(_");
+                    break;
+                case '}':
+                    // We exited curly braces, so track that.
+                    insideCurly--;
+
+                    // Add the more complicated component instead of just the brace.
+                    CodegenParameter parameter = findPathParameterByName(op, parameterName.toString());
+                    pathBuffer.append(toParamName(parameterName.toString()));
+                    if (parameter != null && parameter.isDateTime) {
+                        pathBuffer.append(".toISOString()");
+                    }
+                    pathBuffer.append("))}");
+                    parameterName.setLength(0);
+                    break;
+                default:
+                    char nextChar = op.path.charAt(i);
+                    if (insideCurly > 0) {
+                        parameterName.append(nextChar);
+                    } else {
+                        pathBuffer.append(nextChar);
+                    }
+                    break;
+            }
+        }
+
+        // Overwrite path to TypeScript template string, after applying everything we just did.
+        op.path = pathBuffer.toString();
     }
 
     /**
@@ -435,7 +445,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             if (!im.equals(cm.classname)) {
                 HashMap<String, String> tsImport = new HashMap<>();
                 // TVG: This is used as class name in the import statements of the model file
-                tsImport.put("classname", im);
+                tsImport.put(CLASSNAME_KEY, im);
                 tsImport.put("filename", toModelFilename(removeModelPrefixSuffix(im)));
                 tsImports.add(tsImport);
             }
@@ -488,10 +498,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         return toApiFilename(name);
     }
 
-    @Override
-    public String toModelName(String name) {
-        return super.toModelName(name);
-    }
 
     public String removeModelPrefixSuffix(String name) {
         String result = name;
@@ -516,7 +522,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private void validateClassPrefixArgument(String value) {
         if (!value.matches(CLASS_NAME_PREFIX_PATTERN)) {
             throw new IllegalArgumentException(
-                    String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", "ApiModule")
+                    String.format(Locale.ROOT, "%s class prefix only allows alphanumeric characters.", API_MODULE)
             );
         }
     }

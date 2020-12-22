@@ -33,7 +33,6 @@ class NoReservedWordsChecker(config: Config) {
             context.api.getAllProperties()
                     .filter { schema ->
                         when {
-                            //Map(propertyName, Schema)
                             reservedWords.contains(schema.key) -> true
                             else -> false
                         }

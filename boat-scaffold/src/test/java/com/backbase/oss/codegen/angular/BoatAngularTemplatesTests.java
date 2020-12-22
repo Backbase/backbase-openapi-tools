@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * These tests verifies that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
  */
-public class BoatAngularTemplatesTests {
+class BoatAngularTemplatesTests {
     static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-angular-templates-tests");
