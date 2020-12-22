@@ -82,7 +82,7 @@ public class ExportMojo extends AbstractRamlToOpenApi {
             if (failOnError) {
                 throw new MojoExecutionException(msg);
             }
-            return null;
+            return new File[0];
         }
         return files;
     }
