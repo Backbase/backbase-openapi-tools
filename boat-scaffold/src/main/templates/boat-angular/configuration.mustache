@@ -19,9 +19,6 @@ export interface {{{configurationParametersInterfaceName}}} {
      */
     credentials?: {[ key: string ]: string | (() => string | undefined)};
 }
-{{#apiModulePrefix}}
-export { {{configurationParametersInterfaceName}} as ConfigurationParameters };
-{{/apiModulePrefix}}
 
 export class {{{configurationClassName}}} {
     apiKeys?: {[ key: string ]: string};
@@ -149,9 +146,6 @@ export class {{{configurationClassName}}} {
             : value;
     }
 }
-{{#apiModulePrefix}}
-export { {{configurationClassName}} as Configuration };
-{{/apiModulePrefix}}
 
 {{#withMocks}}
 export const CONFIG_TOKEN = new InjectionToken('api-data-module {{configurationClassName}}');
