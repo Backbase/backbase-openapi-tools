@@ -19,6 +19,19 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.12.0
+* *General*
+  * Improved code quality
+  * Added more unit tests
+  * Added more realistic example projects in boat-maven-plugin
+  * Added help:describe support for boat-maven-plugin
+  * Fixed building in Windows 
+* *Boat Docs*
+  * Render response examples from response instead of schema object
+* *Lint*
+  * Added additional rules. 
+  * Ignore Zalando Ruleset by default in boat-maven-plugin
+  
 ## 0.11.4
 * *Java Templates*
   * Correct the import and use of @Qualifier in ApiClient template

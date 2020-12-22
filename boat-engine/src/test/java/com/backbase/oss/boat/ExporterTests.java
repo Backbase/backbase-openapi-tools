@@ -35,30 +35,16 @@ class ExporterTests extends AbstractBoatEngineTestBase {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
     }
 
-    @Test
-    void testHelloWorld() throws Exception {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api.raml");
+    @ParameterizedTest
+    @ValueSource(strings = {"/raml-examples/backbase-wallet/presentation-client-api.raml",
+            "/raml-examples/backbase-wallet/presentation-xml-client-api.raml",
+            "/raml-examples/backbase-wallet/presentation-client-api-duplicate-operation-id.raml"})
+    void testExportOfDifferentSchema(String fileName) throws Exception {
+        File inputFile = getFile(fileName);
         OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
         String export = SerializerUtils.toYamlString(openAPI);
         validateExport(export);
     }
-
-    @Test
-    void testUnusualTypesSchemaConversion() throws ExportException, IOException {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-xml-client-api.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
-        String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
-    }
-
-    @Test
-    void testDuplicateOperation() throws ExportException, IOException {
-        File inputFile = getFile("/raml-examples/backbase-wallet/presentation-client-api-duplicate-operation-id.raml");
-        OpenAPI openAPI = Exporter.export(inputFile, true, new ArrayList<>());
-        String export = SerializerUtils.toYamlString(openAPI);
-        validateExport(export);
-    }
-
 
     @Test
     void normalizeNameTests() {

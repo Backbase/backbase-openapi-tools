@@ -15,10 +15,15 @@ class InfoBlockDescriptionChecker(config: Config) {
     private val maxDescriptionLength = config.getInt("InfoBlockDescriptionChecker.maxDescriptionLength")
 
     @Check(Severity.MUST)
-    fun validate(context: Context) = when (val title = context.api.info.description) {
-        null -> listOf(Violation("description is a required value", "/openapi/info/description".toJsonPointer()))
-        ""  -> listOf(Violation("description can not be empty", "/openapi/info/description".toJsonPointer()))
-        else -> if (title.length > maxDescriptionLength) listOf(Violation("description can not be longer than $maxDescriptionLength", "/openapi/info/description".toJsonPointer())) else emptyList()
+    fun validate(context: Context): List<Violation> {
+        val descriptionPointer = "/openapi/info/description".toJsonPointer()
+        return when (val title = context.api.info.description) {
+            null -> listOf(Violation("description is a required value", descriptionPointer))
+            ""  -> listOf(Violation("description can not be empty", descriptionPointer))
+            else -> if (title.length > maxDescriptionLength) listOf(Violation("description can not be longer than $maxDescriptionLength",
+                descriptionPointer
+            )) else emptyList()
+        }
     }
 
 }

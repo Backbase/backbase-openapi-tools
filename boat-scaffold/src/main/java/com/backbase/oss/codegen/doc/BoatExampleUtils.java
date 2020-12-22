@@ -13,12 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @UtilityClass
+@SuppressWarnings("java:S3740")
 public class BoatExampleUtils {
 
-    public static void convertExamples(OpenAPI openAPI, MediaType mediaType, String contentType, List<BoatExample> examples) {
+    public static void convertExamples(OpenAPI openAPI, MediaType mediaType, String responseCode, String contentType, List<BoatExample> examples) {
         if (mediaType.getExample() != null) {
             Object example = mediaType.getExample();
             BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example), isJson(contentType));
+
             if (example instanceof ObjectNode && ((ObjectNode) example).has("$ref")) {
                 boatExample.getExample().set$ref(((ObjectNode) example).get("$ref").asText());
             }
@@ -27,12 +29,13 @@ public class BoatExampleUtils {
 
         if (mediaType.getExamples() != null) {
             mediaType.getExamples().forEach((key, example) -> {
+                log.debug("Adding example: {} to examples with content type: {} and responseCode: {} ", key, contentType, responseCode);
                 BoatExample boatExample = new BoatExample(key, contentType, example, isJson(contentType));
                 examples.add(boatExample);
             });
         }
 
-        Schema schema = mediaType.getSchema();
+        Schema<?> schema = mediaType.getSchema();
         if (schema != null && schema.get$ref() != null) {
             String ref = schema.get$ref();
             processRef(openAPI, contentType, examples, ref);

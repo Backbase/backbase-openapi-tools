@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Slf4j
 @SuppressWarnings("java:S2699")
-public class BatchDiffMojoTests {
+class BatchDiffMojoTests {
 
 
     @SneakyThrows
