@@ -19,7 +19,7 @@ class LintMojoTests {
     @Test
     void testFailOnWarningNoWarnings() throws MojoFailureException, MojoExecutionException {
         LintMojo lintMojo = new LintMojo();
-        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151", "134"));
+        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151", "134", "115"));
         lintMojo.setInput(getFile("/oas-examples/no-lint-warnings.yaml"));
         lintMojo.setFailOnWarning(true);
         lintMojo.execute();
