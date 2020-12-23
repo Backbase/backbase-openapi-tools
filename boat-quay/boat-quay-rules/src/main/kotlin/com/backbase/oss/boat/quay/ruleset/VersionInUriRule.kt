@@ -8,7 +8,7 @@ import org.zalando.zally.rule.api.*
         ruleSet = BoatRuleSet::class,
         id = "B009",
         severity = Severity.MUST,
-        title = "Check prefix for paths should contains version."
+        title = "Check prefix for paths should contain version."
 )
 class VersionInUriRule {
 
