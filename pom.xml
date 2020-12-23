@@ -31,8 +31,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</connection>
-        <developerConnection>scm:git:git@github.com:backbase/backbase-openapi-tools.git</developerConnection>
+        <connection>scm:git:git@github.com:Backbase/backbase-openapi-tools.git</connection>
+        <developerConnection>scm:git:ssh://github.com:Backbase/backbase-openapi-tools.git</developerConnection>
+        <url>https://github.com/Backbase/backbase-openapi-tools/tree/master</url>
     </scm>
 
     <distributionManagement>
