@@ -1,5 +1,5 @@
 import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core';
-import { Configuration, CONFIG_TOKEN } from './configuration';
+import { {{configurationClassName}}, CONFIG_TOKEN } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 {{#withMocks}}
@@ -24,10 +24,10 @@ import { {{classname}} } from './{{importPath}}';
     {{/hasMore}}{{/apis}}{{/apiInfo}} {{/providedInRoot}}]
 })
 export class {{apiModuleClassName}} {
-    public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders<{{apiModuleClassName}}> {
+    public static forRoot(configurationFactory: () => {{configurationClassName}}): ModuleWithProviders<{{apiModuleClassName}}> {
         return {
             ngModule: {{apiModuleClassName}},
-            providers: [ { provide: Configuration, useFactory: configurationFactory } ]
+            providers: [ { provide: {{configurationClassName}}, useFactory: configurationFactory } ]
         };
     }
 
@@ -35,7 +35,7 @@ export class {{apiModuleClassName}} {
                  @Optional() http: HttpClient,
                  {{#withMocks}}
                  @Optional() dataModulesManager: DataModulesManager | null,
-                 config: Configuration,
+                 config: {{configurationClassName}},
                  {{/withMocks}}
 
         ) {
