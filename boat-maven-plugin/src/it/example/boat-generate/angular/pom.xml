@@ -23,7 +23,7 @@
         <codegen.npmPackage.name>@boat/petstore-http-ang</codegen.npmPackage.name>
         <codegen.buildDist>dist/libs/petstore-http-ang</codegen.buildDist>
         <codegen.npmPackage.version>2.2.0</codegen.npmPackage.version>
-        <codegen.generateMocks>true</codegen.generateMocks>
+        <codegen.generateMocks>false</codegen.generateMocks>
         <codegen.apiModulePrefix>PetStore</codegen.apiModulePrefix>
         <codegen.serviceSuffix>HttpService</codegen.serviceSuffix>
     </properties>
