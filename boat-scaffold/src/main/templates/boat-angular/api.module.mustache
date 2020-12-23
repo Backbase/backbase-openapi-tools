@@ -1,5 +1,5 @@
 import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core';
-import { {{configurationClassName}}, CONFIG_TOKEN } from './configuration';
+import { {{configurationClassName}}{{#withMocks}}, CONFIG_TOKEN{{/withMocks}} } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 {{#withMocks}}
