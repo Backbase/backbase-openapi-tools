@@ -4,7 +4,7 @@ import { HttpParameterCodec } from '@angular/common/http';
 import { InjectionToken } from '@angular/core';
 {{/withMocks}}
 
-export interface {{{configurationParametersInterfaceName}}} {
+export interface {{configurationParametersInterfaceName}} {
     apiKeys?: {[ key: string ]: string};
     username?: string;
     password?: string;
@@ -20,7 +20,7 @@ export interface {{{configurationParametersInterfaceName}}} {
     credentials?: {[ key: string ]: string | (() => string | undefined)};
 }
 
-export class {{{configurationClassName}}} {
+export class {{configurationClassName}} {
     apiKeys?: {[ key: string ]: string};
     username?: string;
     password?: string;
@@ -88,7 +88,7 @@ export class {{{configurationClassName}}} {
 
     /**
      * Select the correct content-type to use for a request.
-     * Uses {@link Configuration#isJsonMime} to determine the correct content-type.
+     * Uses {@link {{configurationClassName}}#isJsonMime} to determine the correct content-type.
      * If no content type is found return the first found type if the contentTypes is not empty
      * @param contentTypes - the array of content types that are available for selection
      * @returns the selected content-type or <code>undefined</code> if no selection could be made.
@@ -107,7 +107,7 @@ export class {{{configurationClassName}}} {
 
     /**
      * Select the correct accept content-type to use for a request.
-     * Uses {@link Configuration#isJsonMime} to determine the correct accept content-type.
+     * Uses {@link {{configurationClassName}}#isJsonMime} to determine the correct accept content-type.
      * If no content type is found return the first found type if the contentTypes is not empty
      * @param accepts - the array of content types that are available for selection.
      * @returns the selected content-type or <code>undefined</code> if no selection could be made.

@@ -15,7 +15,7 @@ tags:
   - name: Retail
     description: Retail pets tags
 paths:
-  /client-api/pets:
+  /client-api/v1/pets:
     get:
       summary: List all pets
       operationId: listPets
