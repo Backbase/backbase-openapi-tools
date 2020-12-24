@@ -23,7 +23,7 @@
         <codegen.npmPackage.name>@boat/petstore-http-ang</codegen.npmPackage.name>
         <codegen.buildDist>dist/libs/petstore-http-ang</codegen.buildDist>
         <codegen.npmPackage.version>2.2.0</codegen.npmPackage.version>
-        <codegen.generateMocks>true</codegen.generateMocks>
+        <codegen.generateMocks>false</codegen.generateMocks>
         <codegen.apiModulePrefix>PetStore</codegen.apiModulePrefix>
         <codegen.serviceSuffix>HttpService</codegen.serviceSuffix>
     </properties>
@@ -46,6 +46,44 @@
                             <output>${project.basedir}/target/http-module</output>
                             <reservedWordsMappings>delete=delete,function=function,new=new</reservedWordsMappings>
                             <additionalProperties>npmName=${codegen.npmPackage.name},npmVersion=${codegen.npmPackage.version},withMocks=${codegen.generateMocks},buildDist=${codegen.buildDist},serviceSuffix=${codegen.serviceSuffix},apiModulePrefix=${codegen.apiModulePrefix}</additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.10.4</version>
+                <configuration>
+                    <workingDirectory>${project.basedir}/target/http-module</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v12.19.0</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <phase>verify</phase>
+                        <id>npm run-script build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run-script build</arguments>
                         </configuration>
                     </execution>
                 </executions>
