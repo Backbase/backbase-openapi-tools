@@ -1,16 +1,67 @@
-import { createMocks } from '@backbase/foundation-ang/data-http';
-import { Provider } from '@angular/core';
+import { InjectionToken } from '@angular/core';
+import { CONFIG_TOKEN, {{configurationClassName}} } from '../configuration';
+
+export interface MockData {
+    token: InjectionToken<{{configurationClassName}}>,
+    examples: Array<{
+        urlPattern: string;
+        method: string;
+        responses: Array<{
+            status: number;
+            body?: any;
+       }>;
+    }>;
+}
 
 {{#operations}}
     {{#operation}}
 /**
 * Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
 */
-export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = createMocks([{
-        urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
-        method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
-        responses: [
-        {{#responses}}
+export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MockData: MockData = {
+    token: CONFIG_TOKEN,
+    examples: [{
+            urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
+            method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
+            responses: [
+            {{#responses}}
+                {{#examples}}
+                    {{#isJson}}
+                    {
+                        status: {{{code}}},
+                        body: {{{prettyPrintValue}}}
+                    },
+                    {{/isJson}}
+                    {{^isJson}}
+                        {
+                        status: {{{code}}},
+                        body: "{{#escapeJavascript}}{{{prettyPrintValue}}}{{/escapeJavascript}}"
+                        },
+                    {{/isJson}}
+                {{/examples}}
+                {{#hasEmptyBody}}
+                    {
+                    status: {{{code}}},
+                    body: ""
+                    },
+                {{/hasEmptyBody}}
+            {{/responses}}
+        ]
+    }]
+};
+    {{/operation}}
+{{/operations}}
+
+export const {{classname}}MockData: MockData = {
+    token: CONFIG_TOKEN,
+    examples: [{{#operations}}
+        {{#operation}}
+        {
+            urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
+            method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
+            responses: [
+            {{#responses}}
+
             {{#examples}}
                 {{#isJson}}
                 {
@@ -26,51 +77,17 @@ export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}
                 {{/isJson}}
             {{/examples}}
             {{#hasEmptyBody}}
-                {
-                status: {{{code}}},
-                body: ""
-                },
+            {
+              status: {{{code}}},
+              body: ""
+            },
             {{/hasEmptyBody}}
         {{/responses}}
-    ]
-}]);
-    {{/operation}}
-{{/operations}}
-
-export const {{classname}}MocksProvider: Provider = createMocks(
-    [{{#operations}}
-    {{#operation}}
-    {
-        urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
-        method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
-        responses: [
-        {{#responses}}
-
-        {{#examples}}
-            {{#isJson}}
-            {
-                status: {{{code}}},
-                body: {{{prettyPrintValue}}}
-            },
-            {{/isJson}}
-            {{^isJson}}
-                {
-                status: {{{code}}},
-                body: "{{#escapeJavascript}}{{{prettyPrintValue}}}{{/escapeJavascript}}"
-                },
-            {{/isJson}}
-        {{/examples}}
-        {{#hasEmptyBody}}
-        {
-          status: {{{code}}},
-          body: ""
-        },
-        {{/hasEmptyBody}}
-    {{/responses}}
-    ]
-},
-    {{/operation}}
-{{/operations}}]
-);
+        ]
+    },
+        {{/operation}}
+    {{/operations}}
+    ],
+};
 
 
