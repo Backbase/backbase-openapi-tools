@@ -19,6 +19,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.13.0
+* *Lint*
+  * Added additional rules. 
+    * Check prefix for paths should contain version.
 ## 0.12.0
 * *General*
   * Improved code quality
@@ -30,6 +34,11 @@ BOAT is still under development and subject to change.
   * Render response examples from response instead of schema object
 * *Lint*
   * Added additional rules. 
+    * Check x-icon value in the info block.
+    * Check info block description.
+    * Check tags allowed.
+    * Check info block title.
+    * Check prefix for paths. i.e. "client-api", "service-api", "integration-api"
   * Ignore Zalando Ruleset by default in boat-maven-plugin
   
 ## 0.11.4
