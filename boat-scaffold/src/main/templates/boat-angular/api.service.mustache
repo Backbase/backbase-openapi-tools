@@ -12,7 +12,7 @@ import { {{classname}} } from '../model/models';
 {{/imports}}
 
 import { {{basePathVariableName}}, COLLECTION_FORMATS }                     from '../variables';
-import { Configuration }                                     from '../configuration';
+import { {{configurationClassName}} }                                     from '../configuration';
 
 {{#operations}}
 
@@ -45,10 +45,10 @@ export class {{classname}} {
 
     protected basePath = '{{{basePathWithoutHost}}}';
     public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    public configuration = new {{configurationClassName}}();
     public encoder: HttpParameterCodec;
 
-    constructor(protected httpClient: HttpClient, @Optional() @Inject({{basePathVariableName}}) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional() @Inject({{basePathVariableName}}) basePath: string, @Optional() configuration: {{configurationClassName}}) {
         if (configuration) {
             this.configuration = configuration;
         }
