@@ -5,7 +5,6 @@ import com.samskivert.mustache.Template.Fragment;
 import java.io.IOException;
 import java.io.Writer;
 import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import java.util.stream.IntStream;
 import lombok.Getter;
@@ -165,16 +164,23 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
 
         // Whether it's using ApiUtil or not.
-        // Developers can enable or disable it by just specifying it in the list of supporting files.
-        final boolean useApiUtil = ofNullable(GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES))
-            .map(StringUtils::trimToEmpty)
-            .map(s -> s.contains("ApiUtil.java"))
-            .orElse(false);
+        // cases:
+        // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
+        // <generateSupportingFiles>true or false</generateSupportingFiles>
+        final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
+        final boolean useApiUtil =
+            supFiles == null
+                ? false // cleared by <generateSuportingFiles>false</generateSuportingFiles>
+                : supFiles.isEmpty()
+                    ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+                    : supFiles.contains("ApiUtil.java"); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles
                 .removeIf(sf -> "apiUtil.mustache".equals(sf.templateFile));
         }
+
+        writePropertyBack("useApiUtil", useApiUtil);
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -222,8 +228,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             p.containerType = "set";
             p.baseType = BASE_TYPE;
-            p.dataType = BASE_TYPE+"<" + p.items.dataType + ">";
-            p.datatypeWithEnum = BASE_TYPE+"<" + p.items.datatypeWithEnum + ">";
+            p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
+            p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
             p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
         }
     }
@@ -239,10 +245,15 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
                 p.baseType = BASE_TYPE;
-                p.dataType = BASE_TYPE+"<" + p.items.dataType + ">";
-                p.datatypeWithEnum = BASE_TYPE+"<" + p.items.datatypeWithEnum + ">";
+                p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
+                p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
             }
         }
+    }
+
+    private boolean needApiUtil() {
+        return this.apiTemplateFiles.containsKey("api.mustache")
+            && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
     }
 }
