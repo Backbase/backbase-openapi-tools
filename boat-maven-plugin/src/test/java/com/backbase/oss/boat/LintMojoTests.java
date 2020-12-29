@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import com.google.common.io.Files;
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -52,6 +53,31 @@ class LintMojoTests {
         lintMojo.setFailOnWarning(fail);
         lintMojo.setWriteLintReport(report);
         lintMojo.execute();
+    }
+
+    @Test
+    void testExceptionsNotExistingFile() {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(new File("I DO NOT EXIST"));
+        assertThrows(MojoExecutionException.class, lintMojo::execute);
+
+    }
+
+    @Test
+    void testEmptyDirectory() {
+        File empty = Files.createTempDir();
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(empty);
+        assertThrows(MojoExecutionException.class, lintMojo::execute);
+    }
+
+    @Test
+    void testExceptionsWithInvalidFile() {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile("/oas-examples/unable-to-parse.yaml"));
+        lintMojo.showIgnoredRules = true;
+        assertThrows(MojoExecutionException.class, lintMojo::execute);
+
     }
 
 
