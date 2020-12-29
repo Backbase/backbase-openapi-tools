@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.lint;
 
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.codegen.AbstractDocumentationGenerator;
@@ -39,6 +40,8 @@ public class BoatLintGenerator extends AbstractDocumentationGenerator {
             return generate(results);
         } catch (IOException e) {
             throw new IllegalArgumentException("Cannot read file: " + input, e);
+        } catch (OpenAPILoaderException e) {
+            throw new IllegalArgumentException("Cannot load open API", e);
         }
     }
 
