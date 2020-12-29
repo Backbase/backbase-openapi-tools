@@ -53,7 +53,7 @@ public abstract class AbstractLintMojo extends AbstractMojo {
         File[] inputFiles;
         if (inputSpec.isDirectory()) {
             inputFiles = inputSpec.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
-            if (inputFiles == null) {
+            if (inputFiles == null || inputFiles.length == 0) {
                 throw new MojoExecutionException("No OpenAPI specs found in: " + inputSpec);
             }
             log.info("Found " + inputFiles.length + " specs to lint.");
