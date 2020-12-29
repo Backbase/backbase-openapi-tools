@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import java.io.File;
@@ -76,9 +77,10 @@ public abstract class AbstractLintMojo extends AbstractMojo {
             return boatLinter.lint(inputFile);
         } catch (IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: " + inputFile, e);
+        } catch (OpenAPILoaderException e) {
+            throw new MojoExecutionException("Cannot load OpenAPI: " + inputFile, e);
         }
     }
-
 
     public void setInput(File input) {
         this.inputSpec = input;
