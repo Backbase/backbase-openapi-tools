@@ -3,11 +3,9 @@ package com.backbase.oss.boat;
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 class ValidateMojoTests {
 
@@ -27,7 +25,7 @@ class ValidateMojoTests {
     }
 
     @Test
-    void testValidationCatches() throws MojoFailureException, MojoExecutionException{
+    void testValidationCatches() throws MojoFailureException, MojoExecutionException {
 
 
         ValidateMojo mojo = new ValidateMojo();
@@ -46,7 +44,7 @@ class ValidateMojoTests {
 
         assertThrows(MojoFailureException.class, mojo::execute);
         mojo.setFailOnWarning(false);
-        assertDoesNotThrow(()->mojo.execute());
+        assertDoesNotThrow(() -> mojo.execute());
 
 
     }
@@ -62,11 +60,10 @@ class ValidateMojoTests {
         mojo.setFailOnWarning(true);
 
 
-        assertDoesNotThrow(()-> mojo.execute());
+        assertThrows(MojoFailureException.class, mojo::execute);
 
 
     }
-
 
 
 }
