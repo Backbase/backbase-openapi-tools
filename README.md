@@ -21,7 +21,6 @@ BOAT is still under development and subject to change.
 
 ## 0.13.0
 * *Lint*
-  * Added additional rules. 
   * Added rules. 
     * Check plurals on paths resource names. 
     * Check prefix for paths should contain version.
