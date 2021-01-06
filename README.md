@@ -21,8 +21,10 @@ BOAT is still under development and subject to change.
 
 ## 0.13.0
 * *Lint*
-  * Added additional rules. 
+  * Added rules. 
     * Check prefix for paths should contain version.
+  * Enabled rules.
+    * Use Standard HTTP Status Codes.
 ## 0.12.0
 * *General*
   * Improved code quality
