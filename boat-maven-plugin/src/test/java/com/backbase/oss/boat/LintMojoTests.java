@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.assertj.core.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -47,18 +48,23 @@ class LintMojoTests {
         "false, false, /oas-examples/",
         "true, false, /oas-examples/ "
     })
-    void testsLintFile(boolean report, boolean fail, String fileName) throws MojoFailureException, MojoExecutionException {
+    void testsLintFile(boolean report, boolean fail, String fileName)  {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile(fileName));
         lintMojo.setFailOnWarning(fail);
         lintMojo.setWriteLintReport(report);
-        lintMojo.execute();
+        if(fail)
+            assertThrows(MojoExecutionException.class, lintMojo::execute);
+        else {
+            assertDoesNotThrow(lintMojo::execute);
+        }
     }
 
     @Test
     void testExceptionsNotExistingFile() {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(new File("I DO NOT EXIST"));
+        lintMojo.failOnWarning = true;
         assertThrows(MojoExecutionException.class, lintMojo::execute);
 
     }
@@ -68,7 +74,7 @@ class LintMojoTests {
         File empty = Files.createTempDir();
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(empty);
-        assertThrows(MojoExecutionException.class, lintMojo::execute);
+        assertDoesNotThrow(lintMojo::execute);
     }
 
     @Test
@@ -76,7 +82,7 @@ class LintMojoTests {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setInput(getFile("/oas-examples/unable-to-parse.yaml"));
         lintMojo.showIgnoredRules = true;
-        assertThrows(MojoExecutionException.class, lintMojo::execute);
+        assertDoesNotThrow(lintMojo::execute);
 
     }
 
