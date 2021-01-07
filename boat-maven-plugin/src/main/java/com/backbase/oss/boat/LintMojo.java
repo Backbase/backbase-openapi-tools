@@ -34,7 +34,19 @@ public class LintMojo extends AbstractLintMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        List<BoatLintReport> boatLintReports = lint();
+
+        List<BoatLintReport> boatLintReports = null;
+        try {
+            boatLintReports = lint();
+        } catch (MojoExecutionException e) {
+            if (failOnWarning) {
+                throw e;
+            }
+        }
+        if (boatLintReports == null) {
+            log.warn("No reports generated for input: {}", inputSpec);
+            return;
+        }
         boolean isSingleLint = boatLintReports.size() == 1;
         boolean isFailed = false;
         for (BoatLintReport report : boatLintReports) {
