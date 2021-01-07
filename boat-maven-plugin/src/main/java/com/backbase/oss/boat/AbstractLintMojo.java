@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import java.io.File;
@@ -44,7 +45,7 @@ public abstract class AbstractLintMojo extends AbstractMojo {
     @Parameter(name = "ignoreRules")
     protected String[] ignoreRules = new String[]{"219","215","218","166","136","174","235","107","171","224","143",
         "151","129","146","147","172","145","115","132","120", "134","183","154","105","104","130","118","110","153",
-        "101","176","150","116","M009","H002","M010","H001","M008","S005","S006","S007","M011"};
+        "101","176","116","M009","H002","M010","H001","M008","S005","S006","S007","M011"};
 
     protected List<BoatLintReport> lint() throws MojoExecutionException {
         List<BoatLintReport> boatLintReports = new ArrayList<>();
@@ -52,7 +53,7 @@ public abstract class AbstractLintMojo extends AbstractMojo {
         File[] inputFiles;
         if (inputSpec.isDirectory()) {
             inputFiles = inputSpec.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
-            if (inputFiles == null) {
+            if (inputFiles == null || inputFiles.length == 0) {
                 throw new MojoExecutionException("No OpenAPI specs found in: " + inputSpec);
             }
             log.info("Found " + inputFiles.length + " specs to lint.");
@@ -76,9 +77,10 @@ public abstract class AbstractLintMojo extends AbstractMojo {
             return boatLinter.lint(inputFile);
         } catch (IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: " + inputFile, e);
+        } catch (OpenAPILoaderException e) {
+            throw new MojoExecutionException("Cannot load OpenAPI: " + inputFile, e);
         }
     }
-
 
     public void setInput(File input) {
         this.inputSpec = input;

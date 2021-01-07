@@ -14,12 +14,23 @@ public class OpenAPILoader {
         throw new AssertionError("Private constructor");
     }
 
-    public static OpenAPI parse(String openApi) {
+    public static OpenAPI parse(String openApi) throws OpenAPILoaderException {
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlattenComposedSchemas(true);
         parseOptions.setResolveCombinators(true);
-        SwaggerParseResult swaggerParseResult = openAPIParser.readContents(openApi);
+
+        SwaggerParseResult swaggerParseResult = null;
+        try {
+            swaggerParseResult = openAPIParser.readContents(openApi);
+        } catch (Exception e) {
+            throw new OpenAPILoaderException("Cannot parse openAPI", e);
+        }
+
+        if (swaggerParseResult.getOpenAPI() == null) {
+            throw new OpenAPILoaderException("Cannot parse OpenAPI", swaggerParseResult.getMessages());
+        }
+
         return swaggerParseResult.getOpenAPI();
 
     }
@@ -40,7 +51,7 @@ public class OpenAPILoader {
         if (!file.exists()) {
             throw new OpenAPILoaderException("Could not load open api from file :" + file.getAbsolutePath() + ". File does not exist!");
         }
-        return load(file.toURI().toString(), resolveFully,flatten);
+        return load(file.toURI().toString(), resolveFully, flatten);
     }
 
     public static OpenAPI load(String url, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
@@ -56,7 +67,7 @@ public class OpenAPILoader {
         SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(url, null, parseOptions);
         if (swaggerParseResult.getOpenAPI() == null) {
             log.error("Could not load OpenAPI from : {} \n{}", url, String.join("\t\n", swaggerParseResult.getMessages()));
-            throw new OpenAPILoaderException("Could not load open api from :" + url);
+            throw new OpenAPILoaderException("Could not load open api from :" + url, swaggerParseResult.getMessages());
         }
         return swaggerParseResult.getOpenAPI();
     }

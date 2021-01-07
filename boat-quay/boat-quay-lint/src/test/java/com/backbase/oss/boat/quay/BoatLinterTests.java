@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.quay;
 
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
@@ -24,7 +25,7 @@ class BoatLinterTests {
     }
 
     @Test
-    void testRules() throws IOException {
+    void testRules() throws IOException, OpenAPILoaderException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
 
@@ -32,7 +33,7 @@ class BoatLinterTests {
     }
 
     @Test
-    void testBoatViolationDisplay() throws IOException {
+    void testBoatViolationDisplay() throws IOException, OpenAPILoaderException {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
         BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
         Optional<BoatViolation> testDisplay = boatLintReport.getViolations().stream()
@@ -42,7 +43,7 @@ class BoatLinterTests {
     }
 
     @Test
-    void testRulesWithFile() throws IOException {
+    void testRulesWithFile() throws IOException, OpenAPILoaderException {
         // Can't ret relative file from class path resources. Copy into new file
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
 
