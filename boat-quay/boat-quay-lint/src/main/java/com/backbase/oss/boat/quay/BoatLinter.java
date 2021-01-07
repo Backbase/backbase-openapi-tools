@@ -1,6 +1,7 @@
 package com.backbase.oss.boat.quay;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatLintRule;
@@ -49,7 +50,7 @@ public class BoatLinter {
         this.availableRules = mapAvailableRules();
     }
 
-    public BoatLintReport lint(File inputFile) throws IOException {
+    public BoatLintReport lint(File inputFile) throws IOException, OpenAPILoaderException {
         Path relativePath = getFilePath(inputFile);
         log.info("Linting: {}", inputFile);
         String contents = IOUtils.toString(inputFile.toURI(), Charset.defaultCharset());
@@ -71,7 +72,7 @@ public class BoatLinter {
         return relativize;
     }
 
-    public BoatLintReport lint(String openApiContent) {
+    public BoatLintReport lint(String openApiContent) throws OpenAPILoaderException {
         List<Result> validate = validator.validate(openApiContent, rulesPolicy, null);
         List<BoatViolation> violations = validate.stream()
             .map(this::transformResult)
