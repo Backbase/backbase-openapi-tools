@@ -40,15 +40,15 @@ public class ExamplesProcessor {
     private final URI rootUri;
     private final Map<String, ExampleHolder> cache = new LinkedHashMap<>();
 
-    public ExamplesProcessor(OpenAPI openAPI, String inputFile) {
+    public ExamplesProcessor(OpenAPI openAPI, String inputUri) {
         super();
         this.openAPI = openAPI;
 
         try {
             // Resolve the directory containing the file
-            this.rootUri = URI.create(inputFile).resolve(".");
+            this.rootUri = URI.create(inputUri).resolve(".");
         } catch (RuntimeException e) {
-            log.error("Unable to create URI from \"{}\"", inputFile);
+            log.error("Unable to create URI from \"{}\"", inputUri);
             throw e;
         }
     }
@@ -166,7 +166,7 @@ public class ExamplesProcessor {
 
         resolvedUri = resolveUri(relativePath, refPath);
         try {
-            String content = readContent(Paths.get(resolvedUri.getPath()));
+            String content = readContent(Paths.get(resolvedUri));
 
             if (fragment.isPresent()) {
                 String exampleName = StringUtils.substringAfterLast(fragment.get(), "/");
@@ -196,7 +196,7 @@ public class ExamplesProcessor {
             exampleHolder.replaceRef(refPath);
             URI resolvedUri = resolveUri(relativePath, refPath);
             resolveUri(relativePath, refPath);
-            String content = readContent(Paths.get(resolvedUri.getPath()));
+            String content = readContent(Paths.get(resolvedUri));
 
             exampleHolder.setContent(content);
             if (exampleName != null) {
