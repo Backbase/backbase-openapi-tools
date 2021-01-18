@@ -581,12 +581,14 @@ public class GenerateMojo extends AbstractMojo {
                 configurator.setRemoveOperationIdPrefix(removeOperationIdPrefix);
             }
 
-            if (isValidURI(inputSpec)) {
-                configurator.setInputSpec(inputSpec);
-            } else if (inputSpecFile.exists()) {
-                configurator.setInputSpec(inputSpecFile.getAbsoluteFile().toURI().toString());
-            } else {
-                throw new MojoExecutionException(inputSpec + " is not a valid URI or file!");
+            if (isNotEmpty(inputSpec)) {
+                if (isValidURI(inputSpec)) {
+                    configurator.setInputSpec(inputSpec);
+                } else if (inputSpecFile.exists()) {
+                    configurator.setInputSpec(inputSpecFile.getAbsoluteFile().toURI().toString());
+                } else {
+                    throw new MojoExecutionException(inputSpec + " is not a valid URI or file!");
+                }
             }
 
             if (isNotEmpty(gitHost)) {
