@@ -22,7 +22,7 @@ public class BoatCodegenResponse extends CodegenResponse {
     }
 
     public boolean hasEmptyBody() {
-        return this.code.equals("204") && !this.hasExamples();
+        return (this.code.equals("204") || this.code.equals("201")) && !this.hasExamples();
     }
 
     public BoatCodegenResponse(CodegenResponse o, String responseCode, ApiResponse response, OpenAPI openAPI) {
@@ -81,8 +81,8 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.multipleOf = o.multipleOf;
 
         if (response.getContent() != null) {
-            response.getContent().forEach((contentType, mediaType) ->
-                BoatExampleUtils.convertExamples(openAPI, mediaType, responseCode, contentType, examples));
+            response.getContent().forEach((contentType, mediaType) -> BoatExampleUtils.convertExamples(openAPI,
+                    mediaType, responseCode, contentType, examples));
             BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
         }
     }
