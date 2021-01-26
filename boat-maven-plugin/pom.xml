@@ -127,6 +127,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.backbase.oss.boat.bay</groupId>
+            <artifactId>boat-bay-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
 
     </dependencies>
 

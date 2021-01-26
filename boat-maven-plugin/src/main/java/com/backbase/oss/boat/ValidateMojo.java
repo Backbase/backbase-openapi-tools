@@ -1,11 +1,15 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.bay.client.ApiClient;
+import com.backbase.oss.boat.bay.client.api.UploadPluginApi;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.util.ArrayList;
+
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -13,6 +17,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Validates OpenAPI specs.
@@ -27,6 +33,14 @@ public class ValidateMojo extends AbstractMojo {
     @Parameter(name = "failOnWarning", required = true)
     private boolean failOnWarning;
 
+    @Parameter(readonly = true, required = true, defaultValue = "${project}")
+    protected MavenProject project;
+/// cant get it to be sent in source pom flile ???
+    @Parameter(name = "sourceId", defaultValue = "", property = "inputSpec")
+    private String sourceId;
+
+    private UploadLint boatbayUploadSpecClient;
+
     public void setInput(File input) {
         this.input = input;
     }
@@ -34,6 +48,10 @@ public class ValidateMojo extends AbstractMojo {
         this.failOnWarning= failOnWarning;
     }
 
+
+
+
+    @SneakyThrows
     @Override
     public void execute() throws  MojoFailureException {
 
@@ -48,6 +66,9 @@ public class ValidateMojo extends AbstractMojo {
             }
         } else {
             validate(input);
+            if (false){
+                new UploadLint(input,null,project).upload(sourceId);
+            }
         }
     }
 
