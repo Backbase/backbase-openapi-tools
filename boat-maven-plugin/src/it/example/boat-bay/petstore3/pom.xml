@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>example</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>petstore3</artifactId>
+
+    <name>BOAT :: Lint Upload :: Spec</name>
+
+    <description>
+        Example projects showing how BOAT can help you generate code
+    </description>
+
+    <packaging>pom</packaging>
+
+
+
+</project>

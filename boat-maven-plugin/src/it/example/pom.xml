@@ -40,6 +40,7 @@
     <name>BOAT :: Examples</name>
 
     <modules>
+        <module>boat-bay</module>
         <module>boat-doc</module>
         <module>boat-export</module>
         <module>boat-generate</module>
