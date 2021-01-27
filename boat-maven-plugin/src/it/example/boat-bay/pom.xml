@@ -12,19 +12,19 @@
 
     <artifactId>boat-bay</artifactId>
 
-    <name>BOAT :: Lint Upload</name>
+    <name>BOAT :: Boat Bay</name>
 
     <description>
-        Example projects showing how BOAT can help you generate code
+        Example projects showing how BOAT uses Boat bay to help you lint and validate specs
     </description>
 
     <packaging>pom</packaging>
 
     <modules>
-        <module>petstore1</module>
-        <module>petstore2</module>
-        <module>petstore3</module>
-        <module>petstore4</module>
+        <module>lint-petstore</module>
+        <module>lint-petstore-non-breaking</module>
+        <module>lint-petstore-breaking</module>
+        <module>validate-petstore</module>
     </modules>
 
 </project>

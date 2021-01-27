@@ -21,6 +21,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>boat-bay-client</module>
         <module>java</module>
         <module>rest-template-embedded</module>
         <module>webclient-embedded</module>

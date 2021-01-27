@@ -6,19 +6,20 @@
 
     <parent>
         <groupId>com.backbase.oss.boat.example</groupId>
-        <artifactId>example</artifactId>
+        <artifactId>boat-bay</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>petstore2</artifactId>
+    <artifactId>lint-petstore-breaking</artifactId>
 
-    <name>BOAT :: Lint Upload :: Empty Spec</name>
+    <name>BOAT :: Boat Bay :: Lint Spec Breaking</name>
 
     <description>
-        Example projects showing how BOAT can help you generate code
+
     </description>
 
     <packaging>pom</packaging>
+
     <build>
         <plugins>
             <plugin>
@@ -32,7 +33,7 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/petstore.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/petstore-new-breaking.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
                             <sourceId>5</sourceId>
                         </configuration>
@@ -41,6 +42,8 @@
             </plugin>
         </plugins>
     </build>
+
+
 
 
 </project>

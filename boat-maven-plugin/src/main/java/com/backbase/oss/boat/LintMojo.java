@@ -1,18 +1,14 @@
 package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.bay.client.ApiException;
-import com.backbase.oss.boat.bay.client.api.UploadPluginApi;
-import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.codegen.lint.BoatLintConfig;
 import com.backbase.oss.codegen.lint.BoatLintGenerator;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -20,6 +16,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import sun.tools.java.Environment;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
@@ -44,27 +41,32 @@ public class LintMojo extends AbstractLintMojo {
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(name = "sourceId")
+    @Parameter(name = "boatBayUrl", defaultValue = "hjhb", property = "boat.maven.plugin.lint.boatBayUrl")
+    private String boatBayUrl;
+
+    @Parameter(name = "sourceId", defaultValue = "")
     private String sourceId;
 
-    private UploadLint boatBaySpecUpload;
+    private BoatBayRadio boatBayRadio;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        boolean boatbay = false;
-
 
 
         List<BoatLintReport> boatLintReports = null;
         try {
-
-//            if(boatbay){
-//                new UploadLint(inputSpec,output,project).upload(sourceId);
-//            }
-            boatLintReports = lint();
-        } catch (MojoExecutionException e) {
+            if (!sourceId.isEmpty()
+                    || !System.getenv("boatBayUrl").isEmpty()
+                    || System.getenv("boatBayUrl") != null
+                    || !boatBayUrl.isEmpty()) {
+                new BoatBayRadio(inputSpec,output,project).upload(sourceId);
+              //  System.getenv().containsKey("boatBayUrl");
+            }else {
+                boatLintReports = lint();
+            }
+        } catch (MojoExecutionException | ApiException e) {
             if (failOnWarning) {
-                throw e;
+                throw new MojoExecutionException(e.getMessage());
             }
         }
         if (boatLintReports == null) {
@@ -116,8 +118,9 @@ public class LintMojo extends AbstractLintMojo {
     }
 
 
+    public void setSourceId(String sourceId){ this.sourceId = sourceId; }
 
-    public void setWriteLintReport(boolean writeLintReport) {
-        this.writeLintReport = writeLintReport;
-    }
+    public void setBoatBayUrl(String boatBayUrl){this.boatBayUrl = boatBayUrl;}
+
+    public void setWriteLintReport(boolean writeLintReport) { this.writeLintReport = writeLintReport; }
 }
