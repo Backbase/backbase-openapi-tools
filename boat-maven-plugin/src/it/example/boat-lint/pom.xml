@@ -23,7 +23,7 @@
                 <executions>
                     <execution>
                         <id>lint</id>
-                        <phase>validate</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>lint</goal>
                         </goals>
