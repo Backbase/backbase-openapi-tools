@@ -4,23 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <parent>
         <groupId>com.backbase.oss.boat.example</groupId>
-        <artifactId>example</artifactId>
+        <artifactId>boat-bay</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>petstore1</artifactId>
+    <artifactId>lint-petstore-non-breaking</artifactId>
 
-    <name>BOAT :: Lint Upload :: Spec</name>
+    <name>BOAT :: Boat Bay :: Lint Non Breaking Spec</name>
 
     <description>
-        Example projects showing how BOAT can help you generate code
+        Example project showing the linting of a specification via boat-bay
+        Using a spec with non breaking changes in petstore
     </description>
 
     <packaging>pom</packaging>
-
     <build>
         <plugins>
             <plugin>
@@ -34,7 +33,7 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/petstore.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/petstore-new-non-breaking.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
                             <sourceId>5</sourceId>
                         </configuration>
