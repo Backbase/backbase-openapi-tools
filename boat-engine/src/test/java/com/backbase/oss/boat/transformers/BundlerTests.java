@@ -18,6 +18,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -96,11 +97,10 @@ class BundlerTests {
 
     @Test
     void testBundleNonExistingFiles() throws OpenAPILoaderException, IOException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").getFile();
-        String spec = System.getProperty("spec", file);
-        File input = new File(spec);
-        OpenAPI openAPI = OpenAPILoader.load(input);
-        Bundler bundler = new Bundler(input);
+        String inputUri = getClass().getResource("/openapi/bundler-examples-test-api/openapi-example-not-found.yaml").toString();
+        String spec = System.getProperty("spec", inputUri);
+        OpenAPI openAPI = OpenAPILoader.load(inputUri);
+        Bundler bundler = new Bundler(inputUri);
         try {
             bundler.transform(openAPI, Collections.EMPTY_MAP);
             fail("Expected TransformerException");
@@ -111,43 +111,38 @@ class BundlerTests {
     }
 
     @Test
-    void testExamplesProcessor() throws OpenAPILoaderException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
-        String spec = System.getProperty("spec", file);
-        File input = new File(spec);
-        OpenAPI openAPI = OpenAPILoader.load(input);
+    void testExamplesProcessor() throws OpenAPILoaderException, URISyntaxException {
+        String inputUri = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").toString();
+        String spec = System.getProperty("spec", inputUri);
+        OpenAPI openAPI = OpenAPILoader.load(spec);
         OpenAPI openAPIUnproccessed = openAPI;
-        new ExamplesProcessor(openAPI,file).processExamples(openAPI);
+        new ExamplesProcessor(openAPI,spec).processExamples(openAPI);
         assertEquals(openAPIUnproccessed, openAPI);
     }
 
     @Test
     void testExamplesProcessorComponentError() throws OpenAPILoaderException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi-component-example-error.yaml").getFile();
-        String spec = System.getProperty("spec", file);
-        File input = new File(spec);
-        OpenAPI openAPI = OpenAPILoader.load(input);
-        ExamplesProcessor examplesProcessor = new ExamplesProcessor(openAPI,file);
+        String inputUri = getClass().getResource("/openapi/bundler-examples-test-api/openapi-component-example-error.yaml").toString();
+        String spec = System.getProperty("spec", inputUri);;
+        OpenAPI openAPI = OpenAPILoader.load(spec);
+        ExamplesProcessor examplesProcessor = new ExamplesProcessor(openAPI,spec);
         try {
             examplesProcessor.processExamples(openAPI);
             fail("Expected TransformerException");
         }catch (TransformerException e){
             assertEquals("Failed to process example content for ExampleHolder{name='example-in-components', ref=null}",e.getMessage());
         }
-
-
     }
 
 
     @Test
     void testBundleApi() throws OpenAPILoaderException, IOException {
-        String file = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").getFile();
-        String spec = System.getProperty("spec", file);
-        File input = new File(spec);
+        String inputUri = getClass().getResource("/openapi/bundler-examples-test-api/openapi.yaml").toString();
+        String spec = System.getProperty("spec", inputUri);
 
-        OpenAPI openAPI = OpenAPILoader.load(input);
+        OpenAPI openAPI = OpenAPILoader.load(inputUri);
 
-        OpenAPI transform = new Bundler(input).transform(openAPI, Collections.emptyMap());
+        OpenAPI transform = new Bundler(inputUri).transform(openAPI, Collections.emptyMap());
 
         log.debug(Yaml.pretty(openAPI));
 
