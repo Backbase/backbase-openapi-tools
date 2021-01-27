@@ -15,6 +15,11 @@
     <description>Open API Converter</description>
 
     <properties>
+<!--        boat bay client-->
+        <boat-maven-plugin.supportingFilesToGenerate>ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java,ApiException.java,Pair.java</boat-maven-plugin.supportingFilesToGenerate>
+        <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+        <swagger-annotations.version>1.6.2</swagger-annotations.version>
+<!--        boat bay client-->
         <maven.api.version>3.6.0</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
@@ -127,11 +132,46 @@
             <scope>test</scope>
         </dependency>
 
+<!--        temorary depemdancied for boat bay client-->
         <dependency>
-            <groupId>com.backbase.oss.boat.bay</groupId>
-            <artifactId>boat-bay-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
         </dependency>
+
+        <!-- JSON processing: jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>${jackson-databind-nullable-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+
 
 
     </dependencies>
@@ -146,6 +186,45 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <version>0.13.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-webclient-embedded</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/boat-bay-api-client-temp/boat-bay-client.yaml</inputSpec>
+                            <output>${project.basedir}/target/generated-sources</output>
+                            <generatorName>java</generatorName>
+                            <library>native</library>
+                            <configOptions>
+                                <dateLibrary>java8</dateLibrary>
+                            </configOptions>
+                            <modelPackage>com.backbase.oss.boat.bay.client.model</modelPackage>
+                            <apiPackage>com.backbase.oss.boat.bay.client.api</apiPackage>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <typeMappings>
+                                <typeMapping>IntRange = kotlin.ranges.IntRange</typeMapping>
+                            </typeMappings>
+                            <importMappings>
+                                <importMapping>LocalDateTime = java.time.LocalDateTime</importMapping>
+                                <importMapping>Pageable = org.springframework.data.domain.Pageable</importMapping>
+                            </importMappings>
+                            <supportingFilesToGenerate>${boat-maven-plugin.supportingFilesToGenerate}</supportingFilesToGenerate>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -220,6 +299,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
