@@ -6,22 +6,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataModulesManager } from "@backbase/foundation-ang/data-http";
 {{/withMocks}}
 
-{{#apiInfo}}
-{{#apis}}
-{{^providedInRoot}}
-import { {{classname}} } from './{{importPath}}';
-{{/providedInRoot}}
-{{/apis}}
-{{/apiInfo}}
-
-
 @NgModule({
   imports:      [],
   declarations: [],
   exports:      [],
-  providers: [{{^providedInRoot}}
-    {{#apiInfo}}{{#apis}}{{classname}}{{#hasMore}},
-    {{/hasMore}}{{/apis}}{{/apiInfo}} {{/providedInRoot}}]
+  providers:    []
 })
 export class {{apiModuleClassName}} {
     public static forRoot(configurationFactory: () => {{configurationClassName}}): ModuleWithProviders<{{apiModuleClassName}}> {

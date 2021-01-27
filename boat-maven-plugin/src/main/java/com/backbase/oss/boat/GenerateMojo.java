@@ -582,7 +582,13 @@ public class GenerateMojo extends AbstractMojo {
             }
 
             if (isNotEmpty(inputSpec)) {
-                configurator.setInputSpec(inputSpec);
+                if (isValidURI(inputSpec)) {
+                    configurator.setInputSpec(inputSpec);
+                } else if (inputSpecFile.exists()) {
+                    configurator.setInputSpec(inputSpecFile.getAbsoluteFile().toURI().toString());
+                } else {
+                    throw new MojoExecutionException(inputSpec + " is not a valid URI or file!");
+                }
             }
 
             if (isNotEmpty(gitHost)) {
@@ -1047,4 +1053,14 @@ public class GenerateMojo extends AbstractMojo {
             }
         }
     }
+
+    private static boolean isValidURI(String urlString) {
+        try {
+            URI uri = new URI(urlString);
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
 }
