@@ -112,16 +112,6 @@ class BoatAngularTemplatesTests {
     }
 
     @Check
-    public void providedInRoot() {
-        assertThat(
-                findPattern("/api/.+\\.service.ts$", "providedIn: 'root'"),
-                equalTo(this.param.providedInRoot));
-        assertThat(
-                findPattern("/api\\.module\\.ts$", "providers: \\[]"),
-                equalTo(this.param.providedInRoot));
-    }
-
-    @Check
     public void apiModulePrefix() {
         assertThat(
                 findPattern("/api\\.module\\.ts$", "export class BoatApiModule"),
@@ -221,7 +211,6 @@ class BoatAngularTemplatesTests {
         if (this.param.npmName) {
             cf.addAdditionalProperty(AbstractTypeScriptClientCodegen.NPM_NAME, "@example/angular-http");
         }
-        cf.addAdditionalProperty(BoatAngularGenerator.PROVIDED_IN_ROOT, this.param.providedInRoot);
         if (this.param.apiModulePrefix) {
             cf.addAdditionalProperty(BoatAngularGenerator.API_MODULE_PREFIX, "Boat");
         }
@@ -273,7 +262,6 @@ class BoatAngularTemplatesTests {
         final boolean npmRepository;
         final boolean npmName;
         final boolean withMocks;
-        final boolean providedInRoot;
         final boolean apiModulePrefix;
         final boolean serviceSuffix;
 
@@ -285,7 +273,6 @@ class BoatAngularTemplatesTests {
             this.npmName = (mask & 1) != 0;
             this.npmRepository = (mask & 1 << 1) != 0;
             this.withMocks = (mask & 1 << 2) != 0;
-            this.providedInRoot = (mask & 1 << 3) != 0;
             this.apiModulePrefix = (mask & 1 << 4) != 0;
             this.serviceSuffix = (mask & 1 << 5) != 0;
         }

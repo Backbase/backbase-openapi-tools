@@ -64,7 +64,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
-    public static final String PROVIDED_IN_ROOT = "providedInRoot";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
@@ -103,9 +102,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             "Use this property to set an url your private npmRepo in the package.json"));
         this.cliOptions.add(CliOption.newBoolean(WITH_MOCKS,
             "Setting this property to true will generate mocks out of the examples.",
-            false));
-        this.cliOptions.add(CliOption.newBoolean(PROVIDED_IN_ROOT,
-            "Use this property to provide Injectables in root (it is only valid in angular version greater or equal to 6.0.0).",
             false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
@@ -179,11 +175,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
             }
         });
-
-        processBooleanOpt(PROVIDED_IN_ROOT,
-            value -> additionalProperties.put(PROVIDED_IN_ROOT, value),
-            () -> additionalProperties.put(PROVIDED_IN_ROOT, true)
-        );
 
         processOpt(API_MODULE_PREFIX, value -> {
             validateClassPrefixArgument(value);
