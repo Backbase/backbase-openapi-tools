@@ -35,7 +35,7 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/petstore-new-breaking.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
-                            <sourceId>5</sourceId>
+                            <sourceId>6</sourceId>
                         </configuration>
                     </execution>
                 </executions>

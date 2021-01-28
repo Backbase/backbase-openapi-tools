@@ -37,7 +37,7 @@
                             <boatBayUrl>url</boatBayUrl>
                             <inputSpec>${project.basedir}/src/main/resources/petstore.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
-                            <sourceId>5</sourceId>
+                            <sourceId>6</sourceId>
                         </configuration>
                     </execution>
                 </executions>

@@ -33,6 +33,7 @@
                             <goal>validate</goal>
                         </goals>
                         <configuration>
+<!--                            dont know why I cant add sourceId-->
                             <failOnWarning>true</failOnWarning>
                             <input>${project.basedir}/src/main/resources/petstore.yaml</input>
                         </configuration>
