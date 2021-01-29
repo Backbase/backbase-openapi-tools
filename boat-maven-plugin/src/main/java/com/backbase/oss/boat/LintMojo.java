@@ -16,7 +16,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import sun.tools.java.Environment;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
@@ -41,13 +40,12 @@ public class LintMojo extends AbstractLintMojo {
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(name = "boatBayUrl", defaultValue = "hjhb", property = "boat.maven.plugin.lint.boatBayUrl")
+    @Parameter(name = "boatBayUrl", defaultValue = "hjhb", property = "BOAT_BAY_SERVER_URL")
     private String boatBayUrl;
 
-    @Parameter(name = "sourceId", defaultValue = "")
-    private String sourceId;
+    @Parameter(name = "sourceKey", defaultValue = "")
+    private String sourceKey;
 
-    private BoatBayRadio boatBayRadio;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -55,11 +53,11 @@ public class LintMojo extends AbstractLintMojo {
 
         List<BoatLintReport> boatLintReports = null;
         try {
-            if (!sourceId.isEmpty()
-                    || !System.getenv("boatBayUrl").isEmpty()
-                    || System.getenv("boatBayUrl") != null
-                    || !boatBayUrl.isEmpty()) {
-                new BoatBayRadio(inputSpec,output,project).upload(sourceId);
+            if (!sourceKey.isEmpty() &&
+                    (!System.getenv("BOAT_BAY_SERVER_URL").isEmpty()
+                    || System.getenv("BOAT_BAY_SERVER_URL") != null
+                    || !boatBayUrl.isEmpty())) {
+                new BoatBayRadio(inputSpec,output,project, boatBayUrl).upload(sourceKey);
               //  System.getenv().containsKey("boatBayUrl");
             }else {
                 boatLintReports = lint();
@@ -118,7 +116,7 @@ public class LintMojo extends AbstractLintMojo {
     }
 
 
-    public void setSourceId(String sourceId){ this.sourceId = sourceId; }
+    public void setSourceKey(String sourceKey){ this.sourceKey = sourceKey; }
 
     public void setBoatBayUrl(String boatBayUrl){this.boatBayUrl = boatBayUrl;}
 

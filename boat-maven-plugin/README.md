@@ -126,6 +126,14 @@ The `boat` plugin has multiple goals:
     extension are validated. `failOnWarning` specifies whether to fail the build when validation violations are found,
     otherwise, warnings are written to the log for everyone to ignore.
     
+    For validation via boat bay where the specs may be uploaded add the configurations:
+   
+        boatBayServerUrl
+            Set this when specs are to be uploaded by boat bay, optionally configure an enviroment variable BOAT_BAY_SERVER_URL, for testing use export http://localhost:8080, for deployment use https://boat-bay.proto.backbasecloud.com/ 
+           
+        sourceKey
+            Set this when specs are to be uploaded by boat bay, this refers to the key for the source of the specs to be linted, how to set up a source can be found in boat bay documentation
+    
     ```
     <configuration>
         <input>${project.build.outputDirectory}/specs/</input>
@@ -158,6 +166,13 @@ The `boat` plugin has multiple goals:
    
        writeLintReport (Default: true)
          Set this to true to generate lint report.
+       
+       boatBayServerUrl
+        Set this when specs are to be uploaded by boat bay, optionally configure an enviroment variable BOAT_BAY_SERVER_URL, for testing use export http://localhost:8080, for deployment use https://boat-bay.proto.backbasecloud.com/ 
+       
+       sourceKey
+        Set this when specs are to be uploaded by boat bay, this refers to the key for the source of the specs to be linted, how to set up a source can be found in boat bay documentation
+       
  
    Example:
     

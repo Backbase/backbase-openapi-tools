@@ -32,18 +32,17 @@ public class BoatBayRadio {
   private File output;
   protected MavenProject project;
 
-  public BoatBayRadio(File inputSpec, File output, MavenProject project) {
+  public BoatBayRadio(File inputSpec, File output, MavenProject project, String clientBasePath) {
     this.project = project;
     this.output = output;
     this.inputSpec = inputSpec;
-    this.boatbayUploadSpecClient =  new UploadPluginApi(new ApiClient().setReadTimeout(readTimeout));;
+    this.boatbayUploadSpecClient =  new UploadPluginApi(new ApiClient().setReadTimeout(readTimeout).setBasePath(clientBasePath));;
   }
 
 
   public List<BoatLintReport> upload(String sourceId ) throws ApiException {
-
-    if (sourceId.isEmpty()){
-      throw new RuntimeException("Source must be set up first");
+    if (System.getenv().containsKey("BOAT_BAY_SERVER_URL")){
+      sourceId = System.getenv("BOAT_BAY_SERVER_URL");
     }
     try {
       return boatbayUploadSpecClient.uploadSpec(sourceId, createRequestBody());

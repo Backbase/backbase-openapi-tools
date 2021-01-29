@@ -33,18 +33,17 @@ public class ValidateMojo extends AbstractMojo {
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     protected MavenProject project;
 /// cant get it to be sent in source pom file ???
-    @Parameter(name = "sourceId", defaultValue = "", property = "boat.maven.plugin.sourceId")
-    private String sourceId;
+    @Parameter(name = "sourceKey", defaultValue = "", property = "boat.maven.plugin.sourceKey")
+    private String sourceKey;
 
-    @Parameter(name = "boatBayUrl", defaultValue = "", property = "boat.maven.plugin.lint.boatBayUrl")
+    @Parameter(name = "boatBayUrl", defaultValue = "", property = "BOAT_BAY_SERVER_URL")
     private String boatBayUrl;
 
-    private BoatBayRadio boatbayUploadSpecClient;
 
     public void setInput(File input) {
         this.input = input;
     }
-    public void setSourceId(String sourceId){this.sourceId = sourceId;}
+    public void setSourceId(String sourceId){this.sourceKey = sourceId;}
     public void setBoatBayUrl(String boatBayUrl){this.boatBayUrl = boatBayUrl;}
     public void setFailOnWarning(boolean failOnWarning) {
         this.failOnWarning= failOnWarning;
@@ -68,11 +67,11 @@ public class ValidateMojo extends AbstractMojo {
             }
         } else {
             validate(input);
-            if (!sourceId.isEmpty()
-                    || !System.getenv("boatBayUrl").isEmpty()
-                    || System.getenv("boatBayUrl") != null
+            if (!sourceKey.isEmpty()
+                    || !System.getenv("BOAT_BAY_SERVER_URL").isEmpty()
+                    || System.getenv("BOAT_BAY_SERVER_URL") != null
                     || !boatBayUrl.isEmpty()){
-                new BoatBayRadio(input,null,project).upload(sourceId);
+                new BoatBayRadio(input,null,project, boatBayUrl).upload(sourceKey);
             }
         }
     }

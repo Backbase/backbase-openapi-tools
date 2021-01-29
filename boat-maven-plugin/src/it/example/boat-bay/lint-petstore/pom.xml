@@ -34,10 +34,10 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <boatBayUrl>url</boatBayUrl>
+                            <boatBayUrl>https://boat-bay.proto.backbasecloud.com/</boatBayUrl>
                             <inputSpec>${project.basedir}/src/main/resources/petstore.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
-                            <sourceId>6</sourceId>
+                            <sourceKey>repo-petstore</sourceKey>
                         </configuration>
                     </execution>
                 </executions>
