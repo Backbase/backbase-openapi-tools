@@ -40,7 +40,7 @@ public class LintMojo extends AbstractLintMojo {
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(name = "boatBayUrl", defaultValue = "hjhb", property = "BOAT_BAY_SERVER_URL")
+    @Parameter(name = "boatBayUrl", property = "BOAT_BAY_SERVER_URL")
     private String boatBayUrl;
 
     @Parameter(name = "sourceKey", defaultValue = "")
@@ -53,16 +53,9 @@ public class LintMojo extends AbstractLintMojo {
 
         List<BoatLintReport> boatLintReports = null;
         try {
-            if (!sourceKey.isEmpty() &&
-                    (!System.getenv("BOAT_BAY_SERVER_URL").isEmpty()
-                    || System.getenv("BOAT_BAY_SERVER_URL") != null
-                    || !boatBayUrl.isEmpty())) {
-                new BoatBayRadio(inputSpec,output,project, boatBayUrl).upload(sourceKey);
-              //  System.getenv().containsKey("boatBayUrl");
-            }else {
                 boatLintReports = lint();
-            }
-        } catch (MojoExecutionException | ApiException e) {
+
+        } catch (MojoExecutionException e) {
             if (failOnWarning) {
                 throw new MojoExecutionException(e.getMessage());
             }

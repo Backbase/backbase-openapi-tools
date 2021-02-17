@@ -34,7 +34,7 @@ class LintMojoTests {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setIgnoreRules(new String[]{"219", "105", "M008", "M009", "M010", "M011", "H001", "H002",
             "S005", "S006", "S007"});
-        lintMojo.setInput(getFile("/oas-examples/petstore.yaml"));
+        lintMojo.setInput(getFile("/boat-doc-oas-examples/petstore.yaml"));
         lintMojo.setFailOnWarning(true);
         lintMojo.setWriteLintReport(report);
 

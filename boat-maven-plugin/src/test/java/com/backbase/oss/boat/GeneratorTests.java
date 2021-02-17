@@ -10,9 +10,6 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import java.io.File;
 import java.util.*;
@@ -30,7 +27,7 @@ class GeneratorTests {
     @Test
     void testHtml2() throws MojoExecutionException {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
         File input = new File(spec);
         File output = new File("target/boat-docs-generate");
@@ -54,10 +51,11 @@ class GeneratorTests {
         assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
+
     @Test
     void testBoatDocs() throws MojoExecutionException {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         log.info("Generating docs for: {}", spec);
 
@@ -86,9 +84,39 @@ class GeneratorTests {
     }
 
     @Test
+    void testBoatDocsWithDirectory() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs-directory");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.execute();
+        assertThat(output.list()).containsExactlyInAnyOrder("link-docs", "petstore-docs", "petstore-new-non-breaking-docs", "upto-docs");
+    }
+
+    @Test
     void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         log.info("Generating docs for: {}", spec);
 
@@ -128,7 +156,7 @@ class GeneratorTests {
     @Test
     void testAngular() {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         log.info("Generating client for: {}", spec);
 
@@ -208,7 +236,7 @@ class GeneratorTests {
     void testBeanValidation() throws MojoExecutionException {
         GenerateMojo mojo = new GenerateMojo();
 
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
+        String inputFile = getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile();
         File input = new File(inputFile);
         File output = new File("target/spring-mvc");
         if (!output.exists()) {
@@ -248,7 +276,7 @@ class GeneratorTests {
     void testWebClient() throws MojoExecutionException {
         GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
 
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
+        String inputFile = getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile();
         File input = new File(inputFile);
         File output = new File("target/webclient");
         if (!output.exists()) {
@@ -274,7 +302,7 @@ class GeneratorTests {
     void testJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         File input = new File(spec);
         File output = new File("target/javaclient");
@@ -312,7 +340,7 @@ class GeneratorTests {
     void testReactiveJavaClient() throws MojoExecutionException, MavenInvocationException {
         GenerateMojo mojo = new GenerateMojo();
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         File input = new File(spec);
         File output = new File("target/webclient");

@@ -12,7 +12,7 @@ class ValidateMojoTests {
     @Test
     void testValidation() throws MojoFailureException {
 
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples/petstore.yaml").getFile());
 
         File input = new File(spec);
 

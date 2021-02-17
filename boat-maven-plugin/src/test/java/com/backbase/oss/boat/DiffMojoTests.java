@@ -17,7 +17,7 @@ class DiffMojoTests {
     @Test
     void testNonBreakingChange() {
         DiffMojo diffMojo = new DiffMojo();
-        diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
+        diffMojo.setOldFile(getFile("/boat-doc-oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-really-non-breaking.yaml"));
         diffMojo.setWriteChangelog(true);
         diffMojo.setChangelogOutput(new File("target"));
@@ -30,7 +30,7 @@ class DiffMojoTests {
     @Test
     void testBreakingChange() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
-        diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
+        diffMojo.setOldFile(getFile("/boat-doc-oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
         diffMojo.setWriteChangelog(true);
         diffMojo.setChangelogOutput(new File("target"));
@@ -42,7 +42,7 @@ class DiffMojoTests {
     @Test
     void testBreakingChangeWithBreaking() throws MojoExecutionException {
         DiffMojo diffMojo = new DiffMojo();
-        diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
+        diffMojo.setOldFile(getFile("/boat-doc-oas-examples/petstore.yaml"));
         diffMojo.setNewFile(getFile("/oas-examples/petstore-new-breaking.yaml"));
         diffMojo.setBreakOnBreakingChanges(true);
         assertThrows(MojoExecutionException.class, diffMojo::execute);

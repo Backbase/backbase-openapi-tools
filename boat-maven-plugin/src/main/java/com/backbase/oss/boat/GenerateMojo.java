@@ -137,6 +137,9 @@ public class GenerateMojo extends AbstractMojo {
 
 
     /**
+     *
+     * Accepts input as a Directory or a file
+     *
      * Location of the OpenAPI spec, as URL or local file glob pattern.
      * <p>
      * If the input is a local file, the value of this property is considered a glob pattern that must
@@ -504,8 +507,6 @@ public class GenerateMojo extends AbstractMojo {
             return;
         }
 
-
-
         File inputSpecFile = new File(inputSpec);
         File inputParent = inputSpecFile.getParentFile();
 
@@ -522,7 +523,6 @@ public class GenerateMojo extends AbstractMojo {
                         inputSpecFile = new File(inputParent, files[0]);
                         inputSpec = inputSpecFile.getAbsolutePath();
                         break;
-
                     default:
                         throw new MojoExecutionException(
                             format("Input spec %s matches more than one single file", inputSpec));
