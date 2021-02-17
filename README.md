@@ -19,7 +19,7 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
-## 0.14.0 (not released)
+## 0.14.0
 * *Angular Generator*
   * Simplify Angular generator options by removing the unused ones (withInterfaces,providedInRoot)
   * fix Mock is not generated if Http status equals to 201 (SDK-2388)
