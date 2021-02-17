@@ -19,6 +19,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.1
+* *Angular Generator*
+  * Added support for Angular 11
+  
 ## 0.14.0
 * *Angular Generator*
   * Simplify Angular generator options by removing the unused ones (withInterfaces,providedInRoot)
