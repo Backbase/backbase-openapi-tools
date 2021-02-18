@@ -86,6 +86,36 @@ class GeneratorTests {
     }
 
     @Test
+    void testBoatDocsWithDirectory() throws MojoExecutionException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs-directory");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.execute();
+        assertThat(output.list()).containsExactlyInAnyOrder("link-docs", "petstore-docs", "petstore-new-non-breaking-docs", "upto-docs");
+    }
+
+    @Test
     void testBundledBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
