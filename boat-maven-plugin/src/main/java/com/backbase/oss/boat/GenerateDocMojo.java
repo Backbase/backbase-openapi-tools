@@ -6,7 +6,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "doc", threadSafe = true)
 @Slf4j
-public class GenerateDocMojo  extends GenerateMojo  {
+public class GenerateDocMojo  extends GenerateFromDirectoryDocMojo  {
 
     @Override
     public void execute() throws MojoExecutionException {
