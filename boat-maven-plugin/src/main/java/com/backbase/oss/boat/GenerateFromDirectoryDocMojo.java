@@ -28,7 +28,7 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
 
       for(File f : inputSpecs){
         inputSpec = f.getPath();
-        output = new File(outPutDirectory.getPath()+"/"+f.getName().substring(0,f.getName().lastIndexOf(".")).concat("-docs"));
+        output = new File(outPutDirectory.getPath(),f.getName().substring(0,f.getName().lastIndexOf(".")).concat("-docs"));
 
         if(!output.exists()){
           output.mkdir();
