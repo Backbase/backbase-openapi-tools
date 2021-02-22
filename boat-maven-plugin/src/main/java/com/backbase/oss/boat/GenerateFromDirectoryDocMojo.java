@@ -8,7 +8,7 @@ import java.io.File;
 @Slf4j
 public class GenerateFromDirectoryDocMojo extends GenerateMojo {
   // allows generate::Doc to accept inputSpec as a directory
-  // output docs will be places in deperate folders for each spec
+  // output docs will be places in separate folders for each spec
   @Override
   public void execute() throws MojoExecutionException {
 
