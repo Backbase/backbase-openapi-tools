@@ -4,6 +4,7 @@ import com.backbase.oss.codegen.java.BoatJavaCodeGen;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen;
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +27,10 @@ class GenerateMojoTests {
         buildContext.enableLogging(new ConsoleLogger());
     }
 
+
+
     @Test
-    void addTestCompileSourceRoot() throws MojoExecutionException {
+    void addTestCompileSourceRoot() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateMojo(), DefaultCodegen.class.getName());
 
         mojo.addCompileSourceRoot = false;
@@ -46,7 +49,7 @@ class GenerateMojoTests {
     }
 
     @Test
-    void useJavaBoat() throws MojoExecutionException {
+    void useJavaBoat() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateMojo(), "java");
 
         mojo.execute();
@@ -55,7 +58,7 @@ class GenerateMojoTests {
     }
 
     @Test
-    void useSpringBoat() throws MojoExecutionException {
+    void useSpringBoat() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateMojo(), "spring");
 
         mojo.execute();
@@ -64,7 +67,7 @@ class GenerateMojoTests {
     }
 
     @Test
-    void useJavaBoatForRestTemplateEmbedded() throws MojoExecutionException {
+    void useJavaBoatForRestTemplateEmbedded() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateRestTemplateEmbeddedMojo(), null);
 
         mojo.execute();
@@ -73,7 +76,7 @@ class GenerateMojoTests {
     }
 
     @Test
-    void useSpringBoatForSpringBootEmbedded() throws MojoExecutionException {
+    void useSpringBoatForSpringBootEmbedded() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateSpringBootEmbeddedMojo(), null);
 
         mojo.execute();
@@ -82,7 +85,7 @@ class GenerateMojoTests {
     }
 
     @Test
-    void useJavaBoatForWebClientEmbedded() throws MojoExecutionException {
+    void useJavaBoatForWebClientEmbedded() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateWebClientEmbeddedMojo(), null);
 
         mojo.execute();

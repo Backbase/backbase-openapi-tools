@@ -19,17 +19,13 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @Mojo(name = "validate", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
-public class ValidateMojo extends AbstractMojo {
+public class ValidateMojo extends InputMavenArtifact {
 
-    @Parameter(name = "input", required = true)
-    private File input;
 
     @Parameter(name = "failOnWarning", required = true)
     private boolean failOnWarning;
 
-    public void setInput(File input) {
-        this.input = input;
-    }
+
     public void setFailOnWarning(boolean failOnWarning) {
         this.failOnWarning= failOnWarning;
     }
