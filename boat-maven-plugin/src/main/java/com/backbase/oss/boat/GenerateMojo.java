@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -77,7 +78,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 @SuppressWarnings({"DefaultAnnotationParam", "java:S3776", "java:S5411"})
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 @Slf4j
-public class GenerateMojo extends AbstractMojo {
+public class GenerateMojo extends InputMavenArtifact {
 
     private static String trimCSV(String text) {
         if (isNotEmpty(text)) {
@@ -148,8 +149,8 @@ public class GenerateMojo extends AbstractMojo {
      * {@code my-service-api-v*.yaml}.
      * </p>
      */
-    @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
-    protected String inputSpec;
+//    @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
+//    protected String inputSpec;
 
     /**
      * Git host, e.g. gitlab.com.
@@ -489,8 +490,8 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * The project being built.
      */
-    @Parameter(readonly = true, required = true, defaultValue = "${project}")
-    protected MavenProject project;
+//    @Parameter(readonly = true, required = true, defaultValue = "${project}")
+//    protected MavenProject project;
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
@@ -498,7 +499,10 @@ public class GenerateMojo extends AbstractMojo {
 
     @Override
     @SuppressWarnings({"java:S3776", "java:S1874"})
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+
+        super.execute();
+
         if (skip) {
             getLog().info("Code generation is skipped.");
             return;

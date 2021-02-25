@@ -28,7 +28,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testHtml2() throws MojoExecutionException {
+    void testHtml2() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
@@ -54,8 +54,10 @@ class GeneratorTests {
         assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
     }
 
+
+
     @Test
-    void testBoatDocs() throws MojoExecutionException {
+    void testBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -205,7 +207,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBeanValidation() throws MojoExecutionException {
+    void testBeanValidation() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
@@ -271,7 +273,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testJavaClient() throws MojoExecutionException, MavenInvocationException {
+    void testJavaClient() throws MojoExecutionException, MavenInvocationException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
@@ -309,7 +311,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testReactiveJavaClient() throws MojoExecutionException, MavenInvocationException {
+    void testReactiveJavaClient() throws MojoExecutionException, MavenInvocationException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
