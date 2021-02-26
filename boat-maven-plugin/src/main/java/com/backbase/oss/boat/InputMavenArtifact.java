@@ -1,7 +1,6 @@
 package com.backbase.oss.boat;
 
-import lombok.Getter;
-import lombok.Setter;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -9,7 +8,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
 import org.codehaus.plexus.util.Expand;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
