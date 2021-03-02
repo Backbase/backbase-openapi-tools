@@ -6,15 +6,18 @@ info:
     name: Backbase
   version: 1.0.0
 servers:
-- url: http://boat-bay-server.proto.backbasecloud.com/
+  - url: http://localhost:8080
+    description: test server
+  - url: http://boat-bay-server.proto.backbasecloud.com/
+    description: production server
 tags:
-- name: dashboard
-- name: upload-plugin
+  - name: dashboard
+  - name: upload-plugin
 paths:
   /api/boat/portals:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get list of portals
       operationId: getPortals
       responses:
@@ -29,18 +32,18 @@ paths:
   /api/boat/portals/{portalKey}/products:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get products for identified portal
       operationId: getPortalProducts
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of protals products
@@ -53,33 +56,33 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/capabilities:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get Portal Products Capabalities
       operationId: getPortalCapabilities
       parameters:
-      - name: pageable
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/Pageable'
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: pageable
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of capabilities for product
@@ -92,33 +95,33 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/services:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get Portal services for a given product
       operationId: getPortalServices
       parameters:
-      - name: pageable
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/Pageable'
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: pageable
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of services for product
@@ -131,81 +134,85 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/specs:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get Portal Specs for given product
       operationId: getPortalSpecs
       parameters:
-      - name: pageable
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/Pageable'
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: capabilityId
-        in: query
-        description: capablility idenifier
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: productReleaseId
-        in: query
-        description: product release idenifier
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: serviceId
-        in: query
-        description: service idenifier
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: grade
-        in: query
-        description: grade of spec
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: backwardsCompatible
-        in: query
-        description: backwards compatible indicator
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
-      - name: changed
-        in: query
-        description: changed indicator
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
+        - name: pageable
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: capability
+          in: query
+          description: capablility idenifier
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: release
+          in: query
+          description: product release idenifier
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: service
+          in: query
+          description: service idenifier
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: grade
+          in: query
+          description: grade of spec
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: backwardsCompatible
+          in: query
+          description: backwards compatible indicator
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
+        - name: changed
+          in: query
+          description: changed indicator
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
       responses:
         "200":
           description: list of specs for product
@@ -218,42 +225,42 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/specs/{specId}/lint-report:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get Lint Report for spec
       operationId: getLintReportForSpec
       parameters:
-      - name: specId
-        in: path
-        description: spec idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: refresh
-        in: query
-        description: refresh idicator
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
+        - name: specId
+          in: path
+          description: spec idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: refresh
+          in: query
+          description: refresh idicator
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
       responses:
         "200":
           description: lint report for spec
@@ -264,18 +271,18 @@ paths:
   /api/boat/portals/{portalKey}/lint-rules:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get list of lint rules
       operationId: getPortalLintRules
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of lint rules for portal
@@ -288,26 +295,26 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/releases:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get product releases
       operationId: getProductReleases
       parameters:
-      - name: productKey
-        in: path
-        description: id of product
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: productKey
+          in: path
+          description: id of product
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of product releases for product
@@ -320,34 +327,34 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/releases/{releaseKey}/specs:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get specs for product release
       operationId: getProductReleaseSpecs
       parameters:
-      - name: releaseKey
-        in: path
-        description: key for product release
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: id of product
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: releaseKey
+          in: path
+          description: key for product release
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: id of product
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of specs for product release
@@ -360,26 +367,26 @@ paths:
   /api/boat/portals/{portalKey}/lint-rules/{lintRuleId}:
     post:
       tags:
-      - dashboard
+        - dashboard
       summary: update lint rule for portal
       operationId: updatePortalLintRule
       parameters:
-      - name: lintRuleId
-        in: path
-        description: id of portals lint rule
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: lintRuleId
+          in: path
+          description: id of portals lint rule
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -392,7 +399,7 @@ paths:
   /api/boat/dashboard:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get list of boat portal dashboards
       operationId: getDashboard
       responses:
@@ -407,26 +414,26 @@ paths:
   /api/boat/dashboard/{projectKey}/{productKey}:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get product for dashboard project
       operationId: getProductDashboard
       parameters:
-      - name: projectKey
-        in: path
-        description: project idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: projectKey
+          in: path
+          description: project idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: product for dashboard
@@ -437,26 +444,26 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/tags:
     get:
       tags:
-      - dashboard
+        - dashboard
       summary: get tags for product
       operationId: getProductTags
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: list of product tags
@@ -466,61 +473,61 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BoatTag'
-  ? /api/boat/portals/{portalKey}/products/{productKey}/capabilities/{capabilityKey}/services/{serviceKey}/specs/{specKey}/{version}/download
-  : get:
+  /api/boat/portals/{portalKey}/products/{productKey}/capabilities/{capabilityKey}/services/{serviceKey}/specs/{specKey}/{version}/download:
+    get:
       tags:
-      - dashboard
+        - dashboard
       summary: get spec as openapi
       operationId: getSpecAsOpenAPI
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: capabilityKey
-        in: path
-        description: capability identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: serviceKey
-        in: path
-        description: service identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: specKey
-        in: path
-        description: spec identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: version
-        in: path
-        description: version of spec
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: capabilityKey
+          in: path
+          description: capability identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: serviceKey
+          in: path
+          description: service identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: specKey
+          in: path
+          description: spec identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: version of spec
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: openApi of spec
@@ -550,61 +557,61 @@ paths:
             application/vnd.oai.openapi:
               schema:
                 $ref: '#/components/schemas/Resource'
-  ? /api/boat/portals/{portalKey}/products/{productKey}/capabilities/{capabilityKey}/services/{serviceKey}/specs/{specKey}/{version}
-  : get:
+  /api/boat/portals/{portalKey}/products/{productKey}/capabilities/{capabilityKey}/services/{serviceKey}/specs/{specKey}/{version}:
+    get:
       tags:
-      - dashboard
+        - dashboard
       summary: download spec
       operationId: downloadSpec
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: capabilityKey
-        in: path
-        description: capability identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: serviceKey
-        in: path
-        description: service identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: specKey
-        in: path
-        description: spec identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: version
-        in: path
-        description: version of spec
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: capabilityKey
+          in: path
+          description: capability identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: serviceKey
+          in: path
+          description: service identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: specKey
+          in: path
+          description: spec identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: version of spec
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: spec with open api
@@ -615,42 +622,42 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/diff-report:
     get:
       tags:
-      - lint
+        - lint
       summary: get lint report for spec
       operationId: getApiChangesForSpec
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: spec1Id
-        in: query
-        description: identifies first comparitable api
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: spec2Id
-        in: query
-        description: identifies second comparitable api
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: spec1Id
+          in: query
+          description: identifies first comparitable api
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: spec2Id
+          in: query
+          description: identifies second comparitable api
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
       responses:
         "200":
           description: changed openApi
@@ -661,42 +668,42 @@ paths:
   /api/boat/portals/{portalKey}/products/{productKey}/diff-report.html:
     get:
       tags:
-      - lint
+        - lint
       summary: get lint report for spec as html
       operationId: getLintReportForSpecAsHtml
       parameters:
-      - name: portalKey
-        in: path
-        description: portal idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: productKey
-        in: path
-        description: product identifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: spec1Id
-        in: query
-        description: identifies first comparitable api
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: spec2Id
-        in: query
-        description: identifies second comparitable api
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+        - name: portalKey
+          in: path
+          description: portal idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: productKey
+          in: path
+          description: product identifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: spec1Id
+          in: query
+          description: identifies first comparitable api
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: spec2Id
+          in: query
+          description: identifies second comparitable api
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
       responses:
         "200":
           description: changed openApi as html
@@ -704,21 +711,21 @@ paths:
             application/json:
               schema:
                 type: string
-  /api/boat/boat-maven-plugin/{sourceId}/upload:
-    put:
+  /api/boat/boat-maven-plugin/{sourceKey}/upload:
+    post:
       tags:
-      - upload-plugin
+        - upload-plugin
       summary: upload and lint specs
       operationId: uploadSpec
       parameters:
-      - name: sourceId
-        in: path
-        description: source idenifier
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: sourceKey
+          in: path
+          description: source idenifier
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -799,6 +806,10 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         createdBy:
           type: string
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoatService'
         lastLintReport:
           $ref: '#/components/schemas/BoatLintReport'
         statistics:
@@ -998,11 +1009,11 @@ components:
     Changes:
       type: string
       enum:
-      - NOT_APPLICABLE
-      - ERROR_COMPARING
-      - UNCHANGED
-      - COMPATIBLE
-      - BREAKING
+        - NOT_APPLICABLE
+        - ERROR_COMPARING
+        - UNCHANGED
+        - COMPATIBLE
+        - BREAKING
     BoatViolation:
       type: object
       properties:
@@ -1015,14 +1026,14 @@ components:
         lines:
           $ref: '#/components/schemas/IntRange'
         pointer:
-          type: string
+          type: JsonPointer
     Severity:
       type: string
       enum:
-      - MUST
-      - SHOULD
-      - MAY
-      - HINT
+        - MUST
+        - SHOULD
+        - MAY
+        - HINT
     UploadSpec:
       type: object
       properties:

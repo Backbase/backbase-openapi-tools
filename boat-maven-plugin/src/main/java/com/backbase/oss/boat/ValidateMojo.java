@@ -68,12 +68,6 @@ public class ValidateMojo extends AbstractMojo {
             }
         } else {
             validate(input);
-            if (!sourceId.isEmpty()
-                    || !System.getenv("boatBayUrl").isEmpty()
-                    || System.getenv("boatBayUrl") != null
-                    || !boatBayUrl.isEmpty()){
-                new BoatBayRadio(input,null,project).upload(sourceId);
-            }
         }
     }
 
