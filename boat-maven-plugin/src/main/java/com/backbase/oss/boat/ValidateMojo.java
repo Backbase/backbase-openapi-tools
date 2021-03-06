@@ -32,20 +32,11 @@ public class ValidateMojo extends AbstractMojo {
 
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     protected MavenProject project;
-/// cant get it to be sent in source pom file ???
-    @Parameter(name = "sourceId", defaultValue = "", property = "boat.maven.plugin.sourceId")
-    private String sourceId;
-
-    @Parameter(name = "boatBayUrl", defaultValue = "", property = "boat.maven.plugin.lint.boatBayUrl")
-    private String boatBayUrl;
-
-    private BoatBayRadio boatbayUploadSpecClient;
 
     public void setInput(File input) {
         this.input = input;
     }
-    public void setSourceId(String sourceId){this.sourceId = sourceId;}
-    public void setBoatBayUrl(String boatBayUrl){this.boatBayUrl = boatBayUrl;}
+
     public void setFailOnWarning(boolean failOnWarning) {
         this.failOnWarning= failOnWarning;
     }

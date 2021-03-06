@@ -129,19 +129,19 @@ public class BoatBayRadio {
     violation.setDescription(boatViolation.getDescription());
     violation.setRule(mapRule(boatViolation.getRule()));
     violation.setSeverity(mapSeverity(boatViolation.getSeverity()));
-    violation.setLines(boatViolation.getLines());
+    violation.setLines(mapRange(boatViolation.getLines()));
     violation.setPointer(boatViolation.getPointer());
 
     return violation;
   }
 
-//  private IntRange mapRange(com.backbase.oss.boat.bay.client.model.IntRange range){
-//
-//    if (range.getEndInclusive()==null){
-//      return new IntRange(range.getStart(),range.getStart());
-//    }
-//    return new IntRange(range.getStart(),range.getEndInclusive());
-//  }
+  private IntRange mapRange(com.backbase.oss.boat.bay.client.model.IntRange range){
+
+    if (range.getEndInclusive()==null){
+      return new IntRange(range.getStart(),range.getStart());
+    }
+    return new IntRange(range.getStart(),range.getEndInclusive());
+  }
 
   private Severity mapSeverity(com.backbase.oss.boat.bay.client.model.Severity boatSeverity){
     return Severity.valueOf(boatSeverity.getValue());

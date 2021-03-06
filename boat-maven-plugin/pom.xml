@@ -275,7 +275,7 @@
                                 <importMapping>JsonPointer = com.fasterxml.jackson.core.JsonPointer</importMapping>
                                 <importMapping>LocalDateTime = java.time.LocalDateTime</importMapping>
                                 <importMapping>Pageable = org.springframework.data.domain.Pageable</importMapping>
-                                <importMapping>IntRange = kotlin.ranges.IntRange</importMapping>
+<!--                                <importMapping>IntRange = kotlin.ranges.IntRange</importMapping>-->
                             </importMappings>
                         </configuration>
                     </execution>
