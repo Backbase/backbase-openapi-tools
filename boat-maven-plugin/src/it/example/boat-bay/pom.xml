@@ -24,7 +24,6 @@
         <module>lint-petstore</module>
         <module>lint-petstore-non-breaking</module>
         <module>lint-petstore-breaking</module>
-        <module>validate-petstore</module>
     </modules>
 
 </project>

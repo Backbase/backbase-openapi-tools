@@ -158,7 +158,21 @@ The `boat` plugin has multiple goals:
    
        writeLintReport (Default: true)
          Set this to true to generate lint report.
- 
+         
+       sourceKey 
+         Required: false
+         Set this to the SourceKey for the spec being 
+         linted. This should be set to upload spec and lint via BoatBay. 
+         To find out how to set up a source go to BoatBay project.
+       
+       boatBayUrl
+        Required: false
+        Set to url for boat bay server, options for this are, "http://localhost:8080" to run locally for testing 
+        purposes and https://boat-bay.proto.backbasecloud.com/ for deployment
+        Optionally this can be set as an enviroment variable under the key BOAT_BAY_SERVER_URL. To set this as an 
+        enviroment variable use the command export BOAT_BAY_SERVER_URL=http://localhost:8080, or the property 
+        may be added to the config setting of boat-maven-plugin (in the run configuration options).
+        
    Example:
     
    ```

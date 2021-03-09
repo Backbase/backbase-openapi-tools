@@ -35,7 +35,8 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/petstore-new-non-breaking.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
-                            <sourceId>5</sourceId>
+                            <sourceKey>repo-petstore</sourceKey>
+                            <boatBayUrl>http://localhost:8080</boatBayUrl>
                         </configuration>
                     </execution>
                 </executions>

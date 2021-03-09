@@ -11,12 +11,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.zalando.zally.rule.api.Severity;
-import org.zalando.zally.rule.api.Violation;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -84,7 +82,9 @@ public class BoatBayRadio {
     lintReport.setViolations(bayLintReport.getViolations().stream().map(this::mapViolation).collect(Collectors.toList()));
     lintReport.setFilePath(getFilePath(bayLintReport.getSpec().getName()));
 
-    //link to lint report may need updating before release
+    //link to lint report may need updating before release should perhaps
+    //be something like this: (link to html lint file)
+    // http://localhost:63342/backbase-openapi-tools/lint-petstore/output/index.html?_ijt=bh276c3tslp8dkol056oq0h116
     log.info("\n\tSpec {}:     {}/lint-report/{}/view",
             bayLintReport.getSpec().getName(),
             clientBasePath,
