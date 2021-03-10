@@ -87,6 +87,24 @@ class LintMojoTests {
     }
 
 
+    @Test
+    void testExceptionsWithValidHttpCodeFile() {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile("/oas-examples/petstore-backbase-httpcodes.yaml"));
+        assertDoesNotThrow(lintMojo::execute);
+
+    }
+    @Test
+    void testIgnoredExceptionsWithValidHttpCodeFile() {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile("/oas-examples/petstore-invalid-http-codes.yaml"));
+        lintMojo.showIgnoredRules = true;
+        assertDoesNotThrow(lintMojo::execute);
+
+    }
+
+
+
     private File getFile(String fileName) {
         return new File(getClass().getResource(fileName).getFile());
     }
