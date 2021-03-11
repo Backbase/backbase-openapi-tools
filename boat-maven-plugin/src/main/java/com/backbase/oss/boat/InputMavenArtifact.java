@@ -99,7 +99,9 @@ public class InputMavenArtifact extends AbstractMojo {
 
 
   private void getArtifact() throws MojoExecutionException {
-    File specUnzipDirectory = new File(project.getBuild().getDirectory() + "/input-artifact/" + inputMavenArtifact.getVersion(), inputMavenArtifact.getArtifactId());
+    File specUnzipDirectory = new File(project.getBuild().getDirectory()
+            + File.separator + "input-artifact" + File.separator
+            + inputMavenArtifact.getVersion(), inputMavenArtifact.getArtifactId());
 
     ArtifactResult result = resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
             ,inputMavenArtifact.getArtifactId()
