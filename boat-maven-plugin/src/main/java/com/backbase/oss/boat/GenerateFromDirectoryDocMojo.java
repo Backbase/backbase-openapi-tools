@@ -5,10 +5,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 
+/**
+ * Allows generate::Doc to accept inputSpec as a directory
+ * Output docs will be placed in separate folders for each spec
+ */
 @Slf4j
 public class GenerateFromDirectoryDocMojo extends GenerateMojo {
-  // allows generate::Doc to accept inputSpec as a directory
-  // output docs will be places in separate folders for each spec
+
   @Override
   public void execute() throws MojoExecutionException {
 
