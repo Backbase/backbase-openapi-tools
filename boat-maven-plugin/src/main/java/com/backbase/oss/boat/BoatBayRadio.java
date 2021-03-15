@@ -83,8 +83,9 @@ public class BoatBayRadio {
     lintReport.setFilePath(getFilePath(bayLintReport.getSpec().getName()));
 
     //link to lint report may need updating before release should perhaps
-    //be something like this: (link to html lint file)
-    // http://localhost:63342/backbase-openapi-tools/lint-petstore/output/index.html?_ijt=bh276c3tslp8dkol056oq0h116
+    //this link structure is for testing
+    //be something like this:
+    // https://boat-bay.proto.backbasecloud.com/lint-reports/repo/digital-banking/lint-report/167
     log.info("\n\tSpec {}:     {}/lint-report/{}/view",
             bayLintReport.getSpec().getName(),
             clientBasePath,
