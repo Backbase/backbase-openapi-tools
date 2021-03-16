@@ -87,10 +87,6 @@ class LintMojoTests {
     }
 
 
-
-
-
-
     private File getFile(String fileName) {
         return new File(getClass().getResource(fileName).getFile());
     }
