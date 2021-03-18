@@ -467,23 +467,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
         this.servers = servers;
     }
 
-    public ArtifactResult resolveArtifactFromRepositories(org.eclipse.aether.artifact.Artifact artifact) {
-        ArtifactRequest artifactRequest = getArtifactRequest(artifact);
-
-        ArtifactResult artifactResult = null;
-        try {
-            artifactResult = artifactResolver.resolveArtifact(repositorySession, artifactRequest);
-        } catch (ArtifactResolutionException e) {
-            throw new IllegalArgumentException("Cannot resolve artifact: " + artifact);
-        }
-        return artifactResult;
-
-    }
-
-    private ArtifactRequest getArtifactRequest(org.eclipse.aether.artifact.Artifact artifact) {
-        return new ArtifactRequest(artifact, remoteRepositories, null);
-    }
-
     protected DefaultArtifact createNewDefaultArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId()
             , dependency.getArtifactId()
