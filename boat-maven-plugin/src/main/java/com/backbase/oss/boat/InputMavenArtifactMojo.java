@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class InputMavenArtifactMojo extends AbstractMojo {
@@ -112,9 +113,9 @@ public class InputMavenArtifactMojo extends AbstractMojo {
 
     unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
 
-    try {
+    try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())){
 
-      List<String> paths = Files.walk(specUnzipDirectory.toPath())
+      List<String> paths = walk
               .filter(Files::isRegularFile)
               .filter(path -> path.endsWith(inputMavenArtifact.getFileName()))
               .map(Path::toString)
