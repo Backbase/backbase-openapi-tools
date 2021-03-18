@@ -10,67 +10,40 @@ import com.google.common.io.Files;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.CodegenConfig;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.*;
 import org.openapitools.codegen.auth.AuthParser;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.Map.Entry;
+
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.*;
 
 /**
  * Generates client/server code from an OpenAPI json/yaml definition.
@@ -78,7 +51,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 @SuppressWarnings({"DefaultAnnotationParam", "java:S3776", "java:S5411"})
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 @Slf4j
-public class GenerateMojo extends InputMavenArtifact {
+public class GenerateMojo extends InputMavenArtifactMojo {
 
     private static String trimCSV(String text) {
         if (isNotEmpty(text)) {
@@ -135,22 +108,6 @@ public class GenerateMojo extends InputMavenArtifact {
      */
     @Parameter(name = "copyTo", defaultValue = "${project.build.outputDirectory}/META-INF/openapi/openapi.yaml")
     protected File copyTo;
-
-
-    /**
-     * Location of the OpenAPI spec, as URL or local file glob pattern.
-     * <p>
-     * If the input is a local file, the value of this property is considered a glob pattern that must
-     * resolve to a unique file.
-     * </p>
-     * <p>
-     * The glob pattern allows to express the input specification in a version neutral way. For
-     * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
-     * {@code my-service-api-v*.yaml}.
-     * </p>
-     */
-//    @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
-//    protected String inputSpec;
 
     /**
      * Git host, e.g. gitlab.com.
@@ -487,11 +444,6 @@ public class GenerateMojo extends InputMavenArtifact {
     @Parameter(name = "writeDebugFiles")
     protected boolean writeDebugFiles = false;
 
-    /**
-     * The project being built.
-     */
-//    @Parameter(readonly = true, required = true, defaultValue = "${project}")
-//    protected MavenProject project;
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;

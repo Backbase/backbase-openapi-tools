@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class InputMavenArtifact extends AbstractMojo {
+public class InputMavenArtifactMojo extends AbstractMojo {
 
   /**
    * A maven artifact containing a spec, or multiple to be processed
@@ -103,7 +103,8 @@ public class InputMavenArtifact extends AbstractMojo {
             + File.separator + "input-artifact" + File.separator
             + inputMavenArtifact.getVersion(), inputMavenArtifact.getArtifactId());
 
-    ArtifactResult result = resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
+
+    ArtifactResult result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
             ,inputMavenArtifact.getArtifactId()
             ,inputMavenArtifact.getClassifier()
             ,inputMavenArtifact.getType()
@@ -133,26 +134,6 @@ public class InputMavenArtifact extends AbstractMojo {
       throw new MojoExecutionException("Could not search unzipped artifact directory");
     }
 
-  }
-
-
-  public ArtifactResult resolveArtifactFromRepositories(org.eclipse.aether.artifact.Artifact artifact) {
-    ArtifactRequest artifactRequest = getArtifactRequest(artifact);
-
-    ArtifactResult artifactResult = null;
-    try {
-      artifactResult = artifactResolver.resolveArtifact(repositorySession, artifactRequest);
-    } catch (ArtifactResolutionException e) {
-      throw new IllegalArgumentException("Cannot resolve artifact: " + artifact);
-    }
-    return artifactResult;
-
-  }
-
-
-  private ArtifactRequest getArtifactRequest(org.eclipse.aether.artifact.Artifact artifact) {
-
-    return new ArtifactRequest(artifact, remoteRepositories, null);
   }
 
 

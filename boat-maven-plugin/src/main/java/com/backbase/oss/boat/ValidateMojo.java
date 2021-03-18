@@ -8,7 +8,6 @@ import java.io.File;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -19,7 +18,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @Mojo(name = "validate", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
-public class ValidateMojo extends InputMavenArtifact {
+public class ValidateMojo extends InputMavenArtifactMojo {
 
 
     @Parameter(name = "failOnWarning", required = true)
