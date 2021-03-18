@@ -45,12 +45,14 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <groupId>com.backbase.dbs</groupId>
-                            <artifactId>banking-services-bom</artifactId>
-                            <version>2.20.1.1</version>
-                            <classifier>api</classifier>
-                            <type>zip</type>
-                            <fileName>access-control-client-api-v2.4.0.yaml</fileName>
+                            <inputMavenArtifact>
+                                <groupId>com.backbase.dbs</groupId>
+                                <artifactId>banking-services-bom</artifactId>
+                                <version>2.20.1.1</version>
+                                <classifier>api</classifier>
+                                <type>zip</type>
+                                <fileName>access-control-client-api-v2.4.0.yaml</fileName>
+                            </inputMavenArtifact>
                         </configuration>
                     </execution>
                 </executions>
