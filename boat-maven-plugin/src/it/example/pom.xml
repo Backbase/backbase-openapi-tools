@@ -40,7 +40,6 @@
     <name>BOAT :: Examples</name>
 
     <modules>
-        <module>boat-artifact-input</module>
         <module>boat-doc</module>
         <module>boat-export</module>
         <module>boat-generate</module>
