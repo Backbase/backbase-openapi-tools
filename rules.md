@@ -210,3 +210,68 @@ OpenAPI must not contain a license  because it's covered by the License Agreemen
 
 OpenAPI specification version must be 3.0.3 or 3.0.4. Any others are not compatible.
 
+
+
+# Enabling linting
+
+To enable linting add the execution goal `lint` to your plugin configuration, this hooks it up to your build process.
+
+Available parameters:
+   
+       failOnWarning (Default: false)
+         Set this to true to fail in case a warning is found.
+   
+       ignoreRules
+         List of rules ids which will be ignored.
+   
+       inputSpec
+         Required: true
+         Input spec directory or file.
+   
+       output (Default:
+       ${project.build.directory}/boat-lint-reports)
+         Output directory for lint reports.
+   
+       showIgnoredRules (Default: false)
+         Set this to true to show the list of ignored rules..
+   
+       writeLintReport (Default: true)
+         Set this to true to generate lint report.
+ 
+   Example:
+    
+   ```xml
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>lint</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>lint</goal>
+                        </goals>
+                       <configuration>
+                              <inputSpec>${unversioned-filename-spec-dir}/</inputSpec>
+                              <output>${project.build.directory}/boat-lint-reports</output>
+                              <writeLintReport>true</writeLintReport>
+                              <ignoreRules>${ignored-lint-rules}</ignoreRules>
+                              <showIgnoredRules>true</showIgnoredRules>
+                       </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-rest-template-embedded</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>{input-spec}</inputSpec>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+   
+   ```
+
+Alternatively exclude executions from your configuration, include only <configuration> and run `mvn boat:lint`
