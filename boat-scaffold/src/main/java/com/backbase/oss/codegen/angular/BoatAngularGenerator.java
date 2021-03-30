@@ -206,7 +206,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 .sorted((v1, v2) -> v1.compareTo(v2))
                 // Getting the last item of the stream, as it's also the greatest version
                 .reduce((first, second) -> second)
-                .orElse(null);
+                .orElse(new SemVer(this.ngVersion));
 
         additionalProperties.put(NG_VERSION, versionRange);
         addDependencies(greatestVersion);
