@@ -28,6 +28,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -148,14 +149,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         addSupportingFiles();
 
         processOpt(NG_VERSION,
-            value -> {
-                if (value.contains("||")) {
-                    applyAngularVersion(value);
-                } else {
-                    applyAngularVersion(new SemVer(value));
-                }
-            },
-            () -> applyAngularVersion(new SemVer(this.ngVersion))
+            value -> applyAngularVersion(value),
+            () -> applyAngularVersion(this.ngVersion)
         );
 
         processOpt(FOUNDATION_VERSION,
@@ -196,7 +191,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     private void applyAngularVersion(String versionRange) {
-        SemVer greatestVersion = Arrays.stream(versionRange.split("\\|\\|"))
+        SemVer[] versions = Arrays.stream(versionRange.split("\\|\\|"))
                 .map(String::trim)
                 // As given SemVer class doesn't support ranges, have to remove it...
                 .map(value -> value.replace("^", ""))
@@ -204,12 +199,21 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 // Sorting versions via SemVer compareTo
                 .map(value -> new SemVer(value))
                 .sorted((v1, v2) -> v1.compareTo(v2))
+                .toArray(SemVer[]::new);
+
+        Supplier<Stream<SemVer>> versionsSupplier = () -> Stream.of(versions);
+
+        Optional<SemVer> smallestVersion = versionsSupplier.get().findFirst();
+        Optional<SemVer> greatestVersion = versionsSupplier.get()
                 // Getting the last item of the stream, as it's also the greatest version
-                .reduce((first, second) -> second)
-                .orElse(new SemVer(this.ngVersion));
+                .reduce((first, second) -> second);
+
+        if (!smallestVersion.get().atLeast("10.0.0")) {
+            throw new IllegalArgumentException("Only angular versions >= 10.0.0 are supported.");
+        }
 
         additionalProperties.put(NG_VERSION, versionRange);
-        addDependencies(greatestVersion);
+        addDependencies(greatestVersion.get());
     }
 
     private void addDependencies(SemVer angularVersion) {
@@ -227,15 +231,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 additionalProperties.put("ngPackagrVersion", "10.0.3");
             }
         }
-    }
-
-    private void applyAngularVersion(SemVer angularVersion) {
-        if (!angularVersion.atLeast("10.0.0")) {
-            throw new IllegalArgumentException("Only angular versions >= 10.0.0 are supported.");
-        }
-
-        additionalProperties.put(NG_VERSION, angularVersion);
-        addDependencies(angularVersion);
     }
 
     private void addSupportingFiles() {
