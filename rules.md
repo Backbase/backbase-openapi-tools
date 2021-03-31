@@ -2,6 +2,7 @@
 
 Boat comes with a number of Rule Sets which can be selected and used. The built in rule sets are documented below.
 
+For information on how to enable these rules and use them in BOAT see [Enabling Linting](#enabling-linting)
 # InternalRuleSet
 
 Internal rules which exist simply for the purpose of reporting fatal
@@ -74,10 +75,99 @@ As well as the additional rules coming from Zally, there are also additional Boa
 specific but could be transferable. These additional rules, are documented below.    
 ##
 
-## B012: Use Well Understood HTTP Status Codes
+## B001: No license information allowed
 
-Adapted from Zally rule 150. Well-understood codes should be used to ensure that the codes in the spec are being 
-correctly implemented. Any well-understood codes used should be used properly.
+OpenAPI must not contain a license  because it's covered by the License Agreement we already negotiate with customers.
+   
+## B002: All operationIds must be unique
+
+Every operationId must be unique. This helps makes specs less confusing to read, and avoids potential problems when 
+generating code from the specs.
+
+## B003: No reserved words allowed
+   
+The schema must not contain a language's reserved words as keys. This rule checks for reserved words from JavaScript, 
+Spring, Kotlin, and Swift.
+Some examples are :
+
+- Spring:
+    assert, boolean, class, null, new, public
+- JavaScript:
+    abstract, delete, export, import, volatile, static
+- Kotlin:
+    break, interface, throw, super
+- Swift:
+    \#column, \#line, Character, Data, Int, left
+    
+## B004: Check info block tags allowed
+
+Tags enable APIs to be meaningfully grouped together. The info block's Tags value must not be empty, and can only 
+contain entries from the following case-sensitive list:
+
+ - productTags: 
+   - Retail 
+   - Business
+   - Wealth
+   - Identity
+   - Foundation
+   - Basic Support
+   - Flow
+ - informativeTags: 
+   - Mobile
+   - Security
+   - Payments
+   - Authentication
+   - Employee
+   - Cash
+   - Insights
+
+## B005: Check info block title format
+
+For readability the title must not be empty and should be no longer then the configured max title length, 35.
+
+## B006: Check info block description format
+
+To help communicate the purpose of the spec, a description must be present in the info block. This description can't 
+be empty, and must be no longer than the configured maximum length, which defaults to 140.
+
+## B007: Check prefix for paths
+
+Path prefixes should be one of the following values:
+
+ - client-api
+ - service-api
+ - integration-api
+
+## B008: Check x-icon value in the info block
+
+An x-icon should be provided in the info block of the spec. This enables the API portal to display the API with the 
+correct icon.
+
+## B009: Check prefix for paths should contain version
+
+URL Paths must contain a version number to maintain a consistent method of versioning though the APIs.
+
+## B010: Pluralize resource names
+
+Resource names should be pluralized in paths.
+Path components after the prefix and version should be plurals. For example, in the path /client-api/v1/bars, the rule 
+ignores the prefix client-api and the version v1, but the resource bars is checked.
+## B011: Use standard HTTP status codes
+
+Adapted from Zally rule 150, this adds extra HTTP codes to the list of standard codes. 
+This rule highlights when a HTTP code is standard but not well-understood. Standard codes can be used, but it's best practice to use well-understood codes instead.
+Standard HTTP status codes:
+
+    100, 101, 200, 201, 202, 203, 204, 205, 206, 207
+    300, 301, 302, 303, 304, 305, 307, 400, 401, 402, 
+    403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 
+    413, 414, 415, 416, 417, 422, 423, 426, 428, 429, 
+    431, 500, 501, 502, 503, 504, 505, 511, default
+
+## B012: Use well-understood HTTP status codes
+
+Adapted from Zally rule 150. To help ensure that specs are implemented as intended, only use well-understood HTTP codes. 
+Only use these codes with their appropriate methods, as outlined in the following tables:
 
 ### Well-understood codes:
 #### Success Codes
@@ -118,136 +208,22 @@ Code | Method
 #### Server Side Error Codes
 Code | Method
 -----|-------
-    500 | ALL
-    501 | ALL
-    502 | ALL
-    503 | ALL
-    504 | ALL
-
-## B011: Use standard HTTP status codes
-
-Adapted from Zally rule 150, this adds extra HTTP codes to the list of standard and well-understood codes. Any HTTP codes 
-used in responses must be from the standard list. You should however try to stick to well-understood codes.
-Standard HTTP status codes:
-
-    100, 101, 200, 201, 202, 203, 204, 205, 206, 207
-    300, 301, 302, 303, 304, 305, 307, 400, 401, 402, 
-    403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 
-    413, 414, 415, 416, 417, 422, 423, 426, 428, 429, 
-    431, 500, 501, 502, 503, 504, 505, 511, default
-    
-## B010: Pluralize resource names
-
-Resource names should be pluralised in paths.
-Path components after prefix and version should be plurals, for example, `/client-api/v1/bars` client and v1 are ignored.
-
-## B009: Check prefix for paths should contain version
-
-URL Paths Must contain a version number to maintain a consistent method of versioning though the apis.
-## B008: Check x-icon value in the info block
-
-An x-icon should be provided in the info block of the spec with the assigned value for the API. This should be provided 
-so that the api portal can display the api with the correct icon.
-
-## B007: Check prefix for paths
-
-Path prefixes should be from this set of valid prefixes as it should refer to the type of api.
-
-Valid prefixes:
- - client-api
- - service-api
- - integration-api
- 
-## B006: Check info block description format
-
-Descriptions are important to include for readability and understanding the purpose of a spec.
-A description must be present in the info block, it cannot be empty and must be no longer then the configured max length 
-which is currently set to 140. 
-
-## B005: Check info block title format
-
-For readability the title must not be empty and should be no longer then the configured max title length, 35.
-
-## B004: Check info block tags allowed
-
-Tags in the info block, are required to group apis together, they must be from the list of valid meaningful tags below 
-to create a consistent, uniform and well understood set of apis.
-The Tags value must not be empty. They must be used exactly as shown below as they are case-sensitive.
-
-Valid info tags:
-
- - productTags: 
-   - Retail 
-   - Business
-   - Wealth
-   - Identity
-   - Foundation
-   - Basic Support
-   - Flow
- - informativeTags: 
-   - Mobile
-   - Security
-   - Payments
-   - Authentication
-   - Employee
-   - Cash
-   - Insights
-   
-## B003: No reserved words allowed
-   
-Schema must not contain reserved words as keys, the reserved words from js, spring kotlin and swift, are checked for. 
-This is to avoid confusion, when mapping to objects and to avoid injecting code.
-Some examples are :
-
-- Spring:
-    assert, boolean, class, null, new, public
-- Js:
-    abstract, delete, export, import, volatile, static
-- Kotlin:
-    break, interface, throw, super
-- Swift:
-    \#column, \#line, Character, Data, Int, left
-## B002: All operationIds must be unique
-
-Duplicate operationIds cause confusion especially when generating code from specifications, they must be unique.
-
-## B001: No license information allowed
-
-OpenAPI must not contain a license  because it's covered by the License Agreement we already negotiate with customers.
+ 500 | ALL
+ 501 | ALL
+ 502 | ALL
+ 503 | ALL
+ 504 | ALL
 
 ## M00012: Open API Version must be set to the correct version
 
 OpenAPI specification version must be 3.0.3 or 3.0.4. Any others are not compatible.
 
 
+#Enabling linting
 
-# Enabling linting
+To enable linting add the execution goal `lint` to your plugin configuration. This hooks linting into your build process.
 
-To enable linting add the execution goal `lint` to your plugin configuration, this hooks it up to your build process.
-
-Available parameters:
-   
-       failOnWarning (Default: false)
-         Set this to true to fail in case a warning is found.
-   
-       ignoreRules
-         List of rules ids which will be ignored.
-   
-       inputSpec
-         Required: true
-         Input spec directory or file.
-   
-       output (Default:
-       ${project.build.directory}/boat-lint-reports)
-         Output directory for lint reports.
-   
-       showIgnoredRules (Default: false)
-         Set this to true to show the list of ignored rules..
-   
-       writeLintReport (Default: true)
-         Set this to true to generate lint report.
- 
-   Example:
+For example:
     
    ```xml
             <plugin>
@@ -282,5 +258,38 @@ Available parameters:
             </plugin>
    
    ```
+
+The following linting parameters are available:
+
+   * failOnWarning
+        - Default: false
+        - If true, fails in a case where a warning is found.
+        - Optional
+   
+   * ignoreRules
+        - List of rule IDs. Specifies which will be ignored.
+        - Default: false
+        - Optional
+   
+   * inputSpec
+        - Specifies input spec directory or file.
+        - Required: true
+   
+   * output 
+        - Default: ${project.build.directory}/boat-lint-reports)
+        - Specifies output directory for lint reports.
+        - Optional
+   
+   * showIgnoredRules 
+        - Default: false
+        - If true, shows the list of ignored rules.
+        - Optional
+   
+   * writeLintReport
+        - Default: true
+        - If true, generates lint report.
+        - Optional
+ 
+
 
 Alternatively exclude executions from your configuration, include only <configuration> and run `mvn boat:lint`
