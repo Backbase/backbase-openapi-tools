@@ -198,7 +198,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 .map(value -> value.replace("~", ""))
                 // Sorting versions via SemVer compareTo
                 .map(value -> new SemVer(value))
-                .sorted((v1, v2) -> v1.compareTo(v2))
+                .sorted(SemVer::compareTo)
                 .toArray(SemVer[]::new);
 
         Supplier<Stream<SemVer>> versionsSupplier = () -> Stream.of(versions);
@@ -208,12 +208,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 // Getting the last item of the stream, as it's also the greatest version
                 .reduce((first, second) -> second);
 
-        if (!smallestVersion.get().atLeast("10.0.0")) {
+        if (smallestVersion.isPresent() && !smallestVersion.get().atLeast("10.0.0")) {
             throw new IllegalArgumentException("Only angular versions >= 10.0.0 are supported.");
         }
 
         additionalProperties.put(NG_VERSION, versionRange);
-        addDependencies(greatestVersion.get());
+        greatestVersion.ifPresent(this::addDependencies);
     }
 
     private void addDependencies(SemVer angularVersion) {
