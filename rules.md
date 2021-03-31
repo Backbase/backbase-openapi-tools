@@ -290,6 +290,3 @@ The following linting parameters are available:
         - If true, generates lint report.
         - Optional
  
-
-
-Alternatively exclude executions from your configuration, include only <configuration> and run `mvn boat:lint`
