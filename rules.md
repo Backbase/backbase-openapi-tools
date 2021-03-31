@@ -127,7 +127,7 @@ Code | Method
 ## B011: Use standard HTTP status codes
 
 Adapted from Zally rule 150, this adds extra HTTP codes to the list of standard and well-understood codes. Any HTTP codes 
-used in responses must be from the standard list.
+used in responses must be from the standard list. You should however try to stick to well-understood codes.
 Standard HTTP status codes:
 
     100, 101, 200, 201, 202, 203, 204, 205, 206, 207
@@ -166,13 +166,13 @@ which is currently set to 140.
 
 ## B005: Check info block title format
 
-For Readability the title Must not be empty and should be no longer then the configured max title length, 35.
+For readability the title must not be empty and should be no longer then the configured max title length, 35.
 
 ## B004: Check info block tags allowed
 
 Tags in the info block, are required to group apis together, they must be from the list of valid meaningful tags below 
 to create a consistent, uniform and well understood set of apis.
-The Tags value must not be empty.
+The Tags value must not be empty. They must be used exactly as shown below as they are case-sensitive.
 
 Valid info tags:
 
@@ -185,7 +185,7 @@ Valid info tags:
    - Basic Support
    - Flow
  - informativeTags: 
-   - Mobile,
+   - Mobile
    - Security
    - Payments
    - Authentication
@@ -196,8 +196,17 @@ Valid info tags:
 ## B003: No reserved words allowed
    
 Schema must not contain reserved words as keys, the reserved words from js, spring kotlin and swift, are checked for. 
-This is to avoid confusion, when mapping to objects and to avoid injecting code?
+This is to avoid confusion, when mapping to objects and to avoid injecting code.
+Some examples are :
 
+- Spring:
+    assert, boolean, class, null, new, public
+- Js:
+    abstract, delete, export, import, volatile, static
+- Kotlin:
+    break, interface, throw, super
+- Swift:
+    \#column, \#line, Character, Data, Int, left
 ## B002: All operationIds must be unique
 
 Duplicate operationIds cause confusion especially when generating code from specifications, they must be unique.
