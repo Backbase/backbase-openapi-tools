@@ -25,6 +25,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
+    public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
@@ -96,6 +97,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean addServletRequest;
 
     /**
+     * Adds BindingResult to API interface method if @validate is used
+     */
+    @Setter
+    @Getter
+    protected boolean addBindingResult;
+
+    /**
      * Add Lombok to class-level Api models. Defaults to false
      */
     @Setter
@@ -124,17 +132,19 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
-            "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
+            "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
+        this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
+                "Adds a Binding result as method perimeter. Only implemented if @validate is being used.", this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
+            "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library", this.openApiNullable));
+            "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
-            "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
+            "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
 
         this.apiNameSuffix = "Api";
     }
@@ -188,6 +198,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
             this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);
         }
+        if (this.additionalProperties.containsKey(ADD_BINDING_RESULT)) {
+            this.addBindingResult = convertPropertyToBoolean(ADD_BINDING_RESULT);
+        }
         if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
             this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
         }
@@ -203,6 +216,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
+        writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
         writePropertyBack(OPENAPI_NULLABLE, this.openApiNullable);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
