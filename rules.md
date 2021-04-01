@@ -9,13 +9,12 @@ For information on how to enable these rules and use them in BOAT, see [Enable l
 
 # InternalRuleSet
 
-Internal rules which exist simply for the purpose of reporting fatal
-errors found while attempting to parse the API specification.
-The rules cannot be disabled or configured.
+Internal rules for reporting fatal errors found while attempting to parse the API specification.
+These rules cannot be disabled or configured.
 
 # BoatRuleSet
 
-Zally also contains some additional rules enforcing aspects of the OpenAPI spec or other common sense rules that don't form part of the Zalando guidelines. Those addiitonal rules are documented here.
+BoatRuleSet contains the following rules from Zalando's [Zally rule set](https://github.com/zalando/zally/blob/master/server/rules.md#zallyruleset). 
 
 ## M008: Host should not contain protocol
 
@@ -74,9 +73,9 @@ If all paths start with the same prefix then it would be cleaner to extract that
 
 ##
 
+In addition to the above Zally rules, BoatRuleSet contains the following Boat Quay rules. Some of these are Backbase 
+specific, but could be transferable to other projects.
 
-As well as the additional rules coming from Zally, there are also additional Boat Quay rules, some of which are Backbase 
-specific but could be transferable. These additional rules, are documented below.    
 ##
 
 ## B001: No license information allowed
