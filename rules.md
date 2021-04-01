@@ -2,10 +2,10 @@
 
 Boat provides the following rule sets:
 
-* [InternalRuleSet](#-internalruleset)
-* [BoatRuleSet](#-boatruleset)
+* [InternalRuleSet](#internalruleset)
+* [BoatRuleSet](#boatruleset)
 
-For information on how to enable these rules and use them in BOAT, see [Enable linting](#-enable-linting).
+For information on how to enable these rules and use them in BOAT, see [Enable linting](#enable-linting).
 
 # InternalRuleSet
 
