@@ -1,8 +1,12 @@
 # Boat Rule Sets
 
-Boat comes with a number of Rule Sets which can be selected and used. The built in rule sets are documented below.
+Boat provides the following rule sets:
 
-For information on how to enable these rules and use them in BOAT see [Enabling Linting](#enabling-linting)
+* [InternalRuleSet](#-internalruleset)
+* [BoatRuleSet](#-boatruleset)
+
+For information on how to enable these rules and use them in BOAT, see [Enable linting](#-enable-linting).
+
 # InternalRuleSet
 
 Internal rules which exist simply for the purpose of reporting fatal
@@ -77,7 +81,7 @@ specific but could be transferable. These additional rules, are documented below
 
 ## B001: No license information allowed
 
-OpenAPI must not contain a license  because it's covered by the License Agreement we already negotiate with customers.
+Specs must not contain a license. They are covered by the license agreement already negotiated with customers.
    
 ## B002: All operationIds must be unique
 
@@ -87,8 +91,7 @@ generating code from the specs.
 ## B003: No reserved words allowed
    
 The schema must not contain a language's reserved words as keys. This rule checks for reserved words from JavaScript, 
-Spring, Kotlin, and Swift.
-Some examples are :
+Spring, Kotlin, and Swift. For example:
 
 - Spring:
     assert, boolean, class, null, new, public
@@ -145,13 +148,14 @@ correct icon.
 
 ## B009: Check prefix for paths should contain version
 
-URL Paths must contain a version number to maintain a consistent method of versioning though the APIs.
+URL Paths must contain a version number. This maintains a consistent method of versioning though the APIs.
 
 ## B010: Pluralize resource names
 
 Resource names should be pluralized in paths.
 Path components after the prefix and version should be plurals. For example, in the path /client-api/v1/bars, the rule 
 ignores the prefix client-api and the version v1, but the resource bars is checked.
+
 ## B011: Use standard HTTP status codes
 
 Adapted from Zally rule 150, this adds extra HTTP codes to the list of standard codes. 
@@ -219,7 +223,7 @@ Code | Method
 OpenAPI specification version must be 3.0.3 or 3.0.4. Any others are not compatible.
 
 
-#Enabling linting
+# Enable linting
 
 To enable linting add the execution goal `lint` to your plugin configuration. This hooks linting into your build process.
 
