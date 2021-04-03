@@ -42,6 +42,8 @@ import javax.xml.bind.annotation.*;
 import org.springframework.hateoas.RepresentationModel;
 {{/hateoas}}
 {{/parent}}
+{{#vendorExtensions.x-extra-java-imports}}
+{{{vendorExtensions.x-extra-java-imports}}}{{/vendorExtensions.x-extra-java-imports}}
 
 {{#models}}
 {{#model}}
