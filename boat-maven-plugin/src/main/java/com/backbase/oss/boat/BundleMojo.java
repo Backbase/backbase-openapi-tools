@@ -9,8 +9,8 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
-import com.backbase.oss.boat.transformers.SpecVersionTransformer;
-import com.backbase.oss.boat.transformers.VendorExtensionFilter;
+import com.backbase.oss.boat.transformers.SetVersion;
+import com.backbase.oss.boat.transformers.ExtensionFilter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
@@ -110,7 +110,7 @@ public class BundleMojo extends AbstractMojo {
             OpenAPI openAPI = OpenAPILoader.load(inputFile);
 
             if (isNotBlank(version)) {
-                openAPI = new SpecVersionTransformer(version)
+                openAPI = new SetVersion(version)
                     .transform(openAPI);
             }
 
@@ -118,7 +118,7 @@ public class BundleMojo extends AbstractMojo {
                 .transform(openAPI);
 
             if (isNotEmpty(removeExtensions)) {
-                openAPI = new VendorExtensionFilter()
+                openAPI = new ExtensionFilter()
                     .transform(openAPI, singletonMap("remove", removeExtensions));
             }
 

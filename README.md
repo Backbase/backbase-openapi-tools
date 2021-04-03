@@ -19,6 +19,11 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.3
+
+* *Maven Plugin*
+  * Added new goal `boat:transform`; see the description in the [plugin documentation](boat-maven-plugin/README.md#boattransform).
+
 ## 0.14.2
 * *Angular Generator*
   * Added support for Angular version ranges in peer dependencies
@@ -39,6 +44,7 @@ BOAT is still under development and subject to change.
     * Check prefix for paths should contain version.
   * Enabled rules.
     * Use Standard HTTP Status Codes.
+
 ## 0.12.0
 * *General*
   * Improved code quality
@@ -140,12 +146,10 @@ BOAT is still under development and subject to change.
 * ability to resolve references like #/components/schemas/myObject/items or #/components/schemas/myObject/properties/embeddedObject
 * simple fix to avoid npe in StaticHtml2Generation escaping response message.
 
-
 ## 0.5.0
 
 * Add DereferenceComponentsPropertiesTransformer (that does a bit extra)
 * Fix recursive referencing in UnAliasTransformer
-
 
 ## 0.4.0
 * Added bundle skip
