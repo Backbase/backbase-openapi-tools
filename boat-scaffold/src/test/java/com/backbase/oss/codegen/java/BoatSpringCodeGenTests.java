@@ -69,6 +69,7 @@ class BoatSpringCodeGenTests {
         assertThat(param.dataType, is("java.util.Set<String>"));
     }
 
+
     @Test
     void newLineIndent() throws IOException {
         final NewLineIndent indent = new BoatSpringCodeGen.NewLineIndent(2, "_");

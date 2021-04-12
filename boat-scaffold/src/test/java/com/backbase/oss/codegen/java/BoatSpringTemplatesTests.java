@@ -70,7 +70,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "lmb", "nbl", "wth", "utl");
+        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
 
         final String name;
 
@@ -78,6 +78,7 @@ class BoatSpringTemplatesTests {
         final boolean useOptional;
 
         final boolean addServletRequest;
+        final boolean addBindingResult;
         final boolean useLombokAnnotations;
         final boolean openApiNullable;
         final boolean useSetForUniqueItems;
@@ -95,6 +96,7 @@ class BoatSpringTemplatesTests {
                     .collect(joining("-", "boat-", ""));
 
             this.useBeanValidation = (mask & 1 << CASES.indexOf("val")) != 0;
+            this.addBindingResult = (mask & 1 << CASES.indexOf("bin")) != 0;
             this.useOptional = (mask & 1 << CASES.indexOf("opt")) != 0;
             this.addServletRequest = (mask & 1 << CASES.indexOf("req")) != 0;
             this.useLombokAnnotations = (mask & 1 << CASES.indexOf("lmb")) != 0;
@@ -176,9 +178,9 @@ class BoatSpringTemplatesTests {
     @Check
     void useBeanValidation() {
         assertThat(findPattern("/api/.+\\.java$", "@Valid"),
-            equalTo(this.param.useBeanValidation));
+            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
         assertThat(findPattern("/model/.+\\.java$", "@Valid"),
-            equalTo(this.param.useBeanValidation));
+            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
     }
 
     @Check
@@ -195,6 +197,14 @@ class BoatSpringTemplatesTests {
             equalTo(this.param.addServletRequest));
         assertThat(findPattern("/model/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
             is(false));
+    }
+
+    @Check
+    void addBindingResult(){
+        assertThat(findPattern("/api/.+\\.java$", "BindingResult\\s+result"),
+                equalTo(this.param.addBindingResult));
+        assertThat(findPattern("/model/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
+                is(false));
     }
 
     @Check
@@ -277,11 +287,17 @@ class BoatSpringTemplatesTests {
         gcf.setApiNameSuffix("-api");
         gcf.setModelNameSuffix(this.param.name);
 
-        gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
+
         gcf.addAdditionalProperty(OptionalFeatures.USE_OPTIONAL, this.param.useOptional);
 
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, true);
         gcf.addAdditionalProperty(BoatSpringCodeGen.ADD_SERVLET_REQUEST, this.param.addServletRequest);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.ADD_BINDING_RESULT,this.param.addBindingResult);
+        if(this.param.addBindingResult){
+            gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, true);
+        }else {
+            gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
+        }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
         gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
