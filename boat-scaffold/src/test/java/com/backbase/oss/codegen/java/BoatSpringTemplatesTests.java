@@ -201,7 +201,7 @@ class BoatSpringTemplatesTests {
 
     @Check
     void addBindingResult(){
-        assertThat(findPattern("/api/.+\\.java$", "BindingResult\\s+result"),
+        assertThat(findPattern("/api/.+\\.java$", "BindingResult\\s+bindingResult"),
                 equalTo(this.param.addBindingResult));
         assertThat(findPattern("/model/.+\\.java$", "HttpServletRequest\\s+httpServletRequest"),
                 is(false));
