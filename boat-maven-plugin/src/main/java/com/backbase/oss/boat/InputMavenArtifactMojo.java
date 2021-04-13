@@ -105,13 +105,16 @@ public class InputMavenArtifactMojo extends AbstractMojo {
             + inputMavenArtifact.getVersion(), inputMavenArtifact.getArtifactId());
 
 
-    ArtifactResult result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
-            ,inputMavenArtifact.getArtifactId()
-            ,inputMavenArtifact.getClassifier()
-            ,inputMavenArtifact.getType()
-            ,inputMavenArtifact.getVersion()));
+    if(!specUnzipDirectory.exists()){
 
-    unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
+      ArtifactResult result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
+              ,inputMavenArtifact.getArtifactId()
+              ,inputMavenArtifact.getClassifier()
+              ,inputMavenArtifact.getType()
+              ,inputMavenArtifact.getVersion()));
+
+      unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
+    }
 
     try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())){
 
