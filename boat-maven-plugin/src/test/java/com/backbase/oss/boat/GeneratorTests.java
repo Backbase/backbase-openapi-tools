@@ -86,7 +86,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBoatDocsWithDirectory() throws MojoExecutionException {
+    void testBoatDocsWithDirectory() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
 
