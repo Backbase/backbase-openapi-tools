@@ -626,7 +626,7 @@ For the `spring` generator, the additional configuration options are:
 | `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
 | `useLombokAnnotations` | Use Lombok annotations to generate properties accessors and `hashCode`/`equals` methods (Default: false) |
 | `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
-| `addBindingResult` | Adds BindingResult to Api method definitions' request bodies, if UseBeanValidation configured, for this to be effective use configuration UseBeanValidation (Default: false)|
+| `addBindingResult` | Adds BindingResult to Api method definitions' request bodies if UseBeanValidation true, for this to be effective you must configure UseBeanValidation, this is not done automatically (Default: false)|
 | `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
 | `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
 | `apiFirst` | Generate the API from the OAI spec at server compile time (API first approach) (Default: false) |
