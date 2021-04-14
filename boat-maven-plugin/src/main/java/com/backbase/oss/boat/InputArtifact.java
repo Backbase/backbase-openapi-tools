@@ -13,4 +13,6 @@ public class InputArtifact {
   private String type;
   private String classifier;
   private String fileName;
+  private boolean isProcessed;
+  private boolean isUnzipped;
 }
