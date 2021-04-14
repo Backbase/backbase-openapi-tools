@@ -100,18 +100,20 @@ public class InputMavenArtifactMojo extends AbstractMojo {
 
 
   private void getArtifact() throws MojoExecutionException {
+    ArtifactResult result;
+
     File specUnzipDirectory = new File(project.getBuild().getDirectory()
             + File.separator + "input-artifact" + File.separator
-            + inputMavenArtifact.getVersion(), inputMavenArtifact.getArtifactId());
+            + inputMavenArtifact.getArtifactId(), inputMavenArtifact.getVersion());
 
 
-    if(!specUnzipDirectory.exists()){
+    if(!specUnzipDirectory.exists()) {
 
-      ArtifactResult result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
-              ,inputMavenArtifact.getArtifactId()
-              ,inputMavenArtifact.getClassifier()
-              ,inputMavenArtifact.getType()
-              ,inputMavenArtifact.getVersion()));
+      result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
+              , inputMavenArtifact.getArtifactId()
+              , inputMavenArtifact.getClassifier()
+              , inputMavenArtifact.getType()
+              , inputMavenArtifact.getVersion()));
 
       unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
     }
@@ -142,9 +144,11 @@ public class InputMavenArtifactMojo extends AbstractMojo {
 
 
   private void unzipSpec(File inputFile, File specUnzipDirectory) throws MojoExecutionException {
-    specUnzipDirectory.mkdirs();
+
     try {
+      specUnzipDirectory.mkdirs();
       unzip(inputFile, specUnzipDirectory);
+      inputMavenArtifact.setUnzipped(true);
     } catch (Exception e) {
       throw new MojoExecutionException("Error extracting spec: " + inputFile, e);
     }
