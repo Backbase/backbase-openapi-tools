@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.Expand;
+import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactResolver;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,19 +82,20 @@ public class InputMavenArtifactMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
   protected List<RemoteRepository> remoteRepositories;
 
+  private final ReentrantLock reLock = new ReentrantLock(true);
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
-    if (inputMavenArtifact != null && inputMavenArtifact.getArtifactId() !=null){
+    if (inputMavenArtifact != null && inputMavenArtifact.getArtifactId() != null) {
       getArtifact();
     }
 
-    if (input == null && inputSpec== null && inputMavenArtifact == null ){
+    if (input == null && inputSpec == null && inputMavenArtifact == null) {
       throw new MojoExecutionException("Missing input from plugin, input options are: inputMavenArtifact, input, inputSpec");
     }
 
-    if (input == null){
+    if (input == null) {
       input = new File(inputSpec);
     }
 
@@ -107,18 +110,24 @@ public class InputMavenArtifactMojo extends AbstractMojo {
             + inputMavenArtifact.getArtifactId(), inputMavenArtifact.getVersion());
 
 
-    if(!specUnzipDirectory.exists()) {
 
-      result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
-              , inputMavenArtifact.getArtifactId()
-              , inputMavenArtifact.getClassifier()
-              , inputMavenArtifact.getType()
-              , inputMavenArtifact.getVersion()));
+
+
+    // The artifact will be downloaded to the local repository if necessary. An artifact that is already resolved will
+    // be skipped and is not re-resolved.
+    result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
+            , inputMavenArtifact.getArtifactId()
+            , inputMavenArtifact.getClassifier()
+            , inputMavenArtifact.getType()
+            , inputMavenArtifact.getVersion()));
+
+    if (inputMavenArtifact.isNeedsProcessing(specUnzipDirectory,result.getArtifact().getFile())) {
 
       unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
+
     }
 
-    try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())){
+    try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())) {
 
       List<String> paths = walk
               .filter(Files::isRegularFile)
@@ -126,10 +135,10 @@ public class InputMavenArtifactMojo extends AbstractMojo {
               .map(Path::toString)
               .collect(Collectors.toList());
 
-      if (paths.size()>1){
-        log.info("found multiple files of matching {} in zip, using {}", inputMavenArtifact.getFileName() , paths.get(0));
-      }else if(paths.isEmpty()){
-        throw new MojoExecutionException("no file matching "+inputMavenArtifact.getFileName()+" was found in artifact zip");
+      if (paths.size() > 1) {
+        log.info("found multiple files of matching {} in zip, using {}", inputMavenArtifact.getFileName(), paths.get(0));
+      } else if (paths.isEmpty()) {
+        throw new MojoExecutionException("no file matching " + inputMavenArtifact.getFileName() + " was found in artifact zip");
       }
 
       inputSpec = paths.get(0);
@@ -144,13 +153,15 @@ public class InputMavenArtifactMojo extends AbstractMojo {
 
 
   private void unzipSpec(File inputFile, File specUnzipDirectory) throws MojoExecutionException {
-
+    reLock.lock();
     try {
       specUnzipDirectory.mkdirs();
       unzip(inputFile, specUnzipDirectory);
-      inputMavenArtifact.setUnzipped(true);
     } catch (Exception e) {
+      reLock.unlock();
       throw new MojoExecutionException("Error extracting spec: " + inputFile, e);
+    }finally {
+      reLock.unlock();
     }
   }
 
