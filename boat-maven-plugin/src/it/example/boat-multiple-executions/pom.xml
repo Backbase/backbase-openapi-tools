@@ -28,14 +28,7 @@
                             <goal>doc</goal>
                         </goals>
                         <configuration>
-                            <inputMavenArtifact>
-                                <groupId>com.backbase.dbs</groupId>
-                                <artifactId>banking-services-bom</artifactId>
-                                <version>2.20.1.1</version>
-                                <classifier>api</classifier>
-                                <type>zip</type>
-                                <fileName>access-control-client-api-v2.4.0.yaml</fileName>
-                            </inputMavenArtifact>
+                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/api-with-examples.yaml</inputSpec>
                         </configuration>
                     </execution>
                     <execution>
@@ -45,14 +38,7 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <inputMavenArtifact>
-                                <groupId>com.backbase.dbs</groupId>
-                                <artifactId>banking-services-bom</artifactId>
-                                <version>2.20.1.1</version>
-                                <classifier>api</classifier>
-                                <type>zip</type>
-                                <fileName>access-control-client-api-v2.4.0.yaml</fileName>
-                            </inputMavenArtifact>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
                         </configuration>
                     </execution>
                     <execution>
@@ -62,14 +48,7 @@
                             <goal>doc</goal>
                         </goals>
                         <configuration>
-                            <inputMavenArtifact>
-                                <groupId>com.backbase.dbs.contact</groupId>
-                                <artifactId>contact-manager</artifactId>
-                                <version>1.2.38.3</version>
-                                <classifier>api</classifier>
-                                <type>zip</type>
-                                <fileName>contact-manager-service-api-v2.3.0.yaml</fileName>
-                            </inputMavenArtifact>
+                            <inputSpec>${project.basedir}/src/main/resources/contact-manager_contact-manager-service-api-v2.3.0.yaml</inputSpec>
                         </configuration>
                     </execution>
                 </executions>
@@ -79,4 +58,3 @@
 
 
 </project>
-
