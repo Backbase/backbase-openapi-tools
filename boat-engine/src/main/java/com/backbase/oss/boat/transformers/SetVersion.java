@@ -2,17 +2,24 @@ package com.backbase.oss.boat.transformers;
 
 import java.util.Map;
 
-import static java.util.Optional.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-@RequiredArgsConstructor
-public class SpecVersionTransformer implements Transformer {
+import static java.util.Optional.ofNullable;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class SetVersion implements Transformer {
 
     @NonNull
-    private final String version;
+    private String version;
 
     @Override
     public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
@@ -25,6 +32,12 @@ public class SpecVersionTransformer implements Transformer {
         return openAPI;
     }
 
-}
+    /**
+     * Default setter, used at creation from POM configuration.
+     */
+    public void set(String version) {
+        setVersion(version);
+    }
 
+}
 

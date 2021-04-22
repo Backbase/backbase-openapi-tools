@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.backbase.oss</groupId>
@@ -58,10 +59,8 @@
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
         <lombok.version>1.18.16</lombok.version>
-        <junit.version>4.13.1</junit.version>
-
         <jackson.version>2.11.3</jackson.version>
-        <guava-version>30.0-jre</guava-version>
+        <mockito.version>3.8.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.1.5</swagger-core.version>
@@ -71,7 +70,7 @@
     </properties>
 
     <modules>
-        <!-- Project holding all RAML and OpenAPI specs for testing. Also includes reusable test harnesses-->
+        <!-- Project holding all RAML and OpenAPI specs for testing. Also includes reusable test harnesses -->
         <module>boat-trail-resources</module>
         <module>boat-engine</module>
         <module>boat-scaffold</module>
@@ -302,11 +301,13 @@
                 <artifactId>jackson-databind-nullable</artifactId>
                 <version>0.2.1</version>
             </dependency>
+
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>5.7.0</version>
-                <scope>test</scope>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.7.1</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
@@ -315,13 +316,19 @@
                 <version>2.2</version>
                 <scope>test</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>3.3.3</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
