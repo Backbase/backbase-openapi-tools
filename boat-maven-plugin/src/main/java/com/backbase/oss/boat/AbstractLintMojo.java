@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -18,13 +19,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 /*
   Lint Specification
  */
-public abstract class AbstractLintMojo extends AbstractMojo {
+public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
 
-    /**
-     * Input spec directory or file.
-     */
-    @Parameter(name = "inputSpec", property = "inputSpec", required = true)
-    protected File inputSpec;
 
     /**
      * Set this to <code>true</code> to fail in case a warning is found.
@@ -47,18 +43,21 @@ public abstract class AbstractLintMojo extends AbstractMojo {
         "151","129","146","147","172","145","115","132","120", "134","183","154","105","104","130","118","110","153",
         "101","176","116","M009","H002","M010","H001","M008","S005","S006","S007","M011"};
 
-    protected List<BoatLintReport> lint() throws MojoExecutionException {
+    protected List<BoatLintReport> lint() throws MojoExecutionException, MojoFailureException {
+
+        super.execute();
+
         List<BoatLintReport> boatLintReports = new ArrayList<>();
 
         File[] inputFiles;
-        if (inputSpec.isDirectory()) {
-            inputFiles = inputSpec.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
+        if (input.isDirectory()) {
+            inputFiles = input.listFiles(pathname -> pathname.getName().endsWith(".yaml"));
             if (inputFiles == null || inputFiles.length == 0) {
                 throw new MojoExecutionException("No OpenAPI specs found in: " + inputSpec);
             }
             log.info("Found " + inputFiles.length + " specs to lint.");
         } else {
-            inputFiles = new File[]{inputSpec};
+            inputFiles = new File[]{input};
         }
 
         for (File inputFile : inputFiles) {
@@ -83,7 +82,7 @@ public abstract class AbstractLintMojo extends AbstractMojo {
     }
 
     public void setInput(File input) {
-        this.inputSpec = input;
+        this.input = input;
     }
 
     public void setFailOnWarning(boolean failOnWarning) {

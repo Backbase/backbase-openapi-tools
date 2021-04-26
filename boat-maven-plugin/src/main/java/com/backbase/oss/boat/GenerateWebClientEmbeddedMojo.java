@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
@@ -10,7 +11,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class GenerateWebClientEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("Generating Server Stubs using Web Client Boot");
         execute("java", "webclient", true, true, true);
     }

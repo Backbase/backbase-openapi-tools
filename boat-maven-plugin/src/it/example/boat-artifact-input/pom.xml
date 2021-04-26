@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>example</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>boat-artifact-input</artifactId>
+    <packaging>pom</packaging>
+
+    <name>BOAT :: DOCandLint</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-rest-template-embedded</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <inputMavenArtifact>
+                                <groupId>com.backbase.dbs</groupId>
+                                <artifactId>banking-services-bom</artifactId>
+                                <version>2.20.1.1</version>
+                                <classifier>api</classifier>
+                                <type>zip</type>
+                                <fileName>access-control-client-api-v2.4.0.yaml</fileName>
+                            </inputMavenArtifact>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lint</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>lint</goal>
+                        </goals>
+                        <configuration>
+                            <inputMavenArtifact>
+                                <groupId>com.backbase.dbs</groupId>
+                                <artifactId>banking-services-bom</artifactId>
+                                <version>2.20.1.1</version>
+                                <classifier>api</classifier>
+                                <type>zip</type>
+                                <fileName>access-control-client-api-v2.4.0.yaml</fileName>
+                            </inputMavenArtifact>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-docs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <inputMavenArtifact>
+                                <groupId>com.backbase.dbs.contact</groupId>
+                                <artifactId>contact-manager</artifactId>
+                                <version>1.2.38.3</version>
+                                <classifier>api</classifier>
+                                <type>zip</type>
+                                <fileName>contact-manager-service-api-v2.3.0.yaml</fileName>
+                            </inputMavenArtifact>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
+

@@ -28,7 +28,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testHtml2() throws MojoExecutionException {
+    void testHtml2() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
@@ -55,7 +55,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBoatDocs() throws MojoExecutionException {
+    void testBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -86,7 +86,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBoatDocsWithDirectory() throws MojoExecutionException {
+    void testBoatDocsWithDirectory() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
 
@@ -235,7 +235,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBeanValidation() throws MojoExecutionException {
+    void testBeanValidation() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
