@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>boat-artifact-input</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>artifact-input</artifactId>
+    <packaging>pom</packaging>
+
+    <name>BOAT :: Input artifact</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-docs-from-zip</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <inputMavenArtifact>
+                                <groupId>com.backbase.oss.boat.example</groupId>
+                                <artifactId>openapi-zips</artifactId>
+                                <version>1.0.0-SNAPSHOT</version>
+                                <classifier>api</classifier>
+                                <type>zip</type>
+                                <fileName>presentation-client-api/openapi.yaml</fileName>
+                            </inputMavenArtifact>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
+

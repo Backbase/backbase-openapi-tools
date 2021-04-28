@@ -11,9 +11,9 @@ import java.util.List;
 
 public class ArtifactRepositoryResolver {
 
-  private ArtifactResolver artifactResolver;
-  private RepositorySystemSession repositorySession;
-  private List<RemoteRepository> remoteRepositories;
+  private final ArtifactResolver artifactResolver;
+  private final RepositorySystemSession repositorySession;
+  private final List<RemoteRepository> remoteRepositories;
 
   public ArtifactRepositoryResolver(ArtifactResolver artifactResolver, RepositorySystemSession repositorySession, List<RemoteRepository> remoteRepositories) {
     this.artifactResolver = artifactResolver;
