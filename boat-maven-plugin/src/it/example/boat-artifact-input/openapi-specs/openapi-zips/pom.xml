@@ -29,7 +29,7 @@
                 </executions>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/assembly/build.xml</descriptor>
+                        <descriptor>${project.basedir}/src/assembly/build.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
