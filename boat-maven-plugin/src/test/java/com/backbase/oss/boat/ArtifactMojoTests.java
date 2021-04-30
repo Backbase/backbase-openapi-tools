@@ -103,6 +103,109 @@ public class ArtifactMojoTests {
     assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
 
   }
+  @Test
+  void testArtifactInputMojoDuplicateFile() throws ArtifactResolutionException, MojoFailureException, MojoExecutionException {
+    File file = getFile("/oas-examples/openapi-zips-1.0.0-SNAPSHOT-api.zip");
+    artifactResolver = mock(ArtifactResolver.class);
+    artifactResult = mock( ArtifactResult.class);
+    org.eclipse.aether.artifact.Artifact artifact = mock(org.eclipse.aether.artifact.Artifact.class);
+
+    when(artifactResolver.resolveArtifact(any(),any())).thenReturn(artifactResult);
+    when(artifactResult.getArtifact()).thenReturn(artifact);
+    when(artifact.getFile()).thenReturn(file);
+
+    GenerateDocMojo mojo = new GenerateDocMojo();
+    File output = new File("target/boat-docs");
+    if (!output.exists()) {
+      output.mkdirs();
+    }
+
+    DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+    defaultBuildContext.enableLogging(new ConsoleLogger());
+    InputArtifact inputArtifact = new InputArtifact();
+    inputArtifact.setVersion("1.0.0-SNAPSHOT");
+    inputArtifact.setGroupId("test.groupId");
+    inputArtifact.setArtifactId("openapi-zips");
+    inputArtifact.setClassifier("api");
+    inputArtifact.setType("zip");
+    inputArtifact.setFileName("openapi.yaml");
+
+    mojo.inputMavenArtifact=inputArtifact;
+    mojo.getLog();
+    mojo.buildContext = defaultBuildContext;
+    mojo.artifactResolver = artifactResolver;
+    Build build = new Build();
+    build.setDirectory("target");
+
+
+    MavenProject project = new MavenProject();
+
+    project.setBuild(build);
+    mojo.project = project;
+    mojo.repositorySession = mock(RepositorySystemSession.class);
+    mojo.output = output;
+    mojo.skip = false;
+    mojo.skipIfSpecIsUnchanged = false;
+    mojo.bundleSpecs = true;
+    mojo.dereferenceComponents = true;
+    mojo.execute();
+
+    assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
+
+  }
+
+  @Test
+  void testArtifactInputMojoFail() throws ArtifactResolutionException, MojoFailureException, MojoExecutionException {
+    File file = getFile("/oas-examples/openapi-zips-1.0.0-SNAPSHOT-api.zip");
+    artifactResolver = mock(ArtifactResolver.class);
+    artifactResult = mock( ArtifactResult.class);
+    org.eclipse.aether.artifact.Artifact artifact = mock(org.eclipse.aether.artifact.Artifact.class);
+
+    when(artifactResolver.resolveArtifact(any(),any())).thenReturn(artifactResult);
+    when(artifactResult.getArtifact()).thenReturn(artifact);
+    when(artifact.getFile()).thenReturn(file);
+
+    GenerateDocMojo mojo = new GenerateDocMojo();
+    File output = new File("target/boat-docs");
+    if (!output.exists()) {
+      output.mkdirs();
+    }
+
+    DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+    defaultBuildContext.enableLogging(new ConsoleLogger());
+    InputArtifact inputArtifact = new InputArtifact();
+    inputArtifact.setVersion("1.0.0-SNAPSHOT");
+    inputArtifact.setGroupId("test.groupId");
+    inputArtifact.setArtifactId("openapi-zips");
+    inputArtifact.setClassifier("api");
+    inputArtifact.setType("zip");
+    inputArtifact.setFileName("file-not-present.yaml");
+
+    mojo.inputMavenArtifact=inputArtifact;
+    mojo.getLog();
+    mojo.buildContext = defaultBuildContext;
+    mojo.artifactResolver = artifactResolver;
+    Build build = new Build();
+    build.setDirectory("target");
+
+
+    MavenProject project = new MavenProject();
+
+    project.setBuild(build);
+    mojo.project = project;
+    mojo.repositorySession = mock(RepositorySystemSession.class);
+    mojo.output = output;
+    mojo.skip = false;
+    mojo.skipIfSpecIsUnchanged = false;
+    mojo.bundleSpecs = true;
+    mojo.dereferenceComponents = true;
+
+    assertThrows(MojoExecutionException.class, mojo::execute);
+
+  }
+
+
+
   private File getFile(String fileName) {
     return new File(getClass().getResource(fileName).getFile());
   }
