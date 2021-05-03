@@ -30,7 +30,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String BASE_TYPE = "java.util.Set";
+    public static final String UNIQUE_BASE_TYPE = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
 
@@ -223,9 +223,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
         if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", BASE_TYPE);
+            this.typeMapping.put("set", UNIQUE_BASE_TYPE);
 
-            this.importMapping.put("Set", BASE_TYPE);
+            this.importMapping.put("Set", UNIQUE_BASE_TYPE);
             this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
         }
 
@@ -241,9 +241,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             p.containerType = "set";
-            p.baseType = BASE_TYPE;
-            p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
-            p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+            p.baseType = UNIQUE_BASE_TYPE;
+            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
             p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
         }
     }
@@ -258,9 +258,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
             }
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = BASE_TYPE;
-                p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
-                p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+                p.baseType = UNIQUE_BASE_TYPE;
+                p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+                p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
             }
         }
