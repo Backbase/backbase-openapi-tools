@@ -10,10 +10,10 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>boat-artifact-input</artifactId>
+    <artifactId>boat-multiple-executions</artifactId>
     <packaging>pom</packaging>
 
-    <name>BOAT :: DOCandLint</name>
+    <name>BOAT :: Execute multiple</name>
 
     <build>
         <plugins>
@@ -38,7 +38,7 @@
                             <goal>lint</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/presentation-client-api/openapi.yaml</inputSpec>
                         </configuration>
                     </execution>
                     <execution>
@@ -48,7 +48,7 @@
                             <goal>doc</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/contact-manager_contact-manager-service-api-v2.3.0.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/presentation-integration-api/openapi.yaml</inputSpec>
                         </configuration>
                     </execution>
                 </executions>

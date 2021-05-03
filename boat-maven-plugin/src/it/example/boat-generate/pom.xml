@@ -22,7 +22,7 @@
 
     <modules>
         <module>angular</module>
-<!--        <module>java-clients</module>-->
+        <module>java-clients</module>
         <module>java-server</module>
     </modules>
 
