@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.Generator;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -104,7 +105,7 @@ public class BoatYardGenerator extends AbstractDocumentationGenerator {
     private YardModel getYardModel() {
         YardModel yardModel;
 
-        Constructor constructor = new Constructor(YardModel.class);
+        Constructor constructor = new Constructor(YardModel.class, new LoaderOptions());
 
         Yaml yaml = new Yaml(constructor);
         try {
