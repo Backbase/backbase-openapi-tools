@@ -46,10 +46,10 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
     {{/useLombokAnnotations}}
     {{#isContainer}}
     {{#openApiNullable}}
-    private {{>nullableDataType}} {{name}} = {{#isNullable}}JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}}{{/isNullable}};
+    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}} = {{#isNullable}}JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
-    private {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
+    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
     {{/openApiNullable}}
     {{/isContainer}}
     {{^isContainer}}
@@ -60,10 +60,10 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
     @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
     {{/isDateTime}}
     {{#openApiNullable}}
-    private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
-    private {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
     {{/isContainer}}
 
