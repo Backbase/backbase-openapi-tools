@@ -23,6 +23,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public static final String USE_DEFAULT_API_CLIENT = "useDefaultApiClient";
     public static final String REST_TEMPLATE_BEAN_NAME = "restTemplateBeanName";
     public static final String CREATE_API_COMPONENT = "createApiComponent";
+    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
 
     private static final String JAVA_UTIL_SET_NEW = "new " + "java.util.LinkedHashSet<>()";
     private static final String JAVA_UTIL_SET = "java.util.Set";
@@ -67,6 +68,8 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             "An optional RestTemplate bean name"));
         this.cliOptions.add(CliOption.newString(CREATE_API_COMPONENT,
             "Whether to generate the client as a Spring component"));
+        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
+            "Whether to use protected visibility for model fields"));
     }
 
     @Override
@@ -124,6 +127,11 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
                 this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
             }
             writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
+        }
+        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
+            this.additionalProperties.put("modelFieldsVisibility", "protected");
+        } else {
+            this.additionalProperties.put("modelFieldsVisibility", "private");
         }
 
         if (!getLibrary().startsWith("jersey")) {

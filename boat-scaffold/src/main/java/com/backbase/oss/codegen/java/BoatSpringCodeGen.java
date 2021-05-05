@@ -30,6 +30,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
+    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
     public static final String UNIQUE_BASE_TYPE = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
@@ -136,7 +137,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
-                "Adds a Binding result as method perimeter. Only implemented if @validate is being used.", this.addBindingResult));
+            "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
+            this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
@@ -145,6 +147,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
+        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
+            "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
     }
@@ -212,6 +216,11 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
+        }
+        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
+            this.additionalProperties.put("modelFieldsVisibility", "protected");
+        } else {
+            this.additionalProperties.put("modelFieldsVisibility", "private");
         }
 
         writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);

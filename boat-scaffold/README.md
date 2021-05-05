@@ -14,6 +14,7 @@ The `boat` plugin has multiple goals:
 | `useSetForUniqueItems` | `false` | Use `java.util.Set` for arrays that has the attribute `uniqueItems` to `true` |
 | `openApiNullable` | `true` | Whether to use the `jackson-databind-nullable` library |
 | `useWithModifiers` | `false` | Generates bean `with` modifiers for fluent style |
+| `useProtectedFields` | `false` | "Whether to use protected visibility for model fields |
 
 ## Java Code Generator
 
@@ -24,3 +25,4 @@ The `boat` plugin has multiple goals:
 | `useClassLevelBeanValidation` | `false` | Adds @Validated annotation to API interfaces |
 | `useJacksonConversion` | `false` | Use Jackson to convert query parameters (`resttemplate` only) |
 | `useSetForUniqueItems` | `false` | Use `java.util.Set` for arrays that has the attribute `uniqueItems` to `true` |
+| `useProtectedFields` | `false` | "Whether to use protected visibility for model fields |
