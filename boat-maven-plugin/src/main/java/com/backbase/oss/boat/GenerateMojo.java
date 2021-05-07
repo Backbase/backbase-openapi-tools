@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -524,6 +525,11 @@ public class GenerateMojo extends AbstractMojo {
                         break;
 
                     default:
+                        String message = format("Input spec %s matches more than one single file", inputSpec);
+                        getLog().error(message);
+                        Stream.of(files).forEach(f -> {
+                            getLog().error(format("    %s", f));
+                        });
                         throw new MojoExecutionException(
                             format("Input spec %s matches more than one single file", inputSpec));
                 }
