@@ -64,6 +64,8 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     @Parameter(name = "addChangeLog", defaultValue = "true")
     private boolean addChangeLog;
 
+    public void setSpecBom(Dependency specBom){this.specBom = specBom;}
+
 
     @Override
     public void execute() throws MojoExecutionException {
