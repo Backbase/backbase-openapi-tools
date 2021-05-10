@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
 @ExtendWith(MockitoExtension.class)
-public class ExportBomMojoTests {
+class ExportBomMojoTests {
   @Mock
   ArtifactResolver artifactResolver;
   @Mock
@@ -83,7 +83,7 @@ public class ExportBomMojoTests {
     mojo.repositorySession = mock(RepositorySystemSession.class);
     mojo.execute();
 
-    assertThat(output.list().length).isZero();
+    assertThat(output.list()).isEmpty();
   }
 
   @Test
@@ -145,7 +145,7 @@ public class ExportBomMojoTests {
     mojo.repositorySession = mock(RepositorySystemSession.class);
     mojo.execute();
 
-    assertThat(output.list().length).isZero();
+    assertThat(output.list()).isEmpty();
 
   }
   private File getFile(String fileName) {
