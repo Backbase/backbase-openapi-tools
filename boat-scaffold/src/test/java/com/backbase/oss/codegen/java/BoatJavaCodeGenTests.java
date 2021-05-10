@@ -4,6 +4,7 @@ import static com.backbase.oss.codegen.java.BoatJavaCodeGen.*;
 import java.util.Map;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,6 +91,31 @@ class BoatJavaCodeGenTests {
     }
 
     @Test
+    void processOptsCreateApiComponent() {
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        final Map<String, Object> options = gen.additionalProperties();
+
+        options.put(CREATE_API_COMPONENT, "false");
+
+        gen.setLibrary("resttemplate");
+        gen.processOpts();
+
+        assertThat(gen.createApiComponent, is(false));
+    }
+
+    @Test
+    void processOptsUseProtectedFields() {
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        final Map<String, Object> options = gen.additionalProperties();
+
+        options.put(USE_PROTECTED_FIELDS, "true");
+
+        gen.processOpts();
+
+        assertThat(gen.additionalProperties(), hasEntry("modelFieldsVisibility", "protected"));
+    }
+
+    @Test
     void uniquePropertyToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenProperty prop = new CodegenProperty();
@@ -127,4 +153,5 @@ class BoatJavaCodeGenTests {
         assertThat(param.baseType, is("java.util.Set"));
         assertThat(param.dataType, is("java.util.Set<String>"));
     }
+
 }
