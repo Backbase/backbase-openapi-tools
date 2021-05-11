@@ -3,11 +3,12 @@ package com.backbase.oss.boat;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 
 public abstract class AbstractGenerateMojo extends GenerateMojo {
 
     public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive, boolean generateSupportingFiles)
-        throws MojoExecutionException {
+            throws MojoExecutionException, MojoFailureException {
         Map<String, String> options = new HashMap<>();
         options.put("library", library);
         options.put("java8", "true");

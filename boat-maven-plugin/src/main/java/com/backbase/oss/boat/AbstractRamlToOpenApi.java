@@ -40,9 +40,6 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.MetadataResolver;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -465,23 +462,6 @@ abstract class AbstractRamlToOpenApi extends AbstractMojo {
 
     public void setServers(List<Server> servers) {
         this.servers = servers;
-    }
-
-    public ArtifactResult resolveArtifactFromRepositories(org.eclipse.aether.artifact.Artifact artifact) {
-        ArtifactRequest artifactRequest = getArtifactRequest(artifact);
-
-        ArtifactResult artifactResult = null;
-        try {
-            artifactResult = artifactResolver.resolveArtifact(repositorySession, artifactRequest);
-        } catch (ArtifactResolutionException e) {
-            throw new IllegalArgumentException("Cannot resolve artifact: " + artifact);
-        }
-        return artifactResult;
-
-    }
-
-    private ArtifactRequest getArtifactRequest(org.eclipse.aether.artifact.Artifact artifact) {
-        return new ArtifactRequest(artifact, remoteRepositories, null);
     }
 
     protected DefaultArtifact createNewDefaultArtifact(Dependency dependency) {

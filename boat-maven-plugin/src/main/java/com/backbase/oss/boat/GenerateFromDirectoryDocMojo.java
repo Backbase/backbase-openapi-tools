@@ -2,6 +2,7 @@ package com.backbase.oss.boat;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 
@@ -12,12 +13,21 @@ import java.io.File;
 @Slf4j
 public class GenerateFromDirectoryDocMojo extends GenerateMojo {
 
+
   @Override
-  public void execute() throws MojoExecutionException {
+  public void execute() throws MojoExecutionException, MojoFailureException {
+    if (inputSpec != null) {
+      File inputSpecFile = new File(inputSpec);
+      fileInputExecute(inputSpecFile);
+    } else {
+      log.info("Input read as Artifact");
+      super.execute();
+    }
+  }
 
-    File inputSpecFile = new File(inputSpec);
+  private void fileInputExecute(File inputSpecFile) throws MojoExecutionException, MojoFailureException {
 
-    if (inputSpecFile.isDirectory()){
+    if (inputSpecFile.isDirectory()) {
       log.info("inputSpec is being read as a directory");
 
       File[] inputSpecs;
@@ -29,11 +39,11 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
         throw new MojoExecutionException("No OpenAPI specs found in: " + inputSpec);
       }
 
-      for(File f : inputSpecs){
+      for (File f : inputSpecs) {
         inputSpec = f.getPath();
-        output = new File(outPutDirectory.getPath(),f.getName().substring(0,f.getName().lastIndexOf(".")).concat("-docs"));
+        output = new File(outPutDirectory.getPath(), f.getName().substring(0, f.getName().lastIndexOf(".")).concat("-docs"));
 
-        if(!output.exists()){
+        if (!output.exists()) {
           output.mkdir();
         }
 
@@ -41,7 +51,7 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
         super.execute();
       }
 
-    }else {
+    } else {
 
       log.info("inputSpec being read as a single file");
       super.execute();
