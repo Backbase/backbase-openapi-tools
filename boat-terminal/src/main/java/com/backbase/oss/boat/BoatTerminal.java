@@ -1,6 +1,5 @@
 package com.backbase.oss.boat;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.backbase.oss.boat.BoatTerminal.VersionProvider;
 import com.backbase.oss.boat.serializer.SerializerUtils;
@@ -15,6 +14,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ import picocli.CommandLine.Parameters;
     mixinStandardHelpOptions = true,
     sortOptions = false)
 @Slf4j
-public class BoatTerminal implements Runnable {
+public class BoatTerminal implements Callable<Integer> {
 
     static class VersionProvider implements IVersionProvider {
         @Override
@@ -61,7 +61,7 @@ public class BoatTerminal implements Runnable {
         System.exit(run(args));
     }
 
-    static int run(String[] args) {
+    static int run(String... args) {
         return new CommandLine(new BoatTerminal())
             .addSubcommand("completion", new GenerateCompletion())
             .execute(args);
@@ -69,8 +69,8 @@ public class BoatTerminal implements Runnable {
 
     private final Logger root;
 
-    public Level getRootLevel() {
-        return root.getLevel();
+    public ch.qos.logback.classic.Level getRootLevel() {
+        return this.root.getLevel();
     }
 
     public BoatTerminal() {
@@ -117,15 +117,27 @@ public class BoatTerminal implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Integer call() {
         try {
             execute();
+
+            return 0;
+        } catch (final FileNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage(), e);
+            } else {
+                log.error(e.getMessage());
+            }
+
+            return -2; // ENOENT
         } catch (final Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug(e.getMessage(), e);
             } else {
                 log.error(e.getMessage());
             }
+
+            return -1;
         }
     }
 
