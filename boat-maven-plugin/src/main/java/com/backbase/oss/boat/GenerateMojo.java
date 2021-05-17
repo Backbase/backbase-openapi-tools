@@ -508,12 +508,11 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
                     default:
                         String message = format("Input spec %s matches more than one single file", inputSpec);
+
                         getLog().error(message);
-                        Stream.of(files).forEach(f -> {
-                            getLog().error(format("    %s", f));
-                        });
-                        throw new MojoExecutionException(
-                            format("Input spec %s matches more than one single file", inputSpec));
+                        Stream.of(files).forEach(f -> getLog().error(format("    %s", f)));
+
+                        throw new MojoExecutionException(message);
                 }
             } catch (IOException e) {
                 throw new MojoExecutionException("Cannot find input " + inputSpec);

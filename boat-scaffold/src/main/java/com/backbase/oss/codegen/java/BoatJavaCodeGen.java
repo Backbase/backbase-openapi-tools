@@ -81,16 +81,26 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
-        if (WEBCLIENT.equals(getLibrary())) {
-            this.useSetForUniqueItems = false;
-        }
-
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
-        if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
+        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
+            this.additionalProperties.put("modelFieldsVisibility", "protected");
+        } else {
+            this.additionalProperties.put("modelFieldsVisibility", "private");
+        }
+
+        processUniqueItemsOpt();
+        processRestTemplateOpts();
+        processJerseyOpts();
+    }
+
+    private void processUniqueItemsOpt() {
+        if (WEBCLIENT.equals(getLibrary())) {
+            this.useSetForUniqueItems = false;
+        } else if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
             this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
         }
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
@@ -101,39 +111,40 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             this.importMapping.put("Set", JAVA_UTIL_SET);
             this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
         }
+    }
 
-        if (RESTTEMPLATE.equals(getLibrary())) {
-            if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
-                this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
-            }
-            writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
-
-            if (this.additionalProperties.containsKey(USE_JACKSON_CONVERSION)) {
-                this.useJacksonConversion = convertPropertyToBoolean(USE_JACKSON_CONVERSION);
-            }
-            writePropertyBack(USE_JACKSON_CONVERSION, this.useJacksonConversion);
-            if (this.useJacksonConversion) {
-                this.supportingFiles.removeIf(f -> f.templateFile.equals("RFC3339DateFormat.mustache"));
-            }
-
-            if (this.additionalProperties.containsKey(USE_DEFAULT_API_CLIENT)) {
-                this.useDefaultApiClient = convertPropertyToBoolean(USE_DEFAULT_API_CLIENT);
-            }
-            writePropertyBack(USE_DEFAULT_API_CLIENT, this.useDefaultApiClient);
-
-            this.restTemplateBeanName = (String) this.additionalProperties.get(REST_TEMPLATE_BEAN_NAME);
-
-            if (this.additionalProperties.containsKey(CREATE_API_COMPONENT)) {
-                this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
-            }
-            writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
-        }
-        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
-            this.additionalProperties.put("modelFieldsVisibility", "protected");
-        } else {
-            this.additionalProperties.put("modelFieldsVisibility", "private");
+    private void processRestTemplateOpts() {
+        if (!RESTTEMPLATE.equals(getLibrary())) {
+            return;
         }
 
+        if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
+            this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
+        }
+        writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
+
+        if (this.additionalProperties.containsKey(USE_JACKSON_CONVERSION)) {
+            this.useJacksonConversion = convertPropertyToBoolean(USE_JACKSON_CONVERSION);
+        }
+        writePropertyBack(USE_JACKSON_CONVERSION, this.useJacksonConversion);
+        if (this.useJacksonConversion) {
+            this.supportingFiles.removeIf(f -> f.templateFile.equals("RFC3339DateFormat.mustache"));
+        }
+
+        if (this.additionalProperties.containsKey(USE_DEFAULT_API_CLIENT)) {
+            this.useDefaultApiClient = convertPropertyToBoolean(USE_DEFAULT_API_CLIENT);
+        }
+        writePropertyBack(USE_DEFAULT_API_CLIENT, this.useDefaultApiClient);
+
+        this.restTemplateBeanName = (String) this.additionalProperties.get(REST_TEMPLATE_BEAN_NAME);
+
+        if (this.additionalProperties.containsKey(CREATE_API_COMPONENT)) {
+            this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
+        }
+        writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
+    }
+
+    private void processJerseyOpts() {
         if (!getLibrary().startsWith("jersey")) {
             this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerConfiguration.mustache"));
             this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerVariable.mustache"));
