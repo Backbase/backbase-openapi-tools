@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;{{/fullJavaUtil}}
 
-import org.springframework.beans.factory.annotation.Autowired;
+{{#createApiComponent}}import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+{{/createApiComponent}}
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
@@ -33,15 +34,15 @@ import org.springframework.validation.annotation.Validated;
 {{/useBeanValidation}}
 
 {{>generatedAnnotation}}
-@Component("{{package}}.{{classname}}")
-{{#operations}}
-{{#useBeanValidation}}{{!
+{{#createApiComponent}}@Component("{{package}}.{{classname}}")
+{{/createApiComponent}}{{!
+}}{{#useBeanValidation}}{{!
 }}{{#useClassLevelBeanValidation}}{{!
 }}@Validated
 {{/useClassLevelBeanValidation}}{{!
 }}{{/useBeanValidation}}
 public class {{classname}} {
-    private {{^useDefaultApiClient}}final {{/useDefaultApiClient}}ApiClient apiClient;
+    private {{#useDefaultApiClient}}final {{/useDefaultApiClient}}ApiClient apiClient;
 
 {{^useDefaultApiClient}}
     public {{classname}}() {
@@ -49,8 +50,8 @@ public class {{classname}} {
     }
 {{/useDefaultApiClient}}
 
-    @Autowired
-    public {{classname}}(ApiClient apiClient) {
+{{#createApiComponent}}    @Autowired
+{{/createApiComponent}}    public {{classname}}(ApiClient apiClient) {
         this.apiClient = apiClient;
     }
 
@@ -64,6 +65,7 @@ public class {{classname}} {
     }
 {{/useDefaultApiClient}}
 
+{{#operations}}
     {{#operation}}
     /**
      * {{summary}}
@@ -162,5 +164,5 @@ public class {{classname}} {
         return apiClient.invokeAPI(localVarPath, HttpMethod.{{httpMethod}}, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
     }
     {{/operation}}
-}
 {{/operations}}
+}
