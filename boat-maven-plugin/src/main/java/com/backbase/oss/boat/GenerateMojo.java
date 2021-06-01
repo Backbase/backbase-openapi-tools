@@ -31,15 +31,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConfig;
@@ -77,7 +77,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 @SuppressWarnings({"DefaultAnnotationParam", "java:S3776", "java:S5411"})
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 @Slf4j
-public class GenerateMojo extends AbstractMojo {
+public class GenerateMojo extends InputMavenArtifactMojo {
 
     private static String trimCSV(String text) {
         if (isNotEmpty(text)) {
@@ -135,21 +135,6 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(name = "copyTo", defaultValue = "${project.build.outputDirectory}/META-INF/openapi/openapi.yaml")
     protected File copyTo;
 
-
-    /**
-     * Location of the OpenAPI spec, as URL or local file glob pattern.
-     * <p>
-     * If the input is a local file, the value of this property is considered a glob pattern that must
-     * resolve to a unique file.
-     * </p>
-     * <p>
-     * The glob pattern allows to express the input specification in a version neutral way. For
-     * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
-     * {@code my-service-api-v*.yaml}.
-     * </p>
-     */
-    @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = true)
-    protected String inputSpec;
 
     /**
      * Git host, e.g. gitlab.com.
@@ -486,11 +471,7 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(name = "writeDebugFiles")
     protected boolean writeDebugFiles = false;
 
-    /**
-     * The project being built.
-     */
-    @Parameter(readonly = true, required = true, defaultValue = "${project}")
-    protected MavenProject project;
+
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
@@ -498,13 +479,15 @@ public class GenerateMojo extends AbstractMojo {
 
     @Override
     @SuppressWarnings({"java:S3776", "java:S1874"})
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+
         if (skip) {
             getLog().info("Code generation is skipped.");
             return;
         }
 
 
+        super.execute();
 
         File inputSpecFile = new File(inputSpec);
         File inputParent = inputSpecFile.getParentFile();
@@ -524,6 +507,11 @@ public class GenerateMojo extends AbstractMojo {
                         break;
 
                     default:
+                        String message = format("Input spec %s matches more than one single file", inputSpec);
+                        getLog().error(message);
+                        Stream.of(files).forEach(f -> {
+                            getLog().error(format("    %s", f));
+                        });
                         throw new MojoExecutionException(
                             format("Input spec %s matches more than one single file", inputSpec));
                 }

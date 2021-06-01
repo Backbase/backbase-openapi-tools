@@ -2,9 +2,12 @@ package com.backbase.oss.boat.loader;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -55,6 +58,10 @@ public class OpenAPILoader {
     }
 
     public static OpenAPI load(String url, boolean resolveFully, boolean flatten) throws OpenAPILoaderException {
+        return load(url, resolveFully, flatten, null);
+    }
+
+    public static OpenAPI load(String url, boolean resolveFully, boolean flatten, List<AuthorizationValue> auth) throws OpenAPILoaderException {
         log.debug("Reading OpenAPI from: {} resolveFully: {}", url, resolveFully);
         OpenAPIV3Parser openAPIParser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
@@ -64,7 +71,7 @@ public class OpenAPILoader {
         parseOptions.setFlattenComposedSchemas(true);
         parseOptions.setResolveCombinators(true);
 
-        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(url, null, parseOptions);
+        SwaggerParseResult swaggerParseResult = openAPIParser.readLocation(url, auth, parseOptions);
         if (swaggerParseResult.getOpenAPI() == null) {
             log.error("Could not load OpenAPI from : {} \n{}", url, String.join("\t\n", swaggerParseResult.getMessages()));
             throw new OpenAPILoaderException("Could not load open api from :" + url, swaggerParseResult.getMessages());

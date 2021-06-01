@@ -22,6 +22,8 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
     public static final String USE_DEFAULT_API_CLIENT = "useDefaultApiClient";
     public static final String REST_TEMPLATE_BEAN_NAME = "restTemplateBeanName";
+    public static final String CREATE_API_COMPONENT = "createApiComponent";
+    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
 
     private static final String JAVA_UTIL_SET_NEW = "new " + "java.util.LinkedHashSet<>()";
     private static final String JAVA_UTIL_SET = "java.util.Set";
@@ -45,6 +47,9 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     @Getter
     @Setter
     protected String restTemplateBeanName;
+    @Getter
+    @Setter
+    protected boolean createApiComponent = true;
 
     public BoatJavaCodeGen() {
         this.embeddedTemplateDir = this.templateDir = NAME;
@@ -61,6 +66,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             "Whether to use a default ApiClient with a builtin template", this.useDefaultApiClient));
         this.cliOptions.add(CliOption.newString(REST_TEMPLATE_BEAN_NAME,
             "An optional RestTemplate bean name"));
+        this.cliOptions.add(CliOption.newString(CREATE_API_COMPONENT,
+            "Whether to generate the client as a Spring component"));
+        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
+            "Whether to use protected visibility for model fields"));
     }
 
     @Override
@@ -113,6 +122,16 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             writePropertyBack(USE_DEFAULT_API_CLIENT, this.useDefaultApiClient);
 
             this.restTemplateBeanName = (String) this.additionalProperties.get(REST_TEMPLATE_BEAN_NAME);
+
+            if (this.additionalProperties.containsKey(CREATE_API_COMPONENT)) {
+                this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
+            }
+            writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
+        }
+        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
+            this.additionalProperties.put("modelFieldsVisibility", "protected");
+        } else {
+            this.additionalProperties.put("modelFieldsVisibility", "private");
         }
 
         if (!getLibrary().startsWith("jersey")) {
@@ -142,11 +161,11 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             // XXX the model set baseType to the container type, why is this different?
 
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-                p.baseType = JAVA_UTIL_SET;
-                p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-                p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-                p.defaultValue = JAVA_UTIL_SET_NEW;
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
+            p.baseType = JAVA_UTIL_SET;
+            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
+            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
+            p.defaultValue = JAVA_UTIL_SET_NEW;
 
         }
     }

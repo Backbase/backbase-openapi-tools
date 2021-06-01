@@ -28,7 +28,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testHtml2() throws MojoExecutionException {
+    void testHtml2() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
@@ -55,7 +55,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBoatDocs() throws MojoExecutionException {
+    void testBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -83,6 +83,36 @@ class GeneratorTests {
         mojo.execute();
 
         assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
+    }
+
+    @Test
+    void testBoatDocsWithDirectory() throws MojoExecutionException, MojoFailureException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs-directory");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.execute();
+        assertThat(output.list()).containsExactlyInAnyOrder("link-docs", "petstore-docs", "petstore-new-non-breaking-docs", "upto-docs");
     }
 
     @Test
@@ -205,7 +235,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBeanValidation() throws MojoExecutionException {
+    void testBeanValidation() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
