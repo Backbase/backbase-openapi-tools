@@ -52,7 +52,6 @@ public class BoatDocsGenerator extends org.openapitools.codegen.languages.Static
         typeAliases = new HashMap<>();
     }
 
-
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);

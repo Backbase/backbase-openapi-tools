@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>example</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>boat-bay</artifactId>
+
+    <name>BOAT :: Boat Bay</name>
+
+    <description>
+        Example projects showing how BOAT uses Boat bay to help you lint and validate specs
+    </description>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>lint-petstore</module>
+        <module>lint-petstore-non-breaking</module>
+        <module>lint-petstore-breaking</module>
+        <module>validate-petstore</module>
+    </modules>
+
+</project>

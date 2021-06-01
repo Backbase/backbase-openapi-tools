@@ -3,11 +3,7 @@ package com.backbase.oss.codegen.java;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.DynamicContainer.*;
 import static org.junit.jupiter.api.DynamicTest.*;
 import static java.util.stream.Collectors.joining;
@@ -24,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -38,6 +35,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.Generator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
@@ -264,7 +262,10 @@ class BoatSpringTemplatesTests {
     }
 
     private List<File> generateFrom(String templates) {
-        final File input = new File("src/test/resources/boat-spring/openapi.yaml");
+        final File input = new File(Objects.requireNonNull(this.getClass().getResource("/boat-spring/openapi.yaml")).getFile());
+        if(!input.exists()) {
+            throw new IllegalStateException("Input file does not exist");
+        }
         final CodegenConfigurator gcf = new CodegenConfigurator();
 
         gcf.setGeneratorName(BoatSpringCodeGen.NAME);
@@ -344,6 +345,7 @@ class BoatSpringTemplatesTests {
 
         final ClientOptInput coi = gcf.toClientOptInput();
 
-        return new DefaultGenerator().opts(coi).generate();
+        Generator opts = new DefaultGenerator().opts(coi);
+        return opts.generate();
     }
 }

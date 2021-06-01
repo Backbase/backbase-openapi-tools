@@ -62,34 +62,6 @@ class BundleMojoTest {
     }
 
     @Test
-    @SneakyThrows
-    void testVersionFileName() {
-        BundleMojo mojo = new BundleMojo();
-
-        assertEquals(
-            "payment-order-client-api-v2.0.0.yaml",
-            mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("2.0.0")));
-    }
-
-    @Test
-    @SneakyThrows
-    void testNoInfoInApi() {
-        BundleMojo mojo = new BundleMojo();
-
-        assertThrows(MojoExecutionException.class, () ->
-            mojo.versionFileName("payment-order-client-api-v2.yaml", new OpenAPI()));
-    }
-
-    @Test
-    @SneakyThrows
-    void testNoVersionInfoInApi() {
-        BundleMojo mojo = new BundleMojo();
-
-        assertThrows(MojoExecutionException.class, () ->
-            mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion(null)));
-    }
-
-    @Test
     void testSetVersionAttribute() throws MojoFailureException, MojoExecutionException, IOException {
         File output = getFile("/readWriteFiles/output.yaml");
         BundleMojo mojo = new BundleMojo();
@@ -100,17 +72,6 @@ class BundleMojoTest {
 
         String outputApi = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
         assertTrue(outputApi.contains("version: 3.0.0"));
-    }
-
-    @Test
-    @SneakyThrows
-    void testInvalidVersionInApi() {
-        BundleMojo mojo = new BundleMojo();
-
-        OpenAPI openAPI = new OpenAPI();
-        openAPI.setInfo(new Info());
-        assertThrows(MojoExecutionException.class, () ->
-            mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("3.0.0")));
     }
 
 

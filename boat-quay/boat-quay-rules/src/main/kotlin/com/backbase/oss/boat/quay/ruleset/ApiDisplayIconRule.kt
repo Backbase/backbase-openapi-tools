@@ -1,6 +1,5 @@
 package com.backbase.oss.boat.quay.ruleset
 
-import com.typesafe.config.Config
 import org.zalando.zally.core.toJsonPointer
 import org.zalando.zally.rule.api.*
 

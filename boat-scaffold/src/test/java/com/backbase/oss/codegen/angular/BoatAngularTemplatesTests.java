@@ -186,7 +186,10 @@ class BoatAngularTemplatesTests {
     }
 
     private List<File> generateFrom(String templates) {
-        final File input = new File("src/test/resources/boat-spring/openapi.yaml");
+        final File input = new File(Objects.requireNonNull(this.getClass().getResource("/boat-spring/openapi.yaml")).getFile());
+        if(!input.exists()) {
+            throw new IllegalStateException("Input file does not exist");
+        }
         final CodegenConfigurator cf = new CodegenConfigurator();
 
         cf.setGeneratorName(BoatAngularGenerator.NAME);
