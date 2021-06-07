@@ -23,7 +23,7 @@ defined on openapi-generator-maven-plugin can be applied here too.
 
 Boat maven plugin uses slightly modified templates for html, java and webclient that help generate specs and clients that work best in a Backbase projects.
 
-All inputSpec parameters for this goal may additionally be configured as an artifact. See [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter) or integration tests for examples.
+All inputSpec parameters for this goal may additionally be configured as an artifact. See [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter) or [integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-artifact-input) for examples.
 
 ## boat:generate-spring-boot-embedded
 
