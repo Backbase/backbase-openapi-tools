@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+    <pluginExecutions>
+        <pluginExecution>
+            <pluginExecutionFilter>
+                <goals>
+                    <goal>generate</goal>
+                    <goal>generate-rest-template-embedded</goal>
+                    <goal>generate-spring-boot-embedded</goal>
+                    <goal>generate-webclient-embedded</goal>
+                    <goal>transform</goal>
+                </goals>
+            </pluginExecutionFilter>
+            <action>
+                <execute>
+                    <runOnIncremental>true</runOnIncremental>
+                    <runOnConfiguration>true</runOnConfiguration>
+                </execute>
+            </action>
+        </pluginExecution>
+        <pluginExecution>
+            <pluginExecutionFilter>
+                <goals>
+                    <goal>bundle</goal>
+                    <goal>decompose</goal>
+                    <goal>diff</goal>
+                    <goal>export-bom</goal>
+                    <goal>export-dep</goal>
+                    <goal>lint</goal>
+                    <goal>remove-deprecated</goal>
+                    <goal>yard</goal>
+                </goals>
+            </pluginExecutionFilter>
+            <action>
+                <ignore />
+            </action>
+        </pluginExecution>
+    </pluginExecutions>
+</lifecycleMappingMetadata>
