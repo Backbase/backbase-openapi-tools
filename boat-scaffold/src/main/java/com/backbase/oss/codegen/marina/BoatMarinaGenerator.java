@@ -55,6 +55,7 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator {
         this.supportingFiles.add(new SupportingFile("backbase-logo.svg", "backbase-logo.svg"));
 
         this.supportingFiles.add(new SupportingFile("index.js.mustache", "spec/index.js"));
+        this.supportingFiles.add(new SupportingFile("models.js.mustache", "spec/models.js"));
 
 //        this.apiTemplateFiles.put("api.js.mustache", ".js");
 //        this.modelTemplateFiles.put("model.js.mustache", ".js");
