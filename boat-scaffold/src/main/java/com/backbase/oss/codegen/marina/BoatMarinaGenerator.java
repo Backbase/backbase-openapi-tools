@@ -26,7 +26,8 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
         additionalProperties.put("licenseInfo", "All rights reserved");
         additionalProperties.put("licenseUrl", "http://apache.org/licenses/LICENSE-2.0.html");
         typeAliases = new HashMap<>();
-        setTemplatingEngine(new HandlebarsEngineAdapter());
+        HandlebarsEngineAdapter templatingEngine = new BoatHandlebarsEngineAdapter();
+        setTemplatingEngine(templatingEngine);
     }
 
     @Override
