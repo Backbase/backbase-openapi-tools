@@ -2,9 +2,8 @@
     <nav id="scrollingNav">
         <ul class="sidenav nav nav-list">
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API ENDPOINTS</a></li>
-            {{#apiInfo}}
-                {{#apis}}
-                    {{#operations}}
+            {{#each apiInfo.apis}}
+                    {{#with operations}}
                         <li class="nav-header" data-group="{{baseName}}"><a href="#api-{{baseName}}">{{baseName}}</a>
                         </li>
                         {{#operation}}
@@ -24,9 +23,8 @@
                                 </a>
                             </li>
                         {{/operation}}
-                    {{/operations}}
-                {{/apis}}
-            {{/apiInfo}}
+                    {{/with}}
+            {{/each}}
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">MODELS</a></li>
 
             <li class="nav-header" data-group="structures"><a href="#models-structures">structures</a></li>

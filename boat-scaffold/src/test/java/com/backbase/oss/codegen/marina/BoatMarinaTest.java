@@ -27,9 +27,9 @@ class BoatMarinaTest {
         if (spec != null) {
             generateDocs(new File(spec));
         } else {
-            generateDocs(getFile("/oas-examples/petstore.yaml"));
+            generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
-        String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
+//        String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
     }
 
     @Test

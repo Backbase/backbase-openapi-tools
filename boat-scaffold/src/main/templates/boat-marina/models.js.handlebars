@@ -5,18 +5,14 @@ This file contains all the model definitions found in the OpenAPI.
 
 var models = {}
 var enums = {}
-{{#models}}
-    {{#model}}
+{{#each models}}
+    {{#with model}}
         {{^isEnum}}
-models["{{name}}"] = {{{modelJson}}};
-        {{/isEnum}}
-    {{/model}}
-{{/models}}
-{{#models}}
-    {{#model}}
-        {{#isEnum}}
             models["{{name}}"] = {{{modelJson}}};
         {{/isEnum}}
-    {{/model}}
-{{/models}}
+        {{#isEnum}}
+        models["{{name}}"] = {{{modelJson}}};
+        {{/isEnum}}
+    {{/with}}
+{{/each}}
 
