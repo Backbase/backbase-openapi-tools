@@ -33,8 +33,6 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ObjectReader paramReader = BoatStaticDocsGenerator.objectMapper.readerFor(new TypeReference<List<String>>() {
     });
-    protected Boolean generateAliasModel = true;
-
     public BoatStaticDocsGenerator() {
         super();
     }

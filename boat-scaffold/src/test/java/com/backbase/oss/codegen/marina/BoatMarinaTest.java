@@ -57,7 +57,7 @@ class BoatMarinaTest {
         log.info("Generate docs for: {}", spec);
         OpenAPI openAPI = null;
         try {
-            openAPI = OpenAPILoader.load(spec, true, true);
+            openAPI = OpenAPILoader.load(spec, false, false);
         } catch (OpenAPILoaderException e) {
             log.error("Failed to load open api: {}", spec, e);
             System.exit(1);

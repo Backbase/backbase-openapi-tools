@@ -18,7 +18,7 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
         super();
         embeddedTemplateDir = templateDir = NAME;
         cliOptions.add(new CliOption(CodegenConstants.GENERATE_ALIAS_AS_MODEL, CodegenConstants.GENERATE_ALIAS_AS_MODEL));
-        additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, generateAliasModel);
+        additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, true);
         additionalProperties.put("appName", "BOAT Marina Documentation");
         additionalProperties.put("appDescription", "For a collection of doc(k)s");
         additionalProperties.put("infoUrl", "https://backbase.github.io/backbase-openapi-tools/");

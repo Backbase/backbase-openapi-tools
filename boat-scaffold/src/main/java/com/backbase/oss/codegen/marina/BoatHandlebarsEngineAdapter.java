@@ -49,9 +49,9 @@ public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
         });
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//        objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+//        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Helper<Object> instance = new Jackson2Helper(objectMapper);
         handlebars.registerHelper("json", instance);

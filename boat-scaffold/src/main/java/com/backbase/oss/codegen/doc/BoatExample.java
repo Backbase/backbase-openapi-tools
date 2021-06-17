@@ -39,7 +39,11 @@ public class BoatExample {
                 || example.getValue() instanceof HashMap) {
             return Json.pretty(example.getValue());
         } else {
-            return example.getValue().toString();
+            if (example.getValue() != null) {
+                return example.getValue().toString();
+            } else {
+                return null;
+            }
         }
     }
 }
