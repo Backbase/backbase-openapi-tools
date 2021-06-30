@@ -38,6 +38,8 @@ public class BoatExample {
         if (example.getValue() instanceof JsonNode
                 || example.getValue() instanceof HashMap) {
             return Json.pretty(example.getValue());
+        } else if (example.getValue() == null) {
+            return "";
         } else {
             return example.getValue().toString();
         }
