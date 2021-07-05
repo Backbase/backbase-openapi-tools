@@ -41,12 +41,10 @@ const data = {
 {{/each}}
 
 
-{{#swagger.vendorExtensions.x-shared-errors}}
-    {
+{{#each swagger.vendorExtensions.x-shared-errors}}
     let err = {{{json .}}};
     data["errors"][err.errorID] = err;
-    }
-{{/swagger.vendorExtensions.x-shared-errors}}
+{{/each}}
 
 
 

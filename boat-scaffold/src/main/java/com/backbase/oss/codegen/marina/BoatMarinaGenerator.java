@@ -33,7 +33,7 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
     @Override
     public void processOpts() {
         super.processOpts();
-        // this.supportingFiles.add(new SupportingFile("index.handlebars", "index.html"));
+         this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
 
 
         // this.supportingFiles.add(new SupportingFile("css/jsontreeviewer.css", "css/jsontreeviewer.css"));
@@ -61,18 +61,8 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
 //         this.apiTemplateFiles.put("api.js.handlebars", ".js");
         // this.modelTemplateFiles.put("model.js.handlebars", ".js");
 
-        this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
+//        this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
 
-    }
-
-    @Override
-    public String apiFileFolder() {
-        return outputFolder + File.separator + "spec" + File.separator + "api";
-    }
-
-    @Override
-    public String modelFileFolder() {
-        return outputFolder + File.separator + "spec" + File.separator + "model";
     }
 
     @Override
