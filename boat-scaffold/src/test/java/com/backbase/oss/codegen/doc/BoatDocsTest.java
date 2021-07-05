@@ -36,7 +36,7 @@ class BoatDocsTest {
 
     @Test
     void testGenerateDocs() throws IOException {
-        generateDocs(getFile("/openapi/presentation-service-api/openapi.yaml"));
+        generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml"));
 
         File output = new File("target/docs/");
         String[] actualDirectorySorted = output.list();
