@@ -29,19 +29,19 @@ class BoatMarinaTest {
         } else {
             generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
-//        String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
     }
 
     @Test
     void testGenerateDocs() throws IOException {
-        generateDocs(getFile("/openapi/presentation-service-api/openapi.yaml"));
+        generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml"));
 
         File output = new File("target/marina-docs/");
         String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
-        File index = new File("target/marina-docs/index.html");
+        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "api.js"};
+        File index = new File("target/marina-docs/api.js");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
+        assertTrue(generated.startsWith("/**"));
     }
 
 
