@@ -5,7 +5,7 @@ metadata:
   description: The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI
   tags:
     - java
-    - OpenAPI
+    - openapi
   links:
     - url: https://example.com/user
       title: Examples Users
