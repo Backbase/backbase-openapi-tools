@@ -7,27 +7,15 @@ metadata:
     - java
     - openapi
   links:
-    - url: https://example.com/user
-      title: Examples Users
+    - url: https://community.backbase.com/documentation/ServiceSDK/latest/generate_clients_from_openapi
+      title: Generate clients using BOAT
       icon: user
-    - url: https://example.com/group
-      title: Example Group
+    - url: https://community.backbase.com/documentation/ServiceSDK/latest/create_an_openapi_spec_project
+      title: Generate code using BOAT
       icon: group
-    - url: https://example.com/cloud
-      title: Link with Cloud Icon
-      icon: cloud
-    - url: https://example.com/dashboard
-      title: Dashboard
-      icon: dashboard
-    - url: https://example.com/help
-      title: Support
+    - url: https://backbase.slack.com/archives/CMU9PLZ5Z
+      title: Support channel
       icon: help
-    - url: https://example.com/web
-      title: Website
-      icon: web
-    - url: https://example.com/alert
-      title: Alerts
-      icon: alert
 spec:
   type: library
   lifecycle: production
