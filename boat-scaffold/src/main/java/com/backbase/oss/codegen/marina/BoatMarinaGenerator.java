@@ -14,6 +14,13 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator {
 
     public BoatMarinaGenerator() {
         super();
+        library = NAME;
+        templateDir = NAME;
+        embeddedTemplateDir = NAME;
+
+        this.supportingFiles.clear();
+        this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
+
         embeddedTemplateDir = templateDir = NAME;
         cliOptions.add(new CliOption(CodegenConstants.GENERATE_ALIAS_AS_MODEL, CodegenConstants.GENERATE_ALIAS_AS_MODEL));
         additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, true);
@@ -28,12 +35,7 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator {
         setTemplatingEngine(templatingEngine);
     }
 
-    @Override
-    public void processOpts() {
-        super.processOpts();
-        this.supportingFiles.clear();
-        this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
-    }
+
 
     @Override
     public String getName() {
