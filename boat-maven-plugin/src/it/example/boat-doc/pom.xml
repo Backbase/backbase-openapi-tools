@@ -15,23 +15,23 @@
 
     <name>BOAT :: DOC</name>
 
-    <properties>
-        <input.spec></input.spec>
-        <output></output>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>0.14.4-SNAPSHOT</version>
-                <configuration>
-                    <generatorName>boat-marina</generatorName>
-                    <inputSpec>${input.spec}</inputSpec>
-                    <output>${output}</output>
-                    <engine>handlebars</engine>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-rest-template-embedded</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/api-with-examples.yaml</inputSpec>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
