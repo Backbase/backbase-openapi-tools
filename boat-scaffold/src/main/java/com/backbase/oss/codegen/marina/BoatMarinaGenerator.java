@@ -1,16 +1,14 @@
 package com.backbase.oss.codegen.marina;
 
 import com.backbase.oss.codegen.BoatStaticDocsGenerator;
-import com.backbase.oss.codegen.doc.BoatDocsGenerator;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 
-import java.io.File;
 import java.util.HashMap;
 
-public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
+public class BoatMarinaGenerator extends BoatStaticDocsGenerator {
 
     public static final String NAME = "boat-marina";
 
@@ -33,7 +31,8 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator   {
     @Override
     public void processOpts() {
         super.processOpts();
-         this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
+        this.supportingFiles.clear();
+        this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
     }
 
     @Override
