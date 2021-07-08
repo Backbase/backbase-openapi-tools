@@ -19,6 +19,14 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.4
+
+* *Boat Marina*
+  * Added a now BOAT Scaffold template called Marina, as that is where the models hang out. The Boat Marina template outputs a single JSON file that is used to offer a rich user interface built from the specs including search, page per operation and many more features!
+
+* *Maven Plugin*
+    * The boat:doc goal now recursively search OpenAPI specs in a directory to generate docs for each found spec.  
+
 ## 0.14.3
 
 * *Maven Plugin*

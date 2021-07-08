@@ -182,12 +182,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
         // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
         // <generateSupportingFiles>true or false</generateSupportingFiles>
         final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
-        final boolean useApiUtil =
-            supFiles == null
-                ? false // cleared by <generateSuportingFiles>false</generateSuportingFiles>
-                : supFiles.isEmpty()
-                    ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
-                    : supFiles.contains("ApiUtil.java"); // set by <supportingFilesToGenerate/>
+        // cleared by <generateSuportingFiles>false</generateSuportingFiles>
+        final boolean useApiUtil = supFiles != null && (supFiles.isEmpty()
+                        ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+                        : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles

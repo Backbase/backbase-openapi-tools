@@ -41,7 +41,11 @@ public class BoatExample {
         } else if (example.getValue() == null) {
             return "";
         } else {
-            return example.getValue().toString();
+            if (example.getValue() != null) {
+                return example.getValue().toString();
+            } else {
+                return null;
+            }
         }
     }
 }
