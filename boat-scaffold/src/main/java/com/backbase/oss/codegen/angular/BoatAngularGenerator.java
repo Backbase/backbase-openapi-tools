@@ -149,7 +149,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         addSupportingFiles();
 
         processOpt(NG_VERSION,
-            value -> applyAngularVersion(value),
+                this::applyAngularVersion,
             () -> applyAngularVersion(this.ngVersion)
         );
 
@@ -197,7 +197,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 .map(value -> value.replace("^", ""))
                 .map(value -> value.replace("~", ""))
                 // Sorting versions via SemVer compareTo
-                .map(value -> new SemVer(value))
+                .map(SemVer::new)
                 .sorted(SemVer::compareTo)
                 .toArray(SemVer[]::new);
 
