@@ -1,22 +1,26 @@
-package com.backbase.oss.codegen.doc;
+package com.backbase.oss.codegen.marina;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import com.backbase.oss.codegen.doc.BoatDocsGenerator;
 import io.swagger.v3.oas.models.OpenAPI;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.DefaultGenerator;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
+
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.DefaultGenerator;
 
 @Slf4j
-class BoatDocsTest {
+class BoatMarinaTest {
+
     @Test
     void testGenerate() throws IOException {
         String spec = System.getProperty("spec");
@@ -25,41 +29,21 @@ class BoatDocsTest {
         } else {
             generateDocs(getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
         }
-//        String generated = String.join( " ", Files.readAllLines(Paths.get("target/docs/index.html")));
-//        assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
-    }
-
-    @Test
-    void testOpenAPiWithExamples() throws OpenAPILoaderException {
-        assertDoesNotThrow(() -> generateDocs(getFile("/openapi-with-examples/openapi.yaml")));
     }
 
     @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml"));
 
-        File output = new File("target/docs/");
+        File output = new File("target/marina-docs/");
         String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
-//        assertArrayEquals(expectedDirectory, actualDirectorySorted);
-        File index = new File("target/docs/index.html");
+        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "api.js"};
+        File index = new File("target/marina-docs/api.js");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-        assertTrue(generated.startsWith("<!DOCTYPE html>"));
+        assertTrue(generated.startsWith("/**"));
     }
 
-    @Test
-    void testGenerateDocsQuery() throws IOException {
-        generateDocs(getFile("/oas-examples/petstore-query-string-array.yaml"));
-        File output = new File("target/docs/");
-        String[] actualDirectorySorted = output.list();
-        Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
-        assertArrayEquals(expectedDirectory, actualDirectorySorted);
-        File index = new File("target/docs/index.html");
-        String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-        assertTrue(generated.contains("<title>Swagger Petstore</title>"));
-    }
 
 
     protected File getFile(String name) {
@@ -73,19 +57,18 @@ class BoatDocsTest {
         log.info("Generate docs for: {}", spec);
         OpenAPI openAPI = null;
         try {
-            openAPI = OpenAPILoader.load(spec, true, true);
+            openAPI = OpenAPILoader.load(spec, false, false);
         } catch (OpenAPILoaderException e) {
             log.error("Failed to load open api: {}", spec, e);
             System.exit(1);
         }
-        BoatDocsGenerator codegenConfig = new BoatDocsGenerator();
+        BoatMarinaGenerator codegenConfig = new BoatMarinaGenerator();
 
         codegenConfig.setSkipOverwrite(false);
-        codegenConfig.setOutputDir(new File("target/docs/").toString());
+        codegenConfig.setOutputDir(new File("target/marina-docs/").toString());
 
         File output = new File(codegenConfig.getOutputDir());
         output.mkdirs();
-
 
 //        log.info("Clearing output: {}, {}", output);
 

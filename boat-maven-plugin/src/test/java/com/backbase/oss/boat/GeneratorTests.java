@@ -111,8 +111,9 @@ class GeneratorTests {
         mojo.skipIfSpecIsUnchanged = false;
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
+        mojo.openApiFileFilters = "**/*.yaml";
         mojo.execute();
-        assertThat(output.list()).containsExactlyInAnyOrder("link-docs", "petstore-docs", "petstore-new-non-breaking-docs", "upto-docs");
+        assertThat(output.list()).contains("link", "petstore", "petstore-new-non-breaking", "upto");
     }
 
     @Test

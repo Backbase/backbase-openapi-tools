@@ -5,7 +5,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.14.3</version>
+    <version>0.14.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools will help you converting RAML to OpenAPI plus many more</description>
 
@@ -50,8 +50,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jacoco.version>0.8.6</jacoco.version>
-
         <sonar.organization>backbase-technology-prototyping</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <openapi-generator.version>4.3.1</openapi-generator.version>
@@ -66,7 +64,7 @@
         <swagger-core.version>2.1.5</swagger-core.version>
         <swagger-parser.version>2.0.23</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>
 
     <modules>

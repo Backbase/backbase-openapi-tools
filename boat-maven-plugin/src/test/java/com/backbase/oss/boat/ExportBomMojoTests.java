@@ -45,16 +45,12 @@ class ExportBomMojoTests {
   @Mock
   Metadata metadatamock;
 
-  @Captor
-  ArgumentCaptor<List> argCaptor;
-
 
   @Test
-  void testExportBomEmptyMeta() throws MojoFailureException, MojoExecutionException, ArtifactResolutionException {
+  void testExportBomEmptyMeta() throws MojoExecutionException {
     artifactResolver = mock(ArtifactResolver.class);
     artifactResult = mock( ArtifactResult.class);
     metadataResolver = mock(MetadataResolver.class);
-    org.eclipse.aether.artifact.Artifact artifact = mock(org.eclipse.aether.artifact.Artifact.class);
 
     when(metadataResolver.resolveMetadata(any(),any())).thenReturn(Collections.singletonList(metadataResult));
 
@@ -77,13 +73,14 @@ class ExportBomMojoTests {
     build.setDirectory("target");
 
     MavenProject project = new MavenProject();
-    mojo.remoteRepositories = Collections.EMPTY_LIST;
+    mojo.remoteRepositories = Collections.emptyList();
     project.setBuild(build);
     mojo.project = project;
     mojo.repositorySession = mock(RepositorySystemSession.class);
     mojo.execute();
 
-    assertThat(output.list()).isEmpty();
+    assertThat(output).isEmptyDirectory();
+
   }
 
   @Test
@@ -98,7 +95,7 @@ class ExportBomMojoTests {
     artifactResolver = mock(ArtifactResolver.class);
     artifactResult = mock( ArtifactResult.class);
     org.eclipse.aether.artifact.Artifact artifact; //= mock(org.eclipse.aether.artifact.Artifact.class);
-    artifact = new DefaultArtifact(groupId, artifactId, "", type, version,Collections.EMPTY_MAP, pomFile);
+    artifact = new DefaultArtifact(groupId, artifactId, "", type, version,Collections.emptyMap(), pomFile);
 
 
     when(artifactResolver.resolveArtifact(any(),any())).thenReturn(artifactResult);
@@ -138,14 +135,14 @@ class ExportBomMojoTests {
     build.setDirectory("target");
 
     MavenProject project = new MavenProject();
-    mojo.remoteRepositories = Collections.EMPTY_LIST;
+    mojo.remoteRepositories = Collections.emptyList();
 
     project.setBuild(build);
     mojo.project = project;
     mojo.repositorySession = mock(RepositorySystemSession.class);
     mojo.execute();
 
-    assertThat(output.list()).isEmpty();
+    assertThat(output).isEmptyDirectory();
 
   }
   private File getFile(String fileName) {

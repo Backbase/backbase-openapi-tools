@@ -23,6 +23,8 @@ defined on openapi-generator-maven-plugin can be applied here too.
 
 Boat maven plugin uses slightly modified templates for html, java and webclient that help generate specs and clients that work best in a Backbase projects.
 
+All inputSpec parameters for this goal may additionally be configured as an artifact. See [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter) or [integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-artifact-input) for examples.
+
 ## boat:generate-spring-boot-embedded
 
 Same with `generate` but with opinionated defaults for Spring
@@ -152,7 +154,11 @@ Available parameters:
     inputSpec
         Required: true
         Input spec directory or file.
-
+        Optionaly inputMavenArtifact parameter can be used instead to configure an artifact input.
+        
+    inputMavenArtifact
+        Input spec artifact
+        
     output (Default: ${project.build.directory}/boat-lint-reports)
         Output directory for lint reports.
 
@@ -171,12 +177,15 @@ Example:
         <ignoreRules>${ignored-lint-rules}</ignoreRules>
         <showIgnoredRules>true</showIgnoredRules>
     </configuration>
+    
+To see details and an example of inputMavenArtifact:
+ [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter)
 
 To see details about this goal:
 
     mvn help:describe -DgroupId=com.backbase.oss -DartifactId=boat-maven-plugin  -Dgoal=lint -Ddetail`
-  
-  
+    
+    
 ## boat:bundle
 
 Bundles a spec by resolving external references.
@@ -321,3 +330,47 @@ Configuration example
         </pipeline>
     </configuration>
 ```
+
+## Example inputMavenArtifact parameter
+
+Example:
+
+```$xml
+    <inputMavenArtifact>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>openapi-zips</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <classifier>api</classifier>
+        <type>zip</type>
+        <fileName>presentation-client-api/openapi.yaml</fileName>
+    </inputMavenArtifact>
+```
+
+Parameters:
+
+    groupId
+        Required: true
+        Input artifacts groupId
+    artifactId
+        Required: true
+        Input artifacts artifactId
+    version
+        Required: true
+        Input artifacts version
+    classifier
+        Required: true
+        Input artifacts classifier (must be api)
+    type
+        Required: true
+        Input artifacts type (must be zip)
+    fileName
+        Required: true
+        directory or file in artifact to be processed by goal
+        
+
+This parameter is available as a replacement for the inputSpec parameter in goals [generate](#boat:generate) and [lint](#boat:lint).
+
+It downloads a copy of the artifact if it is not already present, and uses a specified spec (or directory of specs) 
+from the artifact as the inputSpec for the goal. 
+
+More examples can be found in integration tests.

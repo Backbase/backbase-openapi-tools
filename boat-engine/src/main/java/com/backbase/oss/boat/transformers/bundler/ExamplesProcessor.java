@@ -253,7 +253,7 @@ public class ExamplesProcessor {
     private Object convertExampleContent(ExampleHolder exampleHolder, String refPath) {
         try {
             if (exampleHolder.getRef().endsWith("json") || refPath.endsWith("json")) {
-                return Json.mapper().readValue(exampleHolder.getContent(), Object.class);
+                return Json.mapper().readValue(exampleHolder.getContent(), JsonNode.class);
             }
             return exampleHolder.getContent();
         } catch (JsonProcessingException | RuntimeException e) {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.14.3</version>
+        <version>0.14.4-SNAPSHOT</version>
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
@@ -239,7 +239,7 @@
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
                     <extraArtifacts>
-                        <extraArtifact>org.jacoco:org.jacoco.agent:0.8.4:jar:runtime</extraArtifact>
+                        <extraArtifact>org.jacoco:org.jacoco.agent:${jacoco-maven-plugin.version}:jar:runtime</extraArtifact>
                     </extraArtifacts>
                 </configuration>
                 <executions>
