@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.StaticHtml2Generator {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

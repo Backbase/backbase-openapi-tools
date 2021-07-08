@@ -25,6 +25,7 @@ import java.util.Map;
 @Slf4j
 public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
 
+    @Override
     public String compileTemplate(TemplatingGenerator generator,
                                   Map<String, Object> bundle, String templateFile) throws IOException {
         TemplateLoader loader = new AbstractTemplateLoader() {
@@ -44,14 +45,11 @@ public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
 
         Handlebars handlebars = new Handlebars(loader);
         handlebars.registerHelperMissing((obj, options) -> {
-            log.warn(String.format(Locale.ROOT, "Unregistered helper name '%s', processing template:\n%s", options.helperName, options.fn.text()));
+            log.warn(String.format(Locale.ROOT, "Unregistered helper name '%s', processing template:%n%s", options.helperName, options.fn.text()));
             return "";
         });
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-//        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Helper<Object> instance = new Jackson2Helper(objectMapper);
         handlebars.registerHelper("json", instance);

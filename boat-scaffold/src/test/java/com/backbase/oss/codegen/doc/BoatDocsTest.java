@@ -45,7 +45,7 @@ class BoatDocsTest {
 //        assertArrayEquals(expectedDirectory, actualDirectorySorted);
         File index = new File("target/docs/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-//        assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
+        assertTrue(generated.contains("<title>NextGenPSD2 XS2A Framework</title>"));
     }
 
     @Test

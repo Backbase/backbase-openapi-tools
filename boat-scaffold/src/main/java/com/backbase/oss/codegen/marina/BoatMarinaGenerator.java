@@ -15,8 +15,6 @@ public class BoatMarinaGenerator extends BoatStaticDocsGenerator {
     public BoatMarinaGenerator() {
         super();
         library = NAME;
-        templateDir = NAME;
-        embeddedTemplateDir = NAME;
 
         this.supportingFiles.clear();
         this.supportingFiles.add(new SupportingFile("api.js.handlebars", "api.js"));
