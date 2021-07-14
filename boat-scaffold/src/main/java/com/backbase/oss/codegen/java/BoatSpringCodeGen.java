@@ -2,27 +2,22 @@ package com.backbase.oss.codegen.java;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
-
-import java.io.IOException;
-import java.io.Writer;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-
-import java.util.stream.IntStream;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.stream.IntStream;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {

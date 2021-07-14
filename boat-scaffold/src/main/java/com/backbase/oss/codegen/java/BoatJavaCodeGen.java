@@ -1,13 +1,8 @@
 package com.backbase.oss.codegen.java;
 
-import static java.lang.String.format;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 
 public class BoatJavaCodeGen extends JavaClientCodegen {
