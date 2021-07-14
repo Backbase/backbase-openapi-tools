@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import com.backbase.oss.codegen.BoatUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
@@ -115,6 +116,11 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
         }
         writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
+    }
+
+    @Override
+    public void postProcess() {
+        BoatUtils.writeThankYouNote();
     }
 
 }

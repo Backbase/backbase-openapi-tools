@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  */
 class BoatAngularTemplatesTests {
     static final String PROP_BASE = BoatAngularTemplatesTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
+    static final boolean PROP_FAST = Boolean.parseBoolean(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-angular-templates-tests");
     /**
      * the actual testing code
@@ -82,7 +82,7 @@ class BoatAngularTemplatesTests {
 
     void generate(Combination param) {
         this.param = param;
-        this.files = generateFrom(null);
+        this.files = generateFrom(null, param);
         // used in development
         // this.files = generateFrom(param, "openapi-generator-originals/JavaSpring-4.3.1");
 
@@ -185,13 +185,13 @@ class BoatAngularTemplatesTests {
         }
     }
 
-    private List<File> generateFrom(String templates) {
+    private List<File> generateFrom(String templates, Combination param) {
         final File input = new File("src/test/resources/boat-spring/openapi.yaml");
         final CodegenConfigurator cf = new CodegenConfigurator();
 
         cf.setGeneratorName(BoatAngularGenerator.NAME);
         cf.setInputSpec(input.getAbsolutePath());
-        cf.setOutputDir(TEST_OUTPUT);
+        cf.setOutputDir(TEST_OUTPUT + "/" + param.name);
 
         GlobalSettings.setProperty(CodegenConstants.APIS, "");
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "true");

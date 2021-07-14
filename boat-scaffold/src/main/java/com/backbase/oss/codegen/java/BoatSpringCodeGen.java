@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import com.backbase.oss.codegen.BoatUtils;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import lombok.Getter;
@@ -218,5 +219,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (p.isContainer && !this.reactive) {
             p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
         }
+    }
+
+    @Override
+    public void postProcess() {
+        BoatUtils.writeThankYouNote();
     }
 }

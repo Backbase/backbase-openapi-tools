@@ -17,6 +17,7 @@
 
 package com.backbase.oss.codegen.angular;
 
+import com.backbase.oss.codegen.BoatUtils;
 import com.backbase.oss.codegen.doc.BoatCodegenParameter;
 import com.backbase.oss.codegen.doc.BoatCodegenResponse;
 import io.swagger.v3.oas.models.Operation;
@@ -598,6 +599,11 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         r.message = StringUtils.replace(r.message, "`", "\\`");
 
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
+    }
+
+    @Override
+    public void postProcess() {
+        BoatUtils.writeThankYouNote();
     }
 
 }
