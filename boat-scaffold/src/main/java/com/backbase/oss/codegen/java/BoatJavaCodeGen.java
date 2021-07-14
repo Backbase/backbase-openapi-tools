@@ -20,10 +20,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public static final String CREATE_API_COMPONENT = "createApiComponent";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
 
-    private static final String JAVA_UTIL_SET_NEW = "new " + "java.util.LinkedHashSet<>()";
-    private static final String JAVA_UTIL_SET = "java.util.Set";
-    private static final String JAVA_UTIL_SET_GEN = "java.util.Set<%s>";
-
     @Setter
     @Getter
     protected boolean useWithModifiers;

@@ -86,12 +86,12 @@ public abstract class NonOpenApiGenerator implements Generator {
     }
 
     protected File processTemplateToFile(Map<String, Object> templateData, String templateName, String outputFilename) throws IOException {
-        String adjustedOutputFilename = outputFilename.replaceAll("//", "/").replace('/', File.separatorChar);
+        String adjustedOutputFilename = outputFilename.replace("//", "/").replace('/', File.separatorChar);
         File target = new File(adjustedOutputFilename);
         Path outDir = java.nio.file.Paths.get(this.config.getOutputDir()).toAbsolutePath();
         Path absoluteTarget = target.toPath().toAbsolutePath();
         if (!absoluteTarget.startsWith(outDir)) {
-            throw new RuntimeException(String.format(Locale.ROOT, "Target files must be generated within the output directory; absoluteTarget=%s outDir=%s", absoluteTarget, outDir));
+            throw new CodegenException(String.format(Locale.ROOT, "Target files must be generated within the output directory; absoluteTarget=%s outDir=%s", absoluteTarget, outDir));
         }
         return this.templateProcessor.write(templateData, templateName, target);
     }
