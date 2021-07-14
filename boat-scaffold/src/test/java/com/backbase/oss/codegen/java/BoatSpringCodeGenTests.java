@@ -1,25 +1,22 @@
 package com.backbase.oss.codegen.java;
 
+import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
+import com.samskivert.mustache.Template.Fragment;
+import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.CliOption;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
-import com.samskivert.mustache.Template.Fragment;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
 
 
 class BoatSpringCodeGenTests {

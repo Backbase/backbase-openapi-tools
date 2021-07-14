@@ -1,10 +1,10 @@
 {{#useBeanValidation}}{{!
     }}{{#isContainer}}{{!
 	    }}{{#isMap}}{{!
-	        }}{{{baseType}}}<String, {{#items}}{{>beanValidationCore}}{{{datatypeWithEnum}}}{{/items}}>{{!
+	        }}{{>beanValidationCore}}{{{baseType}}}<String, {{#items}}{{>beanValidationCore}}{{{datatypeWithEnum}}}{{/items}}>{{!
 	    }}{{/isMap}}{{!
 	    }}{{^isMap}}{{!
-	        }}{{#reactive}}{{{dataType}}}{{/reactive}}{{^reactive}}{{{baseType}}}<{{#items}}{{>beanValidationCore}}{{{datatypeWithEnum}}}{{/items}}>{{/reactive}}{{!
+	        }}{{#reactive}}{{{dataType}}}{{/reactive}}{{^reactive}}{{>beanValidationCore}}{{{baseType}}}<{{#items}}{{>beanValidationCore}}{{{datatypeWithEnum}}}{{/items}}>{{/reactive}}{{!
 	    }}{{/isMap}}{{!
 	}}{{/isContainer}}{{!
 	}}{{^isContainer}}{{!

@@ -67,7 +67,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
+        static final List<String> CASES = asList("flx", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
 
         final String name;
 
