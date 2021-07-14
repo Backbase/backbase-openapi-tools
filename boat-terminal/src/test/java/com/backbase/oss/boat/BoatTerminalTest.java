@@ -20,19 +20,19 @@ class BoatTerminalTest {
     }
     @Test
     void testCLIOptions() {
-        assertThat(BoatTerminal.run(new String[]{"-f=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","--directory=src/test/resources/raml-examples/converted","--output=src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples=false"}), is(0));
-        File output = new File("src/test/resources/raml-examples/converted/openapi.yaml");
+        assertThat(BoatTerminal.run(new String[]{"-f=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","--directory=target/converted","--output=target/converted/openapi.yaml","--convert-examples=false"}), is(0));
+        File output = new File("target/converted/openapi.yaml");
 
         assertTrue(output.exists());
 
-        assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=src/test/resources/raml-examples/converted","-o=src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples=false"}), is(0));
-        assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=src/test/resources/raml-examples/converted","-v"}),is(0));
+        assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=target/converted","-o=target/converted/openapi.yaml","--convert-examples=false"}), is(0));
+        assertThat(BoatTerminal.run(new String[]{"--file=src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","-d=target/converted","-v"}),is(0));
     }
 
     @Test
     void testCLIErrorCatching(){
-        assertThat( BoatTerminal.run(new String[]{"-f=src/test/resources/raml-examples/backbase-wallet/file-not-found ","--directory=src/test/resources/raml-examples/converted","--output=src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples=false"}),is(0));
-        assertThat(BoatTerminal.run(new String[]{"-f src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","--directory src/test/resources/raml-examples/converted","--output src/test/resources/raml-examples/converted/openapi.yaml","--convert-examples false"}), is(2));
+        assertThat( BoatTerminal.run(new String[]{"-f=src/test/resources/raml-examples/backbase-wallet/file-not-found ","--directory=target/converted","--output=target/converted/openapi.yaml","--convert-examples=false"}),is(0));
+        assertThat(BoatTerminal.run(new String[]{"-f src/test/resources/raml-examples/backbase-wallet/presentation-client-api.raml","--directory target/converted","--output target/converted/openapi.yaml","--convert-examples false"}), is(2));
     }
 
 
