@@ -84,9 +84,9 @@ public class {{classname}}Impl implements {{classname}} {
         {{#formParams}}if ({{paramName}} != null) localVarFormParams.put("{{baseName}}", {{paramName}});
         {{/formParams}}
 
-        String[] localVarAccepts = { {{#produces}}"{{{mediaType}}}"{{#-last}}, {{/-last}}{{/produces}} };
-        String[] localVarContentTypes = { {{#consumes}}"{{{mediaType}}}"{{#-last}}, {{/-last}}{{/consumes}} };
-        String[] localVarAuthNames = new String[] { {{#authMethods}}"{{name}}"{{#-last}}, {{/-last}}{{/authMethods}} };
+        String[] localVarAccepts = { {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} };
+        String[] localVarContentTypes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} };
+        String[] localVarAuthNames = new String[] { {{#authMethods}}"{{name}}"{{^-last}}, {{/-last}}{{/authMethods}} };
         {{#returnType}}
         TypeReference<{{{returnType}}}> localVarReturnType = new TypeReference<{{{returnType}}}>() {};
         apiClient.invokeAPI(localVarPath, "{{httpMethod}}", localVarQueryParams, localVarBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccepts, localVarContentTypes, localVarAuthNames, localVarReturnType, resultHandler);{{/returnType}}{{^returnType}}

@@ -31,6 +31,7 @@ public class NonOpenApiGenerator implements Generator {
     @Override
     public Generator opts(ClientOptInput opts) {
         this.opts = opts;
+        this.input = opts.getConfig().getInputSpec();
         this.config = opts.getConfig();
         TemplateManagerOptions templateManagerOptions = new TemplateManagerOptions(
                 this.config.isEnableMinimalUpdate(),

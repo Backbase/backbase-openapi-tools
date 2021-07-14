@@ -130,7 +130,7 @@ export class {{classname}} {
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpResponse<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpEvent<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
 {{/produces}}
-    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{#-last}} | {{/-last}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
+    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{^-last}} | {{/-last}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
     {{#allParams}}
         const _{{paramName}} = requestParameters["{{paramName}}"];
 {{#required}}
@@ -214,7 +214,7 @@ export class {{classname}} {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
                 {{#produces}}
-                '{{{mediaType}}}'{{#-last}},{{/-last}}
+                '{{{mediaType}}}'{{^-last}},{{/-last}}
                 {{/produces}}
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -228,7 +228,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#-last}},{{/-last}}
+            '{{{mediaType}}}'{{^-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}
@@ -237,7 +237,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#-last}},{{/-last}}
+            '{{{mediaType}}}'{{^-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}

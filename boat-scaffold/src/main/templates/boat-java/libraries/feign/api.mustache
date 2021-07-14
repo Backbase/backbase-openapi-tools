@@ -35,14 +35,14 @@ public interface {{classname}} extends ApiClient.Api {
   * @see <a href="{{url}}">{{summary}} Documentation</a>
 {{/externalDocs}}
    */
-  @RequestLine("{{httpMethod}} {{{path}}}{{#hasQueryParams}}?{{/hasQueryParams}}{{#queryParams}}{{baseName}}={{=<% %>=}}{<%paramName%>}<%={{ }}=%>{{#-last}}&{{/-last}}{{/queryParams}}")
+  @RequestLine("{{httpMethod}} {{{path}}}{{#hasQueryParams}}?{{/hasQueryParams}}{{#queryParams}}{{baseName}}={{=<% %>=}}{<%paramName%>}<%={{ }}=%>{{^-last}}&{{/-last}}{{/queryParams}}")
   @Headers({
 {{#vendorExtensions.x-contentType}}    "Content-Type: {{vendorExtensions.x-contentType}}",
 {{/vendorExtensions.x-contentType}}    "Accept: {{vendorExtensions.x-accepts}}",{{#headerParams}}
-    "{{baseName}}: {{=<% %>=}}{<%paramName%>}<%={{ }}=%>"{{#-last}},
+    "{{baseName}}: {{=<% %>=}}{<%paramName%>}<%={{ }}=%>"{{^-last}},
     {{/-last}}{{/headerParams}}
   })
-  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{nickname}}({{#allParams}}{{^isBodyParam}}{{^legacyDates}}@Param("{{paramName}}") {{/legacyDates}}{{#legacyDates}}@Param(value="{{baseName}}", expander=ParamExpander.class) {{/legacyDates}}{{/isBodyParam}}{{{dataType}}} {{paramName}}{{#-last}}, {{/-last}}{{/allParams}});
+  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{nickname}}({{#allParams}}{{^isBodyParam}}{{^legacyDates}}@Param("{{paramName}}") {{/legacyDates}}{{#legacyDates}}@Param(value="{{baseName}}", expander=ParamExpander.class) {{/legacyDates}}{{/isBodyParam}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}});
     {{#hasQueryParams}}
 
   /**
@@ -73,11 +73,11 @@ public interface {{classname}} extends ApiClient.Api {
    * @see <a href="{{url}}">{{summary}} Documentation</a>
       {{/externalDocs}}
    */
-  @RequestLine("{{httpMethod}} {{{path}}}?{{#queryParams}}{{baseName}}={{=<% %>=}}{<%paramName%>}<%={{ }}=%>{{#-last}}&{{/-last}}{{/queryParams}}")
+  @RequestLine("{{httpMethod}} {{{path}}}?{{#queryParams}}{{baseName}}={{=<% %>=}}{<%paramName%>}<%={{ }}=%>{{^-last}}&{{/-last}}{{/queryParams}}")
   @Headers({
 {{#vendorExtensions.x-contentType}}  "Content-Type: {{vendorExtensions.x-contentType}}",
 {{/vendorExtensions.x-contentType}}  "Accept: {{vendorExtensions.x-accepts}}",{{#headerParams}}
-      "{{baseName}}: {{=<% %>=}}{<%paramName%>}<%={{ }}=%>"{{#-last}},
+      "{{baseName}}: {{=<% %>=}}{<%paramName%>}<%={{ }}=%>"{{^-last}},
       {{/-last}}{{/headerParams}}
   })
   {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{nickname}}({{#allParams}}{{^isQueryParam}}{{^isBodyParam}}{{^legacyDates}}@Param("{{paramName}}") {{/legacyDates}}{{#legacyDates}}@Param(value="{{baseName}}", expander=ParamExpander.class) {{/legacyDates}}{{/isBodyParam}}{{{dataType}}} {{paramName}}, {{/isQueryParam}}{{/allParams}}@QueryMap(encoded=true) Map<String, Object> queryParams);

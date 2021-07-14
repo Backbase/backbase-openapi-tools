@@ -19,10 +19,6 @@ import java.util.Map;
 public class BoatLintGenerator extends NonOpenApiGenerator {
 
     @Override
-    public Generator opts(ClientOptInput opts) {
-        return this;
-    }
-
     public List<File> generate() {
 
         BoatLinter boatLinter = new BoatLinter();
@@ -50,7 +46,7 @@ public class BoatLintGenerator extends NonOpenApiGenerator {
         Map<String, Object> bundle = convertToBundle(boatLintReport);
 
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Lint for: {} ", boatLintReport.getTitle());
+        log.info("Finished creating BOAT Lint for: {}. Generated files: {} ", boatLintReport.getTitle(), files);
 
         return files;
     }

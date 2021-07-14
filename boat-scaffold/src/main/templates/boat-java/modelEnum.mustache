@@ -24,7 +24,7 @@ public enum {{#datatypeWithEnum}}{{{.}}}{{/datatypeWithEnum}}{{^datatypeWithEnum
    */
      {{/enumDescription}}
   {{{name}}}({{{value}}}){{^-last}},
-  {{/-last}}{{#-last}};{{/-last}}{{/enumVars}}{{/allowableValues}}
+  {{/-last}}{{^-last}};{{/-last}}{{/enumVars}}{{/allowableValues}}
 
   private {{{dataType}}} value;
 

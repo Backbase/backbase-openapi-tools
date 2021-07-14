@@ -75,6 +75,7 @@ public class LintMojo extends AbstractLintMojo {
     private void generateLintReport(boolean isSingleLint, BoatLintReport report) {
         BoatLintConfig config = new BoatLintConfig();
         File reportOutputDir = getOutput();
+
         config.setOutputDir(reportOutputDir.toString());
         if (!isSingleLint) {
 
@@ -84,7 +85,7 @@ public class LintMojo extends AbstractLintMojo {
         }
 
         BoatLintGenerator boatLintGenerator = new BoatLintGenerator();
-        boatLintGenerator.opts(new ClientOptInput().config(new BoatLintConfig()));
+        boatLintGenerator.opts(new ClientOptInput().config(config));
         boatLintGenerator.generate(report);
     }
 

@@ -10,7 +10,7 @@
 {{#vendorExtensions.x-extra-annotation}}
 {{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}
 public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}{{#hateoas}}extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}}{{#serializableModel}}implements Serializable{{/serializableModel}}
-{{#serializableModel}}, {{/serializableModel}}{{^serializableModel}}{{/serializableModel}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {
+{{#serializableModel}}, {{/serializableModel}}{{^serializableModel}}{{/serializableModel}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{^-last}} {{/-last}}{{/vendorExtensions.x-implements}} {
 {{#serializableModel}}
     private static final long serialVersionUID = 1L;
 
@@ -164,7 +164,7 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
             return false;
         }{{#hasVars}}
         {{classname}} {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#-last}} &&
+        return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
                 {{/-last}}{{/vars}}{{#parent}} &&
                 super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
         return true;{{/hasVars}}
@@ -173,7 +173,7 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
     @Override
     public int hashCode() {
         return Objects.hash(
-            {{#vars}}{{name}}{{#-last}},
+            {{#vars}}{{name}}{{^-last}},
             {{/-last}}{{/vars}}{{#parent}}{{#hasVars}},
             {{/hasVars}}super.hashCode(){{/parent}}
         );

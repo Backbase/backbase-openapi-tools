@@ -41,7 +41,7 @@ Mono<Void> result = Mono.empty();
                 result = {{#useApiUtil}}ApiUtil.{{/useApiUtil}}getExampleResponse(exchange, exampleString);
                 break;
             }
-        {{#-last}}
+        {{^-last}}
         }
         {{/-last}}
     {{/examples}}

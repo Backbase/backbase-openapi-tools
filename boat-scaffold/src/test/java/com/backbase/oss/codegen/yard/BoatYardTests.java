@@ -26,7 +26,6 @@ class BoatYardTests {
         config.setInputSpec(input.getAbsolutePath());
         config.setOutputDir(output.getAbsolutePath());
         config.setSpecsBaseDir(specsBaseDir);
-
         config.setTemplateDir("boat-yard");
 
         BoatYardGenerator boatYardGenerator = new BoatYardGenerator();
@@ -41,7 +40,7 @@ class BoatYardTests {
 
         File index = new File("target/boat-yard/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-        assertTrue(generated.contains("<title>BOAT Developer Portal</title>"));
+        assertTrue(generated.startsWith("<html"));
     }
 
     protected File getFile(String name) {

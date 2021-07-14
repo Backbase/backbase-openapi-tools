@@ -33,12 +33,6 @@ public class BoatYardGenerator extends NonOpenApiGenerator {
         return (BoatYardConfig) config;
     }
 
-    @Override
-    public Generator opts(ClientOptInput opts) {
-                super.opts(opts);
-    return this;
-    }
-
     public List<File> generate() {
         return getYardModel().getPortals().stream()
             .flatMap(portal -> generate(portal).stream())
