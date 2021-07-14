@@ -78,7 +78,6 @@ class BoatSpringTemplatesTests {
         final boolean addBindingResult;
         final boolean useLombokAnnotations;
         final boolean openApiNullable;
-        final boolean useSetForUniqueItems;
         final boolean useWithModifiers;
 
         final boolean reactive;
@@ -98,7 +97,6 @@ class BoatSpringTemplatesTests {
             this.addServletRequest = (mask & 1 << CASES.indexOf("req")) != 0;
             this.useLombokAnnotations = (mask & 1 << CASES.indexOf("lmb")) != 0;
             this.openApiNullable = (mask & 1 << CASES.indexOf("nbl")) != 0;
-            this.useSetForUniqueItems = (mask & 1 << CASES.indexOf("unq")) != 0;
             this.useWithModifiers = (mask & 1 << CASES.indexOf("wth")) != 0;
             this.reactive = (mask & 1 << CASES.indexOf("flx")) != 0;
             this.apiUtil = (mask & 1 << CASES.indexOf("utl")) != 0;
@@ -221,14 +219,6 @@ class BoatSpringTemplatesTests {
     }
 
     @Check
-    void useSetForUniqueItems() {
-        assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-        assertThat(findPattern("/model/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-    }
-
-    @Check
     void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));
@@ -296,7 +286,6 @@ class BoatSpringTemplatesTests {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
         }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
-        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
         gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
         gcf.addAdditionalProperty(SpringCodegen.REACTIVE, this.param.reactive);

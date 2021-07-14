@@ -110,10 +110,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Getter
     protected boolean useLombokAnnotations;
 
-    @Setter
-    @Getter
-    protected boolean useSetForUniqueItems;
-
     /**
      * Whether to use {@code with} prefix for pojos modifiers.
      */
@@ -134,8 +130,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
             this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
-        this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
@@ -163,10 +157,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
-
-        if (this.reactive) {
-            this.useSetForUniqueItems = false;
-        }
 
         // Whether it's using ApiUtil or not.
         // cases:
@@ -197,9 +187,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
             this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
         }
-        if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
-            this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
-        }
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
@@ -213,51 +200,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
         writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-
-        if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", UNIQUE_BASE_TYPE);
-
-            this.importMapping.put("Set", UNIQUE_BASE_TYPE);
-            this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
-        }
 
         this.additionalProperties.put("indent4", new IndentedLambda(4, " "));
         this.additionalProperties.put("newLine4", new NewLineIndent(4, " "));
         this.additionalProperties.put("indent8", new IndentedLambda(8, " "));
         this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
-    }
-
-    @Override
-    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
-        super.postProcessModelProperty(model, p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            p.containerType = "set";
-            p.baseType = UNIQUE_BASE_TYPE;
-            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
-            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
-            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-        }
-    }
-
-    @Override
-    public void postProcessParameter(CodegenParameter p) {
-        super.postProcessParameter(p);
-
-        if (p.isContainer) {
-            if (!this.reactive) {
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            }
-
-            if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = UNIQUE_BASE_TYPE;
-                p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
-                p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
-                p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-            }
-        }
     }
 
     private boolean needApiUtil() {

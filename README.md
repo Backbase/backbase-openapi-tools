@@ -19,6 +19,13 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.15.0 * BREAKING CHANGES
+Upgraded openapi-tools to 5.2.0
+* Changes to Mustache Templates
+  * Renamed `hasMore` to `-last`
+  * Use of `Set` for unique items is now enabled by default as OpenAPI Generator 5.x fixed their implementation
+
+
 ## 0.14.4
 
 * *Boat Marina*
@@ -26,16 +33,6 @@ BOAT is still under development and subject to change.
 
 * *Maven Plugin*
     * The boat:doc goal now recursively search OpenAPI specs in a directory to generate docs for each found spec.  
-## 0.15.0
-* *Maven Generator*
-
-Upgraded openapi-tools to 5.2.0
-* Changes to Mustache Templates
-  ** Renamed `hasMore` to `-last`
-  
-
-  
-
 
 ## 0.14.3
 

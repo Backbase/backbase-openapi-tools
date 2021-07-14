@@ -15,7 +15,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public static final String NAME = "boat-java";
 
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String USE_JACKSON_CONVERSION = "useJacksonConversion";
@@ -32,9 +31,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     @Setter
     @Getter
     protected boolean useWithModifiers;
-    @Setter
-    @Getter
-    protected boolean useSetForUniqueItems;
     @Setter
     @Getter
     protected boolean useClassLevelBeanValidation;
@@ -58,8 +54,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
-        this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(USE_JACKSON_CONVERSION,
             "Whether to use Jackson to convert query parameters to String", this.useJacksonConversion));
         this.cliOptions.add(CliOption.newBoolean(USE_DEFAULT_API_CLIENT,
@@ -81,26 +75,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
-        if (WEBCLIENT.equals(getLibrary())) {
-            this.useSetForUniqueItems = false;
-        }
-
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-
-        if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
-            this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
-        }
-        writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
-
-        if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", JAVA_UTIL_SET);
-
-            this.importMapping.put("Set", JAVA_UTIL_SET);
-            this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
-        }
 
         if (RESTTEMPLATE.equals(getLibrary())) {
             processRestTemplateOpts();
@@ -144,33 +122,4 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
     }
 
-    @Override
-    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
-        super.postProcessModelProperty(model, p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            p.containerType = "set";
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
-        }
-
-    }
-
-    @Override
-    public void postProcessParameter(CodegenParameter p) {
-        super.postProcessParameter(p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            // XXX the model set baseType to the container type, why is this different?
-
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
-
-        }
-    }
 }
