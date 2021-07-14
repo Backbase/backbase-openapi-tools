@@ -27,7 +27,7 @@ class BoatLintTests {
 
         File index = new File("target/boat-lint/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-        assertTrue(generated.startsWith("<html"));
+        assertTrue(generated.startsWith("<!doctype html>"));
     }
 
     @Test

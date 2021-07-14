@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen;
 
+import com.backbase.oss.codegen.marina.BoatHandlebarsEngineAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +38,7 @@ public class NonOpenApiGenerator implements Generator {
                 this.config.isEnableMinimalUpdate(),
                 this.config.isSkipOverwrite());
 
-        TemplatingEngineAdapter templatingEngine = this.config.getTemplatingEngine();
-
-        if (templatingEngine instanceof MustacheEngineAdapter) {
-            MustacheEngineAdapter mustacheEngineAdapter = (MustacheEngineAdapter) templatingEngine;
-            mustacheEngineAdapter.setCompiler(this.config.processCompiler(mustacheEngineAdapter.getCompiler()));
-        }
-
+        TemplatingEngineAdapter templatingEngine = new BoatHandlebarsEngineAdapter();
 
         TemplatePathLocator commonTemplateLocator = new CommonTemplateContentLocator();
         TemplatePathLocator generatorTemplateLocator = new GeneratorTemplateContentLocator(this.config);
