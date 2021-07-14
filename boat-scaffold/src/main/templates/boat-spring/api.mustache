@@ -185,7 +185,7 @@ public interface {{classname}} {
         method = RequestMethod.{{httpMethod}})
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{#responseWrapper}}{{.}}<{{/responseWrapper}}ResponseEntity<{{>returnTypes}}>{{#responseWrapper}}>{{/responseWrapper}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}(
 {{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{^-last}}{{#reactive}}, {{/reactive}}{{^reactive}}{{#addServletRequest}},
+        {{/-last}}{{#-last}}{{#reactive}}, {{/reactive}}{{^reactive}}{{#addServletRequest}},
         {{/addServletRequest}}{{/reactive}}{{/-last}}{{/allParams}}{{#addServletRequest}}HttpServletRequest httpServletRequest{{#reactive}},
         {{/reactive}}{{/addServletRequest}}{{#reactive}}ServerWebExchange exchange{{/reactive}}
     ){{#unhandledException}} throws Exception{{/unhandledException}}{{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}} {

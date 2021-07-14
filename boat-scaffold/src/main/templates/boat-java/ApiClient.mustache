@@ -79,16 +79,16 @@ public class ApiClient {
             Arrays.asList(
           {{/-first}}
               "{{{.}}}"{{^-last}},{{/-last}}
-          {{^-last}}
+          {{#-last}}
             )
           {{/-last}}
           {{/enumValues}}
           )
         ));
-      {{^-last}}
+      {{#-last}}
       }}{{/-last}}{{/variables}}
     ){{^-last}},{{/-last}}
-  {{^-last}}
+  {{#-last}}
   ){{/-last}}{{/servers}});
   protected Integer serverIndex = 0;
   protected Map<String, String> serverVariables = null;

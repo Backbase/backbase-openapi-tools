@@ -59,7 +59,7 @@ public class {{classname}}Test {
           {{/allParams}}
         {{classname}}.{{operationIdCamelCase}}QueryParams queryParams = new {{classname}}.{{operationIdCamelCase}}QueryParams()
           {{#queryParams}}
-            .{{paramName}}(null){{^-last}};{{/-last}}
+            .{{paramName}}(null){{#-last}};{{/-last}}
           {{/queryParams}}
         // {{#returnType}}{{{returnType}}} response = {{/returnType}}api.{{operationId}}({{#allParams}}{{^isQueryParam}}{{paramName}}, {{/isQueryParam}}{{/allParams}}queryParams);
 

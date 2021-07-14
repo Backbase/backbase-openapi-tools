@@ -1,5 +1,5 @@
 {{#isCookieParam}}
-			@ApiParam(value = "{{{description}}}"{{#required}},required=true{{/required}}{{#allowableValues}}, allowableValues = "{{#enumVars}}{{#lambdaEscapeDoubleQuote}}{{{value}}}{{/lambdaEscapeDoubleQuote}}{{^-last}}, {{/-last}}{{^-last}}{{/-last}}{{/enumVars}}"{{/allowableValues}}{{^isContainer}}{{#defaultValue}}, defaultValue={{^isString}}"{{/isString}}{{#isString}}{{#isEnum}}"{{/isEnum}}{{/isString}}{{{defaultValue}}}{{^isString}}"{{/isString}}{{#isString}}{{#isEnum}}"{{/isEnum}}{{/isString}}{{/defaultValue}}{{/isContainer}})
+			@ApiParam(value = "{{{description}}}"{{#required}},required=true{{/required}}{{#allowableValues}}, allowableValues = "{{#enumVars}}{{#lambdaEscapeDoubleQuote}}{{{value}}}{{/lambdaEscapeDoubleQuote}}{{^-last}}, {{/-last}}{{#-last}}{{/-last}}{{/enumVars}}"{{/allowableValues}}{{^isContainer}}{{#defaultValue}}, defaultValue={{^isString}}"{{/isString}}{{#isString}}{{#isEnum}}"{{/isEnum}}{{/isString}}{{{defaultValue}}}{{^isString}}"{{/isString}}{{#isString}}{{#isEnum}}"{{/isEnum}}{{/isString}}{{/defaultValue}}{{/isContainer}})
 			@CookieValue("{{baseName}}")
 			{{#useBeanValidation}}{{#required}}@NotNull
             {{/required}}{{/useBeanValidation}}
