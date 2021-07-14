@@ -104,7 +104,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
-        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(schema));
+        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(openAPI, schema));
         addImport(codegenModel, codegenModel.additionalPropertiesType);
     }
 

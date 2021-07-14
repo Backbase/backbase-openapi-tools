@@ -79,7 +79,7 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
         {{/openApiNullable}}
         return this;
     }
-    {{#isListContainer}}
+    {{#isArray}}
 
     public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
 		{{#openApiNullable}}
@@ -98,8 +98,8 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
 	    {{/openApiNullable}}
         return this;
     }
-    {{/isListContainer}}
-    {{#isMapContainer}}
+    {{/isArray}}
+    {{#isMap}}
 
     public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
 		{{#openApiNullable}}
@@ -118,7 +118,7 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
 	    {{/openApiNullable}}
         return this;
     }
-    {{/isMapContainer}}
+    {{/isMap}}
 
     {{^useLombokAnnotations}}
     /**
@@ -164,8 +164,8 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
             return false;
         }{{#hasVars}}
         {{classname}} {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
-                {{/hasMore}}{{/vars}}{{#parent}} &&
+        return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#-last}} &&
+                {{/-last}}{{/vars}}{{#parent}} &&
                 super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
         return true;{{/hasVars}}
     }
@@ -173,8 +173,8 @@ public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}
     @Override
     public int hashCode() {
         return Objects.hash(
-            {{#vars}}{{name}}{{#hasMore}},
-            {{/hasMore}}{{/vars}}{{#parent}}{{#hasVars}},
+            {{#vars}}{{name}}{{#-last}},
+            {{/-last}}{{/vars}}{{#parent}}{{#hasVars}},
             {{/hasVars}}super.hashCode(){{/parent}}
         );
     }

@@ -3,14 +3,16 @@ package com.backbase.oss.boat;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.codegen.lint.BoatLintConfig;
 import com.backbase.oss.codegen.lint.BoatLintGenerator;
-import java.io.File;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.openapitools.codegen.ClientOptInput;
+
+import java.io.File;
+import java.util.List;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
@@ -80,7 +82,9 @@ public class LintMojo extends AbstractLintMojo {
             log.info("Writing LINT Report for: {} to: {}", report.getTitle(), lintReportOutput);
             config.setOutputDir(lintReportOutput);
         }
-        BoatLintGenerator boatLintGenerator = new BoatLintGenerator(config);
+
+        BoatLintGenerator boatLintGenerator = new BoatLintGenerator();
+        boatLintGenerator.opts(new ClientOptInput().config(new BoatLintConfig()));
         boatLintGenerator.generate(report);
     }
 

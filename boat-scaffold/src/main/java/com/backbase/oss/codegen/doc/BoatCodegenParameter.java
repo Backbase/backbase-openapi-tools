@@ -6,19 +6,21 @@ import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenParameter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @ToString(callSuper = true)
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class BoatCodegenParameter extends CodegenParameter {
 
     private List<BoatExample> examples;
@@ -54,9 +56,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
         output.isFile = codegenParameter.isFile;
-        output.hasMore = codegenParameter.hasMore;
         output.isContainer = codegenParameter.isContainer;
-        output.secondaryParam = codegenParameter.secondaryParam;
         output.baseName = codegenParameter.baseName;
         output.paramName = codegenParameter.paramName;
         output.dataType = codegenParameter.dataType;
@@ -132,8 +132,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.isEmail = codegenParameter.isEmail;
         output.isFreeFormObject = codegenParameter.isFreeFormObject;
         output.isAnyType = codegenParameter.isAnyType;
-        output.isListContainer = codegenParameter.isListContainer;
-        output.isMapContainer = codegenParameter.isMapContainer;
+        output.isArray = codegenParameter.isArray;
+        output.isMap = codegenParameter.isMap;
         output.isExplode = codegenParameter.isExplode;
         output.style = codegenParameter.style;
 
@@ -180,15 +180,15 @@ public class BoatCodegenParameter extends CodegenParameter {
 
         if (parameter.getExamples() != null) {
             boatCodegenParameter.examples.addAll(parameter.getExamples().entrySet().stream()
-                .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(),
-                    codegenParameter.baseType, stringExampleEntry.getValue(), false))
-                .collect(Collectors.toList()));
+                    .map(stringExampleEntry -> new BoatExample(stringExampleEntry.getKey(),
+                            codegenParameter.baseType, stringExampleEntry.getValue(), false))
+                    .collect(Collectors.toList()));
 
         }
 
         if (parameter.getContent() != null) {
             parameter.getContent().forEach((contentType, mediaType) ->
-                dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
+                    dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
 
         }
         return boatCodegenParameter;
@@ -199,7 +199,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
         boatCodegenParameter.setRequestBody(body);
         body.getContent().forEach((contentType, mediaType) ->
-            dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
+                dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
         return boatCodegenParameter;
     }
 

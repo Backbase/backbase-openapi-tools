@@ -3,23 +3,20 @@ package com.backbase.oss.codegen.lint;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.BoatLinter;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
-import com.backbase.oss.codegen.AbstractDocumentationGenerator;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.backbase.oss.codegen.NonOpenApiGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.Generator;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 
 @Slf4j
-public class BoatLintGenerator extends AbstractDocumentationGenerator {
-
-    public BoatLintGenerator(BoatLintConfig config) {
-        super(config);
-    }
+public class BoatLintGenerator extends NonOpenApiGenerator {
 
     @Override
     public Generator opts(ClientOptInput opts) {
@@ -51,8 +48,9 @@ public class BoatLintGenerator extends AbstractDocumentationGenerator {
 
         // After processing our model, convert it into a map
         Map<String, Object> bundle = convertToBundle(boatLintReport);
+
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Lint for portal: {} in: {} ", boatLintReport.getTitle(), output);
+        log.info("Finished creating BOAT Lint for: {} ", boatLintReport.getTitle());
 
         return files;
     }

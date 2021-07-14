@@ -130,7 +130,7 @@ export class {{classname}} {
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpResponse<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpEvent<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
 {{/produces}}
-    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{#hasMore}} | {{/hasMore}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
+    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{#-last}} | {{/-last}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
     {{#allParams}}
         const _{{paramName}} = requestParameters["{{paramName}}"];
 {{#required}}
@@ -143,7 +143,7 @@ export class {{classname}} {
 {{#hasQueryParams}}
         let queryParameters = new HttpParams({encoder: this.encoder});
 {{#queryParams}}
-        {{#isListContainer}}
+        {{#isArray}}
         if (_{{paramName}}) {
         {{#isCollectionFormatMulti}}
             _{{paramName}}.forEach((element) => {
@@ -156,28 +156,28 @@ export class {{classname}} {
                 _{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']), '{{baseName}}');
         {{/isCollectionFormatMulti}}
         }
-        {{/isListContainer}}
-        {{^isListContainer}}
+        {{/isArray}}
+        {{^isArray}}
         if (_{{paramName}} !== undefined && _{{paramName}} !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>_{{paramName}}, '{{baseName}}');
         }
-        {{/isListContainer}}
+        {{/isArray}}
 {{/queryParams}}
 
 {{/hasQueryParams}}
         let headers = this.defaultHeaders;
 {{#headerParams}}
-        {{#isListContainer}}
+        {{#isArray}}
         if (_{{paramName}}) {
             headers = headers.set('{{baseName}}', _{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
         }
-        {{/isListContainer}}
-        {{^isListContainer}}
+        {{/isArray}}
+        {{^isArray}}
         if (_{{paramName}} !== undefined && _{{paramName}} !== null) {
             headers = headers.set('{{baseName}}', String(_{{paramName}}));
         }
-        {{/isListContainer}}
+        {{/isArray}}
 {{/headerParams}}
 
 {{#authMethods}}
@@ -214,7 +214,7 @@ export class {{classname}} {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
                 {{#produces}}
-                '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+                '{{{mediaType}}}'{{#-last}},{{/-last}}
                 {{/produces}}
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -228,7 +228,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+            '{{{mediaType}}}'{{#-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}
@@ -237,7 +237,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+            '{{{mediaType}}}'{{#-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}
@@ -269,7 +269,7 @@ export class {{classname}} {
         }
 
 {{#formParams}}
-        {{#isListContainer}}
+        {{#isArray}}
         if (_{{paramName}}) {
         {{#isCollectionFormatMulti}}
             _{{paramName}}.forEach((element) => {
@@ -286,12 +286,12 @@ export class {{classname}} {
             }
         {{/isCollectionFormatMulti}}
         }
-        {{/isListContainer}}
-        {{^isListContainer}}
+        {{/isArray}}
+        {{^isArray}}
         if (_{{paramName}} !== undefined) {
             formParams = formParams.append('{{baseName}}', {{^isModel}}<any>_{{paramName}}{{/isModel}}{{#isModel}}useForm ? new Blob([JSON.stringify(_{{paramName}})], {type: 'application/json'}) : <any>_{{paramName}}{{/isModel}}) as any || formParams;
         }
-        {{/isListContainer}}
+        {{/isArray}}
 {{/formParams}}
 
 {{/hasFormParams}}
@@ -334,7 +334,7 @@ export class {{classname}} {
 {{#hasQueryParams}}
         let queryParameters = new HttpParams({encoder: this.encoder});
 {{#queryParams}}
-        {{#isListContainer}}
+        {{#isArray}}
         if (_{{paramName}}) {
         {{#isCollectionFormatMulti}}
             _{{paramName}}.forEach((element) => {
@@ -347,13 +347,13 @@ export class {{classname}} {
                 _{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']), '{{baseName}}');
         {{/isCollectionFormatMulti}}
         }
-        {{/isListContainer}}
-        {{^isListContainer}}
+        {{/isArray}}
+        {{^isArray}}
         if (_{{paramName}} !== undefined && _{{paramName}} !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>_{{paramName}}, '{{baseName}}');
         }
-        {{/isListContainer}}
+        {{/isArray}}
 {{/queryParams}}
         const queryString = queryParameters.toString();
 {{/hasQueryParams}}

@@ -8,6 +8,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.openapitools.codegen.ClientOptInput;
 
 @Mojo(name = "yard", threadSafe = true)
 @Slf4j
@@ -30,6 +31,8 @@ public class GenerateYardMojo extends AbstractMojo {
         config.setOutputDir(output.getAbsolutePath());
         config.setSpecsBaseDir(specsBaseDir);
         config.setTemplateDir("boat-yard");
-        new BoatYardGenerator(config).generate();
+        BoatYardGenerator boatYardGenerator = new BoatYardGenerator();
+        boatYardGenerator.opts(new ClientOptInput().config(config));
+        boatYardGenerator.generate();
     }
 }

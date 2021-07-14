@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.ClientOptInput;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +29,9 @@ class BoatYardTests {
 
         config.setTemplateDir("boat-yard");
 
-        new BoatYardGenerator(config).generate();
+        BoatYardGenerator boatYardGenerator = new BoatYardGenerator();
+        boatYardGenerator.opts(new ClientOptInput().config(config));
+        boatYardGenerator.generate();
 
 
         String[] actualDirectorySorted = output.list();

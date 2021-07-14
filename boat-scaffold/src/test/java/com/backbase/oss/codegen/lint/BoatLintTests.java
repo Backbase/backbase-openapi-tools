@@ -10,6 +10,7 @@ import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.ClientOptInput;
 
 class BoatLintTests {
 
@@ -45,7 +46,10 @@ class BoatLintTests {
 
         config.setTemplateDir("boat-lint");
 
-        new BoatLintGenerator(config).generate();
+
+        BoatLintGenerator boatLintGenerator = new BoatLintGenerator();
+        boatLintGenerator.opts(new ClientOptInput().config(config));
+        boatLintGenerator.generate();
         return output;
     }
 

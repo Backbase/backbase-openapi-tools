@@ -26,6 +26,16 @@ BOAT is still under development and subject to change.
 
 * *Maven Plugin*
     * The boat:doc goal now recursively search OpenAPI specs in a directory to generate docs for each found spec.  
+## 0.15.0
+* *Maven Generator*
+
+Upgraded openapi-tools to 5.2.0
+* Changes to Mustache Templates
+  ** Renamed `hasMore` to `-last`
+  
+
+  
+
 
 ## 0.14.3
 

@@ -1,19 +1,13 @@
 package com.backbase.oss.codegen.yard;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
-import com.backbase.oss.codegen.AbstractDocumentationGenerator;
 import com.backbase.oss.codegen.CodegenException;
+import com.backbase.oss.codegen.NonOpenApiGenerator;
 import com.backbase.oss.codegen.doc.BoatDocsGenerator;
 import com.backbase.oss.codegen.yard.model.Portal;
 import com.backbase.oss.codegen.yard.model.Spec;
 import com.backbase.oss.codegen.yard.model.YardModel;
 import io.swagger.v3.oas.models.OpenAPI;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.ClientOptInput;
@@ -22,13 +16,18 @@ import org.openapitools.codegen.Generator;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 
 @Slf4j
-public class BoatYardGenerator extends AbstractDocumentationGenerator {
+public class BoatYardGenerator extends NonOpenApiGenerator {
 
-    public BoatYardGenerator(BoatYardConfig config) {
-        super(config);
-    }
+
 
     private BoatYardConfig getBoatYardConfig() {
         return (BoatYardConfig) config;
@@ -36,7 +35,8 @@ public class BoatYardGenerator extends AbstractDocumentationGenerator {
 
     @Override
     public Generator opts(ClientOptInput opts) {
-        return this;
+                super.opts(opts);
+    return this;
     }
 
     public List<File> generate() {
