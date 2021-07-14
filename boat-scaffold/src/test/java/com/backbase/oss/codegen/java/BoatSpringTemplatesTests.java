@@ -31,10 +31,7 @@ import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DynamicNode;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -167,7 +164,7 @@ class BoatSpringTemplatesTests {
 
     void generate(Combination param) {
         this.param = param;
-        this.files = generateFrom(null);
+        this.files = generateFrom(null, param.name);
         // used in development
         // this.files = generateFrom("openapi-generator-originals/JavaSpring-4.3.1");
 
@@ -263,13 +260,13 @@ class BoatSpringTemplatesTests {
         }
     }
 
-    private List<File> generateFrom(String templates) {
+    private List<File> generateFrom(String templates, String combination) {
         final File input = new File("src/test/resources/boat-spring/openapi.yaml");
         final CodegenConfigurator gcf = new CodegenConfigurator();
 
         gcf.setGeneratorName(BoatSpringCodeGen.NAME);
         gcf.setInputSpec(input.getAbsolutePath());
-        gcf.setOutputDir(TEST_OUTPUT);
+        gcf.setOutputDir(TEST_OUTPUT + "/" + combination);
 
         GlobalSettings.setProperty(CodegenConstants.APIS, "");
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "true");
