@@ -10,6 +10,7 @@ import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.ClientOptInput;
 
 class BoatLintTests {
 
@@ -26,7 +27,7 @@ class BoatLintTests {
 
         File index = new File("target/boat-lint/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
-        assertTrue(generated.contains("<title>BOAT Lint Report - Swagger Petstore</title>"));
+        assertTrue(generated.startsWith("<!doctype html>"));
     }
 
     @Test
@@ -45,7 +46,10 @@ class BoatLintTests {
 
         config.setTemplateDir("boat-lint");
 
-        new BoatLintGenerator(config).generate();
+
+        BoatLintGenerator boatLintGenerator = new BoatLintGenerator();
+        boatLintGenerator.opts(new ClientOptInput().config(config));
+        boatLintGenerator.generate();
         return output;
     }
 

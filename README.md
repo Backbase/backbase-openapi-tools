@@ -19,6 +19,15 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.15.0 * BREAKING CHANGES
+* Upgraded **openapi-generator** to **5.2.0**
+* Plugin now requires Java 11
+* Changes to Mustache Templates
+  * Renamed `hasMore` to `-last`
+  * Use of `Set` for unique items is now enabled by default as OpenAPI Generator 5.x fixed their implementation
+  
+
+
 ## 0.14.4
 
 * *Boat Marina*

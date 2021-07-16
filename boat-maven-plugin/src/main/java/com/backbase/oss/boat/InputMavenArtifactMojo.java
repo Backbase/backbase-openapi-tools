@@ -27,152 +27,149 @@ import java.util.stream.Stream;
 @Slf4j
 public class InputMavenArtifactMojo extends AbstractMojo {
 
-  /**
-   * A maven artifact containing a spec, or multiple to be processed
-   */
-  @Parameter(name = "inputMavenArtifact", property = "inputMavenArtifact", required = false)
-  protected InputArtifact inputMavenArtifact;
+    /**
+     * A maven artifact containing a spec, or multiple to be processed
+     */
+    @Parameter(name = "inputMavenArtifact", property = "inputMavenArtifact", required = false)
+    protected InputArtifact inputMavenArtifact;
 
-  /**
-   * File input used for Linting and Validating
-   * Can be directory or file
-   */
-  @Parameter(name = "input", required = false)
-  protected File input;
+    /**
+     * File input used for Linting and Validating
+     * Can be directory or file
+     */
+    @Parameter(name = "input", required = false)
+    protected File input;
 
-  /**
-   * Location of the OpenAPI spec, as URL or local file glob pattern.
-   * <p>
-   * If the input is a local file, the value of this property is considered a glob pattern that must
-   * resolve to a unique file.
-   * </p>
-   * <p>
-   * The glob pattern allows to express the input specification in a version neutral way. For
-   * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
-   * {@code my-service-api-v*.yaml}.
-   * </p>
-   */
-  @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = false)
-  protected String inputSpec;
+    /**
+     * Location of the OpenAPI spec, as URL or local file glob pattern.
+     * <p>
+     * If the input is a local file, the value of this property is considered a glob pattern that must
+     * resolve to a unique file.
+     * </p>
+     * <p>
+     * The glob pattern allows to express the input specification in a version neutral way. For
+     * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
+     * {@code my-service-api-v*.yaml}.
+     * </p>
+     */
+    @Parameter(name = "inputSpec", property = "openapi.generator.maven.plugin.inputSpec", required = false)
+    protected String inputSpec;
 
-  /**
-   * The project being built.
-   */
-  @Parameter(readonly = true, required = true, defaultValue = "${project}")
-  protected MavenProject project;
+    /**
+     * The project being built.
+     */
+    @Parameter(readonly = true, required = true, defaultValue = "${project}")
+    protected MavenProject project;
 
-  /**
-   * Used to set up artifact request
-   */
-  @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-  protected RepositorySystemSession repositorySession;
+    /**
+     * Used to set up artifact request
+     */
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    protected RepositorySystemSession repositorySession;
 
-  /**
-   * Used to look up Artifacts in the remote repository.
-   */
-  @Component
-  protected ArtifactResolver artifactResolver;
+    /**
+     * Used to look up Artifacts in the remote repository.
+     */
+    @Component
+    protected ArtifactResolver artifactResolver;
 
-  /**
-   * List of Remote Repositories used by the resolver.
-   */
-  @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
-  protected List<RemoteRepository> remoteRepositories;
+    /**
+     * List of Remote Repositories used by the resolver.
+     */
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    protected List<RemoteRepository> remoteRepositories;
 
-  private final ReentrantLock reLock = new ReentrantLock(true);
+    private final ReentrantLock reLock = new ReentrantLock(true);
 
-  @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
-    if (inputMavenArtifact != null && inputMavenArtifact.getArtifactId() != null) {
-      getArtifact();
-    }
+        if (inputMavenArtifact != null && inputMavenArtifact.getArtifactId() != null) {
+            getArtifact();
+        }
 
-    if (input == null && inputSpec == null && inputMavenArtifact == null) {
-      throw new MojoExecutionException("Missing input from plugin, input options are: inputMavenArtifact, input, inputSpec");
-    }
+        if (input == null && inputSpec == null && inputMavenArtifact == null) {
+            throw new MojoExecutionException("Missing input from plugin, input options are: inputMavenArtifact, input, inputSpec");
+        }
 
-    if (input == null) {
-      input = new File(inputSpec);
-    }
-
-  }
-
-
-  private void getArtifact() throws MojoExecutionException {
-    ArtifactResult result;
-
-    File specUnzipDirectory = new File(project.getBuild().getDirectory()
-            + File.separator + "input-artifact" + File.separator
-            + inputMavenArtifact.getArtifactId(), inputMavenArtifact.getVersion());
-
-
-
-
-
-    // The artifact will be downloaded to the local repository if necessary. An artifact that is already resolved will
-    // be skipped and is not re-resolved.
-    result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
-            , inputMavenArtifact.getArtifactId()
-            , inputMavenArtifact.getClassifier()
-            , inputMavenArtifact.getType()
-            , inputMavenArtifact.getVersion()));
-
-    if (inputMavenArtifact.isNeedsProcessing(specUnzipDirectory,result.getArtifact().getFile())) {
-
-      unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
+        if (input == null) {
+            input = new File(inputSpec);
+        }
 
     }
 
-    try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())) {
 
-      List<String> paths = walk
-              .filter(Files::isRegularFile)
-              .filter(path -> path.endsWith(inputMavenArtifact.getFileName()))
-              .map(Path::toString)
-              .collect(Collectors.toList());
+    private void getArtifact() throws MojoExecutionException {
+        ArtifactResult result;
 
-      if (paths.size() > 1) {
-        log.info("found multiple files of matching {} in zip, using {}", inputMavenArtifact.getFileName(), paths.get(0));
-      } else if (paths.isEmpty()) {
-        throw new MojoExecutionException("no file matching " + inputMavenArtifact.getFileName() + " was found in artifact zip");
-      }
+        File specUnzipDirectory = new File(project.getBuild().getDirectory()
+                + File.separator + "input-artifact" + File.separator
+                + inputMavenArtifact.getArtifactId(), inputMavenArtifact.getVersion());
 
-      inputSpec = paths.get(0);
-      input = new File(paths.get(0));
 
-    } catch (IOException e) {
-      log.debug(e.getMessage());
-      throw new MojoExecutionException("Could not search unzipped artifact directory");
+        // The artifact will be downloaded to the local repository if necessary. An artifact that is already resolved will
+        // be skipped and is not re-resolved.
+        result = new ArtifactRepositoryResolver(artifactResolver, repositorySession, remoteRepositories).resolveArtifactFromRepositories(new DefaultArtifact(inputMavenArtifact.getGroupId()
+                , inputMavenArtifact.getArtifactId()
+                , inputMavenArtifact.getClassifier()
+                , inputMavenArtifact.getType()
+                , inputMavenArtifact.getVersion()));
+
+        if (inputMavenArtifact.isNeedsProcessing(specUnzipDirectory, result.getArtifact().getFile())) {
+
+            unzipSpec(result.getArtifact().getFile(), specUnzipDirectory);
+
+        }
+
+        try (Stream<Path> walk = Files.walk(specUnzipDirectory.toPath())) {
+
+            List<String> paths = walk
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.endsWith(inputMavenArtifact.getFileName()))
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+
+            if (paths.size() > 1) {
+                log.info("found multiple files of matching {} in zip, using {}", inputMavenArtifact.getFileName(), paths.get(0));
+            } else if (paths.isEmpty()) {
+                throw new MojoExecutionException("no file matching " + inputMavenArtifact.getFileName() + " was found in artifact zip");
+            }
+
+            inputSpec = paths.get(0);
+            input = new File(paths.get(0));
+
+        } catch (IOException e) {
+            log.debug(e.getMessage());
+            throw new MojoExecutionException("Could not search unzipped artifact directory");
+        }
+
     }
 
-  }
 
-
-  private void unzipSpec(File inputFile, File specUnzipDirectory) throws MojoExecutionException {
-    reLock.lock();
-    try {
-      specUnzipDirectory.mkdirs();
-      unzip(inputFile, specUnzipDirectory);
-    } catch (Exception e) {
-      reLock.unlock();
-      throw new MojoExecutionException("Error extracting spec: " + inputFile, e);
-    }finally {
-      reLock.unlock();
+    private void unzipSpec(File inputFile, File specUnzipDirectory) throws MojoExecutionException {
+        reLock.lock();
+        try {
+            specUnzipDirectory.mkdirs();
+            unzip(inputFile, specUnzipDirectory);
+        } catch (Exception e) {
+            reLock.unlock();
+            throw new MojoExecutionException("Error extracting spec: " + inputFile, e);
+        } finally {
+            reLock.unlock();
+        }
     }
-  }
 
-  private void unzip(File source, File out) throws Exception {
-    Expand expand = new Expand();
-    expand.setSrc(source);
-    expand.setDest(out);
-    expand.setOverwrite(true);
-    expand.execute();
-  }
+    private void unzip(File source, File out) throws Exception {
+        Expand expand = new Expand();
+        expand.setSrc(source);
+        expand.setDest(out);
+        expand.setOverwrite(true);
+        expand.execute();
+    }
 
-  public void setInput(File input) {
-    this.input = input;
-  }
+    public void setInput(File input) {
+        this.input = input;
+    }
 
 }
 

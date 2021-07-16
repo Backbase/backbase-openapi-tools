@@ -21,10 +21,9 @@ public class BoatAngularCodegenOperation extends CodegenOperation {
         this.returnTypeIsPrimitive = o.returnTypeIsPrimitive;
         this.returnSimpleType = o.returnSimpleType;
         this.subresourceOperation = o.subresourceOperation;
-        this.isMapContainer = o.isMapContainer;
-        this.isListContainer = o.isListContainer;
+        this.isMap = o.isMap;
+        this.isArray = o.isArray;
         this.isMultipart = o.isMultipart;
-        this.hasMore = o.hasMore;
         this.isResponseBinary = o.isResponseBinary;
         this.isResponseFile = o.isResponseFile;
         this.hasReference = o.hasReference;

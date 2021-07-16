@@ -30,4 +30,5 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
     public String getName() {
         return NAME;
     }
+
 }

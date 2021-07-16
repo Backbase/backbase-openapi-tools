@@ -2,8 +2,10 @@ package com.backbase.oss.codegen.doc;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +36,6 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.is4xx = o.is4xx;
         this.is5xx = o.is5xx;
         this.message = o.message;
-        this.hasMore = o.hasMore;
         this.dataType = o.dataType;
         this.baseType = o.baseType;
         this.containerType = o.containerType;
@@ -58,8 +59,8 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.isDefault = o.isDefault;
         this.simpleType = o.simpleType;
         this.primitiveType = o.primitiveType;
-        this.isMapContainer = o.isMapContainer;
-        this.isListContainer = o.isListContainer;
+        this.isMap = o.isMap;
+        this.isArray = o.isArray;
         this.isBinary = o.isBinary;
         this.isFile = o.isFile;
         this.schema = o.schema;

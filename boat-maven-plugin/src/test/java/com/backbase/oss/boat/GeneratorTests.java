@@ -268,10 +268,6 @@ class GeneratorTests {
         mojo.skip = false;
         mojo.skipIfSpecIsUnchanged = false;
         mojo.execute();
-        String[] actualFilesGenerated = output.list();
-        Arrays.sort(actualFilesGenerated);
-        String[] expected = {".openapi-generator", ".openapi-generator-ignore", "README.md", "pom.xml", "src"};
-        assertArrayEquals(expected, actualFilesGenerated);
 
     }
 

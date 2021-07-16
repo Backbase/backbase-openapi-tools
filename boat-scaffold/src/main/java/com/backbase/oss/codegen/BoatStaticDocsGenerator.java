@@ -186,4 +186,9 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
             }
         }
     }
+
+    @Override
+    public void postProcess() {
+        BoatUtils.writeThankYouNote();
+    }
 }
