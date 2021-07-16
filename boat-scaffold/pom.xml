@@ -139,7 +139,7 @@
                             <projectsDirectory>target/boat-spring-templates-tests</projectsDirectory>
                             <failIfNoProjects>true</failIfNoProjects>
                             <pomIncludes>
-                                <pomInclude>pom.xml</pomInclude>
+                                <pomInclude>**/pom.xml</pomInclude>
                             </pomIncludes>
                             <streamLogs>true</streamLogs>
                             <goals>
