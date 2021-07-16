@@ -65,6 +65,7 @@
         <swagger-parser.version>2.0.23</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <maven-compiler-plugin.source>11</maven-compiler-plugin.source>
     </properties>
 
     <modules>
@@ -394,8 +395,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${maven-compiler-plugin.source}</source>
+                    <target>${maven-compiler-plugin.source}</target>
                 </configuration>
             </plugin>
             <!-- Source plugin -->
