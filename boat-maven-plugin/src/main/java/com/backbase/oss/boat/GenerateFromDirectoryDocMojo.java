@@ -86,9 +86,11 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
 
                     Files.write(new File(markersDirectory, "success.lst").toPath(),
                             listOfFilesToString(success).getBytes(StandardCharsets.UTF_8),
+                            StandardOpenOption.CREATE,
                             StandardOpenOption.APPEND);
                     Files.write(new File(markersDirectory, "failed.lst").toPath(),
                             listOfFilesToString(failed).getBytes(StandardCharsets.UTF_8),
+                            StandardOpenOption.CREATE,
                             StandardOpenOption.APPEND);
 
                 } catch (IOException e) {
