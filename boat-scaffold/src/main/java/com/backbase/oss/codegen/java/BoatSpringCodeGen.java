@@ -25,11 +25,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
+    public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
     public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String BASE_TYPE = "java.util.Set";
+    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
+    public static final String UNIQUE_BASE_TYPE = "java.util.Set";
 
     static class NewLineIndent implements Mustache.Lambda {
 
@@ -96,6 +98,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean addServletRequest;
 
     /**
+     * Adds BindingResult to API interface method if @validate is used
+     */
+    @Setter
+    @Getter
+    protected boolean addBindingResult;
+
+    /**
      * Add Lombok to class-level Api models. Defaults to false
      */
     @Setter
@@ -124,17 +133,22 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
-            "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
+            "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
+        this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
+            "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
+            this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
+            "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library", this.openApiNullable));
+            "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
-            "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
+            "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
+        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
+            "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
     }
@@ -168,12 +182,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
         // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
         // <generateSupportingFiles>true or false</generateSupportingFiles>
         final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
-        final boolean useApiUtil =
-            supFiles == null
-                ? false // cleared by <generateSuportingFiles>false</generateSuportingFiles>
-                : supFiles.isEmpty()
-                    ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
-                    : supFiles.contains("ApiUtil.java"); // set by <supportingFilesToGenerate/>
+        // cleared by <generateSuportingFiles>false</generateSuportingFiles>
+        final boolean useApiUtil = supFiles != null && (supFiles.isEmpty()
+                        ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+                        : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles
@@ -188,6 +200,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
             this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);
         }
+        if (this.additionalProperties.containsKey(ADD_BINDING_RESULT)) {
+            this.addBindingResult = convertPropertyToBoolean(ADD_BINDING_RESULT);
+        }
         if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
             this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
         }
@@ -200,18 +215,24 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
+        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
+            this.additionalProperties.put("modelFieldsVisibility", "protected");
+        } else {
+            this.additionalProperties.put("modelFieldsVisibility", "private");
+        }
 
         writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
+        writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
         writePropertyBack(OPENAPI_NULLABLE, this.openApiNullable);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
         if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", BASE_TYPE);
+            this.typeMapping.put("set", UNIQUE_BASE_TYPE);
 
-            this.importMapping.put("Set", BASE_TYPE);
+            this.importMapping.put("Set", UNIQUE_BASE_TYPE);
             this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
         }
 
@@ -227,9 +248,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             p.containerType = "set";
-            p.baseType = BASE_TYPE;
-            p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
-            p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+            p.baseType = UNIQUE_BASE_TYPE;
+            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
             p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
         }
     }
@@ -244,9 +265,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
             }
 
             if (this.useSetForUniqueItems && p.getUniqueItems()) {
-                p.baseType = BASE_TYPE;
-                p.dataType = BASE_TYPE + "<" + p.items.dataType + ">";
-                p.datatypeWithEnum = BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+                p.baseType = UNIQUE_BASE_TYPE;
+                p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+                p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
                 p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
             }
         }

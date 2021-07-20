@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: BOAT
+  description: The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI
+  tags:
+    - java
+    - openapi
+  links:
+    - url: https://community.backbase.com/documentation/ServiceSDK/latest/generate_clients_from_openapi
+      title: Generate clients using BOAT
+      icon: user
+    - url: https://community.backbase.com/documentation/ServiceSDK/latest/create_an_openapi_spec_project
+      title: Generate code using BOAT
+      icon: group
+    - url: https://backbase.slack.com/archives/CMU9PLZ5Z
+      title: Support channel
+      icon: help
+spec:
+  type: library
+  lifecycle: production
+  owner: backend-guild

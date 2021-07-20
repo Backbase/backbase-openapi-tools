@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
 import java.nio.charset.StandardCharsets;
 
 @Log
-@SuppressWarnings({"java:S3740", "rawtypes"})
+@SuppressWarnings({"java:S3740", "rawtypes", "java:S2755"})
 public class XmlSchemaToOpenApi {
     public static final String NAME = "name";
     public static final String TYPE = "type";

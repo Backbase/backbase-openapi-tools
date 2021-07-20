@@ -19,7 +19,28 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
-## 0.14.0 (not released)
+## 0.14.4
+
+* *Boat Marina*
+  * Added a now BOAT Scaffold template called Marina, as that is where the models hang out. The Boat Marina template outputs a single JSON file that is used to offer a rich user interface built from the specs including search, page per operation and many more features!
+
+* *Maven Plugin*
+    * The boat:doc goal now recursively search OpenAPI specs in a directory to generate docs for each found spec.  
+
+## 0.14.3
+
+* *Maven Plugin*
+  * Added new goal `boat:transform`; see the description in the [plugin documentation](boat-maven-plugin/README.md#boattransform).
+
+## 0.14.2
+* *Angular Generator*
+  * Added support for Angular version ranges in peer dependencies
+  
+## 0.14.1
+* *Angular Generator*
+  * Added support for Angular 11
+  
+## 0.14.0
 * *Angular Generator*
   * Simplify Angular generator options by removing the unused ones (withInterfaces,providedInRoot)
   * fix Mock is not generated if Http status equals to 201 (SDK-2388)
@@ -31,6 +52,7 @@ BOAT is still under development and subject to change.
     * Check prefix for paths should contain version.
   * Enabled rules.
     * Use Standard HTTP Status Codes.
+
 ## 0.12.0
 * *General*
   * Improved code quality
@@ -132,12 +154,10 @@ BOAT is still under development and subject to change.
 * ability to resolve references like #/components/schemas/myObject/items or #/components/schemas/myObject/properties/embeddedObject
 * simple fix to avoid npe in StaticHtml2Generation escaping response message.
 
-
 ## 0.5.0
 
 * Add DereferenceComponentsPropertiesTransformer (that does a bit extra)
 * Fix recursive referencing in UnAliasTransformer
-
 
 ## 0.4.0
 * Added bundle skip
@@ -618,6 +638,7 @@ For the `spring` generator, the additional configuration options are:
 | `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
 | `useLombokAnnotations` | Use Lombok annotations to generate properties accessors and `hashCode`/`equals` methods (Default: false) |
 | `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
+| `addBindingResult` | Adds BindingResult to Api method definitions' request bodies if UseBeanValidation true, for this to be effective you must configure UseBeanValidation, this is not done automatically (Default: false)|
 | `implicitHeaders` | Skip header parameters in the generated API methods using @ApiImplicitParams annotation. (Default: false) |
 | `swaggerDocketConfig` | Generate Spring OpenAPI Docket configuration class. (Default: false) |
 | `apiFirst` | Generate the API from the OAI spec at server compile time (API first approach) (Default: false) |

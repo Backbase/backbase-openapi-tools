@@ -64,6 +64,8 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
     @Parameter(name = "addChangeLog", defaultValue = "true")
     private boolean addChangeLog;
 
+    public void setSpecBom(Dependency specBom){this.specBom = specBom;}
+
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -113,7 +115,7 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             .filter(versionRange::containsVersion)
             .distinct()
             .map(this::convertToArtifact)
-            .map(this::resolveArtifactFromRepositories)
+            .map(defaultArtifact -> new ArtifactRepositoryResolver(artifactResolver,repositorySession,remoteRepositories).resolveArtifactFromRepositories(defaultArtifact))
             .map(this::parsePomFile)
             .map(this::groupArtifactsPerVersionAndCapability)
             .collect(Collectors.toList());
@@ -147,7 +149,7 @@ public class ExportBomMojo extends AbstractRamlToOpenApi {
             .filter(this::isIncludedSpec)
             .map(this::createNewDefaultArtifact)
             .distinct()
-            .map(this::resolveArtifactFromRepositories)
+            .map(defaultArtifact ->  new ArtifactRepositoryResolver(artifactResolver,repositorySession,remoteRepositories).resolveArtifactFromRepositories(defaultArtifact))
             .collect(Collectors
                 .groupingBy(artifactResult -> artifactResult.getArtifact().getGroupId(), TreeMap::new,
                     Collectors.toSet()));

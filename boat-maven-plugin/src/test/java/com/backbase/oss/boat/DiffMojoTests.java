@@ -18,7 +18,7 @@ class DiffMojoTests {
     void testNonBreakingChange() {
         DiffMojo diffMojo = new DiffMojo();
         diffMojo.setOldFile(getFile("/oas-examples/petstore.yaml"));
-        diffMojo.setNewFile(getFile("/oas-examples/petstore-new-non-breaking.yaml"));
+        diffMojo.setNewFile(getFile("/oas-examples/petstore-really-non-breaking.yaml"));
         diffMojo.setWriteChangelog(true);
         diffMojo.setChangelogOutput(new File("target"));
         diffMojo.setChangelogRenderer("markdown");

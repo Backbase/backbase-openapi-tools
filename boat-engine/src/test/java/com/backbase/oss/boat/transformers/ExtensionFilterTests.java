@@ -17,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-class VendorExtensionFilterTests {
+class ExtensionFilterTests {
 
     @Test
     void run() throws Throwable {
-        Transformer trn = new VendorExtensionFilter();
+        Transformer trn = new ExtensionFilter();
 
         OpenAPI api1 = OpenAPILoader.load(new File("src/test/resources/openapi/extension-filter/openapi.yaml"));
         OpenAPI api2 = trn.transform(api1, singletonMap("remove", singleton("x-remove")));

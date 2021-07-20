@@ -28,7 +28,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testHtml2() throws MojoExecutionException {
+    void testHtml2() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
         GenerateMojo mojo = new GenerateMojo();
@@ -55,7 +55,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBoatDocs() throws MojoExecutionException {
+    void testBoatDocs() throws MojoExecutionException, MojoFailureException {
 
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
 
@@ -83,6 +83,37 @@ class GeneratorTests {
         mojo.execute();
 
         assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
+    }
+
+    @Test
+    void testBoatDocsWithDirectory() throws MojoExecutionException, MojoFailureException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs-directory");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.openApiFileFilters = "**/*.yaml";
+        mojo.execute();
+        assertThat(output.list()).contains("link", "petstore", "petstore-new-non-breaking", "upto");
     }
 
     @Test
@@ -205,7 +236,7 @@ class GeneratorTests {
     }
 
     @Test
-    void testBeanValidation() throws MojoExecutionException {
+    void testBeanValidation() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = new GenerateMojo();
 
         String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
@@ -270,80 +301,5 @@ class GeneratorTests {
 
     }
 
-    @Test
-    void testJavaClient() throws MojoExecutionException, MavenInvocationException {
-        GenerateMojo mojo = new GenerateMojo();
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-
-        File input = new File(spec);
-        File output = new File("target/javaclient");
-        if (output.exists()) {
-            output.delete();
-        }
-        output.mkdirs();
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-        mojo.generatorName = "java";
-        mojo.library = "native";
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.skipOverwrite = false;
-        mojo.generateAliasAsModel = false;
-        mojo.execute();
-
-        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-        invocationRequest.setPomFile(new File(output, "pom.xml"));
-        invocationRequest.setGoals(Arrays.asList("compile"));
-        invocationRequest.setBatchMode(true);
-
-        Invoker invoker = new DefaultInvoker();
-        InvocationResult invocationResult = invoker.execute(invocationRequest);
-        assertNull(invocationResult.getExecutionException());
-
-    }
-
-    @Test
-    void testReactiveJavaClient() throws MojoExecutionException, MavenInvocationException {
-        GenerateMojo mojo = new GenerateMojo();
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-
-        File input = new File(spec);
-        File output = new File("target/webclient");
-        if (output.exists()) {
-            output.delete();
-        }
-        output.mkdirs();
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-        mojo.generatorName = "java";
-        mojo.library = "webclient";
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.skipOverwrite = false;
-        mojo.generateAliasAsModel = false;
-        mojo.execute();
-
-        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-        invocationRequest.setPomFile(new File(output, "pom.xml"));
-        invocationRequest.setGoals(Arrays.asList("compile"));
-        invocationRequest.setBatchMode(true);
-
-        Invoker invoker = new DefaultInvoker();
-        InvocationResult invocationResult = invoker.execute(invocationRequest);
-        assertNull(invocationResult.getExecutionException());
-
-    }
 
 }
