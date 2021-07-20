@@ -16,6 +16,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import java.io.File;
 import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
@@ -80,6 +82,7 @@ class GeneratorTests {
         mojo.skipIfSpecIsUnchanged = false;
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
+        mojo.markersDirectory = new File("target/boat-markers");
         mojo.execute();
 
         assertThat(output.list()).containsExactlyInAnyOrder("index.html", ".openapi-generator-ignore", ".openapi-generator");
@@ -112,8 +115,80 @@ class GeneratorTests {
         mojo.bundleSpecs = true;
         mojo.dereferenceComponents = true;
         mojo.openApiFileFilters = "**/*.yaml";
+        mojo.markersDirectory = new File("target/boat-markers");
         mojo.execute();
+
+
         assertThat(output.list()).contains("link", "petstore", "petstore-new-non-breaking", "upto");
+    }
+
+    @Test
+    void testBoatDocsWithDirectoryAndInvalidFiles() throws MojoExecutionException, MojoFailureException {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples").getFile());
+
+        log.info("Generating docs for: {}", spec);
+
+        GenerateDocMojo mojo = new GenerateDocMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-docs-directory");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.openApiFileFilters = "**/*.yaml";
+        mojo.markersDirectory = new File("target/boat-markers");
+        mojo.execute();
+
+
+        assertThat(output.list()).contains("link", "petstore", "petstore-new-non-breaking", "upto");
+    }
+
+    @Test
+    void testBoatDocsWithNonExistingMarkersDirectory() {
+
+        assertThatExceptionOfType(MojoExecutionException.class).isThrownBy(() -> {
+            String spec = System.getProperty("spec", getClass().getResource("/boat-doc-oas-examples").getFile());
+
+            log.info("Generating docs for: {}", spec);
+
+            GenerateDocMojo mojo = new GenerateDocMojo();
+            File input = new File(spec);
+            File output = new File("target/boat-docs-directory");
+            if (!output.exists()) {
+                output.mkdirs();
+            }
+
+            DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+            defaultBuildContext.enableLogging(new ConsoleLogger());
+
+            mojo.getLog();
+            mojo.buildContext = defaultBuildContext;
+            mojo.project = new MavenProject();
+            mojo.inputSpec = input.getAbsolutePath();
+            mojo.output = output;
+            mojo.skip = false;
+            mojo.skipIfSpecIsUnchanged = false;
+            mojo.bundleSpecs = true;
+            mojo.dereferenceComponents = true;
+            mojo.openApiFileFilters = "**/*.yaml";
+            mojo.markersDirectory = new File(" //43243 \\d a1r1\4t 11t134 t835jyz");
+            mojo.execute();
+        });
+
+
     }
 
     @Test
