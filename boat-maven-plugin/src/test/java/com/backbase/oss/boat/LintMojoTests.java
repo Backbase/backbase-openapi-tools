@@ -60,6 +60,24 @@ class LintMojoTests {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "false, false, /oas-examples/upto.yaml",
+        "false, false, /oas-examples/openapi.yaml"
+    })
+    // TODO: Create proper assertions
+    void testsLintFileWithExamples(boolean report, boolean fail, String fileName)  {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setInput(getFile(fileName));
+        lintMojo.setFailOnWarning(fail);
+        lintMojo.setWriteLintReport(report);
+        if(fail)
+            assertThrows(MojoExecutionException.class, lintMojo::execute);
+        else {
+            assertDoesNotThrow(lintMojo::execute);
+        }
+    }
+
     @Test
     void testExceptionsNotExistingFile() {
         LintMojo lintMojo = new LintMojo();

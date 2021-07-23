@@ -68,6 +68,8 @@ public class LintMojo extends AbstractLintMojo {
             throw new MojoFailureException("Linting " + inputSpec + " failed. Please correct the found issues and try again");
         }
 
+        validateExamples();
+
     }
 
     private void generateLintReport(boolean isSingleLint, BoatLintReport report) {

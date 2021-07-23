@@ -16,6 +16,8 @@
     <description>Open API Converter</description>
 
     <properties>
+        <openapi-schema-validator.version>1.0.7</openapi-schema-validator.version>
+
         <maven.api.version>3.6.0</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
@@ -56,6 +58,12 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openapi4j</groupId>
+            <artifactId>openapi-schema-validator</artifactId>
+            <version>${openapi-schema-validator.version}</version>
         </dependency>
 
         <!-- Maven Dependencies -->
