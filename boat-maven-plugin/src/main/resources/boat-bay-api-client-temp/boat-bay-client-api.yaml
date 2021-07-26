@@ -1,0 +1,322 @@
+openapi: 3.0.0
+info:
+  title: Boat Bay Upload Server
+  description: Endpoints for uploading Specs to boat bay
+  license:
+    name: Backbase
+  version: 1.0.0
+servers:
+- url: http://boat-bay-server.proto.backbasecloud.com/
+tags:
+- name: upload-plugin
+paths:
+  /api/boat/boat-maven-plugin/{sourceKey}/upload:
+    post:
+      tags:
+      - upload-plugin
+      summary: upload and lint specs
+      operationId: uploadSpec
+      parameters:
+      - name: sourceKey
+        in: path
+        description: source identifier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadRequestBody'
+        required: true
+      responses:
+        "200":
+          description: list of lint reports for specs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoatLintReport'
+components:
+  schemas:
+    BoatProduct:
+      type: object
+      properties:
+        portalKey:
+          type: string
+        portalName:
+          type: string
+        id:
+          type: integer
+          format: int64
+        key:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        createdOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        createdBy:
+          type: string
+        lastLintReport:
+          $ref: '#/components/schemas/BoatLintReport'
+        statistics:
+          $ref: '#/components/schemas/BoatStatistics'
+        jiraProjectId:
+          type: string
+    BoatCapability:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        key:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        createdOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        createdBy:
+          type: string
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoatService'
+        lastLintReport:
+          $ref: '#/components/schemas/BoatLintReport'
+        statistics:
+          $ref: '#/components/schemas/BoatStatistics'
+    BoatService:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        createdOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        createdBy:
+          type: string
+        statistics:
+          $ref: '#/components/schemas/BoatStatistics'
+        capability:
+          $ref: '#/components/schemas/BoatCapability'
+    BoatSpec:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        key:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        version:
+          type: string
+        grade:
+          type: string
+        createdOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        createdBy:
+          type: string
+        statistics:
+          $ref: '#/components/schemas/BoatStatistics'
+        backwardsCompatible:
+          type: boolean
+        changes:
+          $ref: '#/components/schemas/Changes'
+        capability:
+          $ref: '#/components/schemas/BoatCapability'
+        serviceDefinition:
+          $ref: '#/components/schemas/BoatService'
+        openApi:
+          type: string
+    BoatLintReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        spec:
+          $ref: '#/components/schemas/BoatSpec'
+        name:
+          type: string
+        passed:
+          type: boolean
+        lintedOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        openApi:
+          type: string
+        version:
+          type: string
+        grade:
+          type: string
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoatViolation'
+        hasViolations:
+          type: boolean
+    BoatLintRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ruleId:
+          type: string
+        enabled:
+          type: boolean
+        title:
+          type: string
+        ruleSet:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        url:
+          type: string
+          format: uri
+    BoatProductRelease:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        key:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        releaseDate:
+          $ref: '#/components/schemas/LocalDateTime'
+    Resource:
+      type: array
+      items:
+        type: string
+        format: byte
+    ChangedOpenApiObject:
+      type: object
+    UploadRequestBody:
+      type: object
+      properties:
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadSpec'
+        projectId:
+          type: string
+          nullable: false
+          minLength: 1
+        artifactId:
+          type: string
+          nullable: false
+          minLength: 1
+        version:
+          type: string
+          nullable: false
+          minLength: 1
+    LocalDateTime:
+      type: string
+      format: date-time
+    BoatStatistics:
+      type: object
+      properties:
+        updatedOn:
+          $ref: '#/components/schemas/LocalDateTime'
+        mustViolationsCount:
+          type: integer
+          format: int64
+        shouldViolationsCount:
+          type: integer
+          format: int64
+        mayViolationsCount:
+          type: integer
+          format: int64
+        hintViolationsCount:
+          type: integer
+          format: int64
+    Changes:
+      type: string
+      enum:
+      - INVALID_VERSION
+      - NOT_APPLICABLE
+      - ERROR_COMPARING
+      - UNCHANGED
+      - COMPATIBLE
+      - BREAKING
+    BoatViolation:
+      type: object
+      properties:
+        rule:
+          $ref: '#/components/schemas/BoatLintRule'
+        description:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        lines:
+          $ref: '#/components/schemas/IntRange'
+        pointer:
+          $ref: '#/components/schemas/JsonPointer'
+    Severity:
+      type: string
+      enum:
+      - MUST
+      - SHOULD
+      - MAY
+      - HINT
+    UploadSpec:
+      type: object
+      properties:
+        fileName:
+          type: string
+        openApi:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+    JsonPointer:
+      type: object
+      properties:
+        separator:
+          type: string
+          default: /
+        EMPTY:
+          type: JsonPointer
+        _nextSegment:
+          type: JsonPointer
+        _head:
+          type: JsonPointer
+        _asString:
+          type: string
+        _matchingPropertyName:
+          type: string
+        _matchingElementIndex:
+          type: int
+    IntRange:
+      type: object
+      properties:
+        start:
+          type: integer
+        endInclusive:
+          type: integer
+  examples: {}

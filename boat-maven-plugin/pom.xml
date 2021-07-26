@@ -20,7 +20,7 @@
         <boat-maven-plugin.supportingFilesToGenerate>ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java,ApiException.java,Pair.java</boat-maven-plugin.supportingFilesToGenerate>
         <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
         <swagger-annotations.version>1.6.2</swagger-annotations.version>
-<!--        boat bay client-->
+        <!--        boat bay client-->
         <maven.api.version>3.6.0</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
@@ -62,7 +62,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.backbase.buildingblocks</groupId>
+            <artifactId>service-sdk-starter-mapping</artifactId>
+            <version>13.0.0-cr.18</version>
+        </dependency>
         <!-- Maven Dependencies -->
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -81,12 +85,17 @@
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-common-artifact-filters</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>4.0.6.RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>org.sonatype.plexus</groupId>
             <artifactId>plexus-build-api</artifactId>
             <version>0.0.7</version>
         </dependency>
+
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-io</artifactId>
@@ -206,6 +215,11 @@
             <version>4.13.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+            <version>5.11.1</version>
+        </dependency>
         <!--        abouve okhttp below feign-->
 
         <dependency>
@@ -257,7 +271,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/boat-bay-api-client-temp/boat-bay-client.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/boat-bay-api-client-temp/boat-bay-client-api.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <configOptions>
                                 <java8>true</java8>

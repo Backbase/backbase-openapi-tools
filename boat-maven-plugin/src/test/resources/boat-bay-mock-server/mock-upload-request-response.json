@@ -1,0 +1,426 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/boat/boat-maven-plugin/repo-petstore/upload"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": [
+          {
+            "id": 2,
+            "spec": {
+              "id": 1,
+              "key": "petstore",
+              "name": "petstore-v1.0.0.yaml",
+              "title": "Swagger Petstore",
+              "version": "1.0.0",
+              "createdOn": "2021-11-17T14:45:10Z",
+              "createdBy": "MavenPluginUpload",
+              "changes": "NOT_APPLICABLE",
+              "capability": {
+                "id": 1,
+                "key": "backbase-com",
+                "name": "backbase-com"
+              },
+              "serviceDefinition": {
+                "key": "petstore",
+                "name": "petstore",
+                "capability": {
+                  "id": 1,
+                  "key": "backbase-com",
+                  "name": "backbase-com"
+                }
+              }
+            },
+            "name": "petstore-v1.0.0.yaml",
+            "lintedOn": "2021-11-17T14:50:10Z",
+            "openApi": "openapi: \"3.0.0\"\ninfo:\n  version: 1.0.0\n  title: Swagger Petstore\n  license:\n    name: MIT\nservers:\n  - url: http://petstore.swagger.io/v1\npaths:\n  /pets:\n    get:\n      summary: List all pets\n      operationId: listPets\n      tags:\n        - pets\n      parameters:\n        - name: limit\n          in: query\n          description: How many items to return at one time (max 100)\n          required: false\n          schema:\n            type: integer\n            format: int32\n      responses:\n        \u0027200\u0027:\n          description: A paged array of pets\n          headers:\n            x-next:\n              description: A link to the next page of responses\n              schema:\n                type: string\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Pets\"\n            text/csv:\n              schema:\n                type: string\n        500:\n          content:\n            application/json:\n              schema:\n                $ref: \u0027#/components/schemas/InternalServerError\u0027\n          description: InternalServerError\n        default:\n          description: unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\n    post:\n      summary: Create a pet\n      operationId: createPets\n      tags:\n        - pets\n      responses:\n        \u0027201\u0027:\n          description: Null response\n        default:\n          description: unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\n  /pets/{petId}:\n    get:\n      summary: Info for a specific pet\n      operationId: showPetById\n      tags:\n        - pets\n      parameters:\n        - name: petId\n          in: path\n          required: true\n          description: The id of the pet to retrieve\n          schema:\n            type: string\n      responses:\n        \u0027200\u0027:\n          description: Expected response to a valid request\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Pet\"\n        default:\n          description: unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\n  /no-schema:\n    get:\n      summary: No Schema\n      operationId: getNoSchema\n      tags:\n        - pets\n      responses:\n        200:\n          description: A response that does not specify a schema\n          content:\n            application/json: {}\ncomponents:\n  schemas:\n    Pet:\n      type: object\n      required:\n        - id\n        - name\n      properties:\n        id:\n          type: integer\n          format: int64\n        name:\n          type: string\n        tag:\n          type: string\n    Pets:\n      type: array\n      items:\n        $ref: \"#/components/schemas/Pet\"\n    Error:\n      type: object\n      required:\n        - code\n        - message\n      properties:\n        code:\n          type: integer\n          format: int32\n        message:\n          type: string\n    InternalServerError:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          type: string",
+            "version": "1.0.0",
+            "grade": "F",
+            "violations": [
+              {
+                "rule": {
+                  "id": 21,
+                  "ruleId": "B007",
+                  "enabled": true,
+                  "title": "Check prefix for paths",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b007-check-prefix-for-paths"
+                },
+                "description": "Incorrect path prefix: pets. Correct values are [client-api, service-api, integration-api]",
+                "severity": "MUST",
+                "lines": {
+                  "first": 10,
+                  "last": 65,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1pets",
+                    "_matchingPropertyName": "/pets",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1pets",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 20,
+                  "ruleId": "B006",
+                  "enabled": true,
+                  "title": "Check info block description format.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b006-check-info-block-description-format-"
+                },
+                "description": "description is a required value",
+                "severity": "MUST",
+                "lines": {
+                  "first": 1,
+                  "last": 1,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_nextSegment": {
+                        "_asString": "",
+                        "_matchingPropertyName": "",
+                        "_matchingElementIndex": -1
+                      },
+                      "_asString": "/description",
+                      "_matchingPropertyName": "description",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/info/description",
+                    "_matchingPropertyName": "info",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/openapi/info/description",
+                  "_matchingPropertyName": "openapi",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 13,
+                  "ruleId": "B008",
+                  "enabled": true,
+                  "title": "Check x-icon value in the info block",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "SHOULD",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b008-check-x-icon-value-in-the-info-block"
+                },
+                "description": "x-icon should be provided in the info block with the assigned value for the API",
+                "severity": "SHOULD",
+                "lines": {
+                  "first": 1,
+                  "last": 1,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_nextSegment": {
+                        "_asString": "",
+                        "_matchingPropertyName": "",
+                        "_matchingElementIndex": -1
+                      },
+                      "_asString": "/x-icon",
+                      "_matchingPropertyName": "x-icon",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/info/x-icon",
+                    "_matchingPropertyName": "info",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/openapi/info/x-icon",
+                  "_matchingPropertyName": "openapi",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 18,
+                  "ruleId": "B004",
+                  "enabled": true,
+                  "title": "Check info block tags allowed.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b004-check-info-block-tags-allowed-"
+                },
+                "description": "tags are required",
+                "severity": "MUST",
+                "lines": {
+                  "first": 1,
+                  "last": 1,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_nextSegment": {
+                        "_asString": "",
+                        "_matchingPropertyName": "",
+                        "_matchingElementIndex": -1
+                      },
+                      "_asString": "/tags",
+                      "_matchingPropertyName": "tags",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/info/tags",
+                    "_matchingPropertyName": "info",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/openapi/info/tags",
+                  "_matchingPropertyName": "openapi",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 15,
+                  "ruleId": "B001",
+                  "enabled": true,
+                  "title": "No license information allowed.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b001-no-license-information-allowed-"
+                },
+                "description": "OpenAPI must not contain a license  because it\u0027s covered by the License Agreement we already negotiate with customers. ",
+                "severity": "MUST",
+                "lines": {
+                  "first": 1,
+                  "last": 1,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_nextSegment": {
+                        "_asString": "",
+                        "_matchingPropertyName": "",
+                        "_matchingElementIndex": -1
+                      },
+                      "_asString": "/version",
+                      "_matchingPropertyName": "version",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/info/version",
+                    "_matchingPropertyName": "info",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/openapi/info/version",
+                  "_matchingPropertyName": "openapi",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 23,
+                  "ruleId": "M0012",
+                  "enabled": true,
+                  "title": "Open API Version must be set to the correct version",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#m0012-open-api-version-must-be-set-to-the-correct-version"
+                },
+                "description": "OpenAPI specification version must be [3.0.3, 3.0.4]. It\u0027s now set to `3.0.0`",
+                "severity": "MUST",
+                "lines": {
+                  "first": 1,
+                  "last": 1,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_asString": "",
+                    "_matchingPropertyName": "",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/openapi",
+                  "_matchingPropertyName": "openapi",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 21,
+                  "ruleId": "B007",
+                  "enabled": true,
+                  "title": "Check prefix for paths",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b007-check-prefix-for-paths"
+                },
+                "description": "Incorrect path prefix: pets. Correct values are [client-api, service-api, integration-api]",
+                "severity": "MUST",
+                "lines": {
+                  "first": 65,
+                  "last": 91,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1pets~1{petId}",
+                    "_matchingPropertyName": "/pets/{petId}",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1pets~1{petId}",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 21,
+                  "ruleId": "B007",
+                  "enabled": true,
+                  "title": "Check prefix for paths",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b007-check-prefix-for-paths"
+                },
+                "description": "Incorrect path prefix: no-schema. Correct values are [client-api, service-api, integration-api]",
+                "severity": "MUST",
+                "lines": {
+                  "first": 91,
+                  "last": 102,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1no-schema",
+                    "_matchingPropertyName": "/no-schema",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1no-schema",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 22,
+                  "ruleId": "B009",
+                  "enabled": true,
+                  "title": "Check prefix for paths should contain version.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b009-check-prefix-for-paths-should-contain-version-"
+                },
+                "description": "URL should contain version number",
+                "severity": "MUST",
+                "lines": {
+                  "first": 10,
+                  "last": 65,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1pets",
+                    "_matchingPropertyName": "/pets",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1pets",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 22,
+                  "ruleId": "B009",
+                  "enabled": true,
+                  "title": "Check prefix for paths should contain version.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b009-check-prefix-for-paths-should-contain-version-"
+                },
+                "description": "URL should contain version number",
+                "severity": "MUST",
+                "lines": {
+                  "first": 65,
+                  "last": 91,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1pets~1{petId}",
+                    "_matchingPropertyName": "/pets/{petId}",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1pets~1{petId}",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              },
+              {
+                "rule": {
+                  "id": 22,
+                  "ruleId": "B009",
+                  "enabled": true,
+                  "title": "Check prefix for paths should contain version.",
+                  "ruleSet": "BoatRuleSet",
+                  "severity": "MUST",
+                  "url": "https://backbase.github.io/backbase-openapi-tools/rules.md#b009-check-prefix-for-paths-should-contain-version-"
+                },
+                "description": "URL should contain version number",
+                "severity": "MUST",
+                "lines": {
+                  "first": 91,
+                  "last": 102,
+                  "step": 1
+                },
+                "pointer": {
+                  "_nextSegment": {
+                    "_nextSegment": {
+                      "_asString": "",
+                      "_matchingPropertyName": "",
+                      "_matchingElementIndex": -1
+                    },
+                    "_asString": "/~1no-schema",
+                    "_matchingPropertyName": "/no-schema",
+                    "_matchingElementIndex": -1
+                  },
+                  "_asString": "/paths/~1no-schema",
+                  "_matchingPropertyName": "paths",
+                  "_matchingElementIndex": -1
+                }
+              }
+            ]
+          }
+        ]
+
+    }
+  }
+]

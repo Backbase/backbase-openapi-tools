@@ -94,7 +94,7 @@ class GenerateMojoTests {
     private <T extends GenerateMojo> T configure(T mojo, String generatorName) {
         mojo.buildContext = buildContext;
         mojo.project = project;
-        mojo.inputSpec = "src/test/resources/oas-examples/petstore.yaml";
+        mojo.inputSpec = "src/test/resources/oas-examples/petstore-v1.0.0.yaml";
         mojo.output = new File("target/generate-mojo-tests");
         mojo.generatorName = generatorName;
 

@@ -35,7 +35,7 @@
                         </goals>
                         <configuration>
                             <boatBayUrl>url</boatBayUrl>
-                            <inputSpec>${project.basedir}/src/main/resources/petstore.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/petstore-v2.0.0.yaml</inputSpec>
                             <output>${project.basedir}/src/main/resources/output</output>
                             <sourceKey>repo-petstore</sourceKey>
                             <boatBayUrl>http://localhost:8080</boatBayUrl>

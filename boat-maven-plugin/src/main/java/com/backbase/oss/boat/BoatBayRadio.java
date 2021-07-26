@@ -4,6 +4,9 @@ import com.backbase.oss.boat.bay.client.ApiClient;
 import com.backbase.oss.boat.bay.client.api.UploadPluginApi;
 import com.backbase.oss.boat.bay.client.model.*;
 import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.mapper.LintReportMapperImpl;
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
+import feign.auth.BasicAuthRequestInterceptor;
 import io.swagger.v3.oas.models.OpenAPI;
 import kotlin.ranges.IntRange;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +34,14 @@ public class BoatBayRadio {
 
   private final UploadPluginApi boatbayUploadSpecClient;
   private final File inputSpec;
-  private final File output;
   private String clientBasePath;
+  private LintReportMapperImpl reportMapper;
   protected MavenProject project;
 
 
-  public BoatBayRadio(File inputSpec, File output, MavenProject project, String clientBasePath) {
+  public BoatBayRadio(File inputSpec, MavenProject project, String clientBasePath) {
     this.project = project;
-    this.output = output;
+    this.reportMapper = new LintReportMapperImpl();
     this.inputSpec = inputSpec;
     this.clientBasePath = clientBasePath;
 
@@ -50,17 +53,21 @@ public class BoatBayRadio {
 
   private ApiClient configureApiClient(String clientBasePath){
 
-    if (readTimeout == null)
-      return new ApiClient().setBasePath(clientBasePath);
+    if (readTimeout == null){
+      BasicAuthRequestInterceptor basicAuthRequestInterceptor = new BasicAuthRequestInterceptor("admin","admin");
+      ApiClient apiClient = new ApiClient().setBasePath(clientBasePath);
+      apiClient.addAuthorization("Basic",basicAuthRequestInterceptor);
+      return apiClient;
+    }
 
     return new ApiClient().setBasePath(clientBasePath);
   }
 
+  public List<com.backbase.oss.boat.quay.model.BoatLintReport> upload(String sourceKey )  {
+    log.debug("uploading specs for source : {}" , sourceKey);
 
-  public List<com.backbase.oss.boat.quay.model.BoatLintReport> upload(String sourceId )  {
-    log.debug("uploading specs for source : {}" , sourceId);
 
-    List<BoatLintReport> boatLintReports = boatbayUploadSpecClient.uploadSpec(sourceId, createRequestBody());
+    List<BoatLintReport> boatLintReports = boatbayUploadSpecClient.uploadSpec(sourceKey, createRequestBody());
 
     log.info("\nSpecs linted.Lint reports can be found at:");
 
@@ -73,27 +80,21 @@ public class BoatBayRadio {
 
 
   private com.backbase.oss.boat.quay.model.BoatLintReport mapBoatBayLintToBoatLint(BoatLintReport bayLintReport){
-    com.backbase.oss.boat.quay.model.BoatLintReport lintReport = new com.backbase.oss.boat.quay.model.BoatLintReport();
 
-    lintReport.setOpenApi(bayLintReport.getOpenApi());
-    lintReport.setVersion(bayLintReport.getVersion());
-    lintReport.setTitle(bayLintReport.getName());
-    lintReport.setAvailableRules(bayLintReport.getViolations().stream().map(BoatViolation::getRule).map(this::mapRule).collect(Collectors.toList()));
-    lintReport.setViolations(bayLintReport.getViolations().stream().map(this::mapViolation).collect(Collectors.toList()));
-    lintReport.setFilePath(getFilePath(bayLintReport.getSpec().getName()));
+    com.backbase.oss.boat.quay.model.BoatLintReport lintReport = reportMapper.bayReportToBoatReport(bayLintReport);
+    lintReport.setFilePath(getFilePath(lintReport.getFilePath()));
 
     //link to lint report may need updating before release should perhaps
     //this link structure is for testing
     //be something like this:
     // https://boat-bay.proto.backbasecloud.com/lint-reports/repo/digital-banking/lint-report/167
-    log.info("\n\tSpec {}:     {}/lint-report/{}/view",
+    log.info("\n\tSpec {}:     {}lint-report/{}/view",
             bayLintReport.getSpec().getName(),
             clientBasePath,
             bayLintReport.getId());
 
     return lintReport;
   }
-
 
   private String getFilePath(String fileName) {
     File inputFile = inputSpec.toPath().resolve(fileName).toFile();
@@ -111,44 +112,6 @@ public class BoatBayRadio {
   }
 
 
-  private com.backbase.oss.boat.quay.model.BoatLintRule mapRule(BoatLintRule boatRule){
-    com.backbase.oss.boat.quay.model.BoatLintRule boatLintRule = new com.backbase.oss.boat.quay.model.BoatLintRule();
-
-    boatLintRule.setTitle(boatRule.getTitle());
-    boatLintRule.setRuleSet(boatRule.getRuleSet());
-    boatLintRule.setIgnored(!boatRule.getEnabled());
-    boatLintRule.setUrl(boatRule.getUrl());
-    boatLintRule.setSeverity(mapSeverity(boatRule.getSeverity()));
-
-    return boatLintRule;
-  }
-
-
-  private com.backbase.oss.boat.quay.model.BoatViolation mapViolation(BoatViolation boatViolation){
-    com.backbase.oss.boat.quay.model.BoatViolation violation = new com.backbase.oss.boat.quay.model.BoatViolation();
-
-    violation.setDescription(boatViolation.getDescription());
-    violation.setRule(mapRule(boatViolation.getRule()));
-    violation.setSeverity(mapSeverity(boatViolation.getSeverity()));
-    violation.setLines(mapRange(boatViolation.getLines()));
-    violation.setPointer(boatViolation.getPointer());
-
-    return violation;
-  }
-
-  private IntRange mapRange(com.backbase.oss.boat.bay.client.model.IntRange range){
-
-    if (range.getEndInclusive()==null){
-      return new IntRange(range.getStart(),range.getStart());
-    }
-    return new IntRange(range.getStart(),range.getEndInclusive());
-  }
-
-  private Severity mapSeverity(com.backbase.oss.boat.bay.client.model.Severity boatSeverity){
-    return Severity.valueOf(boatSeverity.getValue());
-  }
-
-
   private UploadRequestBody createRequestBody(){
     UploadRequestBody requestBody = new UploadRequestBody();
 
@@ -157,11 +120,6 @@ public class BoatBayRadio {
     }catch (Exception e){
       throw new RuntimeException("unable to load specs", e);
     }
-
-    requestBody.location(output.getParentFile().getPath());
-
-    if (output == null)
-      requestBody.location(new File("./target/boat-bay-lint").getAbsolutePath());
 
     requestBody.projectId(project.getGroupId());
     requestBody.setArtifactId(project.getArtifactId());
@@ -203,31 +161,15 @@ public class BoatBayRadio {
 
     UploadSpec uploadSpec = new UploadSpec();
     uploadSpec.fileName(spec.getName());
-
+    uploadSpec.version(openAPI.getInfo().getVersion());
     uploadSpec.openApi(contents);
 
     log.debug("uploading api {} with contents {}", spec.getName(),openAPI.getOpenapi());
 
-    uploadSpec.key(getSpecKey(spec));
     uploadSpec.name(spec.getName());
 
     return uploadSpec;
   }
 
-  private String getSpecKey(File spec){
-    String key;
-    String spEL;
-    ExpressionParser parser = new SpelExpressionParser();
-
-    if(spec.getName().contains("-")){
-      spEL = "name.substring(0,name.lastIndexOf('-'))";
-    }else
-      spEL = "name.substring(0,name.lastIndexOf('.'))";
-
-    Expression value = parser.parseExpression(spEL);
-    key = value.getValue(spec, String.class);
-
-    return key;
-  }
 
 }

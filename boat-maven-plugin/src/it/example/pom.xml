@@ -42,7 +42,6 @@
     <modules>
         <module>boat-multiple-executions</module>
         <module>boat-artifact-input</module>
-        <module>boat-bay</module>
         <module>boat-doc</module>
         <module>boat-export</module>
         <module>boat-generate</module>
