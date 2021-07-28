@@ -56,7 +56,7 @@ public class BoatBayRadio {
     if (readTimeout == null){
       BasicAuthRequestInterceptor basicAuthRequestInterceptor = new BasicAuthRequestInterceptor("admin","admin");
       ApiClient apiClient = new ApiClient().setBasePath(clientBasePath);
-      apiClient.addAuthorization("Basic",basicAuthRequestInterceptor);
+//      apiClient.addAuthorization("Basic",basicAuthRequestInterceptor);
       return apiClient;
     }
 
