@@ -4,6 +4,7 @@ const data = {
   appDescription: {{json appDescription}},
   operations: [],
   models: {},
+  examples: {},
   requestBodies: {},
   responses: {},
   parameters: {},
@@ -25,6 +26,12 @@ const data = {
 {{#each models}}
     {{#with model}}
         data.models["{{name}}"] = {{{json .}}};
+    {{/with}}
+{{/each}}
+
+{{#each examples as |example|}}
+    {{#with example}}
+        data.examples["{{name}}"] = {{json .}}
     {{/with}}
 {{/each}}
 
