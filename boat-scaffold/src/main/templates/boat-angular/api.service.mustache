@@ -109,6 +109,7 @@ export class {{classname}} {
     }
 
 {{#operation}}
+{{#produces}}
     /**
 {{#summary}}
      * {{summary}}
@@ -125,11 +126,58 @@ export class {{classname}} {
      * @deprecated This endpoint is deprecated
      {{/isDeprecated}}
      */
-{{#produces}}
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>;
+    /**
+{{#summary}}
+     * {{summary}}
+{{/summary}}
+{{#notes}}
+     * {{notes}}
+{{/notes}}
+     {{#allParams.0}}
+     * @param requestParameters
+     {{/allParams.0}}
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     {{#isDeprecated}}
+     * @deprecated This endpoint is deprecated
+     {{/isDeprecated}}
+     */
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpResponse<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
+    /**
+{{#summary}}
+     * {{summary}}
+{{/summary}}
+{{#notes}}
+     * {{notes}}
+{{/notes}}
+     {{#allParams.0}}
+     * @param requestParameters
+     {{/allParams.0}}
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     {{#isDeprecated}}
+     * @deprecated This endpoint is deprecated
+     {{/isDeprecated}}
+     */
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '{{mediaType}}'}): Observable<HttpEvent<{{#returnType}}{{{returnType}}}{{#isResponseTypeFile}}|undefined{{/isResponseTypeFile}}{{/returnType}}{{^returnType}}any{{/returnType}}>>;
 {{/produces}}
+    /**
+{{#summary}}
+     * {{summary}}
+{{/summary}}
+{{#notes}}
+     * {{notes}}
+{{/notes}}
+     {{#allParams.0}}
+     * @param requestParameters
+     {{/allParams.0}}
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     {{#isDeprecated}}
+     * @deprecated This endpoint is deprecated
+     {{/isDeprecated}}
+     */
     public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{#hasMore}} | {{/hasMore}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
     {{#allParams}}
         const _{{paramName}} = requestParameters["{{paramName}}"];
