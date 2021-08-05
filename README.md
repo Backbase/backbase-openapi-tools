@@ -19,6 +19,12 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.6 
+* *Maven Plugin*
+  * Added `boat:ship` mojo to automagically zip specs found in `src/main/resources` and attach it to the project reactor so `mvn install` or `mvn deploy` will also include a zip archive of the project with with `api` classifier
+  * Changed `boat:bundle` to use the `includes` parameter to an array of patterns to allow recursive patters to discover OpenAPIs 
+
+
 ## 0.14.5
 * *Boat Marina*
   * Added `boat-markers` directory in target to keep track of successful and unsuccessful actions on OpenAPI specs

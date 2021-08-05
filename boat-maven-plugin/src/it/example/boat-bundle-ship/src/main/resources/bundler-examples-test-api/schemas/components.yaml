@@ -1,0 +1,11 @@
+openapi: 3.0.3
+components:
+  schemas:
+    BadRequestResponse:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: '../lib/schema/bad-request-error.yaml'
+          example:
+            $ref: '../lib/examples/bad-request-validation-error.json'
