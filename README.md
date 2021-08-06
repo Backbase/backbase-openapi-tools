@@ -19,6 +19,11 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.6
+
+* *Boat Scaffold*
+  * Fixed bug in typescript generator where only one of the overloaded function signatures per deprecated endpoint was marked as deprecated. 
+
 ## 0.14.5
 * *Boat Marina*
   * Added `boat-markers` directory in target to keep track of successful and unsuccessful actions on OpenAPI specs
