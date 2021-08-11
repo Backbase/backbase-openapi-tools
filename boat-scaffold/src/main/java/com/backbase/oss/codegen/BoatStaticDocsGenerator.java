@@ -104,7 +104,7 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         return new BoatExample(key,"", example , false);
     }
 
-    private Object mapFreeFormObject(Map.Entry<String, Schema> freeFormObject) {
+    private Object mapFreeFormObject(Map.Entry<String, Schema> freeFormObject) {//NOSONAR
         String name = freeFormObject.getKey();
         return fromModel(name, freeFormObject.getValue());
     }
