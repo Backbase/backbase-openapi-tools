@@ -4,6 +4,7 @@ const data = {
   appDescription: {{json appDescription}},
   operations: [],
   models: {},
+  examples: {},
   requestBodies: {},
   responses: {},
   parameters: {},
@@ -28,6 +29,12 @@ const data = {
     {{/with}}
 {{/each}}
 
+{{#each examples as |example|}}
+    {{#with example}}
+        data.examples["{{name}}"] = {{json .}}
+    {{/with}}
+{{/each}}
+
 {{#each requestBodies}}
     data["requestBodies"]["{{baseName}}"] = {{{jsonSchema}}};
 {{/each}}
@@ -48,3 +55,4 @@ const data = {
 
 
 
+module.exports = { data };

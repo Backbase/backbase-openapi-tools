@@ -1,0 +1,16 @@
+title: ErrorItem
+type: object
+properties:
+  message:
+    description: Any further information.
+    type: string
+  key:
+    description: '{capability-name}.api.{api-key-name}. For generated validation
+            errors this is the path in the document the error resolves to. e.g. object
+            name + ''.'' + field'
+    type: string
+  context:
+    description: Context can be anything used to construct localised messages.
+    type: object
+    additionalProperties:
+      type: string

@@ -2,11 +2,13 @@ package com.backbase.oss.codegen;
 
 import com.backbase.oss.codegen.doc.BoatCodegenParameter;
 import com.backbase.oss.codegen.doc.BoatCodegenResponse;
+import com.backbase.oss.codegen.doc.BoatExample;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
@@ -21,10 +23,7 @@ import org.openapitools.codegen.CodegenResponse;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,6 +64,13 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
                     .collect(Collectors.toList()));
         }
 
+        if (openAPI.getComponents().getExamples() != null) {
+            Set<String> imports = new HashSet<>();
+            additionalProperties.put("examples", openAPI.getComponents().getExamples().entrySet().stream()
+                    .map(exampleEntry -> mapComponentExample(imports, exampleEntry))
+                    .collect(Collectors.toList()));
+        }
+
         if (openAPI.getPaths() != null)
             // Ensure single tags for operations
             openAPI.getPaths().forEach((path, pathItem) ->
@@ -82,6 +88,12 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         String name = namedRequestBody.getKey();
         RequestBody requestBody = namedRequestBody.getValue();
         return fromRequestBody(requestBody, imports, name);
+    }
+
+    private BoatExample mapComponentExample(Set<String> imports, Map.Entry<String, Example> namedExample) {
+        String key = namedExample.getKey();
+        Example example = namedExample.getValue();
+        return new BoatExample(key,"", example , false);
     }
 
     private CodegenParameter mapComponentParameter(Set<String> imports, java.util.Map.Entry<String, Parameter> nameParameter) {

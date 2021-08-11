@@ -4,6 +4,7 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
@@ -18,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 @Mojo(name = "bundle", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
@@ -37,13 +41,13 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Setter
 public class BundleMojo extends AbstractMojo {
 
-    @Parameter(name = "input", required = true)
+    @Parameter(name = "input", required = true, defaultValue = "${project.basedir}/src/main/resources")
     private File input;
 
-    @Parameter(name = "includes", required = false, defaultValue = "*.yaml")
-    private String includes;
+    @Parameter(name = "includes", defaultValue = "**/openapi.yaml, **/*api*.yaml")
+    protected String[] includes;
 
-    @Parameter(name = "output", required = true)
+    @Parameter(name = "output", required = true, defaultValue = "${project.build.directory}/openapi")
     private File output;
 
     @Parameter(name = "version", required = false)
@@ -65,7 +69,6 @@ public class BundleMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
             getLog().info("Skipping OpenAPI bundle.");
-
             return;
         }
 
@@ -78,18 +81,14 @@ public class BundleMojo extends AbstractMojo {
         final File[] inputFiles;
         final File[] outputFiles;
         if (input.isDirectory()) {
-            String[] inputs;
 
-            try {
-                inputs = Utils.selectInputs(input.toPath(), includes);
-            } catch (IOException e) {
-                throw new MojoExecutionException("Cannot scan input " + input, e);
-            }
-
-            inputFiles = stream(inputs)
-                .map(file -> new File(input, file))
-                .toArray(File[]::new);
-            outputFiles = stream(inputs)
+            DirectoryScanner directoryScanner = new DirectoryScanner();
+            directoryScanner.setBasedir(input);
+            directoryScanner.setIncludes(includes);
+            directoryScanner.scan();
+            String[] includedFiles = directoryScanner.getIncludedFiles();
+            inputFiles = stream(includedFiles).map(f -> new File(input, f)).collect(Collectors.toList()).toArray(File[]::new);
+            outputFiles = stream(includedFiles)
                 .map(file -> new File(output, file))
                 .toArray(File[]::new);
 
@@ -107,6 +106,7 @@ public class BundleMojo extends AbstractMojo {
 
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
         try {
+            log.info("Bundling {} into a single OpenAPI file: {}", inputFile, outputFile);
             OpenAPI openAPI = OpenAPILoader.load(inputFile);
 
             if (isNotBlank(version)) {
@@ -132,6 +132,7 @@ public class BundleMojo extends AbstractMojo {
 
             }
             Files.write(outputFile.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
+            log.info("Bundled: {} into: {}", inputFile, outputFile);
         } catch (OpenAPILoaderException | IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: {}" + inputFile, e);
         }
