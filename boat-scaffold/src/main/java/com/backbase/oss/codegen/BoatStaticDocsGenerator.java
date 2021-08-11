@@ -77,7 +77,7 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
             Set<String> imports = new HashSet<>();
             additionalProperties.put("freeFormModels", openAPI.getComponents().getSchemas().entrySet().stream()
                     .filter(freeFormModel -> ModelUtils.isFreeFormObject(freeFormModel.getValue()))
-                    .map(freeFormModel -> mapFreeFormObject(imports, freeFormModel))
+                    .map(freeFormModel -> mapFreeFormObject(freeFormModel))
                     .collect(Collectors.toList()));
         }
 
@@ -106,10 +106,9 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         return new BoatExample(key,"", example , false);
     }
 
-    private Object mapFreeFormObject(Set<String> imports, Map.Entry<String, Schema> freeFormObject) {
+    private Object mapFreeFormObject(Map.Entry<String, Schema> freeFormObject) {
         String name = freeFormObject.getKey();
-        Schema schema = freeFormObject.getValue();
-        return fromModel(name, schema);
+        return fromModel(name, freeFormObject.getValue());
     }
 
     private CodegenParameter mapComponentParameter(Set<String> imports, java.util.Map.Entry<String, Parameter> nameParameter) {
