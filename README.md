@@ -26,6 +26,7 @@ BOAT is still under development and subject to change.
 * *Boat Scaffold*
   * Fixed bug in typescript generator where only one of the overloaded function signatures per deprecated endpoint was marked as deprecated.
 
+
 ## 0.14.5
 * *Boat Marina*
   * Added `boat-markers` directory in target to keep track of successful and unsuccessful actions on OpenAPI specs
