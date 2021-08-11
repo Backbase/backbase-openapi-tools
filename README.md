@@ -23,7 +23,8 @@ BOAT is still under development and subject to change.
 * *Maven Plugin*
   * Added `boat:ship` mojo to automagically zip specs found in `src/main/resources` and attach it to the project reactor so `mvn install` or `mvn deploy` will also include a zip archive of the project with with `api` classifier
   * Changed `boat:bundle`  `includes` parameter to an array of patterns to allow recursive patters to discover OpenAPIs 
-
+* *Boat Scaffold*
+  * Fixed bug in typescript generator where only one of the overloaded function signatures per deprecated endpoint was marked as deprecated.
 
 ## 0.14.5
 * *Boat Marina*
