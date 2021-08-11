@@ -4,6 +4,7 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
@@ -105,6 +106,7 @@ public class BundleMojo extends AbstractMojo {
 
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
         try {
+            log.info("Bundling {} into a single OpenAPI file: {}", inputFile, outputFile);
             OpenAPI openAPI = OpenAPILoader.load(inputFile);
 
             if (isNotBlank(version)) {
