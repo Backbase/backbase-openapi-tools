@@ -22,7 +22,8 @@ class BundleMojoTest {
 
     @Test
     @SneakyThrows
-    void testInputDirectoryAndOutputFile() {
+    void
+    testInputDirectoryAndOutputFile() {
         BundleMojo mojo = new BundleMojo();
         mojo.setInput(new File("."));
         mojo.setOutput(new File("target/testInputDirectoryAndOutputFile.yaml"));
@@ -52,7 +53,7 @@ class BundleMojoTest {
         mojo.setInput(new File(getClass().getResource("/bundler/folder/one-client-api-v1.yaml").getFile())
             .getParentFile());
         mojo.setOutput(new File("target/test-bundle-folder"));
-        mojo.setIncludes("*-api-v*.yaml");
+        mojo.setIncludes(new String[]{"*-api-v*.yaml"});
         mojo.setVersionFileName(true);
         mojo.execute();
 
