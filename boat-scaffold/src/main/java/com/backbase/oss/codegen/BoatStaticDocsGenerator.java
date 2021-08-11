@@ -67,7 +67,7 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
 
         if (openAPI.getComponents().getExamples() != null) {
             additionalProperties.put("examples", openAPI.getComponents().getExamples().entrySet().stream()
-                    .map(exampleEntry -> mapComponentExample(exampleEntry))
+                    .map(this::mapComponentExample)
                     .collect(Collectors.toList()));
         }
 
@@ -75,7 +75,7 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         if (openAPI.getComponents().getSchemas() != null) {
             additionalProperties.put("freeFormModels", openAPI.getComponents().getSchemas().entrySet().stream()
                     .filter(freeFormModel -> ModelUtils.isFreeFormObject(freeFormModel.getValue()))
-                    .map(freeFormModel -> mapFreeFormObject(freeFormModel))
+                    .map(this::mapFreeFormObject)
                     .collect(Collectors.toList()));
         }
 
