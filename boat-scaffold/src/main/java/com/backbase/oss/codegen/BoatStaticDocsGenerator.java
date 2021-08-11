@@ -66,15 +66,13 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         }
 
         if (openAPI.getComponents().getExamples() != null) {
-            Set<String> imports = new HashSet<>();
             additionalProperties.put("examples", openAPI.getComponents().getExamples().entrySet().stream()
-                    .map(exampleEntry -> mapComponentExample(imports, exampleEntry))
+                    .map(exampleEntry -> mapComponentExample(exampleEntry))
                     .collect(Collectors.toList()));
         }
 
         // We need freeForm objects as models as well, since they are being referenced with $ref
         if (openAPI.getComponents().getSchemas() != null) {
-            Set<String> imports = new HashSet<>();
             additionalProperties.put("freeFormModels", openAPI.getComponents().getSchemas().entrySet().stream()
                     .filter(freeFormModel -> ModelUtils.isFreeFormObject(freeFormModel.getValue()))
                     .map(freeFormModel -> mapFreeFormObject(freeFormModel))
@@ -100,7 +98,7 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         return fromRequestBody(requestBody, imports, name);
     }
 
-    private BoatExample mapComponentExample(Set<String> imports, Map.Entry<String, Example> namedExample) {
+    private BoatExample mapComponentExample( Map.Entry<String, Example> namedExample) {
         String key = namedExample.getKey();
         Example example = namedExample.getValue();
         return new BoatExample(key,"", example , false);
