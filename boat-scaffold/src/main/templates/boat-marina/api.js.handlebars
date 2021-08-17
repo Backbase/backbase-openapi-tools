@@ -47,10 +47,6 @@ const data = {
     data["parameters"]["{{paramName}}"] = {{{jsonSchema}}};
 {{/each}}
 
-{{#each freeFormModels}}
-        data.models["{{name}}"] = {{{json .}}};
-{{/each}}
-
 {{#each swagger.vendorExtensions.x-shared-errors}}
     let err = {{{json .}}};
     data["errors"][err.errorID] = err;

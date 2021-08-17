@@ -20,7 +20,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenResponse;
-import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -71,14 +70,6 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
                     .collect(Collectors.toList()));
         }
 
-        // We need freeForm objects as models as well, since they are being referenced with $ref
-        if (openAPI.getComponents().getSchemas() != null) {
-            additionalProperties.put("freeFormModels", openAPI.getComponents().getSchemas().entrySet().stream()
-                    .filter(freeFormModel -> ModelUtils.isFreeFormObject(freeFormModel.getValue()))
-                    .map(this::mapFreeFormObject)
-                    .collect(Collectors.toList()));
-        }
-
         if (openAPI.getPaths() != null)
             // Ensure single tags for operations
             openAPI.getPaths().forEach((path, pathItem) ->
@@ -104,10 +95,6 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
         return new BoatExample(key,"", example , false);
     }
 
-    private Object mapFreeFormObject(Map.Entry<String, Schema> freeFormObject) {//NOSONAR
-        String name = freeFormObject.getKey();
-        return fromModel(name, freeFormObject.getValue());
-    }
 
     private CodegenParameter mapComponentParameter(Set<String> imports, java.util.Map.Entry<String, Parameter> nameParameter) {
         Parameter parameter = nameParameter.getValue();
