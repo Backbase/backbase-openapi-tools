@@ -105,7 +105,7 @@
     </div>
 </div>
 <script>
-  var response{{baseName}}{{code}}_description = `{{{message}}}`;
+  var response{{baseName}}{{code}}_description = `{{#escapeBackTicks}}{{{message}}}{{/escapeBackTicks}}`;
   var response{{baseName}}{{code}}_description_break = response{{baseName}}{{code}}_description.indexOf('\n');
   if (response{{baseName}}{{code}}_description_break == -1) {
     $("#examples-{{baseName}}-{{nickname}}-title-{{code}}").html("<span class='response-header-tab-handle'></span> <b>{{code}}</b> " + response{{baseName}}{{code}}_description);

@@ -19,6 +19,11 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.14.8
+* *Boat Marina*
+  * Removes flatObjects as they are no longer needed
+  * response.message was wrongfully escaped, escaping in the docs template instead
+  * We no longer need to generate model aliases in boat marina
 ## 0.14.7
 * *Boat Marina*
   * Exports flatObjects as a model to prevent errors with references
