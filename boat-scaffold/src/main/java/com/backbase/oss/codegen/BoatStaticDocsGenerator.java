@@ -165,8 +165,6 @@ public class BoatStaticDocsGenerator extends org.openapitools.codegen.languages.
     @Override
     public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
         CodegenResponse r = super.fromResponse(responseCode, response);
-        r.message = StringUtils.replace(r.message, "`", "\\`");
-
         return new BoatCodegenResponse(r, responseCode, response, openAPI);
     }
 
