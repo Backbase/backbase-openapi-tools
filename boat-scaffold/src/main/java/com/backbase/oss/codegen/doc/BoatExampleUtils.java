@@ -1,6 +1,5 @@
 package com.backbase.oss.codegen.doc;
 
-import com.backbase.oss.boat.transformers.OpenApiStreamUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -10,11 +9,12 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
-import java.util.Arrays;
-import java.util.List;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @UtilityClass
@@ -155,7 +155,7 @@ public class BoatExampleUtils {
         }
 
         Example example = new Example().value(mediaType.getExample());
-        log.debug("Replacing Example ref: {}  used in: {}  with example from components: {}", ref, name, example);
+        log.warn("Incorrect example reference found! Replacing Example ref: {} used in: {} with example from components: {}", ref, name, example);
         boatExample.setExample(example);
     }
 

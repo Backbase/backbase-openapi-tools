@@ -18,7 +18,7 @@ public class Decomposer implements Transformer {
     public OpenAPI transform(OpenAPI openAPI, Map<String, Object> options) {
 
         List<Schema> composedSchemas = openAPI.getComponents().getSchemas().values().stream()
-            .filter(schema -> schema instanceof ComposedSchema)
+            .filter(ComposedSchema.class::isInstance)
             .collect(Collectors.toList());
 
         composedSchemas.forEach(composedSchema -> mergeComposedSchema(openAPI, composedSchema));
