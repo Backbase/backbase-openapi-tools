@@ -9,10 +9,12 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,22 +73,33 @@ public class BoatExampleUtils {
     }
 
     public static void inlineExamples(String name, List<BoatExample> examples, OpenAPI openAPI) {
+        List<BoatExample> nonExistingExamples = new ArrayList<>();
+
         examples.stream()
-            .filter(boatExample -> boatExample.getExample().get$ref() != null)
-            .forEach(boatExample -> {
-                String ref = boatExample.getExample().get$ref();
-                if (ref.startsWith(COMPONENTS_EXAMPLES_REF_PREFIX)) {
-                    resolveComponentsExamples(name, openAPI, boatExample, ref);
-                } else if (ref.startsWith(PATHS_REF_PREFIX)) {
-                    resolvePathsExamples(name, openAPI, boatExample, ref);
-                } else {
-                    log.warn("Example ref: {} used in: {} refers to an example that does not exist", ref, name);
-                }
-            });
+                .filter(boatExample -> {
+                    Example example = boatExample.getExample();
+                    if (example == null) {
+                        log.warn("Example :{} refers to an example that does not exist", boatExample.getKey());
+                        nonExistingExamples.add(boatExample);
+                    }
+                    return example != null && example.get$ref() != null;
+                })
+                .forEach(boatExample -> {
+                    String ref = boatExample.getExample().get$ref();
+                    if (ref.startsWith(COMPONENTS_EXAMPLES_REF_PREFIX)) {
+                        resolveComponentsExamples(name, openAPI, boatExample, ref);
+                    } else if (ref.startsWith(PATHS_REF_PREFIX)) {
+                        resolvePathsExamples(name, openAPI, boatExample, ref);
+                    } else {
+                        log.warn("Example ref: {} used in: {} refers to an example that does not exist", ref, name);
+                    }
+                });
+        // Ensure non existing examples are removed to prevent further errors down the road
+        examples.removeAll(nonExistingExamples);
     }
 
     private static void resolveComponentsExamples(
-        String name, OpenAPI openAPI, BoatExample boatExample, String ref) {
+            String name, OpenAPI openAPI, BoatExample boatExample, String ref) {
         String exampleName = ref.replace(COMPONENTS_EXAMPLES_REF_PREFIX, "");
         if (openAPI.getComponents() == null || openAPI.getComponents().getExamples() == null) {
             log.warn("Example ref: {}  used in: {}  refers to an example that does not exist", ref, name);
@@ -102,7 +115,7 @@ public class BoatExampleUtils {
     }
 
     private static void resolvePathsExamples(
-        String name, OpenAPI openAPI, BoatExample boatExample, String ref) {
+            String name, OpenAPI openAPI, BoatExample boatExample, String ref) {
 
         // #/paths/
         // ~1client-api~1v2~1accounts~1balance-history~1%7BarrangementIds%7D/
@@ -117,8 +130,8 @@ public class BoatExampleUtils {
             return;
         }
         String[] refParts = Arrays.stream(ref.replace(PATHS_REF_PREFIX, "").split("/"))
-            .map(s -> s.replace("~1", "/"))
-            .toArray(String[]::new);
+                .map(s -> s.replace("~1", "/"))
+                .toArray(String[]::new);
 
         String pathName = refParts[1];
         PathItem pathItem = openAPI.getPaths().get(pathName);
@@ -140,7 +153,12 @@ public class BoatExampleUtils {
             content = operation.getRequestBody().getContent();
             mediaTypeName = refParts[5];
         } else {
-            content = operation.getResponses().get(refParts[4]).getContent();
+            ApiResponse apiResponse = operation.getResponses().get(refParts[4]);
+            if (apiResponse == null) {
+                log.warn("Example ref: {} refers to response that is not defined.", ref);
+                return;
+            }
+            content = apiResponse.getContent();
             mediaTypeName = refParts[6];
         }
         if (content == null) {
@@ -155,7 +173,7 @@ public class BoatExampleUtils {
         }
 
         Example example = new Example().value(mediaType.getExample());
-        log.warn("Incorrect example reference found! Replacing Example ref: {} used in: {} with example from components: {}", ref, name, example);
+        log.warn("Incorrect example reference found! Replacing Example ref: {} used in: {} with example from components", ref, name);
         boatExample.setExample(example);
     }
 
