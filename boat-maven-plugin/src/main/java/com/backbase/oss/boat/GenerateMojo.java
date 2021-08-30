@@ -509,9 +509,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                     default:
                         String message = format("Input spec %s matches more than one single file", inputSpec);
                         getLog().error(message);
-                        Stream.of(files).forEach(f -> {
-                            getLog().error(format("    %s", f));
-                        });
+                        Stream.of(files).forEach(f -> getLog().error(format("    %s", f)));
                         throw new MojoExecutionException(
                             format("Input spec %s matches more than one single file", inputSpec));
                 }
@@ -966,7 +964,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     /**
      * Get specification hash file.
      *
-     * @param inputSpecFile - Openapi specification input file to calculate it's hash.
+     * @param inputSpecFile - Openapi specification input file  to calculate it's hash.
      *                      Does not taken into account if input spec is hosted on remote resource
      * @return a file with previously calculated hash
      */
@@ -1044,7 +1042,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
     private static boolean isValidURI(String urlString) {
         try {
-            URI uri = new URI(urlString);
+            new URI(urlString);
             return true;
         } catch (Exception exception) {
             return false;

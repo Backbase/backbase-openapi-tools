@@ -35,6 +35,11 @@ class BoatDocsTest {
     }
 
     @Test
+    public void testGenerateDocsExampleRefs() {
+        assertDoesNotThrow(() -> generateDocs(getFile("/oas-examples/petstore-example-refs.yaml")));
+    }
+
+    @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml"));
 
