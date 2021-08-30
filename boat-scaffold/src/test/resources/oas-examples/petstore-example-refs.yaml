@@ -44,7 +44,6 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 $ref: "#/paths/~1pets/get/responses/default/content/application~2json/example"
-
     post:
       summary: Create a pet
       operationId: createPets
@@ -77,7 +76,6 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 $ref: "#/paths/~1pets/get/responses/default/content/application~1json/example"
-
   /pets/{petId}:
     get:
       summary: Info for a specific pet
@@ -130,6 +128,88 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 $ref: "#/paths/~1pets/post/responses/default/content/application~1json/example"
+    put:
+      summary: Update pet
+      operationId: updatePet
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: The id of the pet to retrieve
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+            example:
+              id: 1
+              name: "Joep"
+              tag: "Gun dog"
+      responses:
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                $ref: "#/paths/~1pets/put/responses/default/content/application~1json/example"
+    patch:
+      summary: Update pet
+      operationId: patchPet
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: The id of the pet to patch
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+            example:
+              id: 1
+              name: "Joep"
+              tag: "Gun dog"
+      responses:
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                $ref: "#/paths/~1pets/patch/responses/default/content/application~1json/example"
+    delete:
+      summary: Delete pet
+      operationId: deletePet
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: The id of the pet to delete
+          schema:
+            type: string
+      responses:
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                $ref: "#/paths/~1pets/delete/responses/default/content/application~1json/example"
+
 
 components:
   schemas:
