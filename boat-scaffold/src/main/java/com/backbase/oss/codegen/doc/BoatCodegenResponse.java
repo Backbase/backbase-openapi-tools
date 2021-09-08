@@ -3,8 +3,10 @@ package com.backbase.oss.codegen.doc;
 import com.samskivert.mustache.Mustache;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -88,9 +90,11 @@ public class BoatCodegenResponse extends CodegenResponse {
         this.multipleOf = o.multipleOf;
 
         if (response.getContent() != null) {
-            response.getContent().forEach((contentType, mediaType) -> BoatExampleUtils.convertExamples(openAPI,
-                    mediaType, responseCode, contentType, examples));
-            BoatExampleUtils.inlineExamples(responseCode, examples, openAPI);
+            response.getContent()
+                    .forEach((contentType, mediaType) -> {
+                        log.debug("Converting examples for content type: {} of responseCode: {}", mediaType, responseCode);
+                        BoatExampleUtils.convertExamples(openAPI, mediaType, responseCode, contentType, examples);
+                    });
         }
     }
 

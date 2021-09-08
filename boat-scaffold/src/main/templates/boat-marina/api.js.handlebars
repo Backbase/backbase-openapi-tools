@@ -9,47 +9,47 @@ const data = {
   responses: {},
   parameters: {},
   errors: {},
-  {{#if version}}
+  {{~#if version}}
   version: "{{version}}",
   {{/if}}
     generatedDate: "{{generatedDate}}",
 };
-
-{{#with apiInfo}}
-    {{#each apis}}
-        {{#with operations}}
-            data.operations.push({{json .}});
-        {{/with}}
-    {{/each}}
-{{/with}}
-
+# OpenAPI Operations
+{{#with apiInfo~}}
+    {{~#each apis~}}
+        {{~#with operations}}
+data.operations.push({{json .}});
+        {{~/with}}
+    {{~/each}}
+{{~/with}}
+# OpenAPI Models
 {{#each models}}
-    {{#with model}}
-        data.models["{{name}}"] = {{{json .}}};
-    {{/with}}
-{{/each}}
-
+    {{~#with model}}
+data.models["{{name}}"] = {{{json .}}};
+    {{~/with}}
+{{~/each}}
+# OpenAPI Examples
 {{#each examples as |example|}}
-    {{#with example}}
-        data.examples["{{name}}"] = {{json .}}
-    {{/with}}
-{{/each}}
-
+    {{~#with example}}
+data.examples["{{name}}"] = {{json .}}
+    {{~/with}}
+{{~/each}}
+# Request Bodies
 {{#each requestBodies}}
-    data["requestBodies"]["{{baseName}}"] = {{{jsonSchema}}};
-{{/each}}
-
+data["requestBodies"]["{{baseName}}"] = {{{jsonSchema}}};
+{{~/each}}
+# Response Bodies
 {{#each responses}}
-    data["responses"]["{{code}}"] = {{{jsonSchema}}};
-{{/each}}
-
+data["responses"]["{{code}}"] = {{{jsonSchema}}};
+{{~/each}}
+# Parameters
 {{#each parameters}}
-    data["parameters"]["{{paramName}}"] = {{{jsonSchema}}};
-{{/each}}
-
+data["parameters"]["{{paramName}}"] = {{{jsonSchema}}};
+{{~/each}}
+# Vendor Extensions
 {{#each swagger.vendorExtensions.x-shared-errors}}
     let err = {{{json .}}};
     data["errors"][err.errorID] = err;
-{{/each}}
+{{~/each}}
 
 module.exports = { data };

@@ -36,7 +36,7 @@ class BoatDocsTest {
 
     @Test
     public void testGenerateDocsExampleRefs() {
-        assertDoesNotThrow(() -> generateDocs(getFile("/oas-examples/petstore-example-refs.yaml")));
+        assertDoesNotThrow(() -> generateDocs(new File("/Users/bartv/Downloads/action-service-api-v2.0.12.yaml")));
     }
 
     @Test
