@@ -18,8 +18,14 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.14.10
+* *Boat Scaffold*
+  * Makes sure to URLDecode paths while dereferencing examples
+## 0.14.9
+* *Boat Scaffold*
+  * Resolve references to other path operations' examples
 
-## 0.14.8
+* ## 0.14.8
 * *Boat Marina*
   * Removes flatObjects as they are no longer needed
   * response.message was wrongfully escaped, escaping in the docs template instead
