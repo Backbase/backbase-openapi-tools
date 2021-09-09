@@ -25,7 +25,7 @@ BOAT is still under development and subject to change.
 * *Boat Scaffold*
   * Resolve references to other path operations' examples
 
-* ## 0.14.8
+## 0.14.8
 * *Boat Marina*
   * Removes flatObjects as they are no longer needed
   * response.message was wrongfully escaped, escaping in the docs template instead
