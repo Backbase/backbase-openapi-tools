@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -132,7 +133,7 @@ public class BoatExampleUtils {
         }
 
         String[] refParts = Arrays.stream(ref.replace(PATHS_REF_PREFIX, "").split("/"))
-                .map(s -> URLDecoder.decode(s.replace("~1", "/").replace("~0", "~"), java.nio.charset.Charset.forName(("UTF-8"))))
+                .map(s -> URLDecoder.decode(s.replace("~1", "/").replace("~0", "~"), StandardCharsets.UTF_8))
                 .toArray(String[]::new);
 
         String pathName = refParts[1];
