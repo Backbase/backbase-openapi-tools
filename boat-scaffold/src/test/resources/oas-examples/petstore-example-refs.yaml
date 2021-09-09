@@ -68,6 +68,14 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 $ref: "#/components/examples/InternalServerError"
+        '400':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                $ref: "#/paths/~1pets~1%7BpetId%7D/get/responses/default/content/application~1json/example"
         default:
           description: unexpected error
           content:
