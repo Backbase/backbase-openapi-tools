@@ -120,6 +120,12 @@ paths:
             application/json:
               example:
                 $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/example"
+            application/xml:
+              examples:
+                Inexistent:
+                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/foo"
+                AnotheOne:
+                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/example"
         '500':
           description: InternalServerError
           content:
