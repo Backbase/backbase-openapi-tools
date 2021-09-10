@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 @UtilityClass
-@SuppressWarnings("java:S3740")
+@SuppressWarnings({"java:S3740", "java:S125"})
 public class BoatExampleUtils {
 
     private static final String PATHS_REF_PREFIX = "#/paths";
