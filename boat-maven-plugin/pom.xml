@@ -6,6 +6,7 @@
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
         <version>0.14.11-SNAPSHOT</version>
+
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
