@@ -18,6 +18,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.14.11
+* *Boat Scaffold*
+  * References to /examples/foo now are also dereferenced
 ## 0.14.10
 * *Boat Scaffold*
   * Makes sure to URLDecode paths while dereferencing examples

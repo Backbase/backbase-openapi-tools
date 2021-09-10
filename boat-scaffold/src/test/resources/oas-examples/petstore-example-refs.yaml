@@ -76,6 +76,14 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 $ref: "#/paths/~1pets~1%7BpetId%7D/get/responses/default/content/application~1json/example"
+        '202':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              examples:
+                example:
+                  summary: This is an example referenced in a horrible path
+                  value: foo
         default:
           description: unexpected error
           content:
@@ -106,6 +114,18 @@ paths:
                 $ref: "#/components/schemas/Pet"
               example:
                 $ref: "#/paths/~1pets/get/responses/default/content/application~1json/example"
+        '400':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              example:
+                $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/example"
+            application/xml:
+              examples:
+                Inexistent:
+                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/theinexistentexample"
+                AnotheOne:
+                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/example"
         '500':
           description: InternalServerError
           content:
