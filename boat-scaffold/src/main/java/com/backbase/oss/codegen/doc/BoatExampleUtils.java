@@ -189,10 +189,6 @@ public class BoatExampleUtils {
         * */
         if (refParts[7].equals("examples")) {
             Example example = mediaType.getExamples().get(refParts[8]);
-            if(example == null) {
-                log.error("Incorrect example reference found! ref: {} , {} does not exist", ref, refParts[8]);
-                return;
-            }
             boatExample.setExample(example);
             return;
         }

@@ -123,7 +123,7 @@ paths:
             application/xml:
               examples:
                 Inexistent:
-                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/foo"
+                  $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/theinexistentexample"
                 AnotheOne:
                   $ref: "#/paths/~1pets/post/responses/202/content/application~1json/examples/example"
         '500':
