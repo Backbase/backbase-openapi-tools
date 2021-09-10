@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 @UtilityClass
-@SuppressWarnings("java:S3740")
+@SuppressWarnings({"java:S3740", "java:S125"})
 public class BoatExampleUtils {
 
     private static final String PATHS_REF_PREFIX = "#/paths";
@@ -42,7 +42,7 @@ public class BoatExampleUtils {
 
         if (mediaType.getExamples() != null) {
             mediaType.getExamples().forEach((key, example) -> {
-                log.debug("Adding example: {} to examples with content type: {} and responseCode: {} ", key, contentType, responseCode);
+                log.info("Adding example: {} to examples with content type: {} and responseCode: {} ", key, contentType, responseCode);
                 BoatExample boatExample = new BoatExample(key, contentType, example, isJson(contentType));
                 examples.add(boatExample);
             });
@@ -172,6 +172,24 @@ public class BoatExampleUtils {
         MediaType mediaType = content.get(mediaTypeName);
         if (mediaType == null) {
             log.warn("Example ref: {} refers to mediaType {} that is not defined.", ref, mediaTypeName);
+            return;
+        }
+
+        /* This could be a ref to /example or to /examples/foo in the case of responses.
+        *  responses:
+        200:
+          description: OK
+          examples:
+            application/json: { "id": 38, "title": "T-shirt" }
+            text/csv: >
+              id,title
+              38,T-shirt
+        *
+        *
+        * */
+        if (refParts[7].equals("examples")) {
+            Example example = mediaType.getExamples().get(refParts[8]);
+            boatExample.setExample(example);
             return;
         }
 
