@@ -56,13 +56,13 @@ class RadioMojoTests {
         specConfig.setInputSpec(getFile("/bundler/folder/" + fileName));
 
         RadioMojo mojo = new RadioMojo();
-        mojo.groupId = groupId;
-        mojo.artifactId = artifactId;
-        mojo.version = version;
-        mojo.portalKey = portalKey;
-        mojo.sourceKey = sourceKey;
-        mojo.specs = new SpecConfig[]{specConfig};
-        mojo.basePath = String.format("http://localhost:%s", mockBackEnd.getPort());
+        mojo.setGroupId(groupId);
+        mojo.setArtifactId(artifactId);
+        mojo.setVersion(version);
+        mojo.setPortalKey(portalKey);
+        mojo.setSourceKey(sourceKey);
+        mojo.setSpecs(new SpecConfig[]{specConfig});
+        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -101,7 +101,7 @@ class RadioMojoTests {
 
         mojo.execute();
 
-        File output = new File(mojo.radioOutput, "radioOutput.json");
+        File output = new File(mojo.getRadioOutput(), "radioOutput.json");
 
         assertTrue(output.exists());
 
@@ -132,13 +132,13 @@ class RadioMojoTests {
         specConfig.setInputSpec(getFile("/bundler/folder/" + fileName));
 
         RadioMojo mojo = new RadioMojo();
-        mojo.groupId = groupId;
-        mojo.artifactId = artifactId;
-        mojo.version = version;
-        mojo.portalKey = portalKey;
-        mojo.sourceKey = sourceKey;
-        mojo.specs = new SpecConfig[]{specConfig};
-        mojo.basePath = String.format("http://localhost:%s", mockBackEnd.getPort());
+        mojo.setGroupId(groupId);
+        mojo.setArtifactId(artifactId);
+        mojo.setVersion(version);
+        mojo.setPortalKey(portalKey);
+        mojo.setSourceKey(sourceKey);
+        mojo.setSpecs(new SpecConfig[]{specConfig});
+        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -180,7 +180,7 @@ class RadioMojoTests {
 
         mojo.execute();
 
-        File output = new File(mojo.radioOutput, "radioOutput.json");
+        File output = new File(mojo.getRadioOutput(), "radioOutput.json");
 
         assertTrue(output.exists());
 

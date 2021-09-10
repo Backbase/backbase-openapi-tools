@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -32,37 +34,39 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 @Mojo(name = "radio", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
+@Getter
+@Setter
 public class RadioMojo extends AbstractMojo {
 
     @Parameter(property = "groupId", defaultValue = "${project.groupId}", required = true)
-    String groupId;
+    private String groupId;
 
     @Parameter(property = "artifactId", defaultValue = "${project.artifactId}", required = true)
-    String artifactId;
+    private String artifactId;
 
     @Parameter(property = "version", defaultValue = "${project.version}", required = true)
-    String version;
+    private String version;
 
     @Parameter(property = "basePath", required = true)
-    String basePath;
+    private String basePath;
 
     @Parameter(property = "portalKey", required = true)
-    String portalKey;
+    private String portalKey;
 
     @Parameter(property = "sourceKey", required = true)
-    String sourceKey;
+    private String sourceKey;
 
     @Parameter(property = "username", required = false)
-    String username;
+    private String username;
 
     @Parameter(property = "password", required = false)
-    String password;
+    private String password;
 
     @Parameter(property = "specs")
-    SpecConfig[] specs;
+    private SpecConfig[] specs;
 
     @Parameter(name = "radioOutput", defaultValue = "${project.build.directory}/target/boat-radio-report")
-    File radioOutput;
+    private File radioOutput;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
