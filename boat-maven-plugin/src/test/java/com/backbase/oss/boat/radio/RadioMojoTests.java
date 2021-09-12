@@ -2,6 +2,7 @@ package com.backbase.oss.boat.radio;
 
 import com.backbase.oss.boat.bay.client.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.auth.BasicAuthRequestInterceptor;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -84,12 +86,7 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            BoatLintReport boatLintReport = new BoatLintReport();
-                            boatLintReport.setId(reportId);
-                            boatLintReport.setGrade(reportGrade);
-                            boatLintReport.setSpec(BoatSpec.builder().key(specKey).changes(Changes.COMPATIBLE).build());
-                            List<BoatLintReport> result = new ArrayList<>();
-                            result.add(boatLintReport);
+                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -164,12 +161,7 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            BoatLintReport boatLintReport = new BoatLintReport();
-                            boatLintReport.setId(reportId);
-                            boatLintReport.setGrade(reportGrade);
-                            boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(Changes.COMPATIBLE).build());
-                            List<BoatLintReport> result = new ArrayList<>();
-                            result.add(boatLintReport);
+                            List<BoatLintReport> result = getSampleBoatLintReports(expectedDefaultKey, reportId, reportGrade);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -278,6 +270,47 @@ class RadioMojoTests {
     }
 
     @Test
+    void test_invalid_open_api_file() {
+
+        final String portalKey = "example";
+        final String sourceKey = "pet-store-bom";
+        final String groupId = "com.backbase.boat.samples";
+        final String artifactId = "pet-store-bom";
+        final String version = "2021.09";
+        final String invalidFile = "logback.xml";
+
+        SpecConfig specConfig = new SpecConfig();
+        specConfig.setInputSpec(getFile("/" + invalidFile));
+
+        RadioMojo mojo = new RadioMojo();
+        mojo.setGroupId(groupId);
+        mojo.setArtifactId(artifactId);
+        mojo.setVersion(version);
+        mojo.setPortalKey(portalKey);
+        mojo.setSourceKey(sourceKey);
+        mojo.setSpecs(new SpecConfig[]{specConfig});
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
+
+        final Dispatcher dispatcher = new Dispatcher() {
+            @SneakyThrows
+            @Override
+            public MockResponse dispatch(RecordedRequest request) {
+                switch (request.getPath()) {
+                    case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
+
+                        return new MockResponse().setResponseCode(200);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        mockBackEnd.setDispatcher(dispatcher);
+
+        assertThrows(MojoExecutionException.class, () -> mojo.execute());
+
+    }
+
+    @Test
     void test_invalid_parent_folder() {
 
         final String portalKey = "example";
@@ -320,9 +353,77 @@ class RadioMojoTests {
 
     }
 
+    @SneakyThrows
+    @Test
+    void test_auth() {
+
+        final String portalKey = "example";
+        final String sourceKey = "pet-store-bom";
+        final String specKey = "spec-key";
+        final String groupId = "com.backbase.boat.samples";
+        final String artifactId = "pet-store-bom";
+        final String version = "2021.09";
+        final String validName = "one-client-api-v1.yaml";
+        final String username = "admin";
+        final String password = "admin";
+        final BigDecimal reportId = BigDecimal.valueOf(10);
+        final String reportGrade = "A";
+
+        SpecConfig specConfig = new SpecConfig();
+        specConfig.setInputSpec(getFile("/bundler/folder/" + validName));
+
+        RadioMojo mojo = new RadioMojo();
+        mojo.setGroupId(groupId);
+        mojo.setArtifactId(artifactId);
+        mojo.setVersion(version);
+        mojo.setPortalKey(portalKey);
+        mojo.setSourceKey(sourceKey);
+        mojo.setUsername(username);
+        mojo.setPassword(password);
+        mojo.setSpecs(new SpecConfig[]{specConfig});
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
+
+        final Dispatcher dispatcher = new Dispatcher() {
+            @SneakyThrows
+            @Override
+            public MockResponse dispatch(RecordedRequest request) {
+                switch (request.getPath()) {
+                    case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
+
+                        if(request.getHeader("Authorization")!=null && request.getHeader("Authorization").length()>0){
+                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade);
+                            return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
+                        }
+                        return new MockResponse().setResponseCode(401);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        mockBackEnd.setDispatcher(dispatcher);
+
+        mojo.execute();
+
+        File output = new File(mojo.getRadioOutput(), "radioOutput.json");
+
+        assertTrue(output.exists());
+
+    }
+
 
     private String getFile(String glob) {
         return (new File("src/test/resources").getAbsolutePath() + glob);
+    }
+
+    @NotNull
+    private List<BoatLintReport> getSampleBoatLintReports(String expectedDefaultKey, BigDecimal reportId, String reportGrade) {
+        BoatLintReport boatLintReport = new BoatLintReport();
+        boatLintReport.setId(reportId);
+        boatLintReport.setGrade(reportGrade);
+        boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(Changes.COMPATIBLE).build());
+        List<BoatLintReport> result = new ArrayList<>();
+        result.add(boatLintReport);
+        return result;
     }
 
 }

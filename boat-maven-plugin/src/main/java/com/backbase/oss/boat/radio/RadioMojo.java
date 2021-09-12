@@ -170,7 +170,7 @@ public class RadioMojo extends AbstractMojo {
 
     private UploadSpec mapToUploadSpec(SpecConfig spec) throws MojoExecutionException {
 
-        //Validate is the spec file path is valid and unique.
+        //Validate if the spec file path is valid and unique.
         File inputSpecFile = new File(spec.getInputSpec());
         File inputParent = inputSpecFile.getParentFile();
 
@@ -204,7 +204,7 @@ public class RadioMojo extends AbstractMojo {
             throw new MojoExecutionException(message);
         }
 
-        //Validate is the spec file is valid open-api spec
+        //Validate if the spec file is valid open-api spec
         String contents;
         try {
             contents = IOUtils.toString(inputSpecFile.toURI(), Charset.defaultCharset());
