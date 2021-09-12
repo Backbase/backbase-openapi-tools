@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.doc;
 
+import com.samskivert.mustache.Mustache;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenResponse;
 
 @Slf4j
@@ -14,6 +16,11 @@ import org.openapitools.codegen.CodegenResponse;
 @ToString
 @SuppressWarnings("java:S2387")
 public class BoatCodegenResponse extends CodegenResponse {
+
+    public static final Mustache.Lambda escapeBackTicks = (fragment, writer) -> {
+        String text = fragment.execute();
+        writer.write(StringUtils.replace(text, "`", "\\`"));
+    };
 
     private final List<BoatExample> examples = new ArrayList<>();
 

@@ -2,7 +2,38 @@ openapi: "3.0.0"
 info:
   title: Simple API overview
   version: 2.0.0
+components:
+  schemas:
+    ParameterMap:
+      type: object
+      additionalProperties:
+        type: object
+      example:
+        enable_payments: true
+  examples:
+    BadRequestError:
+      summary: BadRequestError
+      value:
+        message: Bad Request
+        errors:
+          - message: "Value Exceeded. Must be between {min} and {max}."
+            key: common.api.shoesize
+            context:
+              max: "50"
+              min: "1"
 paths:
+  /foo:
+    description: Some random description
+    get:
+      operationId: foo
+      summary: Gets a project's parameters.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterMap'
   /:
     get:
       operationId: listVersionsv2
@@ -29,6 +60,8 @@ paths:
                         links:
                           - href: http://127.0.0.1:8774/v3/
                             rel: self
+                bar:
+                  $ref: '#/components/examples/BadRequestError'
 
         '300':
           description: |-

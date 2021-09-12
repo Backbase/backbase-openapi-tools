@@ -47,12 +47,9 @@ const data = {
     data["parameters"]["{{paramName}}"] = {{{jsonSchema}}};
 {{/each}}
 
-
 {{#each swagger.vendorExtensions.x-shared-errors}}
     let err = {{{json .}}};
     data["errors"][err.errorID] = err;
 {{/each}}
-
-
 
 module.exports = { data };
