@@ -1,8 +1,6 @@
-package com.backbase.oss.boat;
+package com.backbase.oss.boat.radio;
 
-import com.backbase.oss.boat.bay.client.model.BoatLintReport;
-import com.backbase.oss.boat.bay.client.model.UploadRequestBody;
-import com.backbase.oss.boat.bay.client.model.UploadSpec;
+import com.backbase.oss.boat.bay.client.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.math.BigDecimal;
@@ -38,7 +36,7 @@ class RadioMojoTests {
 
     @Test
     @SneakyThrows
-    void test_valid_inputs() {
+    void test_all_valid_inputs() {
 
         final String portalKey = "example";
         final String sourceKey = "pet-store-bom";
@@ -65,7 +63,7 @@ class RadioMojoTests {
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
         mojo.setSpecs(new SpecConfig[]{specConfig});
-        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -89,6 +87,7 @@ class RadioMojoTests {
                             BoatLintReport boatLintReport = new BoatLintReport();
                             boatLintReport.setId(reportId);
                             boatLintReport.setGrade(reportGrade);
+                            boatLintReport.setSpec(BoatSpec.builder().key(specKey).changes(Changes.COMPATIBLE).build());
                             List<BoatLintReport> result = new ArrayList<>();
                             result.add(boatLintReport);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
@@ -142,7 +141,7 @@ class RadioMojoTests {
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
         mojo.setSpecs(new SpecConfig[]{specConfig});
-        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -168,6 +167,7 @@ class RadioMojoTests {
                             BoatLintReport boatLintReport = new BoatLintReport();
                             boatLintReport.setId(reportId);
                             boatLintReport.setGrade(reportGrade);
+                            boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(Changes.COMPATIBLE).build());
                             List<BoatLintReport> result = new ArrayList<>();
                             result.add(boatLintReport);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
@@ -215,7 +215,7 @@ class RadioMojoTests {
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
         mojo.setSpecs(new SpecConfig[]{specConfig});
-        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -256,7 +256,7 @@ class RadioMojoTests {
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
         mojo.setSpecs(new SpecConfig[]{specConfig});
-        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
@@ -297,7 +297,7 @@ class RadioMojoTests {
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
         mojo.setSpecs(new SpecConfig[]{specConfig});
-        mojo.setBasePath(String.format("http://localhost:%s", mockBackEnd.getPort()));
+        mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
         final Dispatcher dispatcher = new Dispatcher() {
             @SneakyThrows
