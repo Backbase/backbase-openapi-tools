@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 class RadioMojoTests {
@@ -106,9 +106,9 @@ class RadioMojoTests {
 
         List<BoatLintReport> result = Arrays.asList(objectMapper.readValue(output, BoatLintReport[].class));
 
-        assertTrue(result.size() == 1);
-        assertTrue(result.get(0).getId().equals(reportId));
-        assertTrue(result.get(0).getGrade().equals(reportGrade));
+        assertEquals(1, result.size());
+        assertEquals(reportId, result.get(0).getId());
+        assertEquals(reportGrade, result.get(0).getGrade());
 
     }
 
@@ -181,9 +181,9 @@ class RadioMojoTests {
 
         List<BoatLintReport> result = Arrays.asList(objectMapper.readValue(output, BoatLintReport[].class));
 
-        assertTrue(result.size() == 1);
-        assertTrue(result.get(0).getId().equals(reportId));
-        assertTrue(result.get(0).getGrade().equals(reportGrade));
+        assertEquals(1, result.size());
+        assertEquals(reportId, result.get(0).getId());
+        assertEquals(reportGrade, result.get(0).getGrade());
 
     }
 

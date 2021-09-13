@@ -158,9 +158,7 @@ public class RadioMojo extends AbstractMojo {
         try {
             File outputFile = new File(getOutput(), "radioOutput.json");
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
-            reports.forEach(report -> {
-                getLog().info(format("Changes to spec %s is %s", report.getSpec().getKey(), report.getSpec().getChanges()));
-            });
+            reports.forEach(report -> getLog().info(format("Changes to spec %s is %s", report.getSpec().getKey(), report.getSpec().getChanges())));
             getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
         } catch (IOException e) {
             throw new MojoFailureException("Failed to write output", e);
