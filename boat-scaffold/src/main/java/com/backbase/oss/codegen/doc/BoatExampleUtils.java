@@ -187,7 +187,7 @@ public class BoatExampleUtils {
         *
         *
         * */
-        if (refParts[7].equals("examples")) {
+        if (refParts.length > 7 && refParts[7].equals("examples")) {
             Example example = mediaType.getExamples().get(refParts[8]);
             boatExample.setExample(example);
             return;
