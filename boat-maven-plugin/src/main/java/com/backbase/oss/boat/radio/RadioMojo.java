@@ -3,10 +3,7 @@ package com.backbase.oss.boat.radio;
 import com.backbase.oss.boat.Utils;
 import com.backbase.oss.boat.bay.client.ApiClient;
 import com.backbase.oss.boat.bay.client.api.BoatMavenPluginApi;
-import com.backbase.oss.boat.bay.client.model.BoatLintReport;
-import com.backbase.oss.boat.bay.client.model.Changes;
-import com.backbase.oss.boat.bay.client.model.UploadRequestBody;
-import com.backbase.oss.boat.bay.client.model.UploadSpec;
+import com.backbase.oss.boat.bay.client.model.*;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,7 +68,7 @@ public class RadioMojo extends AbstractMojo {
     private boolean failOnBreakingChange;
 
     /**
-     * Fail the build if the spec has lint violation (mustViolationsCount > 0)
+     * Fail the build if the spec has lint violation (Violation with Severity.MUST)
      */
     @Parameter(property = "failOnLintViolation", defaultValue="false")
     private boolean failOnLintViolation;
@@ -174,7 +171,7 @@ public class RadioMojo extends AbstractMojo {
             reports.forEach(report -> {
                 getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
                 getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
-                getLog().info(report.getSpec().getStatistics().toString());
+                getLog().info("Number of Violations:"+report.getViolations().size());
             });
             // Log link to reports
             getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
@@ -184,7 +181,7 @@ public class RadioMojo extends AbstractMojo {
                 throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
             }
             boolean doesSpecsHaveMustViolations = reports.stream()
-                    .anyMatch(report -> report.getSpec().getStatistics().getMustViolationsCount() > 0);
+                    .anyMatch(report -> report.getViolations().stream().anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
             if(doesSpecsHaveMustViolations && failOnLintViolation){
                 throw new MojoFailureException("Specs have Must Violations. Check full report.");
             }

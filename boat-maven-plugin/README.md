@@ -276,7 +276,7 @@ Available parameters:
 
     failOnLintViolation (Default: false)
       User property: failOnLintViolation
-      Fail the build if the spec has lint violation (mustViolationsCount > 0)
+      Fail the build if the spec has lint violation (Violation with Severity.MUST)
 
 
     groupId (Default: ${project.groupId})

@@ -87,7 +87,7 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,0);
+                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -162,7 +162,7 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            List<BoatLintReport> result = getSampleBoatLintReports(expectedDefaultKey, reportId, reportGrade,Changes.COMPATIBLE,0);
+                            List<BoatLintReport> result = getSampleBoatLintReports(expectedDefaultKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -392,7 +392,7 @@ class RadioMojoTests {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
 
                         if(request.getHeader("Authorization")!=null && request.getHeader("Authorization").length()>0){
-                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,0);
+                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         }
                         return new MockResponse().setResponseCode(401);
@@ -443,7 +443,7 @@ class RadioMojoTests {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
-                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.BREAKING,0);
+                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.BREAKING,Severity.HINT);
                         return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                 }
                 return new MockResponse().setResponseCode(404);
@@ -497,7 +497,7 @@ class RadioMojoTests {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
-                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.BREAKING,2);
+                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.MUST);
                         return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                 }
                 return new MockResponse().setResponseCode(404);
@@ -526,12 +526,12 @@ class RadioMojoTests {
 
     @NotNull
     private List<BoatLintReport> getSampleBoatLintReports(String expectedDefaultKey, BigDecimal reportId, String reportGrade,
-                                                          Changes typeOfChange, long numberOfMustViolation) {
+                                                          Changes typeOfChange, Severity sampleSeverityInResponse) {
         BoatLintReport boatLintReport = new BoatLintReport();
         boatLintReport.setId(reportId);
         boatLintReport.setGrade(reportGrade);
-        boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(typeOfChange)
-                .statistics(BoatStatistics.builder().mustViolationsCount(numberOfMustViolation).build()).build());
+        boatLintReport.violations(List.of(BoatViolation.builder().severity(sampleSeverityInResponse).build()));
+        boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(typeOfChange).build());
         List<BoatLintReport> result = new ArrayList<>();
         result.add(boatLintReport);
         return result;
