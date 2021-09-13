@@ -73,7 +73,7 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Fail the build if the spec has lint violation (mustViolationsCount > 0)
      */
-    @Parameter(property = "failOnBreakingChange")
+    @Parameter(property = "failOnLintViolation")
     private boolean failOnLintViolation;
 
     /**

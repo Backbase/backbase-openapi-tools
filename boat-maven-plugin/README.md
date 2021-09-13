@@ -275,7 +275,7 @@ Available parameters:
       Fail the build for breaking changes in specs
 
     failOnLintViolation
-      User property: failOnBreakingChange
+      User property: failOnLintViolation
       Fail the build if the spec has lint violation (mustViolationsCount > 0)
 
     groupId (Default: ${project.groupId})
