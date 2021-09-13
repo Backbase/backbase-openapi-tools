@@ -4,6 +4,7 @@ import com.backbase.oss.boat.Utils;
 import com.backbase.oss.boat.bay.client.ApiClient;
 import com.backbase.oss.boat.bay.client.api.BoatMavenPluginApi;
 import com.backbase.oss.boat.bay.client.model.BoatLintReport;
+import com.backbase.oss.boat.bay.client.model.Changes;
 import com.backbase.oss.boat.bay.client.model.UploadRequestBody;
 import com.backbase.oss.boat.bay.client.model.UploadSpec;
 import com.backbase.oss.boat.loader.OpenAPILoader;
@@ -64,6 +65,18 @@ public class RadioMojo extends AbstractMojo {
     private String boatBayUrl;
 
     /**
+     * Fail the build for breaking changes in specs
+     */
+    @Parameter(property = "failOnBreakingChange")
+    private boolean failOnBreakingChange;
+
+    /**
+     * Fail the build if the spec has lint violation (mustViolationsCount > 0)
+     */
+    @Parameter(property = "failOnBreakingChange")
+    private boolean failOnLintViolation;
+
+    /**
      * Project portal Identifier in Boat-Bay.
      */
     @Parameter(property = "portalKey", required = true)
@@ -89,27 +102,26 @@ public class RadioMojo extends AbstractMojo {
 
     /**
      * <p>
-     *     Array of spec to be uploaded. Spec fields:
-     *</p>
-     * <p>
-     *     {@code key} :
-     *     Spec Key in Boat-Bay. Defaults to {@code filename.lastIndexOf("-")}.
-     *     For example - By default {@code my-service-api-v3.1.4.yaml} would be evaluated to {@code my-service-api}
+     * Array of spec to be uploaded. Spec fields:
      * </p>
      * <p>
-     *     {@code name} :
-     *     Spec Name in Boat-Bay. Defaults to filename.
+     * {@code key} :
+     * Spec Key in Boat-Bay. Defaults to {@code filename.lastIndexOf("-")}.
+     * For example - By default {@code my-service-api-v3.1.4.yaml} would be evaluated to {@code my-service-api}
      * </p>
      * <p>
-     *     {@code inputSpec} :
-     *      Location of the OpenAPI spec, as URL or local file glob pattern.
-     *      If the input is a local file, the value of this property is considered a glob pattern that must
-     *      resolve to a unique file.
-     *      The glob pattern allows to express the input specification in a version neutral way. For
-     *      instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
-     *      {@code my-service-api-v*.yaml}.
+     * {@code name} :
+     * Spec Name in Boat-Bay. Defaults to filename.
      * </p>
-     *
+     * <p>
+     * {@code inputSpec} :
+     * Location of the OpenAPI spec, as URL or local file glob pattern.
+     * If the input is a local file, the value of this property is considered a glob pattern that must
+     * resolve to a unique file.
+     * The glob pattern allows to express the input specification in a version neutral way. For
+     * instance, if the actual file is {@code my-service-api-v3.1.4.yaml} the expression could be
+     * {@code my-service-api-v*.yaml}.
+     * </p>
      */
     @Parameter(property = "specs", required = true)
     private SpecConfig[] specs;
@@ -117,7 +129,7 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Output directory for boat-radio report.
      */
-    @Parameter(name = "radioOutput", defaultValue = "${project.build.directory}/target/boat-radio-report" )
+    @Parameter(name = "radioOutput", defaultValue = "${project.build.directory}/target/boat-radio-report")
     private File radioOutput;
 
     @Override
@@ -128,7 +140,7 @@ public class RadioMojo extends AbstractMojo {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-            getLog().info("Basic Authentication set for username "+username);
+            getLog().info("Basic Authentication set for username " + username);
             basicAuthRequestInterceptor = new BasicAuthRequestInterceptor(username, password);
         } else {
             getLog().info("No Authentication set");
@@ -158,8 +170,24 @@ public class RadioMojo extends AbstractMojo {
         try {
             File outputFile = new File(getOutput(), "radioOutput.json");
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
-            reports.forEach(report -> getLog().info(format("Changes to spec %s is %s", report.getSpec().getKey(), report.getSpec().getChanges())));
+            // Log summary of report
+            reports.forEach(report -> {
+                getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
+                getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
+                getLog().info(report.getSpec().getStatistics().toString());
+            });
+            // Log link to reports
             getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
+            boolean doesSpecsHaveBreakingChanges = reports.stream()
+                    .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
+            if(doesSpecsHaveBreakingChanges && failOnBreakingChange){
+                throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
+            }
+            boolean doesSpecsHaveMustViolations = reports.stream()
+                    .anyMatch(report -> report.getSpec().getStatistics().getMustViolationsCount() > 0);
+            if(doesSpecsHaveMustViolations && failOnLintViolation){
+                throw new MojoFailureException("Specs have Must Violations. Check full report.");
+            }
         } catch (IOException e) {
             throw new MojoFailureException("Failed to write output", e);
         }
