@@ -270,13 +270,14 @@ Available parameters:
       User property: boatBayUrl
       Boat-Bay domain. eg. https://boatbay.mycompany.eu
 
-    failOnBreakingChange
+    failOnBreakingChange (Default: false)
       User property: failOnBreakingChange
       Fail the build for breaking changes in specs
 
-    failOnLintViolation
+    failOnLintViolation (Default: false)
       User property: failOnLintViolation
       Fail the build if the spec has lint violation (mustViolationsCount > 0)
+
 
     groupId (Default: ${project.groupId})
       User property: groupId

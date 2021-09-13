@@ -67,13 +67,13 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Fail the build for breaking changes in specs
      */
-    @Parameter(property = "failOnBreakingChange")
+    @Parameter(property = "failOnBreakingChange", defaultValue="false")
     private boolean failOnBreakingChange;
 
     /**
      * Fail the build if the spec has lint violation (mustViolationsCount > 0)
      */
-    @Parameter(property = "failOnLintViolation")
+    @Parameter(property = "failOnLintViolation", defaultValue="false")
     private boolean failOnLintViolation;
 
     /**
