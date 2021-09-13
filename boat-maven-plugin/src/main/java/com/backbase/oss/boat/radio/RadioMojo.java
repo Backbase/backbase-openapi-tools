@@ -175,14 +175,19 @@ public class RadioMojo extends AbstractMojo {
             });
             // Log link to reports
             getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
-            boolean doesSpecsHaveBreakingChanges = reports.stream()
-                    .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
-            if(doesSpecsHaveBreakingChanges && failOnBreakingChange){
+
+            if(failOnBreakingChange){
+                boolean doesSpecsHaveBreakingChanges = reports.stream()
+                        .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
+                if(doesSpecsHaveBreakingChanges)
                 throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
             }
-            boolean doesSpecsHaveMustViolations = reports.stream()
-                    .anyMatch(report -> report.getViolations().stream().anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
-            if(doesSpecsHaveMustViolations && failOnLintViolation){
+
+            if(failOnLintViolation){
+                boolean doesSpecsHaveMustViolations = reports.stream()
+                        .anyMatch(report -> report.getViolations().stream()
+                                .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
+                if(doesSpecsHaveMustViolations)
                 throw new MojoFailureException("Specs have Must Violations. Check full report.");
             }
         } catch (IOException e) {
