@@ -74,6 +74,12 @@ public class RadioMojo extends AbstractMojo {
     private boolean failOnLintViolation;
 
     /**
+     * Fail the build if boatbay server returns an error
+     */
+    @Parameter(property = "failOnBoatBayErrorResponse", defaultValue="true")
+    private boolean failOnBoatBayErrorResponse =true;
+
+    /**
      * Project portal Identifier in Boat-Bay.
      */
     @Parameter(property = "portalKey", required = true)
@@ -156,42 +162,49 @@ public class RadioMojo extends AbstractMojo {
 
         BoatMavenPluginApi api = apiClient.buildClient(BoatMavenPluginApi.class);
 
-        UploadRequestBody uploadRequestBody = new UploadRequestBody();
-        uploadRequestBody.setGroupId(groupId);
-        uploadRequestBody.setArtifactId(artifactId);
-        uploadRequestBody.setVersion(version);
-        uploadRequestBody.setSpecs(allSpecs);
+        UploadRequestBody uploadRequestBody = UploadRequestBody.builder()
+                .groupId(groupId).artifactId(artifactId).version(version).specs(allSpecs).build();
 
-        List<BoatLintReport> reports = api.uploadSpec(portalKey, sourceKey, uploadRequestBody);
-
+        List<BoatLintReport> reports =null;
         try {
-            File outputFile = new File(getOutput(), "radioOutput.json");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
-            // Log summary of report
-            reports.forEach(report -> {
-                getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
-                getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
-                getLog().info("Number of Violations:"+report.getViolations().size());
-            });
-            // Log link to reports
-            getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
+            reports = api.uploadSpec(portalKey, sourceKey, uploadRequestBody);
+        }catch (Exception e){
+            getLog().error("BoatBay error :: " + e.getMessage());
+            if(failOnBoatBayErrorResponse)
+                throw new MojoFailureException("BoatBay error", e);
+        }
 
-            if(failOnBreakingChange){
-                boolean doesSpecsHaveBreakingChanges = reports.stream()
-                        .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
-                if(doesSpecsHaveBreakingChanges)
-                throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
-            }
+        // Process Result
+        if(reports!=null) {
+            try {
+                File outputFile = new File(getOutput(), "radioOutput.json");
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
+                // Log summary of report
+                reports.forEach(report -> {
+                    getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
+                    getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
+                    getLog().info("Number of Violations:" + report.getViolations().size());
+                });
+                // Log link to reports
+                getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
 
-            if(failOnLintViolation){
-                boolean doesSpecsHaveMustViolations = reports.stream()
-                        .anyMatch(report -> report.getViolations().stream()
-                                .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
-                if(doesSpecsHaveMustViolations)
-                throw new MojoFailureException("Specs have Must Violations. Check full report.");
+                if (failOnBreakingChange) {
+                    boolean doesSpecsHaveBreakingChanges = reports.stream()
+                            .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
+                    if (doesSpecsHaveBreakingChanges)
+                        throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
+                }
+
+                if (failOnLintViolation) {
+                    boolean doesSpecsHaveMustViolations = reports.stream()
+                            .anyMatch(report -> report.getViolations().stream()
+                                    .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
+                    if (doesSpecsHaveMustViolations)
+                        throw new MojoFailureException("Specs have Must Violations. Check full report.");
+                }
+            } catch (IOException e) {
+                throw new MojoFailureException("Failed to write output", e);
             }
-        } catch (IOException e) {
-            throw new MojoFailureException("Failed to write output", e);
         }
 
     }
@@ -258,12 +271,8 @@ public class RadioMojo extends AbstractMojo {
         }
 
         //Validation Complete. Prepare UploadSpec.
-        UploadSpec uploadSpec = new UploadSpec();
-        uploadSpec.setFileName(inputSpecFile.getName());
-        uploadSpec.setKey(key);
-        uploadSpec.setName(name);
-        uploadSpec.setOpenApi(contents);
-
+        UploadSpec uploadSpec = UploadSpec.builder()
+                .fileName(inputSpecFile.getName()).key(key).name(name).openApi(contents).build();
 
         return uploadSpec;
 

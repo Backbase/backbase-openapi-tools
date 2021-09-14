@@ -519,6 +519,62 @@ class RadioMojoTests {
 
     }
 
+    @SneakyThrows
+    @Test
+    void test_when_boat_bay_is_unavailable() {
+
+        final String portalKey = "example";
+        final String sourceKey = "pet-store-bom";
+        final String groupId = "com.backbase.boat.samples";
+        final String artifactId = "pet-store-bom";
+        final String specKey = "spec-key";
+        final String version = "2021.09";
+        final BigDecimal reportId = BigDecimal.valueOf(10);
+        final String reportGrade = "A";
+        final String validName = "one-client-api-v1.yaml";
+
+        SpecConfig specConfig = new SpecConfig();
+        specConfig.setInputSpec(getFile("/bundler/folder/" + validName));
+
+        RadioMojo mojo = new RadioMojo();
+        mojo.setGroupId(groupId);
+        mojo.setArtifactId(artifactId);
+        mojo.setVersion(version);
+        mojo.setPortalKey(portalKey);
+        mojo.setSourceKey(sourceKey);
+        mojo.setSpecs(new SpecConfig[]{specConfig});
+        //Set invalid domain
+        mojo.setBoatBayUrl(String.format("http://invalid-domain:%s", mockBackEnd.getPort()));
+
+        final Dispatcher dispatcher = new Dispatcher() {
+            @SneakyThrows
+            @Override
+            public MockResponse dispatch(RecordedRequest request) {
+                switch (request.getPath()) {
+                    case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
+                        return new MockResponse().setResponseCode(200);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        mockBackEnd.setDispatcher(dispatcher);
+
+
+        // Build will fail, when failOnBoatBayErrorResponse is true (Defualt)
+        Exception exception = assertThrows(MojoFailureException.class, () -> mojo.execute());
+        assertTrue(exception.getMessage().startsWith("BoatBay error"));
+
+        // Build will not fail if failOnBoatBayErrorResponse is false
+        mojo.setFailOnBoatBayErrorResponse(false);
+        //No Exception is thrown
+        assertDoesNotThrow(() -> mojo.execute());
+        File output = new File(mojo.getRadioOutput(), "radioOutput.json");
+        //But No output file present
+        assertTrue(!output.exists());
+
+    }
+
 
     private String getFile(String glob) {
         return (new File("src/test/resources").getAbsolutePath() + glob);
