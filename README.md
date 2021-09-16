@@ -18,6 +18,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.15.0
+* *Maven Plugin*
+  * Added new goal `boat:radio`; see the description in the [plugin documentation](boat-maven-plugin/README.md#boatradio).
 ## 0.14.12
 * *Boat Scaffold*
   * References to /examples/foo now are also dereferenced

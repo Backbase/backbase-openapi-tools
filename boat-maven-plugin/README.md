@@ -255,6 +255,105 @@ Usage
 
 Or hook up to your build process by adding ```executions``` configuration.
 
+## boat:radio
+
+Upload specs (one of more) to Boat-Bay.
+
+Available parameters:
+
+    artifactId (Default: ${project.artifactId})
+      User property: artifactId
+      Project ArtifactId in Boat-Bay. Defaults to ${project.artifactId}
+
+    boatBayUrl
+      Required: true
+      User property: boatBayUrl
+      Boat-Bay domain. eg. https://boatbay.mycompany.eu
+
+    failOnBreakingChange (Default: false)
+      User property: failOnBreakingChange
+      Fail the build for breaking changes in specs
+
+    failOnLintViolation (Default: false)
+      User property: failOnLintViolation
+      Fail the build if the spec has lint violation (Violation with Severity.MUST)
+
+
+    groupId (Default: ${project.groupId})
+      User property: groupId
+      Project GroupId in Boat-Bay. Defaults to ${project.groupId}
+
+    password
+      User property: password
+      Defines the password of the username which can access the Boat-Bay upload
+      API. Required if boat-bay APIs are protected.
+
+    portalKey
+      Required: true
+      User property: portalKey
+      Project portal Identifier in Boat-Bay.
+
+    radioOutput (Default:
+    ${project.build.directory}/target/boat-radio-report)
+      Output directory for boat-radio report.
+
+    sourceKey
+      Required: true
+      User property: sourceKey
+      Project source identifier in Boat-Bay.
+
+    specs
+      Required: true
+      User property: specs
+      Array of spec to be uploaded. Spec fields:
+      
+      key : Spec Key in Boat-Bay. Defaults to filename.lastIndexOf('-'). For
+      example - By default my-service-api-v3.1.4.yaml would be evaluated to
+      my-service-api
+      
+      name : Spec Name in Boat-Bay. Defaults to filename.
+      
+      inputSpec : Location of the OpenAPI spec, as URL or local file glob
+      pattern. If the input is a local file, the value of this property is
+      considered a glob pattern that must resolve to a unique file. The glob
+      pattern allows to express the input specification in a version neutral
+      way. For instance, if the actual file is my-service-api-v3.1.4.yaml the
+      expression could be my-service-api-v*.yaml.
+
+    username
+      User property: username
+      Defines the username which can access Boat-Bay upload API. Required if
+      boat-bay APIs are protected.
+
+    version (Default: ${project.version})
+      User property: version
+      Project Version in Boat-Bay. Defaults to ${project.version}
+
+
+Configuration example:
+
+```$xml
+     <execution>
+      <id>upload-specs</id>
+      <phase>install</phase>
+      <goals>
+       <goal>radio</goal>
+      </goals>
+      <configuration>
+       <sourceKey>pet-store-bom</sourceKey>
+       <portalKey>example</portalKey>
+       <boatBayUrl>https://boatbay.backbase.eu</boatBayUrl>
+       <username>admin</username>
+       <password>admin</password>
+       <specs>
+        <spec>
+         <inputSpec>${project.build.directory}/spec/bundled/pet-store-client-api-*.yaml</inputSpec>
+        </spec>
+       </specs>
+      </configuration>
+     </execution>
+```
+
 ## boat:transform
 
 Apply transformers to an existing specification.

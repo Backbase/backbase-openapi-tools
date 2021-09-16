@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Boat Bay Upload Server
+  description: Endpoints for uploading Specs to boat bay
+  license:
+    name: Backbase
+  version: 1.0.0
+servers:
+- url: http://localhost:8080/
+tags:
+- name: boat-maven-plugin
+  description: Endpoints used by the Boat Maven Plugin
+paths:
+  /api/boat/portals/{portalKey}/boat-maven-plugin/{sourceKey}/upload:
+    post:
+      tags:
+      - boat-maven-plugin
+      summary: upload and lint specs
+      operationId: uploadSpec
+      parameters:
+      - $ref: 'schemas/definitions.yaml#/components/parameters/PortalKey'
+      - name: sourceKey
+        in: path
+        description: source identifier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'schemas/definitions.yaml#/components/schemas/UploadRequestBody'
+        required: true
+      responses:
+        "200":
+          description: list of lint reports for specs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'schemas/definitions.yaml#/components/schemas/BoatLintReport'
