@@ -278,6 +278,9 @@ Available parameters:
       User property: failOnLintViolation
       Fail the build if the spec has lint violation (Violation with Severity.MUST)
 
+    failOnBoatBayErrorResponse (Default: true)
+      User property: failOnBoatBayErrorResponse
+      Fail the build if boatbay server returns an error
 
     groupId (Default: ${project.groupId})
       User property: groupId
