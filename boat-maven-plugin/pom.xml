@@ -339,7 +339,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.2.1</version>
+                <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
                         <goals>
