@@ -1,5 +1,9 @@
 package com.backbase.oss.boat.quay;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatLintRule;
@@ -11,7 +15,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +51,19 @@ class BoatLinterTests {
         String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
 
         File inputFile = new File("target/openapi.yaml");
+        Files.write(inputFile.toPath(), openApiContents.getBytes());
+
+        BoatLintReport boatLintReport = boatLinter.lint(inputFile);
+
+        assertTrue(boatLintReport.hasViolations());
+    }
+
+    @Test
+    void testRulesWithFile_absolutePath() throws IOException, OpenAPILoaderException {
+        // Can't ret relative file from class path resources. Copy into new file
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+
+        File inputFile = new File("target/openapi.yaml").getAbsoluteFile();
         Files.write(inputFile.toPath(), openApiContents.getBytes());
 
         BoatLintReport boatLintReport = boatLinter.lint(inputFile);

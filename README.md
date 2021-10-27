@@ -18,6 +18,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.15.2
+* *Maven Plugin*
+  * Fixed handling of absolute file paths for linting OpenAPI specs
 ## 0.15.1
 * *Maven Plugin*
   * Made `boat:radio` goal properties w.r.t boat-bay server unique.
