@@ -144,8 +144,13 @@ public class BundleMojo extends AbstractMojo {
         if (openApiVersion == null) {
             throw new MojoExecutionException("Configured to use version in filename, but no version set.");
         }
-        String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
+        if (!openApiVersion.matches("^\\d\\..*")) {
+            throw new MojoExecutionException(
+                "Version should be semver (or at least have a recognisable major version), but found '" + openApiVersion
+                    + "' (string starts with number and dot: 2.0.0, 2.blabla, 2.3.4.5.6.234234)");
+        }
         String majorFromVersion = openApiVersion.substring(0, openApiVersion.indexOf("."));
+        String majorFromFileName = originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$2");
         if (!majorFromFileName.equals(majorFromVersion)) {
             throw new MojoExecutionException("Invalid version " + openApiVersion + " in file " + originalFileName);
         }
