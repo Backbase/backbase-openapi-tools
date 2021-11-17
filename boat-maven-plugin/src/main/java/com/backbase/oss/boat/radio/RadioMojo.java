@@ -19,6 +19,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -58,7 +59,7 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Boat-Bay domain. eg. https://boatbay.mycompany.eu
      */
-    @Parameter(property = "boatBayUrl", required = true)
+    @Parameter(property = "boat.bay.url", required = true)
     private String boatBayUrl;
 
     /**
@@ -76,8 +77,8 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Fail the build if boatbay server returns an error
      */
-    @Parameter(property = "failOnBoatBayErrorResponse", defaultValue="true")
-    private boolean failOnBoatBayErrorResponse =true;
+    @Parameter(property = "failOnBoatBayErrorResponse", defaultValue="false")
+    private boolean failOnBoatBayErrorResponse;
 
     /**
      * Project portal Identifier in Boat-Bay.
@@ -94,14 +95,14 @@ public class RadioMojo extends AbstractMojo {
     /**
      * Defines the username which can access Boat-Bay upload API. Required if boat-bay APIs are protected.
      */
-    @Parameter(property = "username")
-    private String username;
+    @Parameter(property = "boat.bay.username")
+    private String boatBayUsername;
 
     /**
      * Defines the password of the username which can access the Boat-Bay upload API. Required if boat-bay APIs are protected.
      */
-    @Parameter(property = "password")
-    private String password;
+    @Parameter(property = "boat.bay.password")
+    private String boatBayPassword;
 
     /**
      * <p>
@@ -142,9 +143,9 @@ public class RadioMojo extends AbstractMojo {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-            getLog().info("Basic Authentication set for username " + username);
-            basicAuthRequestInterceptor = new BasicAuthRequestInterceptor(username, password);
+        if (StringUtils.isNotEmpty(boatBayUsername) && StringUtils.isNotEmpty(boatBayPassword)) {
+            getLog().info("Basic Authentication set for username " + boatBayUsername);
+            basicAuthRequestInterceptor = new BasicAuthRequestInterceptor(boatBayUsername, boatBayPassword);
         } else {
             getLog().info("No Authentication set");
         }
