@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -110,10 +111,23 @@ class BundleMojoTest {
 
         OpenAPI openAPI = new OpenAPI();
         openAPI.setInfo(new Info());
-        assertThrows(MojoExecutionException.class, () ->
-            mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("3.0.0")));
+        assertThrowsMojoExecutionExceptionWithMessage(
+            () -> mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("3.0.0")),
+            "Invalid version 3.0.0 in file payment-order-client-api-v2.yaml");
+        assertThrowsMojoExecutionExceptionWithMessage(
+            () -> mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("v2.0")),
+            "Version should be semver (or at least have a recognisable major version), but found 'v2.0'");
+        assertThrowsMojoExecutionExceptionWithMessage(
+            ()  -> mojo.versionFileName("payment-order-client-api-v2.yaml", createOpenApiWithVersion("2dada")),
+            "Version should be semver (or at least have a recognisable major version), but found '2dada'");
+
     }
 
+    private void assertThrowsMojoExecutionExceptionWithMessage(Executable executable, String message) {
+        MojoExecutionException thrown = assertThrows(MojoExecutionException.class, executable);
+        assertTrue(thrown.getMessage().startsWith(message), "Expected message '" + message + "' but got '"
+            + thrown.getMessage() + "'");
+    }
 
     private OpenAPI createOpenApiWithVersion(String version) {
         OpenAPI openAPI = new OpenAPI();
