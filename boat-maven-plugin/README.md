@@ -265,10 +265,24 @@ Available parameters:
       User property: artifactId
       Project ArtifactId in Boat-Bay. Defaults to ${project.artifactId}
 
+    boatBayPassword
+      User property: boat.bay.password
+      Defines the password of the username which can access the Boat-Bay upload
+      API. Required if boat-bay APIs are protected.
+
     boatBayUrl
       Required: true
-      User property: boatBayUrl
+      User property: boat.bay.url
       Boat-Bay domain. eg. https://boatbay.mycompany.eu
+
+    boatBayUsername
+      User property: boat.bay.username
+      Defines the username which can access Boat-Bay upload API. Required if
+      boat-bay APIs are protected.
+
+    failOnBoatBayErrorResponse (Default: false)
+      User property: failOnBoatBayErrorResponse
+      Fail the build if boatbay server returns an error
 
     failOnBreakingChange (Default: false)
       User property: failOnBreakingChange
@@ -276,20 +290,12 @@ Available parameters:
 
     failOnLintViolation (Default: false)
       User property: failOnLintViolation
-      Fail the build if the spec has lint violation (Violation with Severity.MUST)
-
-    failOnBoatBayErrorResponse (Default: true)
-      User property: failOnBoatBayErrorResponse
-      Fail the build if boatbay server returns an error
+      Fail the build if the spec has lint violation (Violation with
+      Severity.MUST)
 
     groupId (Default: ${project.groupId})
       User property: groupId
       Project GroupId in Boat-Bay. Defaults to ${project.groupId}
-
-    password
-      User property: password
-      Defines the password of the username which can access the Boat-Bay upload
-      API. Required if boat-bay APIs are protected.
 
     portalKey
       Required: true
@@ -323,14 +329,10 @@ Available parameters:
       way. For instance, if the actual file is my-service-api-v3.1.4.yaml the
       expression could be my-service-api-v*.yaml.
 
-    username
-      User property: username
-      Defines the username which can access Boat-Bay upload API. Required if
-      boat-bay APIs are protected.
-
     version (Default: ${project.version})
       User property: version
       Project Version in Boat-Bay. Defaults to ${project.version}
+
 
 
 Configuration example:

@@ -379,8 +379,8 @@ class RadioMojoTests {
         mojo.setVersion(version);
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
-        mojo.setUsername(username);
-        mojo.setPassword(password);
+        mojo.setBoatBayUsername(username);
+        mojo.setBoatBayPassword(password);
         mojo.setSpecs(new SpecConfig[]{specConfig});
         mojo.setBoatBayUrl(String.format("http://localhost:%s", mockBackEnd.getPort()));
 
@@ -521,7 +521,7 @@ class RadioMojoTests {
 
     @SneakyThrows
     @Test
-    void test_when_boat_bay_is_unavailable() {
+    void test_when_boat_bay_is_unavailable_and_failOnBoatBayError_is_true() {
 
         final String portalKey = "example";
         final String sourceKey = "pet-store-bom";
@@ -542,6 +542,7 @@ class RadioMojoTests {
         mojo.setVersion(version);
         mojo.setPortalKey(portalKey);
         mojo.setSourceKey(sourceKey);
+        mojo.setFailOnBoatBayErrorResponse(true);
         mojo.setSpecs(new SpecConfig[]{specConfig});
         //Set invalid domain
         mojo.setBoatBayUrl(String.format("http://invalid-domain:%s", mockBackEnd.getPort()));
