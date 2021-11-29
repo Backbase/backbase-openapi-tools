@@ -62,6 +62,11 @@ public class BoatLinter {
     @NotNull
     private Path getFilePath(File inputFile) {
         File workingDirectory = new File(".");
+
+        if (inputFile.isAbsolute()) {
+            workingDirectory = workingDirectory.getAbsoluteFile();
+        }
+
         Path relativize;
         try {
             relativize = workingDirectory.toPath().relativize(inputFile.toPath());
