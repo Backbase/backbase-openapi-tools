@@ -357,7 +357,7 @@
                                 <modelPackage>com.backbase.oss.boat.bay.client.model</modelPackage>
                                 <apiPackage>com.backbase.oss.boat.bay.client.api</apiPackage>
                                 <library>feign</library>
-                                <dateLibrary>java8-localdatetime</dateLibrary>
+                                <dateLibrary>java8</dateLibrary>
                                 <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
