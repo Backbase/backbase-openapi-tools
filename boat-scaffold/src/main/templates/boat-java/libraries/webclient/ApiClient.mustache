@@ -382,6 +382,15 @@ public class ApiClient {
             collectionFormat = CollectionFormat.CSV;
         }
 
+        if (value instanceof Map) {
+            Map map = (Map) value;
+
+            for (Object key : map.keySet()) {
+                params.add(parameterToString(key), parameterToString(map.get(key)));
+            }
+            return params;
+        }
+
         Collection<?> valueCollection = null;
         if (value instanceof Collection) {
             valueCollection = (Collection<?>) value;
