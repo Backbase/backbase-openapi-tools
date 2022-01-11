@@ -1,7 +1,12 @@
 {
     "compilerOptions": {
-        "emitDecoratorMetadata": true,
+        "baseUrl": ".",
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "skipLibCheck": true,
+        "emitDecoratorMetadata": false,
         "experimentalDecorators": true,
+        "importHelpers": true,
         "noImplicitAny": false,
         "suppressImplicitAnyIndexErrors": true,
         "target": "{{#supportsES6}}es6{{/supportsES6}}{{^supportsES6}}es5{{/supportsES6}}",
@@ -12,7 +17,7 @@
         "outDir": "./dist",
         "noLib": false,
         "declaration": true,
-        "lib": [ "es6", "dom" ],
+        "lib": [ "es2018", "dom" ],
         "typeRoots": [
             "node_modules/@types"
         ]
@@ -23,6 +28,17 @@
     ],
     "filesGlob": [
         "./model/*.ts",
-        "./api/*.ts"
-    ]
+        "./api/*.ts",
+        "**/*.ngfactory.ts",
+        "**/*.shim.ts",
+        "**/*.spec.ts"
+    ],
+    "angularCompilerOptions": {
+        "enableIvy": true,
+        "compilationMode": "partial",
+        "skipTemplateCodegen": true,
+        "strictMetadataEmit": true,
+        "fullTemplateTypeCheck": true,
+        "enableResourceInlining": true
+    }
 }
