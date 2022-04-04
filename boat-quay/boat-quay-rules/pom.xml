@@ -4,9 +4,10 @@
 
     <parent>
         <groupId>com.backbase.oss</groupId>
-        <artifactId>backbase-openapi-tools</artifactId>
+        <artifactId>boat-quay</artifactId>
         <version>0.15.5-SNAPSHOT</version>
     </parent>
+
     <artifactId>boat-quay-rules</artifactId>
     <packaging>jar</packaging>
     <description>Backbase Open Api Tools QUAlitY Lint Rules</description>
