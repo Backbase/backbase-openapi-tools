@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>com.backbase.oss</groupId>
-        <artifactId>boat-quay</artifactId>
+        <artifactId>backbase-openapi-tools</artifactId>
         <version>0.15.5-SNAPSHOT</version>
     </parent>
     <artifactId>boat-quay-rules</artifactId>
