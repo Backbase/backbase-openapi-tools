@@ -87,6 +87,15 @@ Same with `generate` but with opinionated defaults for Rest Template Client
         </configOptions>
     </configuration>
 
+### Sample usage with additional feature
+
+    <configuration>
+        ...
+        <additionalProperties>
+            <additionalProperty>createApiComponent=false</additionalProperty>
+        </additionalProperties>
+    </configuration>
+
 ## boat:generate-webclient-embedded
 
 Same with `generate` but with opinionated defaults for Web Client
