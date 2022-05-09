@@ -1,5 +1,7 @@
 package com.backbase.oss.codegen.angular;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -88,6 +90,22 @@ class BoatAngularTemplatesTests {
 
         assertThat(this.files, not(nullValue()));
         assertThat(this.files.size(), not(equalTo(0)));
+    }
+
+    @Check
+    public void ngPackageConfig() throws IOException {
+        var ngPackageFiles = selectFiles("/ng-package\\.json$");
+        if (this.param.npmName) {
+            assertThat(ngPackageFiles, hasSize(1));
+            List<String> content;
+            try (var lines = Files.lines(Paths.get(ngPackageFiles.get(0)))) {
+                content = lines.collect(Collectors.toList());
+            }
+            var dist = Optional.ofNullable(this.param.buildDist).orElse("dist");
+            assertThat(content, hasItem(containsString("\"dest\": \"" + dist + "\"")));
+        } else {
+            assertThat(ngPackageFiles, hasSize(0));
+        }
     }
 
     @Check
