@@ -12,13 +12,7 @@
   ],
   "license": "Unlicense",
   "scripts": {
-    "build": "ng-packagr -p package.json"
-  },
-  "ngPackage": {
-    "lib": {
-      "entryFile": "public_api.ts"
-    },
-    "dest": "{{{buildDist}}}"
+    "build": "ng-packagr -p ng-package.json"
   },
   "peerDependencies": {
     "@angular/core": "^{{ngVersion}}",
