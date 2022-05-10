@@ -22,7 +22,7 @@ BOAT is still under development and subject to change.
 * *Maven Plugin*
   * Add example of use the additional properties like createApiComponent
 * Boat Angular generator 
-  * Generate an `ng-package.json` file for use with the `ng-package` CLI
+  * Generate the `ng-package.json` file for use with the `ng-package` CLI
 ## 0.15.5
 * *Boat Lint*
  * Bumped version of Zally Linting Libraries that contain several vulnerability fixes
