@@ -18,6 +18,15 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.15.6
+* *Maven Plugin*
+  * Add example of use the additional properties like createApiComponent
+## 0.15.5
+* *Boat Lint*
+ * Bumped version of Zally Linting Libraries that contain several vulnerability fixes
+## 0.15.4
+* *Boat Angular generator*
+  * Enable partial Ivy compilation for libraries.
 ## 0.15.3
 * *Boat Scaffold*
  * A fix for mapping of Map for query params (in client code). 

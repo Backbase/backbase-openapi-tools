@@ -219,6 +219,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     private void addDependencies(SemVer angularVersion) {
         if (additionalProperties.containsKey(NPM_NAME)) {
             supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
+            supportingFiles.add(new SupportingFile("ng-package.mustache", getIndexDirectory(), "ng-package.json"));
             supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
             additionalProperties.put("zonejsVersion", "0.10.2");
             additionalProperties.put("rxjsVersion", "6.6.0");

@@ -5,8 +5,13 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
+<<<<<<< HEAD
         <version>0.15.4-SNAPSHOT</version>
+=======
+        <version>0.15.6-SNAPSHOT</version>
+>>>>>>> ec93cdbd79c3c117ee2a4244be598045ab07328f
     </parent>
+
     <artifactId>boat-quay-rules</artifactId>
     <packaging>jar</packaging>
     <description>Backbase Open Api Tools QUAlitY Lint Rules</description>
@@ -16,10 +21,11 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.3.61</kotlin.version>
+        <kotlin.version>1.4.10</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <auto-service.version>1.0-rc7</auto-service.version>
         <dokka.version>1.4.10.2</dokka.version>
+        <zally.version>2.1.0</zally.version>
     </properties>
 
     <dependencyManagement>
@@ -49,39 +55,37 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.mpg.mpi-inf</groupId>
+            <artifactId>javatools</artifactId>
+            <version>2017-06-28</version>
+        </dependency>
+        <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>zally-core</artifactId>
-            <version>2.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.github.config4k</groupId>
-                    <artifactId>config4k</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${zally.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.github.config4k</groupId>
-            <artifactId>config4k</artifactId>
-            <version>0.4.2</version>
-        </dependency>
-
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>zally-rule-api</artifactId>
-            <version>2.0.0</version>
+            <version>${zally.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>zally-ruleset-zalando</artifactId>
-            <version>2.0.0</version>
+            <version>${zally.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>zally-ruleset-zally</artifactId>
-            <version>2.0.0</version>
+            <version>${zally.version}</version>
         </dependency>
 
         <dependency>

@@ -5,8 +5,13 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
+<<<<<<< HEAD
         <version>0.15.4-SNAPSHOT</version>
+=======
+        <version>0.15.6-SNAPSHOT</version>
+>>>>>>> ec93cdbd79c3c117ee2a4244be598045ab07328f
     </parent>
+  
     <artifactId>boat-trail-resources</artifactId>
 
     <packaging>jar</packaging>
