@@ -59,14 +59,21 @@ public class BoatExampleUtils {
     }
 
     private static void processRef(OpenAPI openAPI, String contentType, List<BoatExample> examples, String ref) {
-        if (ref.startsWith("#/components/schemas")) {
-            ref = StringUtils.substringAfterLast(ref, "/");
+        if (!examples.isEmpty()) return;    // No auto-generated example from the schema if examples are already present.
+        if (!ref.startsWith("#/components/schemas"))  return;
 
-            if (openAPI.getComponents().getSchemas() != null && openAPI.getComponents().getSchemas().get(ref) != null && openAPI.getComponents().getSchemas().get(ref).getExample() != null) {
-                Object example = openAPI.getComponents().getSchemas().get(ref).getExample();
-                BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example), isJson(contentType));
-                examples.add(boatExample);
-            }
+        ref = StringUtils.substringAfterLast(ref, "/");
+
+        boolean hasValidRef = openAPI.getComponents().getSchemas() != null && openAPI.getComponents().getSchemas().get(ref) != null;
+
+        if (!hasValidRef) return;
+
+        Schema schema = openAPI.getComponents().getSchemas().get(ref);
+
+        if (schema.getExample() != null) {
+            Object example = schema.getExample();
+            BoatExample boatExample = new BoatExample("example", contentType, new Example().value(example), isJson(contentType));
+            examples.add(boatExample);
         }
     }
 
