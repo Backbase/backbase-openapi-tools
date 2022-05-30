@@ -18,10 +18,13 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.15.7
+* *Boat Scaffold*
+  * Makes sure to not autogenerate examples from schema if examples are already present
 ## 0.15.6
 * *Maven Plugin*
   * Add example of use the additional properties like createApiComponent
-* Boat Angular generator 
+* *Boat Angular generator*
   * Generate the `ng-package.json` file for use with the `ng-package` CLI
 ## 0.15.5
 * *Boat Lint*
@@ -41,7 +44,7 @@ BOAT is still under development and subject to change.
   * Made `boat:radio` goal properties w.r.t boat-bay server unique.
 ## 0.15.0
 * *Maven Plugin*
-  * Added new goal `boat:radio`; see the description in the [plugin documentation](boat-maven-plugin/README.md#boatradio).
+  * Added new goal `boat:radio`; see the description in the [plugin **documentation**](boat-maven-plugin/README.md#boatradio).
 ## 0.14.12
 * *Boat Scaffold*
   * References to /examples/foo now are also dereferenced

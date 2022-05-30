@@ -5,9 +5,9 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.15.6</version>
+        <version>0.15.7-SNAPSHOT</version>
     </parent>
-  
+
     <artifactId>boat-scaffold</artifactId>
 
     <packaging>jar</packaging>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-trail-resources</artifactId>
-            <version>0.15.6</version>
+            <version>0.15.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
