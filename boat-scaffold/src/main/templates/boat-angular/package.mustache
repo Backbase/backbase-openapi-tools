@@ -17,9 +17,9 @@
   "peerDependencies": {
     "@angular/core": ">={{ngVersion}}",
     {{#withMocks}}
-    "@backbase/foundation-ang": "^{{foundationVersion}}",
+    "@backbase/foundation-ang": ">={{foundationVersion}}",
     {{/withMocks}}
-    "rxjs": "^{{rxjsVersion}}"
+    "rxjs": ">={{rxjsVersion}}"
   },
   "devDependencies": {
     "@angular/common": ">={{ngVersion}}",
@@ -30,9 +30,9 @@
     "ng-packagr": "^{{ngPackagrVersion}}",
     "reflect-metadata": "^0.1.3",
     {{#withMocks}}
-    "@backbase/foundation-ang": "~{{foundationVersion}}",
+    "@backbase/foundation-ang": ">={{foundationVersion}}",
     {{/withMocks}}
-    "rxjs": "~{{rxjsVersion}}",
+    "rxjs": ">={{rxjsVersion}}",
     "typescript": "{{{tsVersion}}}",
     "zone.js": "^{{zonejsVersion}}"
   }{{#npmRepository}},
