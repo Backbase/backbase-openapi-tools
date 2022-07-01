@@ -306,7 +306,6 @@ class GeneratorTests {
         mojo.additionalProperties.add("withMocks=true");
         mojo.additionalProperties.add("npmName=@petstore/http");
         mojo.additionalProperties.add("npmRepository=https://repo.example.com");
-        mojo.additionalProperties.add("tsVersion=4.6");
 
         assertDoesNotThrow(mojo::execute, "Angular client generation should not throw exceptions");
     }
