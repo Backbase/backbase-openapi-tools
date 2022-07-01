@@ -39,6 +39,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-jackson2</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-engine</artifactId>
             <version>${project.version}</version>
