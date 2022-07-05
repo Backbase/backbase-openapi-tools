@@ -56,15 +56,15 @@
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
-        <lombok.version>1.18.16</lombok.version>
-        <jackson.version>2.11.3</jackson.version>
-        <mockito.version>3.8.0</mockito.version>
+        <lombok.version>1.18.24</lombok.version>
+        <jackson.version>2.13.3</jackson.version>
+        <mockito.version>4.6.1</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.1.5</swagger-core.version>
         <swagger-parser.version>2.0.23</swagger-parser.version>
         <snakeyaml.version>1.26</snakeyaml.version>
-        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
 
     <modules>
@@ -98,7 +98,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.2.3</version>
+                <version>1.2.9</version>
             </dependency>
 
 

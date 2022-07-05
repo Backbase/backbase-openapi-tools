@@ -17,7 +17,7 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.4.10</kotlin.version>
+        <kotlin.version>1.7.0</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <auto-service.version>1.0-rc7</auto-service.version>
         <dokka.version>1.4.10.2</dokka.version>

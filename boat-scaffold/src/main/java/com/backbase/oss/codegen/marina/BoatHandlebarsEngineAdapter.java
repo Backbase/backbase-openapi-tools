@@ -39,8 +39,7 @@ public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
                 .newBuilder(bundle)
                 .resolver(
                         MapValueResolver.INSTANCE,
-                        JavaBeanValueResolver.INSTANCE,
-                        FieldValueResolver.INSTANCE)
+                        JavaBeanValueResolver.INSTANCE)
                 .build();
 
         Handlebars handlebars = new Handlebars(loader);
