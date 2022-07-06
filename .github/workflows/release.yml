@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Setup Build Cache
         uses: actions/cache@v1
         with:
@@ -109,12 +107,7 @@ jobs:
         run: |
           git commit -m "[version bump]" -a
           git tag -a release-$NEW_VERSION -m "[version bump]"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          git push origin release-$NEW_VERSION
 
   bump:
     if: "!contains(github.event.head_commit.message, '[version bump]')"
