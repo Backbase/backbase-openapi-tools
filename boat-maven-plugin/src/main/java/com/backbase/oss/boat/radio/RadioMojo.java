@@ -7,6 +7,7 @@ import com.backbase.oss.boat.bay.client.model.*;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import feign.auth.BasicAuthRequestInterceptor;
 import java.io.File;
 import java.io.IOException;
@@ -141,7 +142,9 @@ public class RadioMojo extends AbstractMojo {
 
         BasicAuthRequestInterceptor basicAuthRequestInterceptor = null;
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .findAndAddModules()
+            .build();
 
         if (StringUtils.isNotEmpty(boatBayUsername) && StringUtils.isNotEmpty(boatBayPassword)) {
             getLog().info("Basic Authentication set for username " + boatBayUsername);
