@@ -18,6 +18,14 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+
+java17
+## 0.16.2
+* Boat Angular generator
+  * Specify minimum Angular-related package versions when Angular v13 is used
+## 0.16.1
+* Boat Java generator
+  * Java 17 compatibility update
 ## 0.16.0
 * Boat Angular generator
   * Use `>=` for main peer dependency to improve forward compatibility
