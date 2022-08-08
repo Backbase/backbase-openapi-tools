@@ -221,20 +221,24 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
             supportingFiles.add(new SupportingFile("ng-package.mustache", getIndexDirectory(), "ng-package.json"));
             supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
-            additionalProperties.put("zonejsVersion", "0.10.2");
+            additionalProperties.put("zonejsVersion", "0.11.4");
+
+            final String tsVersion = "tsVersion";
+            final String ngPackagrVersion = "ngPackagrVersion";
+            final String rxjsVersion = "rxjsVersion";
 
             if (angularVersion.atLeast("13.0.0")) {
-                additionalProperties.put("tsVersion", ">=4.4.2");
-                additionalProperties.put("ngPackagrVersion", "13.0.1");
-                additionalProperties.put("rxjsVersion", "7.0.1");
+                additionalProperties.put(tsVersion, ">=4.4.2");
+                additionalProperties.put(ngPackagrVersion, "13.0.1");
+                additionalProperties.put(rxjsVersion, "7.5.0");
             } else if (angularVersion.atLeast("11.0.0")) {
-                additionalProperties.put("tsVersion", ">=4.2.0");
-                additionalProperties.put("ngPackagrVersion", "11.0.0");
-                additionalProperties.put("rxjsVersion", "6.6.0");
+                additionalProperties.put(tsVersion, ">=4.2.0");
+                additionalProperties.put(ngPackagrVersion, "11.0.0");
+                additionalProperties.put(rxjsVersion, "6.6.0");
             } else {
-                additionalProperties.put("tsVersion", ">=3.9.2");
-                additionalProperties.put("ngPackagrVersion", "10.0.3");
-                additionalProperties.put("rxjsVersion", "6.6.0");
+                additionalProperties.put(tsVersion, ">=3.9.2");
+                additionalProperties.put(ngPackagrVersion, "10.0.3");
+                additionalProperties.put(rxjsVersion, "6.6.0");
             }
         }
     }
