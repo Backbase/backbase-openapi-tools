@@ -1,20 +1,19 @@
 package com.backbase.oss.codegen.angular;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DynamicNode;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import org.assertj.core.api.Assert;
+import org.junit.jupiter.api.*;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
-
+import org.openapitools.codegen.utils.SemVer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
@@ -24,9 +23,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -285,7 +281,7 @@ class BoatAngularTemplatesTests {
 
         Combination(int mask) {
             this.name = caseName(mask);
-            this.ngVersion = mask == 0 ? "10.0.0" : mask == 1 ? "11.0.0" : null;
+            this.ngVersion = mask == 0 ? "10.0.0" : mask == 1 ? "11.0.0" : mask == 2 ? "12.0.0" : mask == -1 ? "13.0.0" :  null;
             this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
             this.buildDist = mask > 0 ? caseName(mask) : null;
             this.npmName = (mask & 1) != 0;
