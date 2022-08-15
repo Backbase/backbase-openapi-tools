@@ -81,7 +81,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
     private static String trimCSV(String text) {
         if (isNotEmpty(text)) {
-            return stream(text.split("[,;\\s]+"))
+            return stream(text.split("[,;]+"))
                 .map(StringUtils::trimToNull)
                 .filter(Objects::nonNull)
                 .collect(joining(","));
