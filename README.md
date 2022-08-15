@@ -19,6 +19,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.16.3
+* *Maven Plugin*
+  * Do not treat spaces as delimiters in configuration properties which take a comma-separated list of values.
+    Fixes an issue that prevented the use of tag names containing spaces in the `apisToGenerate` property.
 ## 0.16.2
 * Boat Angular generator
   * Specify minimum Angular-related package versions when Angular v13 is used
