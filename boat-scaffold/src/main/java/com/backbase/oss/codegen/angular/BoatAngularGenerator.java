@@ -70,7 +70,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String HAS_EXAMPLES = "hasExamples";
     public static final String PATTERN = "pattern";
     protected String foundationVersion = "6.6.7";
-    protected String specVersion = null;
+    protected String specVersion = "";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
