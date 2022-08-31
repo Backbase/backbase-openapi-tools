@@ -189,7 +189,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processOpt(SPEC_VERSION,
             value -> {
                 if(!StringUtils.isEmpty(value)) {
-                    additionalProperties.put(SPEC_VERSION, new SemVer(value)),
+                    additionalProperties.put(SPEC_VERSION, new SemVer(value));
                 }
             },
             () -> {
