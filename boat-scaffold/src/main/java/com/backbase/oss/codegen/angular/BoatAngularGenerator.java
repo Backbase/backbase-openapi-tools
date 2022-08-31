@@ -57,6 +57,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
+    public static final String SPEC_VERSION = "specVersion";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
@@ -69,6 +70,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String HAS_EXAMPLES = "hasExamples";
     public static final String PATTERN = "pattern";
     protected String foundationVersion = "6.6.7";
+    protected String specVersion = "1.0.0";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
@@ -101,6 +103,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
+        this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
     }
 
 
@@ -182,6 +185,19 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 additionalProperties.put(FOUNDATION_VERSION, version);
                 log.info("generating code with foundation-ang {} ...", version);
                 log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
+            });
+
+        processOpt(SPEC_VERSION,
+            value -> {
+                if(StringUtils.isNotEmpty(value)) {
+                    additionalProperties.put(SPEC_VERSION, new SemVer(value));
+                }
+            },
+            () -> {
+                SemVer version = new SemVer(this.specVersion);
+                additionalProperties.put(SPEC_VERSION, version);
+                log.info("generating code with OpenAPI YAML Spec Version {} ...", version);
+                log.info("  (you can select the spec version by setting the additionalProperty specVersion)");
             });
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
