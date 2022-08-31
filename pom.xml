@@ -58,12 +58,12 @@
 
         <lombok.version>1.18.24</lombok.version>
         <jackson.version>2.13.3</jackson.version>
-        <mockito.version>4.6.1</mockito.version>
+        <mockito.version>4.7.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.1.5</swagger-core.version>
         <swagger-parser.version>2.0.23</swagger-parser.version>
-        <snakeyaml.version>1.30</snakeyaml.version>
+        <snakeyaml.version>1.31</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
 
