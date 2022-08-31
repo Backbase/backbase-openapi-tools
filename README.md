@@ -19,6 +19,9 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.16.4
+* Boat Angular generator
+  * Add ability to bake the spec version used in the package.json file.
 ## 0.16.3
 * *Maven Plugin*
   * Do not treat spaces as delimiters in configuration properties which take a comma-separated list of values.
