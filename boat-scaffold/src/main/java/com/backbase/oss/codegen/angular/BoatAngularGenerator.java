@@ -194,9 +194,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 }
             },
             () -> {
-                SemVer version = new SemVer(this.specVersion);
-                additionalProperties.put(SPEC_VERSION, version);
-                log.info("generating code with OpenAPI YAML Spec Version {} ...", version);
+                log.info("generating code without OpenAPI YAML Spec Version ...");
                 log.info("  (you can select the spec version by setting the additionalProperty specVersion)");
             });
 
