@@ -70,7 +70,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String HAS_EXAMPLES = "hasExamples";
     public static final String PATTERN = "pattern";
     protected String foundationVersion = "6.6.7";
-    protected String specVersion = "0.0.0";
+    protected String specVersion = "1.0.0";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
@@ -100,7 +100,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
         this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
-        this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package.").defaultValue(this.specVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
@@ -188,7 +187,11 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             });
 
         processOpt(SPEC_VERSION,
-            value -> additionalProperties.put(SPEC_VERSION, new SemVer(value)),
+            value -> {
+                if(!StringUtils.isEmpty(value)) {
+                    additionalProperties.put(SPEC_VERSION, new SemVer(value)),
+                }
+            },
             () -> {
                 SemVer version = new SemVer(this.specVersion);
                 additionalProperties.put(SPEC_VERSION, version);
