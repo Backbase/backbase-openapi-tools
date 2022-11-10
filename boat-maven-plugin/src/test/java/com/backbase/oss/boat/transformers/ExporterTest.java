@@ -1,7 +1,6 @@
 package com.backbase.oss.boat.transformers;
 
 import com.backbase.oss.boat.ExportException;
-import com.backbase.oss.boat.Exporter;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
