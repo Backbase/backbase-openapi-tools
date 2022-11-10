@@ -19,6 +19,10 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.16.6
+* Boat Angular generator
+  * Use `^` instead of `>=` for `devDependencies` in the generated project, so project will be built using correct target version of ng-packagr & the Angular CLI
+  * Declare some extra `devDependencies` at explicit versions to fix `npm install` issues in the generated project when using `npm` v8
 ## 0.16.5
 * Boat Angular generator
   * Allow any format for spec versions.

@@ -256,24 +256,32 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
             supportingFiles.add(new SupportingFile("ng-package.mustache", getIndexDirectory(), "ng-package.json"));
             supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
-            additionalProperties.put("zonejsVersion", "0.11.4");
 
             final String tsVersion = "tsVersion";
             final String ngPackagrVersion = "ngPackagrVersion";
             final String rxjsVersion = "rxjsVersion";
+            final String zonejsVersion = "zonejsVersion";
 
             if (angularVersion.atLeast("13.0.0")) {
-                additionalProperties.put(tsVersion, ">=4.4.2");
+                additionalProperties.put(tsVersion, "4.4.2");
                 additionalProperties.put(ngPackagrVersion, "13.3.1");
                 additionalProperties.put(rxjsVersion, "7.5.0");
+                additionalProperties.put(zonejsVersion, "0.11.4");
+            } else if (angularVersion.atLeast("12.0.0")) {
+                additionalProperties.put(tsVersion, "4.3.2");
+                additionalProperties.put(ngPackagrVersion, "12.0.0");
+                additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.11.4");
             } else if (angularVersion.atLeast("11.0.0")) {
-                additionalProperties.put(tsVersion, ">=4.2.0");
+                additionalProperties.put(tsVersion, "4.0.0");
                 additionalProperties.put(ngPackagrVersion, "11.0.0");
                 additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.10.3");
             } else {
-                additionalProperties.put(tsVersion, ">=3.9.2");
+                additionalProperties.put(tsVersion, "3.9.2");
                 additionalProperties.put(ngPackagrVersion, "10.0.3");
                 additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.10.3");
             }
         }
     }
