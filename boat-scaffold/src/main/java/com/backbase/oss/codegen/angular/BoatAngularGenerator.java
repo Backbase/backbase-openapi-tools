@@ -105,28 +105,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
     }
 
-
-    @Override
-    public void preprocessOpenAPI(OpenAPI openAPI) {
-        super.preprocessOpenAPI(openAPI);
-        // Ensure single tag for all operations
-        openAPI.getPaths().forEach((path, pathItem) -> {
-            pathItem.readOperations().forEach(operation -> {
-                if(operation.getTags()!=null && operation.getTags().size() > 1) {
-                    List<String> firstTag = operation.getTags().subList(0, 1);
-                    log.warn("Operation: {} on path: {} contains multiple tags: {}. " +
-                                    "This causes duplicated code. Only processing the first tag: {}",
-                            operation.getOperationId(),
-                            path,
-                            operation.getTags(),
-                            firstTag);
-                    operation.setTags(firstTag);
-                }
-            });
-        });
-    }
-
-
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
