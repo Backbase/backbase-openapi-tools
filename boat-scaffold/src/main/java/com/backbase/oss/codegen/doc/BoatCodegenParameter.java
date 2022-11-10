@@ -54,9 +54,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
         output.isFile = codegenParameter.isFile;
-        output.hasMore = codegenParameter.hasMore;
         output.isContainer = codegenParameter.isContainer;
-        output.secondaryParam = codegenParameter.secondaryParam;
         output.baseName = codegenParameter.baseName;
         output.paramName = codegenParameter.paramName;
         output.dataType = codegenParameter.dataType;
@@ -132,8 +130,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.isEmail = codegenParameter.isEmail;
         output.isFreeFormObject = codegenParameter.isFreeFormObject;
         output.isAnyType = codegenParameter.isAnyType;
-        output.isListContainer = codegenParameter.isListContainer;
-        output.isMapContainer = codegenParameter.isMapContainer;
+        output.isArray = codegenParameter.isArray;
+        output.isMap = codegenParameter.isMap;
         output.isExplode = codegenParameter.isExplode;
         output.style = codegenParameter.style;
 

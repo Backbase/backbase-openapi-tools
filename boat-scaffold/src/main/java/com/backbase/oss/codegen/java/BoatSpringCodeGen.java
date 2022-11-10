@@ -189,7 +189,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         if (!useApiUtil) {
             this.supportingFiles
-                .removeIf(sf -> "apiUtil.mustache".equals(sf.templateFile));
+                .removeIf(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
         }
 
         writePropertyBack("useApiUtil", useApiUtil);
