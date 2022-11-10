@@ -72,7 +72,6 @@
         <module>boat-trail-resources</module>
         <module>boat-engine</module>
         <module>boat-scaffold</module>
-        <module>boat-terminal</module>
         <module>boat-quay</module>
         <module>boat-maven-plugin</module>
         <!-- Code Coverage Project -->
@@ -85,7 +84,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
+                <version>1.18.24</version>
             </dependency>
 
 

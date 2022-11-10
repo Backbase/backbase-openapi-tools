@@ -1,8 +1,8 @@
 package com.backbase.oss.boat.example;
 
 import io.swagger.v3.oas.models.examples.Example;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotNull;
 
 /**
  * A data class that has an example and its name.
