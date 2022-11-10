@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.16.3-SNAPSHOT</version>
+        <version>0.16.7-SNAPSHOT</version>
     </parent>
   
     <artifactId>boat-scaffold</artifactId>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars-jackson2</artifactId>
-            <version>4.3.0</version>
+            <version>4.3.1</version>
         </dependency>
 
         <dependency>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-trail-resources</artifactId>
-            <version>0.16.3-SNAPSHOT</version>
+            <version>0.16.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

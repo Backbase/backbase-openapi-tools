@@ -239,6 +239,10 @@ class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.FOUNDATION_VERSION, this.param.foundationVersion);
         }
 
+        if (!Objects.isNull(this.param.specVersion)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_VERSION, this.param.specVersion);
+        }
+
         if (!Objects.isNull(this.param.buildDist)) {
             cf.addAdditionalProperty(BoatAngularGenerator.BUILD_DIST, this.param.buildDist);
         }
@@ -272,6 +276,7 @@ class BoatAngularTemplatesTests {
         final String name;
         final String ngVersion;
         final String foundationVersion;
+        final String specVersion;
         final String buildDist;
         final boolean npmRepository;
         final boolean npmName;
@@ -279,10 +284,11 @@ class BoatAngularTemplatesTests {
         final boolean apiModulePrefix;
         final boolean serviceSuffix;
 
-        Combination(int mask) {
-            this.name = caseName(mask);
-            this.ngVersion = mask == 0 ? "10.0.0" : mask == 1 ? "11.0.0" : mask == 2 ? "12.0.0" : mask == -1 ? "13.0.0" :  null;
+        Combination(int mask, String ngVersion) {
+            this.name = caseName(mask) + "-ng-" + ngVersion;
+            this.ngVersion = ngVersion;
             this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
+            this.specVersion = mask == 0 ? "1.0.0" : mask == 1 ? "2.0.0" : null;
             this.buildDist = mask > 0 ? caseName(mask) : null;
             this.npmName = (mask & 1) != 0;
             this.npmRepository = (mask & 1 << 1) != 0;
@@ -320,8 +326,15 @@ class BoatAngularTemplatesTests {
             if (minimal) {
                 cases.add(-1);
             }
+            final String[] ngVersions = {
+                "13.0.0",
+                "12.0.0",
+                "11.0.0",
+                "10.0.0",
+                null,
+            };
 
-            return cases.stream().map(Combination::new);
+            return cases.stream().flatMap((mask) -> stream(ngVersions).map(ngVersion -> new Combination(mask, ngVersion)));
         }
     }
 }

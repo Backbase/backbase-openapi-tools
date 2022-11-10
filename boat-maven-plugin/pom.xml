@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.16.3-SNAPSHOT</version>
+        <version>0.16.7-SNAPSHOT</version>
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
@@ -24,11 +24,11 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <feign-version>11.9.1</feign-version>
+        <feign-version>11.10</feign-version>
         <feign-form-version>3.8.0</feign-form-version>
-        <jackson-threetenbp-version>2.9.10</jackson-threetenbp-version>
+        <jackson-threetenbp-version>2.12.5</jackson-threetenbp-version>
         <scribejava-version>8.3.1</scribejava-version>
-        <swagger-annotations-version>1.6.6</swagger-annotations-version>
+        <swagger-annotations-version>1.6.8</swagger-annotations-version>
     </properties>
 
     <dependencyManagement>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>4.2.5</version>
+            <version>4.5.0</version>
         </dependency>
 
         <dependency>

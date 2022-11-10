@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.16.3-SNAPSHOT</version>
+        <version>0.16.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>boat-quay-rules</artifactId>
@@ -17,7 +17,7 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.7.10</kotlin.version>
+        <kotlin.version>1.7.21</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <auto-service.version>1.0-rc7</auto-service.version>
         <dokka.version>1.7.10</dokka.version>

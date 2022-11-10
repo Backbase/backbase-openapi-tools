@@ -57,6 +57,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
+    public static final String SPEC_VERSION = "specVersion";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
@@ -101,6 +102,28 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
+        this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
+    }
+
+
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        // Ensure single tag for all operations
+        openAPI.getPaths().forEach((path, pathItem) -> {
+            pathItem.readOperations().forEach(operation -> {
+                if(operation.getTags()!=null && operation.getTags().size() > 1) {
+                    List<String> firstTag = operation.getTags().subList(0, 1);
+                    log.warn("Operation: {} on path: {} contains multiple tags: {}. " +
+                                    "This causes duplicated code. Only processing the first tag: {}",
+                            operation.getOperationId(),
+                            path,
+                            operation.getTags(),
+                            firstTag);
+                    operation.setTags(firstTag);
+                }
+            });
+        });
     }
 
 
@@ -184,6 +207,17 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
             });
 
+        processOpt(SPEC_VERSION,
+            value -> {
+                if(StringUtils.isNotEmpty(value)) {
+                    additionalProperties.put(SPEC_VERSION, value);
+                }
+            },
+            () -> {
+                log.info("generating code without OpenAPI YAML Spec Version ...");
+                log.info("  (you can select the spec version by setting the additionalProperty specVersion)");
+            });
+
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
                 apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
@@ -243,24 +277,32 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             supportingFiles.add(new SupportingFile("package.mustache", getIndexDirectory(), "package.json"));
             supportingFiles.add(new SupportingFile("ng-package.mustache", getIndexDirectory(), "ng-package.json"));
             supportingFiles.add(new SupportingFile("tsconfig.mustache", getIndexDirectory(), "tsconfig.json"));
-            additionalProperties.put("zonejsVersion", "0.11.4");
 
             final String tsVersion = "tsVersion";
             final String ngPackagrVersion = "ngPackagrVersion";
             final String rxjsVersion = "rxjsVersion";
+            final String zonejsVersion = "zonejsVersion";
 
             if (angularVersion.atLeast("13.0.0")) {
-                additionalProperties.put(tsVersion, ">=4.4.2");
+                additionalProperties.put(tsVersion, "4.4.2");
                 additionalProperties.put(ngPackagrVersion, "13.3.1");
                 additionalProperties.put(rxjsVersion, "7.5.0");
+                additionalProperties.put(zonejsVersion, "0.11.4");
+            } else if (angularVersion.atLeast("12.0.0")) {
+                additionalProperties.put(tsVersion, "4.3.2");
+                additionalProperties.put(ngPackagrVersion, "12.0.0");
+                additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.11.4");
             } else if (angularVersion.atLeast("11.0.0")) {
-                additionalProperties.put(tsVersion, ">=4.2.0");
+                additionalProperties.put(tsVersion, "4.0.0");
                 additionalProperties.put(ngPackagrVersion, "11.0.0");
                 additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.10.3");
             } else {
-                additionalProperties.put(tsVersion, ">=3.9.2");
+                additionalProperties.put(tsVersion, "3.9.2");
                 additionalProperties.put(ngPackagrVersion, "10.0.3");
                 additionalProperties.put(rxjsVersion, "6.6.0");
+                additionalProperties.put(zonejsVersion, "0.10.3");
             }
         }
     }
