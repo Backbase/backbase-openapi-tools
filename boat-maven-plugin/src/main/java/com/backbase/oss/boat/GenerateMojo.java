@@ -825,7 +825,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                         value = "";
                     }
                     GlobalSettings.setProperty(key, value);
-                    configurator.addSystemProperty(key, value);
+                    configurator.addGlobalProperty(key, value);
                 }
             }
 

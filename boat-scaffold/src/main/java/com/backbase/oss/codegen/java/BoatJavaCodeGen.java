@@ -112,8 +112,8 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
 
         if (!getLibrary().startsWith("jersey")) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerConfiguration.mustache"));
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerVariable.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerConfiguration.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerVariable.mustache"));
         }
     }
 
@@ -128,7 +128,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
         writePropertyBack(USE_JACKSON_CONVERSION, this.useJacksonConversion);
         if (this.useJacksonConversion) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("RFC3339DateFormat.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("RFC3339DateFormat.mustache"));
         }
 
         if (this.additionalProperties.containsKey(USE_DEFAULT_API_CLIENT)) {

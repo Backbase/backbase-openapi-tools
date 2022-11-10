@@ -23,17 +23,12 @@
             <artifactId>boat-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-maven-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.backbase.oss</groupId>
-            <artifactId>boat-terminal</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-quay-lint</artifactId>

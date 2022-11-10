@@ -15,6 +15,7 @@ import com.github.jknack.handlebars.io.AbstractTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.codegen.api.TemplatingExecutor;
 import org.openapitools.codegen.api.TemplatingGenerator;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 
@@ -26,15 +27,12 @@ import java.util.Map;
 public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
 
     @Override
-    public String compileTemplate(TemplatingGenerator generator,
-                                  Map<String, Object> bundle, String templateFile) throws IOException {
+    public String compileTemplate(final TemplatingExecutor executor, Map<String, Object> bundle, String templateFile) throws IOException {
         TemplateLoader loader = new AbstractTemplateLoader() {
-            @Override
             public TemplateSource sourceAt(String location) {
-                return findTemplate(generator, location);
+                return BoatHandlebarsEngineAdapter.this.findTemplate(executor, location);
             }
         };
-
         Context context = Context
                 .newBuilder(bundle)
                 .resolver(

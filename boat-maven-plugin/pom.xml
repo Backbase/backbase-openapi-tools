@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -32,7 +33,7 @@
     </properties>
 
     <dependencyManagement>
-        <dependencies />
+        <dependencies/>
     </dependencyManagement>
 
     <dependencies>
@@ -330,7 +331,8 @@
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
                     <extraArtifacts>
-                        <extraArtifact>org.jacoco:org.jacoco.agent:${jacoco-maven-plugin.version}:jar:runtime</extraArtifact>
+                        <extraArtifact>org.jacoco:org.jacoco.agent:${jacoco-maven-plugin.version}:jar:runtime
+                        </extraArtifact>
                     </extraArtifacts>
                 </configuration>
                 <executions>
@@ -364,7 +366,8 @@
                                 <apiPackage>com.backbase.oss.boat.bay.client.api</apiPackage>
                                 <library>feign</library>
                                 <dateLibrary>java8</dateLibrary>
-                                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
+                                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder
+                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
