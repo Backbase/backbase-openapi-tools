@@ -28,7 +28,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
-    public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
     public static final String UNIQUE_BASE_TYPE = "java.util.Set";
@@ -116,13 +115,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean useSetForUniqueItems;
 
     /**
-     * Enable OpenAPI Jackson Nullable library
-     */
-    @Setter
-    @Getter
-    protected boolean openApiNullable;
-
-    /**
      * Whether to use {@code with} prefix for pojos modifiers.
      */
     @Setter
@@ -143,8 +135,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
             "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
-        this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
@@ -209,9 +199,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
             this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
         }
-        if (this.additionalProperties.containsKey(OPENAPI_NULLABLE)) {
-            this.openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
-        }
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
@@ -225,7 +212,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
         writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(OPENAPI_NULLABLE, this.openApiNullable);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
@@ -242,18 +228,18 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
     }
 
-    @Override
-    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
-        super.postProcessModelProperty(model, p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            p.containerType = "set";
-            p.baseType = UNIQUE_BASE_TYPE;
-            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
-            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
-            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-        }
-    }
+//    @Override
+//    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
+//        super.postProcessModelProperty(model, p);
+//
+//        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
+//            p.containerType = "set";
+//            p.baseType = UNIQUE_BASE_TYPE;
+//            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+//            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+//            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
+//        }
+//    }
 
     @Override
     public void postProcessParameter(CodegenParameter p) {
