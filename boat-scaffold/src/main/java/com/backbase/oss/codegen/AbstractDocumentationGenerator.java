@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
+import org.openapitools.codegen.api.TemplatePathLocator;
 import org.openapitools.codegen.api.TemplatingEngineAdapter;
 import org.openapitools.codegen.ignore.CodegenIgnoreProcessor;
+import org.openapitools.codegen.templating.CommonTemplateContentLocator;
+import org.openapitools.codegen.templating.GeneratorTemplateContentLocator;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
+import org.openapitools.codegen.templating.TemplateManagerOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +32,6 @@ public abstract class AbstractDocumentationGenerator implements Generator {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
     protected CodegenIgnoreProcessor ignoreProcessor;
-    private final TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
 
     protected AbstractDocumentationGenerator(CodegenConfig config) {
         this.config = config;
@@ -37,6 +40,18 @@ public abstract class AbstractDocumentationGenerator implements Generator {
         if (this.ignoreProcessor == null) {
             this.ignoreProcessor = new CodegenIgnoreProcessor(this.config.getOutputDir());
         }
+
+        TemplateManagerOptions templateManagerOptions = new TemplateManagerOptions(
+                this.config.isEnableMinimalUpdate(),
+                this.config.isSkipOverwrite());
+        TemplatePathLocator commonTemplateLocator = new CommonTemplateContentLocator();
+        TemplatePathLocator generatorTemplateLocator = new GeneratorTemplateContentLocator(this.config);
+        TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
+        this.templateProcessor = new TemplateManager(
+                templateManagerOptions,
+                templatingEngine,
+                new TemplatePathLocator[]{generatorTemplateLocator, commonTemplateLocator}
+        );
     }
 
 

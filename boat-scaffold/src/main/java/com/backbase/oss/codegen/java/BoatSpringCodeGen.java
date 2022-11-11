@@ -120,7 +120,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
      */
     @Setter
     @Getter
-    protected boolean openApiNullable = true;
+    protected boolean openApiNullable;
 
     /**
      * Whether to use {@code with} prefix for pojos modifiers.
