@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
@@ -58,6 +59,7 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * created dynamically.
  * </p>
  */
+@Slf4j
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
@@ -219,7 +221,10 @@ class BoatSpringTemplatesTests {
     void openApiNullable() {
         assertThat(findPattern("/api/.+\\.java$", "JsonNullable<[^>]+>"),
             is(false));
-        assertThat(findPattern("/model/.+\\.java$", "JsonNullable<[^>]+>"),
+        boolean pattern = findPattern("/model/.+\\.java$", "JsonNullable<[^>]+>");
+        if(pattern != this.param.openApiNullable)
+            System.out.println("what?");
+        assertThat(pattern,
             equalTo(this.param.openApiNullable));
     }
 
@@ -241,6 +246,7 @@ class BoatSpringTemplatesTests {
 
     private boolean findPattern(String filePattern, String linePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
+        log.info("Files: {}", files);
         final List<String> selection = this.files.stream()
             .map(File::getPath)
             .map(path -> path.replace(File.separatorChar, '/'))
