@@ -208,7 +208,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-models</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.9</version>
             </dependency>
 
 
