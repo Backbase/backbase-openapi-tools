@@ -228,18 +228,18 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
     }
 
-//    @Override
-//    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
-//        super.postProcessModelProperty(model, p);
-//
-//        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-//            p.containerType = "set";
-//            p.baseType = UNIQUE_BASE_TYPE;
-//            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
-//            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
-//            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
-//        }
-//    }
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
+        super.postProcessModelProperty(model, p);
+
+        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
+            p.containerType = "set";
+            p.baseType = UNIQUE_BASE_TYPE;
+            p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
+            p.datatypeWithEnum = UNIQUE_BASE_TYPE + "<" + p.items.datatypeWithEnum + ">";
+            p.defaultValue = "new " + "java.util.LinkedHashSet<>()";
+        }
+    }
 
     @Override
     public void postProcessParameter(CodegenParameter p) {
