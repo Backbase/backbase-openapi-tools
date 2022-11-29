@@ -94,7 +94,7 @@ class BoatSpringTemplatesTests {
                 ? "boat"
                 : IntStream.range(0, CASES.size())
                     .filter(n -> (mask & (1 << n)) != 0)
-                    .mapToObj(n -> CASES.get(n))
+                    .mapToObj(CASES::get)
                     .collect(joining("-", "boat-", ""));
 
             this.useBeanValidation = (mask & 1 << CASES.indexOf("val")) != 0;
@@ -127,8 +127,8 @@ class BoatSpringTemplatesTests {
             }
 
             if (minimal) {
-                cases.add(-1 & ~(1 << CASES.indexOf("flx")));
-                cases.add(-1 & ~(1 << CASES.indexOf("utl")));
+                cases.add(~(1 << CASES.indexOf("flx")));
+                cases.add(~(1 << CASES.indexOf("utl")));
                 cases.add(-1);
             }
 
@@ -230,9 +230,9 @@ class BoatSpringTemplatesTests {
 
     @Check
     void useSetForUniqueItems() {
-        assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
+        assertThat(findPattern("/api/.+\\.java$", "java\\.util\\.Set<.+>"),
             equalTo(this.param.useSetForUniqueItems));
-        assertThat(findPattern("/model/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
+        assertThat(findPattern("/model/.+\\.java$", "java\\.util\\.Set<.+>"),
             equalTo(this.param.useSetForUniqueItems));
     }
 
