@@ -32,7 +32,6 @@ public abstract class AbstractDocumentationGenerator implements Generator {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
     protected CodegenIgnoreProcessor ignoreProcessor;
-    private final TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
 
     protected AbstractDocumentationGenerator(CodegenConfig config) {
         this.config = config;
@@ -41,6 +40,18 @@ public abstract class AbstractDocumentationGenerator implements Generator {
         if (this.ignoreProcessor == null) {
             this.ignoreProcessor = new CodegenIgnoreProcessor(this.config.getOutputDir());
         }
+
+        TemplateManagerOptions templateManagerOptions = new TemplateManagerOptions(
+                this.config.isEnableMinimalUpdate(),
+                this.config.isSkipOverwrite());
+        TemplatePathLocator commonTemplateLocator = new CommonTemplateContentLocator();
+        TemplatePathLocator generatorTemplateLocator = new GeneratorTemplateContentLocator(this.config);
+        TemplatingEngineAdapter templatingEngine = new HandlebarsEngineAdapter();
+        this.templateProcessor = new TemplateManager(
+                templateManagerOptions,
+                templatingEngine,
+                new TemplatePathLocator[]{generatorTemplateLocator, commonTemplateLocator}
+        );
     }
 
 
