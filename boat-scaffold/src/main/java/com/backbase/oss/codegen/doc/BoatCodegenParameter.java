@@ -6,9 +6,8 @@ import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.ToString;
@@ -135,6 +134,9 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.isExplode = codegenParameter.isExplode;
         output.style = codegenParameter.style;
 
+        // Starting with empty content
+        output.setContent(new LinkedHashMap<>());
+
         if (codegenParameter instanceof BoatCodegenParameter) {
             output.examples = ((BoatCodegenParameter) codegenParameter).examples;
             output.dataTypeDisplayName = ((BoatCodegenParameter) codegenParameter).dataTypeDisplayName;
@@ -187,12 +189,11 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (parameter.getContent() != null) {
             parameter.getContent().forEach((contentType, mediaType) ->
                 dereferenceExamples(boatCodegenParameter, openAPI, contentType, mediaType));
-
         }
+
         return boatCodegenParameter;
     }
 
-    //
     public static CodegenParameter fromCodegenParameter(CodegenParameter codegenParameter, RequestBody body, OpenAPI openAPI) {
         BoatCodegenParameter boatCodegenParameter = fromCodegenParameter(codegenParameter);
         boatCodegenParameter.setRequestBody(body);
