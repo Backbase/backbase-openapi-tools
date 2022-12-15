@@ -327,6 +327,7 @@ class BoatAngularTemplatesTests {
                 cases.add(-1);
             }
             final String[] ngVersions = {
+                "14.0.0",
                 "13.0.0",
                 "12.0.0",
                 "11.0.0",
