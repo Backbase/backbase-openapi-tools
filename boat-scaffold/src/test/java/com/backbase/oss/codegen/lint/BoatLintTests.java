@@ -1,6 +1,5 @@
 package com.backbase.oss.codegen.lint;
 
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

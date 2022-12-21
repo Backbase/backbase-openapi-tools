@@ -57,8 +57,8 @@
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
         <lombok.version>1.18.24</lombok.version>
-        <jackson.version>2.14.0</jackson.version>
-        <mockito.version>4.8.1</mockito.version>
+        <jackson.version>2.14.1</jackson.version>
+        <mockito.version>4.9.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.1.5</swagger-core.version>
@@ -183,7 +183,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-ext</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.5</version>
             </dependency>
 
             <dependency>
@@ -207,7 +207,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-models</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.9</version>
             </dependency>
 
 
@@ -221,7 +221,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-core</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.9</version>
             </dependency>
 
             <dependency>
@@ -283,7 +283,7 @@
             <dependency>
                 <groupId>com.googlecode.libphonenumber</groupId>
                 <artifactId>libphonenumber</artifactId>
-                <version>8.13.0</version>
+                <version>8.13.1</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -460,7 +460,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.0.0-M6</version>
+                        <version>3.0.0-M7</version>
                         <configuration>
                             <scmCommentPrefix>[ci skip]</scmCommentPrefix>
                         </configuration>

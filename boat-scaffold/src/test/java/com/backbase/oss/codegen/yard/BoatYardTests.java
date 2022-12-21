@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -20,16 +21,13 @@ class BoatYardTests {
         File output = new File("target/boat-yard");
         File specsBaseDir = new File("src/test/resources");
 
-
         BoatYardConfig config = new BoatYardConfig();
         config.setInputSpec(input.getAbsolutePath());
         config.setOutputDir(output.getAbsolutePath());
         config.setSpecsBaseDir(specsBaseDir);
-
         config.setTemplateDir("boat-yard");
 
         new BoatYardGenerator(config).generate();
-
 
         String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
