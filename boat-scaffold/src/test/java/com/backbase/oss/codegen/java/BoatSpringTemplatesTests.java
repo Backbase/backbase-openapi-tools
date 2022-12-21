@@ -279,11 +279,11 @@ class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODEL_TESTS, "true");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
 
-        if (this.param.apiUtil) {
+//        if (this.param.apiUtil) {
             GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml");
-        } else {
-            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
-        }
+//        } else {
+//            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
+//        }
 
         gcf.setApiNameSuffix("-api");
         gcf.setModelNameSuffix(this.param.name);
