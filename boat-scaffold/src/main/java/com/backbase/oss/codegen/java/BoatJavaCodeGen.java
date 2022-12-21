@@ -58,8 +58,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
-        this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(USE_JACKSON_CONVERSION,
             "Whether to use Jackson to convert query parameters to String", this.useJacksonConversion));
         this.cliOptions.add(CliOption.newBoolean(USE_DEFAULT_API_CLIENT,
@@ -112,8 +110,8 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
 
         if (!getLibrary().startsWith("jersey")) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerConfiguration.mustache"));
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerVariable.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerConfiguration.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerVariable.mustache"));
         }
     }
 
@@ -128,7 +126,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
         writePropertyBack(USE_JACKSON_CONVERSION, this.useJacksonConversion);
         if (this.useJacksonConversion) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("RFC3339DateFormat.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("RFC3339DateFormat.mustache"));
         }
 
         if (this.additionalProperties.containsKey(USE_DEFAULT_API_CLIENT)) {

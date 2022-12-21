@@ -1,203 +1,268 @@
 /**
- * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
- */{{#description}}
-@ApiModel(description = "{{{description}}}"){{/description}}
-{{>generatedAnnotation}}{{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{>xmlAnnotation}}{{>additionalModelTypeAnnotations}}
+ * {{description}}{{^description}}{{classname}}{{/description}}
+ */
+{{>additionalModelTypeAnnotations}}
+{{#description}}
+{{#swagger1AnnotationLibrary}}
+@ApiModel(description = "{{{description}}}")
+{{/swagger1AnnotationLibrary}}
+{{#swagger2AnnotationLibrary}}
+@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}")
+{{/swagger2AnnotationLibrary}}
+{{/description}}
+{{#discriminator}}
+{{>typeInfoAnnotation}}
+{{/discriminator}}
+{{#jackson}}
+{{#isClassnameSanitized}}
+@JsonTypeName("{{name}}")
+{{/isClassnameSanitized}}
+{{/jackson}}
+{{#withXml}}
+{{>xmlAnnotation}}
+{{/withXml}}
+{{>generatedAnnotation}}
 {{#useLombokAnnotations}}
 @lombok.EqualsAndHashCode(onlyExplicitlyIncluded = true, doNotUseGetters = true{{#parent}}, callSuper = true{{/parent}})
 @lombok.ToString(onlyExplicitlyIncluded = true, doNotUseGetters = true{{#parent}}, callSuper = true{{/parent}})
 {{/useLombokAnnotations}}
-{{#vendorExtensions.x-extra-annotation}}
-{{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}
-public {{#vendorExtensions.x-abstract}}abstract {{/vendorExtensions.x-abstract}}class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}{{#hateoas}}extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}}{{#serializableModel}}implements Serializable{{/serializableModel}}
-{{#serializableModel}}, {{/serializableModel}}{{^serializableModel}}{{/serializableModel}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {
+{{#vendorExtensions.x-class-extra-annotation}}
+{{{vendorExtensions.x-class-extra-annotation}}}
+{{/vendorExtensions.x-class-extra-annotation}}
+public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}{{#hateoas}} extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}} implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 {{#serializableModel}}
-    private static final long serialVersionUID = 1L;
 
+  private static final long serialVersionUID = 1L;
 {{/serializableModel}}
-    {{#vars}}
-        {{#isEnum}}
-        {{^isContainer}}
-{{>enumClass}}
-        {{/isContainer}}
-        {{#isContainer}}
-        {{#mostInnerItems}} 
-{{>enumClass}}
-        {{/mostInnerItems}}
-        {{/isContainer}}
-        {{/isEnum}}
-    {{#jackson}}
-    @JsonProperty("{{baseName}}")
-        {{#withXml}}
-    @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-        {{/withXml}}
-    {{/jackson}}
-    {{#gson}}
-    @SerializedName("{{baseName}}")
-    {{/gson}}
-    {{#useLombokAnnotations}}
-    @lombok.Getter(onMethod_ = @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}"))
-    @lombok.Setter
-    @lombok.EqualsAndHashCode.Include
-    @lombok.ToString.Include
-    {{#vendorExtensions.x-extra-annotation}}
-    {{#indent4}}{{{vendorExtensions.x-extra-annotation}}}{{/indent4}}{{/vendorExtensions.x-extra-annotation}}
-    {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}
-    {{/useLombokAnnotations}}
-    {{#isContainer}}
-    {{#openApiNullable}}
-    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}} = {{#isNullable}}JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}}{{/isNullable}};
-    {{/openApiNullable}}
-    {{^openApiNullable}}
-    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
-    {{/openApiNullable}}
-    {{/isContainer}}
+  {{#vars}}
+
+    {{#isEnum}}
     {{^isContainer}}
-    {{#isDate}}
-    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
-    {{/isDate}}
-    {{#isDateTime}}
-    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
-    {{/isDateTime}}
+{{>enumClass}}
+    {{/isContainer}}
+    {{#isContainer}}
+    {{#mostInnerItems}}
+{{>enumClass}}
+    {{/mostInnerItems}}
+    {{/isContainer}}
+    {{/isEnum}}
+  {{#jackson}}
+  @JsonProperty("{{baseName}}")
+  {{#withXml}}
+  @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace="{{.}}", {{/xmlNamespace}}localName = "{{xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+  {{/withXml}}
+  {{/jackson}}
+  {{#gson}}
+  @SerializedName("{{baseName}}")
+  {{/gson}}
+  {{#useLombokAnnotations}}
+  @lombok.Getter(onMethod_ = @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}"))
+  @lombok.Setter
+  @lombok.EqualsAndHashCode.Include
+  @lombok.ToString.Include
+  {{#vendorExtensions.x-extra-annotation}}
+  {{#indent4}}{{{vendorExtensions.x-extra-annotation}}}{{/indent4}}{{/vendorExtensions.x-extra-annotation}}
+  {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}
+  {{/useLombokAnnotations}}
+  {{#vendorExtensions.x-field-extra-annotation}}
+  {{{vendorExtensions.x-field-extra-annotation}}}
+  {{/vendorExtensions.x-field-extra-annotation}}
+  {{#isContainer}}
+  {{#useBeanValidation}}@Valid{{/useBeanValidation}}
+  {{#openApiNullable}}
+  private {{>nullableDataType}} {{name}} = {{#isNullable}}JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}}{{/isNullable}};
+  {{/openApiNullable}}
+  {{^openApiNullable}}
+  private {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
+  {{/openApiNullable}}
+  {{/isContainer}}
+  {{^isContainer}}
+  {{#isDate}}
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  {{/isDate}}
+  {{#isDateTime}}
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  {{/isDateTime}}
+  {{#openApiNullable}}
+  private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+  {{/openApiNullable}}
+  {{^openApiNullable}}
+  private {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+  {{/openApiNullable}}
+  {{/isContainer}}
+  {{/vars}}
+  {{#vars}}
+
+  {{! begin feature: fluent setter methods }}
+  public {{classname}} {{#useWithModifiers}}with{{nameInCamelCase}}{{/useWithModifiers}}{{^useWithModifiers}}{{name}}{{/useWithModifiers}}({{{datatypeWithEnum}}} {{name}}) {
     {{#openApiNullable}}
-    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+    this.{{name}} = {{#isNullable}}JsonNullable.of({{name}}){{/isNullable}}{{^isNullable}}{{name}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
-    {{modelFieldsVisibility}} {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+    this.{{name}} = {{name}};
     {{/openApiNullable}}
-    {{/isContainer}}
+    return this;
+  }
+  {{#isArray}}
 
-    {{/vars}}
-    {{#vars}}
-
-    public {{classname}} {{#useWithModifiers}}with{{nameInCamelCase}}{{/useWithModifiers}}{{^useWithModifiers}}{{name}}{{/useWithModifiers}}({{{datatypeWithEnum}}} {{name}}) {
-        {{#openApiNullable}}
-        this.{{name}} = {{#isNullable}}JsonNullable.of({{name}}){{/isNullable}}{{^isNullable}}{{name}}{{/isNullable}};
-        {{/openApiNullable}}
-        {{^openApiNullable}}
-        this.{{name}} = {{name}};
-        {{/openApiNullable}}
-        return this;
+  public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    {{#openApiNullable}}
+    {{^required}}
+    if (this.{{name}} == null{{#isNullable}} || !this.{{name}}.isPresent(){{/isNullable}}) {
+      this.{{name}} = {{#isNullable}}JsonNullable.of({{{defaultValue}}}){{/isNullable}}{{^isNullable}}{{{defaultValue}}}{{/isNullable}};
     }
-    {{#isListContainer}}
-
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
-		{{#openApiNullable}}
-		{{^required}}
-        if (this.{{name}} == null{{#isNullable}} || !this.{{name}}.isPresent(){{/isNullable}}) {
-            this.{{name}} = {{#isNullable}}JsonNullable.of({{{defaultValue}}}){{/isNullable}}{{^isNullable}}{{{defaultValue}}}{{/isNullable}};
-        }
-        {{/required}}
-        this.{{name}}{{#isNullable}}.get(){{/isNullable}}.add({{name}}Item);
-        {{/openApiNullable}}
-    	{{^openApiNullable}}
-	    if (this.{{name}} == null) {
-	      this.{{name}} = {{{defaultValue}}};
-	    }
-	    this.{{name}}.add({{name}}Item);
-	    {{/openApiNullable}}
-        return this;
+    {{/required}}
+    this.{{name}}{{#isNullable}}.get(){{/isNullable}}.add({{name}}Item);
+    {{/openApiNullable}}
+    {{^openApiNullable}}
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
     }
-    {{/isListContainer}}
-    {{#isMapContainer}}
+    this.{{name}}.add({{name}}Item);
+    {{/openApiNullable}}
+    return this;
+  }
+  {{/isArray}}
+  {{#isMap}}
 
-    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
-		{{#openApiNullable}}
-        {{^required}}
-        if (this.{{name}} == null{{#isNullable}} || !this.{{name}}.isPresent(){{/isNullable}}) {
-            this.{{name}} = {{#isNullable}}JsonNullable.of({{{defaultValue}}}){{/isNullable}}{{^isNullable}}{{{defaultValue}}}{{/isNullable}};
-        }
-        {{/required}}
-        this.{{name}}{{#isNullable}}.get(){{/isNullable}}.put(key, {{name}}Item);
-        {{/openApiNullable}}
-    	{{^openApiNullable}}
-	    if (this.{{name}} == null) {
-	      this.{{name}} = {{{defaultValue}}};
-	    }
-    	this.{{name}}.put(key, {{name}}Item);
-	    {{/openApiNullable}}
-        return this;
+  public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    {{^required}}
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
     }
-    {{/isMapContainer}}
+    {{/required}}
+    this.{{name}}.put(key, {{name}}Item);
+    return this;
+  }
+  {{/isMap}}
+  {{! end feature: fluent setter methods }}
+  {{! begin feature: getter and setter }}
 
-    {{^useLombokAnnotations}}
-    /**
-    {{#description}}
-     * {{{description}}}
-    {{/description}}
-    {{^description}}
-     * Get {{name}}
-    {{/description}}
-    {{#minimum}}
-     * minimum: {{minimum}}
-    {{/minimum}}
-    {{#maximum}}
-     * maximum: {{maximum}}
-    {{/maximum}}
-     * @return {{name}}
-     */{{!
-    }}{{#vendorExtensions.x-extra-annotation}}
-    {{#indent4}}{{{vendorExtensions.x-extra-annotation}}}{{/indent4}}{{/vendorExtensions.x-extra-annotation}}
-    @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")
-    {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}
-    public {{>nullableDataType}} {{getter}}() {
-        return {{name}};
+{{^useLombokAnnotations}}
+  /**
+  {{#description}}
+   * {{{.}}}
+  {{/description}}
+  {{^description}}
+   * Get {{name}}
+  {{/description}}
+  {{#minimum}}
+   * minimum: {{.}}
+  {{/minimum}}
+  {{#maximum}}
+   * maximum: {{.}}
+  {{/maximum}}
+   * @return {{name}}
+  */
+  {{#vendorExtensions.x-extra-annotation}}
+  {{{vendorExtensions.x-extra-annotation}}}
+  {{/vendorExtensions.x-extra-annotation}}
+  {{#useBeanValidation}}
+  {{>beanValidation}}
+  {{/useBeanValidation}}
+  {{^useBeanValidation}}
+  {{#required}}@NotNull{{/required}}
+  {{/useBeanValidation}}
+  {{#swagger2AnnotationLibrary}}
+  @Schema(name = "{{{baseName}}}", {{#isReadOnly}}accessMode = Schema.AccessMode.READ_ONLY, {{/isReadOnly}}{{#example}}example = "{{{.}}}", {{/example}}{{#description}}description = "{{{.}}}", {{/description}}required = {{{required}}})
+  {{/swagger2AnnotationLibrary}}
+  {{#swagger1AnnotationLibrary}}
+  @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")
+  {{/swagger1AnnotationLibrary}}
+  public {{>nullableDataType}} {{getter}}() {
+    return {{name}};
+  }
+
+  {{#vendorExtensions.x-setter-extra-annotation}}
+  {{{vendorExtensions.x-setter-extra-annotation}}}
+  {{/vendorExtensions.x-setter-extra-annotation}}
+  public void {{setter}}({{>nullableDataType}} {{name}}) {
+    this.{{name}} = {{name}};
+  }
+  {{/useLombokAnnotations}}
+  {{! end feature: getter and setter }}
+  {{/vars}}
+  {{#parentVars}}
+
+  {{! begin feature: fluent setter methods for inherited properties }}
+  public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
+    super.{{setter}}({{name}});
+    return this;
+  }
+  {{#isArray}}
+
+  public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    super.add{{nameInCamelCase}}Item({{name}}Item);
+    return this;
+  }
+  {{/isArray}}
+  {{#isMap}}
+
+  public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    super.put{{nameInCamelCase}}Item(key, {{name}}Item);
+    return this;
+  }
+  {{/isMap}}
+  {{! end feature: fluent setter methods for inherited properties }}
+  {{/parentVars}}
+
+{{^useLombokAnnotations}}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }{{#hasVars}}
+    {{classname}} {{classVarName}} = ({{classname}}) o;
+    return {{#vars}}{{#vendorExtensions.x-is-jackson-optional-nullable}}equalsNullable(this.{{name}}, {{classVarName}}.{{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^-last}} &&
+        {{/-last}}{{/vars}}{{#parent}} &&
+        super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
+    return true;{{/hasVars}}
+  }
+  {{#vendorExtensions.x-jackson-optional-nullable-helpers}}
 
-    public void {{setter}}({{>nullableDataType}} {{name}}) {
-        this.{{name}} = {{name}};
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+  }
+  {{/vendorExtensions.x-jackson-optional-nullable-helpers}}
+
+  @Override
+  public int hashCode() {
+    return Objects.hash({{#vars}}{{#vendorExtensions.x-is-jackson-optional-nullable}}hashCodeNullable({{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{^isByteArray}}{{name}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{/vendorExtensions.x-is-jackson-optional-nullable}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+  }
+  {{#vendorExtensions.x-jackson-optional-nullable-helpers}}
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
     }
-    {{/useLombokAnnotations}}
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
+  }
+  {{/vendorExtensions.x-jackson-optional-nullable-helpers}}
 
-    {{/vars}}
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class {{classname}} {\n");
+    {{#parent}}
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    {{/parent}}
+    {{#vars}}sb.append("    {{name}}: ").append(toIndentedString({{name}})).append("\n");
+    {{/vars}}sb.append("}");
+    return sb.toString();
+  }
 
-    {{#vendorExtensions.x-extra-java-code}}
-    {{#indent4}}{{{vendorExtensions.x-extra-java-code}}}{{/indent4}}{{/vendorExtensions.x-extra-java-code}}
-
-    {{^useLombokAnnotations}}
-    @Override
-    public boolean equals(java.lang.Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }{{#hasVars}}
-        {{classname}} {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
-                {{/hasMore}}{{/vars}}{{#parent}} &&
-                super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
-        return true;{{/hasVars}}
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-            {{#vars}}{{name}}{{#hasMore}},
-            {{/hasMore}}{{/vars}}{{#parent}}{{#hasVars}},
-            {{/hasVars}}super.hashCode(){{/parent}}
-        );
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class {{classname}} {\n");
-        {{#parent}}sb.append("        ").append(toIndentedString(super.toString())).append("\n");{{/parent}}
-        {{#vars}}sb.append("        {{name}}: ").append(toIndentedString({{name}})).append("\n");
-        {{/vars}}sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
-    private String toIndentedString(java.lang.Object o) {
-        if (o == null) {
-            return "null";
-        }
-        return o.toString().replace("\n", "\n        ");
-    }
-    {{/useLombokAnnotations}}
+    return o.toString().replace("\n", "\n    ");
+  }
+  {{/useLombokAnnotations}}
 }

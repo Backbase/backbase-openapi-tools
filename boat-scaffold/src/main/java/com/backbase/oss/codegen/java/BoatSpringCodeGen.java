@@ -28,7 +28,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
-    public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
     public static final String UNIQUE_BASE_TYPE = "java.util.Set";
@@ -116,13 +115,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean useSetForUniqueItems;
 
     /**
-     * Enable OpenAPI Jackson Nullable library
-     */
-    @Setter
-    @Getter
-    protected boolean openApiNullable = true;
-
-    /**
      * Whether to use {@code with} prefix for pojos modifiers.
      */
     @Setter
@@ -143,8 +135,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
             "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
-        this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
@@ -189,7 +179,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         if (!useApiUtil) {
             this.supportingFiles
-                .removeIf(sf -> "apiUtil.mustache".equals(sf.templateFile));
+                .removeIf(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
         }
 
         writePropertyBack("useApiUtil", useApiUtil);

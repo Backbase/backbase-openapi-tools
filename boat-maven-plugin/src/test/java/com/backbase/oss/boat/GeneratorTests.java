@@ -311,46 +311,6 @@ class GeneratorTests {
     }
 
     @Test
-    void testBeanValidation() throws MojoExecutionException, MojoFailureException {
-        GenerateMojo mojo = new GenerateMojo();
-
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target/spring-mvc");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        Map<String, String> configOption = new HashMap<>();
-        configOption.put("library", "spring-mvc");
-        configOption.put("dateLibrary", "java8");
-        configOption.put("apiPackage", "com.backbase.accesscontrol.service.rest.spec.api");
-        configOption.put("modelPackage", "com.backbase.accesscontrol.service.rest.spec.model");
-        configOption.put("useBeanValidation", "true");
-        configOption.put("useClassLevelBeanValidation", "false");
-
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.generatorName = "spring";
-        mojo.configOptions = configOption;
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.execute();
-        String[] actualFilesGenerated = output.list();
-        Arrays.sort(actualFilesGenerated);
-        String[] expected = {".openapi-generator", ".openapi-generator-ignore", "README.md", "pom.xml", "src"};
-        assertArrayEquals(expected, actualFilesGenerated);
-
-    }
-
-    @Test
     void testWebClient() throws MojoExecutionException {
         GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
 

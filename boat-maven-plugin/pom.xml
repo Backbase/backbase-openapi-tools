@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.16.7-SNAPSHOT</version>
+        <version>0.17.0-SNAPSHOT</version>
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
@@ -358,7 +358,7 @@
                                 <apiPackage>com.backbase.oss.boat.bay.client.api</apiPackage>
                                 <library>feign</library>
                                 <dateLibrary>java8</dateLibrary>
-                                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
+                                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>

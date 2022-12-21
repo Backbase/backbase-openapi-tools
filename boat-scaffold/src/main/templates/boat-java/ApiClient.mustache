@@ -1,21 +1,13 @@
 {{>licenseInfo}}
 package {{invokerPackage}};
 
-{{#threetenbp}}
-import org.threeten.bp.*;
-
-{{/threetenbp}}
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 {{#joda}}
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 {{/joda}}
-{{#java8}}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-{{/java8}}
-{{#threetenbp}}
-import com.fasterxml.jackson.datatype.threetenbp.ThreeTenModule;
-{{/threetenbp}}
+import java.time.OffsetDateTime;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import com.sun.jersey.api.client.Client;
@@ -53,15 +45,21 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 
 import {{invokerPackage}}.auth.Authentication;
+{{#hasHttpBasicMethods}}
 import {{invokerPackage}}.auth.HttpBasicAuth;
+{{/hasHttpBasicMethods}}
+{{#hasHttpBearerMethods}}
 import {{invokerPackage}}.auth.HttpBearerAuth;
+{{/hasHttpBearerMethods}}
+{{#hasApiKeyMethods}}
 import {{invokerPackage}}.auth.ApiKeyAuth;
+{{/hasApiKeyMethods}}
 {{#hasOAuthMethods}}
 import {{invokerPackage}}.auth.OAuth;
 {{/hasOAuthMethods}}
 
 {{>generatedAnnotation}}
-public class ApiClient {
+public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
   private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
   private Map<String, String> defaultCookieMap = new HashMap<String, String>();
   private String basePath = "{{{basePath}}}";
@@ -116,22 +114,13 @@ public class ApiClient {
     {{#joda}}
     objectMapper.registerModule(new JodaModule());
     {{/joda}}
-    {{#java8}}
     objectMapper.registerModule(new JavaTimeModule());
-    {{/java8}}
-    {{#threetenbp}}
-    ThreeTenModule module = new ThreeTenModule();
-    module.addDeserializer(Instant.class, CustomInstantDeserializer.INSTANT);
-    module.addDeserializer(OffsetDateTime.class, CustomInstantDeserializer.OFFSET_DATE_TIME);
-    module.addDeserializer(ZonedDateTime.class, CustomInstantDeserializer.ZONED_DATE_TIME);
-    objectMapper.registerModule(module);
-    {{/threetenbp}}
     objectMapper.setDateFormat(ApiClient.buildDefaultDateFormat());
 
     dateFormat = ApiClient.buildDefaultDateFormat();
 
     // Set default User-Agent.
-    setUserAgent("{{#httpUserAgent}}{{{.}}}{{/httpUserAgent}}{{^httpUserAgent}}OpenAPI-Generator/{{{artifactVersion}}}/java{{/httpUserAgent}}");
+    setUserAgent("{{{httpUserAgent}}}{{^httpUserAgent}}OpenAPI-Generator/{{{artifactVersion}}}/java{{/httpUserAgent}}");
 
     // Setup authentications (key: authentication name, value: authentication).
     authentications = new HashMap<String, Authentication>();{{#authMethods}}{{#isBasic}}{{#isBasicBasic}}
@@ -267,6 +256,25 @@ public class ApiClient {
     return authentications.get(authName);
   }
 
+  {{#hasHttpBearerMethods}}
+  /**
+   * Helper method to set access token for the first Bearer authentication.
+   * @param bearerToken Bearer token
+   * @return API client
+   */
+  public void setBearerToken(String bearerToken) {
+    for (Authentication auth : authentications.values()) {
+      if (auth instanceof HttpBearerAuth) {
+        ((HttpBearerAuth) auth).setBearerToken(bearerToken);
+        return;
+      }
+    }
+    throw new RuntimeException("No Bearer authentication configured!");
+  }
+
+  {{/hasHttpBearerMethods}}
+
+  {{#hasHttpBasicMethods}}
   /**
    * Helper method to set username for the first HTTP basic authentication.
    * @param username Username
@@ -295,6 +303,9 @@ public class ApiClient {
     throw new RuntimeException("No HTTP basic authentication configured!");
   }
 
+  {{/hasHttpBasicMethods}}
+
+  {{#hasApiKeyMethods}}
   /**
    * Helper method to set API key value for the first API key authentication.
    * @param apiKey the API key
@@ -323,6 +334,8 @@ public class ApiClient {
     throw new RuntimeException("No API key authentication configured!");
   }
 
+  {{/hasApiKeyMethods}}
+
   {{#hasOAuthMethods}}
   /**
    * Helper method to set access token for the first OAuth2 authentication.
@@ -339,20 +352,6 @@ public class ApiClient {
   }
 
   {{/hasOAuthMethods}}
-
-  /**
-   * Helper method to set access token for the first Bearer authentication.
-   * @param bearerToken Bearer token
-   */
-  public void setBearerToken(String bearerToken) {
-    for (Authentication auth : authentications.values()) {
-      if (auth instanceof HttpBearerAuth) {
-        ((HttpBearerAuth) auth).setBearerToken(bearerToken);
-        return;
-      }
-    }
-    throw new RuntimeException("No Bearer authentication configured!");
-  }
 
   /**
    * Set the User-Agent header's value (by adding to the default header map).
@@ -484,7 +483,9 @@ public class ApiClient {
       return "";
     } else if (param instanceof Date) {
       return formatDate((Date) param);
-    } else if (param instanceof Collection) {
+    } {{#jsr310}}else if (param instanceof OffsetDateTime) {
+      return formatOffsetDateTime((OffsetDateTime) param);
+    } {{/jsr310}}else if (param instanceof Collection) {
       StringBuilder b = new StringBuilder();
       for(Object o : (Collection<?>)param) {
         if(b.length() > 0) {

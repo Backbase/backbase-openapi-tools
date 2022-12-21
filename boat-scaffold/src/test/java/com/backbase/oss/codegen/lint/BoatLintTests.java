@@ -1,6 +1,9 @@
 package com.backbase.oss.codegen.lint;
 
-import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -8,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class BoatLintTests {

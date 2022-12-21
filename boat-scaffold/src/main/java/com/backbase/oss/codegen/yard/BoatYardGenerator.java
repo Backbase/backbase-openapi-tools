@@ -27,16 +27,11 @@ import org.yaml.snakeyaml.constructor.Constructor;
 public class BoatYardGenerator extends AbstractDocumentationGenerator {
 
     public BoatYardGenerator(BoatYardConfig config) {
-        super(config);
+        this.opts(new ClientOptInput().config(config));
     }
 
     private BoatYardConfig getBoatYardConfig() {
         return (BoatYardConfig) config;
-    }
-
-    @Override
-    public Generator opts(ClientOptInput opts) {
-        return this;
     }
 
     public List<File> generate() {

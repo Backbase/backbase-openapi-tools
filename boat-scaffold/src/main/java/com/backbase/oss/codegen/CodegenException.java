@@ -8,4 +8,8 @@ public class CodegenException extends RuntimeException {
     public CodegenException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public CodegenException(Throwable e) {
+        super(e);
+    }
 }

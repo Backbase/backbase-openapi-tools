@@ -60,7 +60,7 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  */
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
+    static final boolean PROP_FAST = Boolean.parseBoolean(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-templates-tests");
 
     @BeforeAll
@@ -70,7 +70,8 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
+        static final List<String> CASES = asList("flx",
+            "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
 
         final String name;
 
@@ -224,14 +225,6 @@ class BoatSpringTemplatesTests {
     }
 
     @Check
-    void useSetForUniqueItems() {
-        assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-        assertThat(findPattern("/model/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-    }
-
-    @Check
     void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));
@@ -251,9 +244,7 @@ class BoatSpringTemplatesTests {
 
         final Predicate<String> lineMatch = Pattern.compile(linePattern).asPredicate();
         return selection.stream()
-            .filter(file -> contentMatches(file, lineMatch))
-            .findAny()
-            .isPresent();
+            .anyMatch(file -> contentMatches(file, lineMatch));
     }
 
     @SneakyThrows
@@ -299,7 +290,7 @@ class BoatSpringTemplatesTests {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
         }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
-        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
+//        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
         gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
         gcf.addAdditionalProperty(SpringCodegen.REACTIVE, this.param.reactive);
