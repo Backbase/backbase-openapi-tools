@@ -1,0 +1,4 @@
+{
+  "message" : "Could not find acceptable representation",
+  "supportedMediaTypes" : [ "application/json" ]
+}

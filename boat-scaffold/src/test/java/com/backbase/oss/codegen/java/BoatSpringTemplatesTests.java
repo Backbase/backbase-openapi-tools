@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
@@ -58,6 +59,7 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * created dynamically.
  * </p>
  */
+@Slf4j
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.parseBoolean(System.getProperty(PROP_BASE + "fast", "true"));
@@ -70,8 +72,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx",
-            "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
+        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
 
         final String name;
 
@@ -93,7 +94,7 @@ class BoatSpringTemplatesTests {
                 ? "boat"
                 : IntStream.range(0, CASES.size())
                     .filter(n -> (mask & (1 << n)) != 0)
-                    .mapToObj(n -> CASES.get(n))
+                    .mapToObj(CASES::get)
                     .collect(joining("-", "boat-", ""));
 
             this.useBeanValidation = (mask & 1 << CASES.indexOf("val")) != 0;
@@ -126,8 +127,8 @@ class BoatSpringTemplatesTests {
             }
 
             if (minimal) {
-                cases.add(-1 & ~(1 << CASES.indexOf("flx")));
-                cases.add(-1 & ~(1 << CASES.indexOf("utl")));
+                cases.add(~(1 << CASES.indexOf("flx")));
+                cases.add(~(1 << CASES.indexOf("utl")));
                 cases.add(-1);
             }
 
@@ -225,6 +226,14 @@ class BoatSpringTemplatesTests {
     }
 
     @Check
+    void useSetForUniqueItems() {
+        assertThat(findPattern("/api/.+\\.java$", "java\\.util\\.Set<.+>"),
+            equalTo(this.param.useSetForUniqueItems));
+        assertThat(findPattern("/model/.+\\.java$", "java\\.util\\.Set<.+>"),
+            equalTo(this.param.useSetForUniqueItems));
+    }
+
+    @Check
     void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));
@@ -234,6 +243,7 @@ class BoatSpringTemplatesTests {
 
     private boolean findPattern(String filePattern, String linePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
+        log.info("Files: {}", files);
         final List<String> selection = this.files.stream()
             .map(File::getPath)
             .map(path -> path.replace(File.separatorChar, '/'))
@@ -290,7 +300,7 @@ class BoatSpringTemplatesTests {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
         }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
-//        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
         gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
         gcf.addAdditionalProperty(SpringCodegen.REACTIVE, this.param.reactive);

@@ -32,7 +32,7 @@
     </properties>
 
     <dependencyManagement>
-        <dependencies />
+        <dependencies/>
     </dependencyManagement>
 
     <dependencies>
@@ -44,9 +44,15 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.openapitools.openapidiff</groupId>
             <artifactId>openapi-diff-core</artifactId>
-            <version>2.0.0-beta.6</version>
+            <version>2.1.0-beta.4</version>
         </dependency>
 
         <dependency>
@@ -70,6 +76,13 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
+            <version>${maven.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
             <version>${maven.api.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -324,7 +337,8 @@
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
                     <extraArtifacts>
-                        <extraArtifact>org.jacoco:org.jacoco.agent:${jacoco-maven-plugin.version}:jar:runtime</extraArtifact>
+                        <extraArtifact>org.jacoco:org.jacoco.agent:${jacoco-maven-plugin.version}:jar:runtime
+                        </extraArtifact>
                     </extraArtifacts>
                 </configuration>
                 <executions>

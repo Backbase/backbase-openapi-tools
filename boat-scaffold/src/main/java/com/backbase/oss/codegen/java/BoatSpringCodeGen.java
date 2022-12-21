@@ -199,9 +199,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
             this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
         }
-        if (this.additionalProperties.containsKey(OPENAPI_NULLABLE)) {
-            this.openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
-        }
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
@@ -215,7 +212,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
         writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(OPENAPI_NULLABLE, this.openApiNullable);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 

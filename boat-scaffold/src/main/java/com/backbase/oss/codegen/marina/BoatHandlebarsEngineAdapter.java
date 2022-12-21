@@ -1,12 +1,13 @@
 package com.backbase.oss.codegen.marina;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.github.jknack.handlebars.*;
-import com.github.jknack.handlebars.context.FieldValueResolver;
+import com.github.jknack.handlebars.Context;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Jackson2Helper;
+import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
@@ -14,14 +15,12 @@ import com.github.jknack.handlebars.helper.StringHelpers;
 import com.github.jknack.handlebars.io.AbstractTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
-import lombok.extern.slf4j.Slf4j;
-import org.openapitools.codegen.api.TemplatingExecutor;
-import org.openapitools.codegen.api.TemplatingGenerator;
-import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
-
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.openapitools.codegen.api.TemplatingExecutor;
+import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 
 @Slf4j
 public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
