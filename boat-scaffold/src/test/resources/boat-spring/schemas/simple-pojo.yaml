@@ -4,8 +4,8 @@ allOf:
 x-implements:
   - Cloneable
 x-extra-annotation: |
-  @jakarta.persistence.Entity
-  @jakarta.persistence.Table(name="pojo")
+  @Entity
+  @Table(name="pojo")
 properties:
   pEnum1:
     $ref: '../components.yaml#/Enum1'
@@ -23,19 +23,19 @@ properties:
     maximum: 10
     exclusiveMaximum: true
   pDate:
-    x-extra-annotation: '@jakarta.persistence.Column(name="date") @jakarta.persistence.Access(jakarta.persistence.AccessType.PROPERTY)'
+    x-extra-annotation: '@Column(name="date") @Access(AccessType.PROPERTY)'
     type: string
     format: date
   pDateTime:
     x-extra-annotation: |
-      @jakarta.persistence.Column(name="date_time")
-      @jakarta.persistence.Access(jakarta.persistence.AccessType.PROPERTY)
+      @Column(name="date_time")
+      @Access(AccessType.PROPERTY)
     type: string
     format: date-time
   pString:
     x-extra-annotation: >
-      @jakarta.persistence.Column(name="value")
-      @jakarta.persistence.Access(jakarta.persistence.AccessType.PROPERTY)
+      @Column(name="value")
+      @Access(AccessType.PROPERTY)
     type: string
     minLength: 1
     maxLength: 36

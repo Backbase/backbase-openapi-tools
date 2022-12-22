@@ -23,8 +23,6 @@
 
     <modules>
         <module>raml-specs</module>
-        <module>export-bom</module>
-        <module>export-dep</module>
     </modules>
 </project>
 
