@@ -132,8 +132,14 @@ class BoatSpringTemplatesTests {
                 cases.add(-1);
             }
 
-            return cases.stream().map(Combination::new);
+            Stream<Combination> combinationStream = cases.stream().map(Combination::new);
+
+            return combinationStream;
         }
+
+//        static Stream<Combination> combinations(boolean minimal) {
+//            return Stream.of(new Combination())
+//        }
     }
 
     /** dynamic suite creation **/
