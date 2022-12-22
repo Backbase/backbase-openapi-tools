@@ -232,7 +232,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isMap && this.useSetForUniqueItems && p.getUniqueItems()) {
+        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
             p.containerType = "set";
             p.baseType = UNIQUE_BASE_TYPE;
             p.dataType = UNIQUE_BASE_TYPE + "<" + p.items.dataType + ">";
