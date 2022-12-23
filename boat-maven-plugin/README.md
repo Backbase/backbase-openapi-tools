@@ -8,13 +8,6 @@ The `boat` plugin has multiple goals:
 Generates client/server code from a OpenAPI json/yaml definition. Finds files name `api.raml`, `client-api.raml` or `service-api.raml`.
 Processes these files (and the json schemes they refer to) to produce `open-api.yaml` files in the output directory.
 
-## boat:export-bom
-
-Converts all RAML spec dependencies to OpenAPI Specs. See integration tests for examples
-
-## boat:export-dep
-
-Exports project dependencies where the ArtifactId ends with.  See integration tests for examples '-spec'.
 
 ## boat:generate
 

@@ -200,14 +200,17 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
 {{/deprecated}}
 {{#required}}
 {{#isNullable}}
-  @javax.annotation.Nullable
+{{#useJakartaEe}}  @jakarta.annotation.Nullable{{/useJakartaEe}}
+{{^useJakartaEe}}  @javax.annotation.Nullable{{/useJakartaEe}}
 {{/isNullable}}
 {{^isNullable}}
-  @javax.annotation.Nonnull
+  {{#useJakartaEe}}  @jakarta.annotation.Nullable{{/useJakartaEe}}
+  {{^useJakartaEe}}  @javax.annotation.Nullable{{/useJakartaEe}}
 {{/isNullable}}
 {{/required}}
 {{^required}}
-  @javax.annotation.Nullable
+  {{#useJakartaEe}}  @jakarta.annotation.Nullable{{/useJakartaEe}}
+  {{^useJakartaEe}}  @javax.annotation.Nullable{{/useJakartaEe}}
 {{/required}}
 {{#jsonb}}
   @JsonbProperty("{{baseName}}")
