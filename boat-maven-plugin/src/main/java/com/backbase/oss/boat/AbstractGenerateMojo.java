@@ -21,6 +21,7 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("useBeanValidation", "true");
         options.put("useClassLevelBeanValidation", "false");
         options.put("useOptional", "false");
+        options.put("useJakartaEe", "true");
 
         this.generatorName = generatorName;
         this.generateSupportingFiles = generateSupportingFiles;
