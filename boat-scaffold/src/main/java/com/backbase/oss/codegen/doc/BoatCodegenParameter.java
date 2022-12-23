@@ -58,25 +58,48 @@ public class BoatCodegenParameter extends CodegenParameter {
 
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
-        for (Field field : codegenParameter.getClass().getDeclaredFields()) {
-            if (Modifier.isPublic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-                Arrays.stream(output.getClass().getFields())
-                    .filter(ff -> ff.getName().equals(field.getName()) && ff.getType().equals(field.getType()))
-                    .findFirst().ifPresent(p -> {
-                        try {
-                            if (p.canAccess(output)) {
-                                p.set(output, field.get(codegenParameter));
-                            }
-                        } catch (IllegalAccessException e) {
-                            throw new CodegenException(e);
-                        }
-                    });
-            }
-        }
-
+        output.isFile = codegenParameter.isFile;
+        output.isContainer = codegenParameter.isContainer;
+        output.baseName = codegenParameter.baseName;
+        output.paramName = codegenParameter.paramName;
+        output.dataType = codegenParameter.dataType;
+        output.datatypeWithEnum = codegenParameter.datatypeWithEnum;
+        output.enumName = codegenParameter.enumName;
+        output.dataFormat = codegenParameter.dataFormat;
+        output.collectionFormat = codegenParameter.collectionFormat;
+        output.isCollectionFormatMulti = codegenParameter.isCollectionFormatMulti;
+        output.isPrimitiveType = codegenParameter.isPrimitiveType;
+        output.isModel = codegenParameter.isModel;
+        output.description = codegenParameter.description;
+        output.unescapedDescription = codegenParameter.unescapedDescription;
+        output.baseType = codegenParameter.baseType;
+        output.isFormParam = codegenParameter.isFormParam;
+        output.isQueryParam = codegenParameter.isQueryParam;
+        output.isPathParam = codegenParameter.isPathParam;
+        output.isHeaderParam = codegenParameter.isHeaderParam;
+        output.isCookieParam = codegenParameter.isCookieParam;
+        output.isBodyParam = codegenParameter.isBodyParam;
+        output.required = codegenParameter.required;
+        output.maximum = codegenParameter.maximum;
+        output.exclusiveMaximum = codegenParameter.exclusiveMaximum;
+        output.minimum = codegenParameter.minimum;
+        output.exclusiveMinimum = codegenParameter.exclusiveMinimum;
+        output.maxLength = codegenParameter.maxLength;
+        output.minLength = codegenParameter.minLength;
+        output.pattern = codegenParameter.pattern;
+        output.maxItems = codegenParameter.maxItems;
+        output.minItems = codegenParameter.minItems;
+        output.uniqueItems = codegenParameter.uniqueItems;
+        output.multipleOf = codegenParameter.multipleOf;
+        output.jsonSchema = codegenParameter.jsonSchema;
         output.defaultValue = "null".equals(codegenParameter.defaultValue) ? null : codegenParameter.defaultValue;
+        output.example = codegenParameter.example;
+        output.isEnum = codegenParameter.isEnum;
         output.setMaxProperties(codegenParameter.getMaxProperties());
         output.setMinProperties(codegenParameter.getMinProperties());
+        output.maximum = codegenParameter.maximum;
+        output.minimum = codegenParameter.minimum;
+        output.pattern = codegenParameter.pattern;
 
         if (codegenParameter._enum != null) {
             output._enum = new ArrayList<>(codegenParameter._enum);
@@ -93,6 +116,29 @@ public class BoatCodegenParameter extends CodegenParameter {
         if (codegenParameter.vendorExtensions != null) {
             output.vendorExtensions = new HashMap<>(codegenParameter.vendorExtensions);
         }
+        output.hasValidation = codegenParameter.hasValidation;
+        output.isNullable = codegenParameter.isNullable;
+        output.isBinary = codegenParameter.isBinary;
+        output.isByteArray = codegenParameter.isByteArray;
+        output.isString = codegenParameter.isString;
+        output.isNumeric = codegenParameter.isNumeric;
+        output.isInteger = codegenParameter.isInteger;
+        output.isLong = codegenParameter.isLong;
+        output.isDouble = codegenParameter.isDouble;
+        output.isFloat = codegenParameter.isFloat;
+        output.isNumber = codegenParameter.isNumber;
+        output.isBoolean = codegenParameter.isBoolean;
+        output.isDate = codegenParameter.isDate;
+        output.isDateTime = codegenParameter.isDateTime;
+        output.isUuid = codegenParameter.isUuid;
+        output.isUri = codegenParameter.isUri;
+        output.isEmail = codegenParameter.isEmail;
+        output.isFreeFormObject = codegenParameter.isFreeFormObject;
+        output.isAnyType = codegenParameter.isAnyType;
+        output.isContainer = codegenParameter.isContainer;
+        output.isMap = codegenParameter.isMap;
+        output.isExplode = codegenParameter.isExplode;
+        output.style = codegenParameter.style;
 
         if (codegenParameter instanceof BoatCodegenParameter) {
             output.examples = ((BoatCodegenParameter) codegenParameter).examples;
