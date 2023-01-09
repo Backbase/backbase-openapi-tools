@@ -7,7 +7,7 @@
     <version>0.17.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <description>Backbase Open Api Tools will help you convert RAML to OpenAPI plus many more</description>
+    <description>Backbase Open Api Tools is a collection of tools to work with Open API</description>
 
     <name>Backbase OpenApi Tools ${project.version}</name>
 
@@ -68,7 +68,7 @@
     </properties>
 
     <modules>
-        <!-- Project holding all RAML and OpenAPI specs for testing. Also includes reusable test harnesses -->
+        <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
         <module>boat-trail-resources</module>
         <module>boat-engine</module>
         <module>boat-scaffold</module>

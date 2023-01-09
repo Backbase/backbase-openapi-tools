@@ -11,7 +11,7 @@
     <properties>
 
         <boat-maven-plugin.version>@pom.version@</boat-maven-plugin.version>
-<!--        <boat-maven-plugin.version>0.12.0-SNAPSHOT</boat-maven-plugin.version>-->
+<!--        <boat-maven-plugin.version>0.12.0-SNAPS§HOT</boat-maven-plugin.version>-->
         <jackson-databind-nullable-version>0.2.3</jackson-databind-nullable-version>
 
         <jackson.version>2.13.3</jackson.version>
@@ -45,7 +45,6 @@
         <module>boat-multiple-executions</module>
         <module>boat-artifact-input</module>
         <module>boat-doc</module>
-        <module>boat-export</module>
         <module>boat-generate</module>
         <module>boat-lint</module>
         <module>boat-yard</module>
