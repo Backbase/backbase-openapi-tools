@@ -14,12 +14,6 @@ import java.net.URI;
 import java.util.Objects;
 {{#imports}}import {{import}};
 {{/imports}}
-{{#useJakartaEe}}
-import jakarta.persistence.*;
-{{/useJakartaEe}}
-{{^useJakartaEe}}
-import javax.persistence.*;
-{{/useJakartaEe}}
 {{#openApiNullable}}
 import org.openapitools.jackson.nullable.JsonNullable;
 {{/openApiNullable}}

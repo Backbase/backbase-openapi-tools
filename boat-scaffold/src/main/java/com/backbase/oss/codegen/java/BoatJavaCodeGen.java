@@ -24,6 +24,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public static final String REST_TEMPLATE_BEAN_NAME = "restTemplateBeanName";
     public static final String CREATE_API_COMPONENT = "createApiComponent";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
+    public static final String USE_JAKARTA_EE = "useJakartaEe";
 
     private static final String JAVA_UTIL_SET_NEW = "new " + "java.util.LinkedHashSet<>()";
     private static final String JAVA_UTIL_SET = "java.util.Set";
@@ -50,6 +51,9 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     @Getter
     @Setter
     protected boolean createApiComponent = true;
+    @Getter
+    @Setter
+    protected boolean useJakartaEe = true;
 
     public BoatJavaCodeGen() {
         this.embeddedTemplateDir = this.templateDir = NAME;
@@ -68,6 +72,8 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             "Whether to generate the client as a Spring component"));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
             "Whether to use protected visibility for model fields"));
+        this.cliOptions.add(CliOption.newBoolean(USE_JAKARTA_EE,
+            "Whether to use jakarta.* classes instead of javax.*", this.useJakartaEe));
     }
 
     @Override
@@ -113,6 +119,12 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerConfiguration.mustache"));
             this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerVariable.mustache"));
         }
+
+        if (this.additionalProperties.containsKey(USE_JAKARTA_EE)) {
+            this.useJakartaEe = convertPropertyToBoolean(USE_JAKARTA_EE);
+        }
+        writePropertyBack(USE_JAKARTA_EE, this.useJakartaEe);
+
     }
 
     private void processRestTemplateOpts() {
