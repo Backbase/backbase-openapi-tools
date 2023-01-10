@@ -24,6 +24,7 @@
         <module>models</module>
         <module>webflux</module>
         <module>webmvc</module>
+        <module>spring-embedded</module>
     </modules>
 
 </project>
