@@ -214,7 +214,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-        writePropertyBack(USE_JAKARTA_EE, true);
 
         if (this.useSetForUniqueItems) {
             this.typeMapping.put("set", UNIQUE_BASE_TYPE);

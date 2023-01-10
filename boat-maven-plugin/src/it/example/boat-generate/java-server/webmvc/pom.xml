@@ -60,6 +60,7 @@
                                 <skipDefaultInterface>true</skipDefaultInterface>
                                 <useBeanValidation>false</useBeanValidation>
                                 <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                             <modelPackage>com.backbase.oss.boat.example.petstore.model</modelPackage>
                             <apiPackage>com.backbase.oss.boat.example.petstore.api</apiPackage>
