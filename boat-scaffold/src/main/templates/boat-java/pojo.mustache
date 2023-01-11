@@ -210,8 +210,8 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
 {{^useJakartaEe}}  @javax.annotation.Nullable{{/useJakartaEe}}
 {{/isNullable}}
 {{^isNullable}}
-  {{#useJakartaEe}}  @jakarta.annotation.Nullable{{/useJakartaEe}}
-  {{^useJakartaEe}}  @javax.annotation.Nullable{{/useJakartaEe}}
+  {{#useJakartaEe}}  @jakarta.annotation.Nonnull{{/useJakartaEe}}
+  {{^useJakartaEe}}  @javax.annotation.Nonnull{{/useJakartaEe}}
 {{/isNullable}}
 {{/required}}
 {{^required}}

@@ -62,7 +62,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
-import javax.annotation.Nullable;
+{{#useJakartaEe}}import jakarta.annotation.Nullable;{{/useJakartaEe}}
+{{^useJakartaEe}}import javax.annotation.Nullable;{{/useJakartaEe}}
 
 {{#jsr310}}
 import java.time.OffsetDateTime;
