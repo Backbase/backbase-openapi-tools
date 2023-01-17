@@ -33,6 +33,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Pets"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/Pets"
         default:
           description: unexpected error
           content:
