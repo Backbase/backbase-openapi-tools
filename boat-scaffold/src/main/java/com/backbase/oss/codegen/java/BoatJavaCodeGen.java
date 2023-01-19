@@ -158,12 +158,19 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            p.containerType = "set";
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
+        if (!fullJavaUtil) {
+            if ("array".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("array"));
+            } else if ("set".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("set"));
+                boolean canNotBeWrappedToNullable = !openApiNullable || !p.isNullable;
+                if (canNotBeWrappedToNullable) {
+                    model.imports.add("JsonDeserialize");
+                    p.vendorExtensions.put("x-setter-extra-annotation", "@JsonDeserialize(as = " + instantiationTypes.get("set") + ".class)");
+                }
+            } else if ("map".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("map"));
+            }
         }
 
     }

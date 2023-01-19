@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
@@ -116,6 +118,7 @@ class BoatJavaCodeGenTests {
     }
 
     @Test
+    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
     void uniquePropertyToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenProperty prop = new CodegenProperty();
@@ -136,6 +139,7 @@ class BoatJavaCodeGenTests {
     }
 
     @Test
+    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
     void uniqueParameterToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenParameter param = new CodegenParameter();
