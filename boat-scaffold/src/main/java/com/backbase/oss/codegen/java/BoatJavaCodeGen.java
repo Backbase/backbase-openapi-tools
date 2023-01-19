@@ -1,12 +1,9 @@
 package com.backbase.oss.codegen.java;
 
-import static java.lang.String.format;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 
@@ -175,19 +172,4 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
     }
 
-    @Override
-    public void postProcessParameter(CodegenParameter p) {
-        super.postProcessParameter(p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            // XXX the model set baseType to the container type, why is this different?
-
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
-
-        }
-    }
 }
