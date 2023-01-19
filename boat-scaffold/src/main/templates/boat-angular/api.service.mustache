@@ -178,7 +178,7 @@ export class {{classname}} {
      * @deprecated This endpoint is deprecated
      {{/isDeprecated}}
      */
-    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{#hasMore}} | {{/hasMore}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
+    public {{nickname}}({{#allParams.0}}requestParameters: {{#prefixParameterInterfaces}}{{classname}}{{/prefixParameterInterfaces}}{{operationIdCamelCase}}RequestParams, {{/allParams.0}}observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: {{#produces}}'{{mediaType}}'{{^-last}} | {{/-last}}{{/produces}}{{^produces}}undefined{{/produces}}}): Observable<any> {
     {{#allParams}}
         const _{{paramName}} = requestParameters["{{paramName}}"];
 {{#required}}
@@ -262,7 +262,7 @@ export class {{classname}} {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
                 {{#produces}}
-                '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+                '{{{mediaType}}}'{{^-last}},{{/-last}}
                 {{/produces}}
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -276,7 +276,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+            '{{{mediaType}}}'{{^-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}
@@ -285,7 +285,7 @@ export class {{classname}} {
         // to determine the Content-Type header
         const consumes: string[] = [
             {{#consumes}}
-            '{{{mediaType}}}'{{#hasMore}},{{/hasMore}}
+            '{{{mediaType}}}'{{^-last}},{{/-last}}
             {{/consumes}}
         ];
 {{/bodyParam}}
