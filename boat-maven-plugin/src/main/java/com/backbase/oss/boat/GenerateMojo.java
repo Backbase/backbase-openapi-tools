@@ -64,6 +64,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInst
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
@@ -471,7 +472,8 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     @Parameter(name = "writeDebugFiles")
     protected boolean writeDebugFiles = false;
 
-
+    @Parameter(name = "openapiNormalizer", property = "openapi.generator.maven.plugin.openapiNormalizer")
+    private List<String> openapiNormalizer;
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
@@ -812,6 +814,10 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             if (reservedWordsMappings != null && (configOptions == null || !configOptions.containsKey(
                 RESERVED_WORDS_MAPPINGS))) {
                 applyReservedWordsMappingsKvpList(reservedWordsMappings, configurator);
+            }
+
+            if (openapiNormalizer != null && (configOptions == null || !configOptions.containsKey("openapi-normalizer"))) {
+                applyOpenAPINormalizerKvpList(openapiNormalizer, configurator);
             }
 
             if (environmentVariables != null) {
