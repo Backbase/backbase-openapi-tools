@@ -19,6 +19,9 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.16.7
+* Boat Angular generator
+  * Use of `/*#__PURE__*/` for `createMocks` function call in templates to enable tree-shaking
 ## 0.16.6
 * Boat Angular generator
   * Use `^` instead of `>=` for `devDependencies` in the generated project, so project will be built using correct target version of ng-packagr & the Angular CLI
