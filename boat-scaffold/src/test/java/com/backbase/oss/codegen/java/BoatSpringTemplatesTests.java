@@ -128,18 +128,14 @@ class BoatSpringTemplatesTests {
 
             if (minimal) {
                 cases.add(~(1 << CASES.indexOf("flx")));
-                cases.add(~(1 << CASES.indexOf("utl")));
-                cases.add(-1);
+                //everything except flx & utl (because req & flx together is incorrect
+                cases.add(-514);
+                //everything except req
+                cases.add(~(1 << CASES.indexOf("req")));
             }
 
-            Stream<Combination> combinationStream = cases.stream().map(Combination::new);
-
-            return combinationStream;
+            return cases.stream().map(Combination::new);
         }
-
-//        static Stream<Combination> combinations(boolean minimal) {
-//            return Stream.of(new Combination())
-//        }
     }
 
     /** dynamic suite creation **/
