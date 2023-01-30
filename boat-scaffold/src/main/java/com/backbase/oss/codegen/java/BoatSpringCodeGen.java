@@ -1,11 +1,16 @@
 package com.backbase.oss.codegen.java;
 
-import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template.Fragment;
-import java.io.IOException;
-import java.io.Writer;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
+
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template.Fragment;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.servers.Server;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
 import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,14 +18,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
+
     public static final String NAME = "boat-spring";
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
@@ -122,6 +128,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean useWithModifiers;
 
     public BoatSpringCodeGen() {
+        super();
         this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
@@ -174,8 +181,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
         final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
         // cleared by <generateSuportingFiles>false</generateSuportingFiles>
         final boolean useApiUtil = supFiles != null && (supFiles.isEmpty()
-                        ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
-                        : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
+            ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+            : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles
@@ -262,5 +269,22 @@ public class BoatSpringCodeGen extends SpringCodegen {
     private boolean needApiUtil() {
         return this.apiTemplateFiles.containsKey("api.mustache")
             && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
+    }
+
+    /**
+        This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
+        the service interface. There is a relevant httpServletParam.mustache file.
+     */
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        final CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        if (this.addServletRequest) {
+            final CodegenParameter codegenParameter = new CodegenParameter() {
+                public boolean isHttpServletRequest = true;
+            };
+            codegenParameter.paramName = "httpServletRequest";
+            codegenOperation.allParams.add(codegenParameter);
+        }
+        return codegenOperation;
     }
 }
