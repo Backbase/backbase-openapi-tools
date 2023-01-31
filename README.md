@@ -27,7 +27,7 @@ BOAT is still under development and subject to change.
   * `spring-mvc` library is removed because it is not supported by OpenAPI Tools anymore
   * Use of `Set` for unique items is now enabled by default as OpenAPI Generator fixed their implementation
 
-## 0.16.7
+## 0.16.9
 * Boat Angular generator
   * Use of `/*#__PURE__*/` for `createMocks` function call in templates to enable tree-shaking
 ## 0.16.6
