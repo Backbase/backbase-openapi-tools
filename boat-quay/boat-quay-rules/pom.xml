@@ -17,7 +17,6 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.7.22</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <auto-service.version>1.0-rc7</auto-service.version>
         <dokka.version>1.7.20</dokka.version>
@@ -93,7 +92,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.24.2</version>
         </dependency>
 
     </dependencies>
