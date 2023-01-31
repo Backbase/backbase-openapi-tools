@@ -19,7 +19,7 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
-## 0.16.7
+## 0.16.9
 * Boat Angular generator
   * Use of `/*#__PURE__*/` for `createMocks` function call in templates to enable tree-shaking
 ## 0.16.6
