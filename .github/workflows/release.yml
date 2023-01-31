@@ -87,7 +87,8 @@ jobs:
             --no-transfer-progress \
             --batch-mode \
             -DskipTests=true \
-            deploy
+            deploy \
+            -P deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
