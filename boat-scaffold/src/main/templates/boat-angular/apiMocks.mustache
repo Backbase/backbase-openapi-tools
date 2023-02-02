@@ -6,7 +6,7 @@ import { Provider } from '@angular/core';
 /**
 * Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
 */
-export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = /*#__PURE__*/ createMocks([{
+export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider = /*#__PURE__*/ createMocks([{
         urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
         method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
         responses: [
@@ -37,7 +37,7 @@ export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}
     {{/operation}}
 {{/operations}}
 
-export const {{classname}}MocksProvider: Provider = /*#__PURE__*/ createMocks(
+export const {{classname}}MocksProvider = /*#__PURE__*/ createMocks(
     [{{#operations}}
     {{#operation}}
     {
