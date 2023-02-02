@@ -65,7 +65,7 @@
         <mockito.version>5.1.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
-        <swagger-core.version>2.2.7</swagger-core.version>
+        <swagger-core.version>2.2.8</swagger-core.version>
         <swagger-parser.version>2.1.6</swagger-parser.version>
         <snakeyaml.version>1.33</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
@@ -95,13 +95,13 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.30</version>
+                <version>2.0.6</version>
             </dependency>
 
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.2.11</version>
+                <version>1.4.5</version>
             </dependency>
 
 
@@ -173,12 +173,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mozilla</groupId>
-                <artifactId>rhino</artifactId>
-                <version>1.7.14</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.github.java-json-tools</groupId>
                 <artifactId>json-schema-core</artifactId>
                 <version>1.2.14</version>
@@ -188,12 +182,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-ext</artifactId>
                 <version>2.0.6</version>
-            </dependency>
-
-            <dependency>
-                <groupId>info.picocli</groupId>
-                <artifactId>picocli</artifactId>
-                <version>4.7.1</version>
             </dependency>
 
             <dependency>
@@ -214,14 +202,6 @@
                 <version>1.6.9</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>2.16</version>
-                <scope>compile</scope>
-            </dependency>
-
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-core</artifactId>
@@ -238,7 +218,7 @@
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
                 <artifactId>swagger-parser</artifactId>
-                <version>${swagger-parser.version}</version>
+                <version>2.1.11</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.validation</groupId>
@@ -283,14 +263,6 @@
                 <version>4.4</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>com.googlecode.libphonenumber</groupId>
-                <artifactId>libphonenumber</artifactId>
-                <version>8.13.1</version>
-                <scope>compile</scope>
-            </dependency>
-
             <dependency>
                 <groupId>com.github.java-json-tools</groupId>
                 <artifactId>json-schema-validator</artifactId>
@@ -312,7 +284,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.9.1</version>
+                <version>5.9.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

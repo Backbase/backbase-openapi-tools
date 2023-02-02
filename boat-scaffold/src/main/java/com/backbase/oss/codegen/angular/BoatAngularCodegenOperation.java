@@ -14,6 +14,7 @@ public class BoatAngularCodegenOperation extends CodegenOperation {
 
     public final String pattern;
 
+    @SuppressWarnings("java:S3011")
     public BoatAngularCodegenOperation(CodegenOperation o) {
         for (Field field : o.getClass().getDeclaredFields()) {
             if (Modifier.isPublic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {

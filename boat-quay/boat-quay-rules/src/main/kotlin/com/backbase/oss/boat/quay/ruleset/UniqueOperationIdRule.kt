@@ -19,9 +19,9 @@ class UniqueOperationIdRule() {
         context.api.paths.orEmpty().values
                 .flatMap { it?.readOperations().orEmpty() }
                 .filter { operation ->
-                    val exist = operationIds.contains(operation.operationId.toLowerCase())
+                    val exist = operationIds.contains(operation.operationId.lowercase())
                     if (!exist) {
-                        operationIds.add(operation.operationId.toLowerCase())
+                        operationIds.add(operation.operationId.lowercase())
                     }
                     exist;
                 }
