@@ -130,6 +130,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public BoatSpringCodeGen() {
         super();
         this.embeddedTemplateDir = this.templateDir = NAME;
+        this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));

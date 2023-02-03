@@ -47,6 +47,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
     public BoatJavaCodeGen() {
         this.useJakartaEe = true;
+        this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
         this.embeddedTemplateDir = this.templateDir = NAME;
 
