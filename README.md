@@ -19,6 +19,9 @@ The project is very much Work In Progress and will be published on maven central
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.16.11
+* Boat Angular generator
+  * Set `removeComments: false` in generated tsconfig.json files to retain `/*#__PURE__*/` annotation in compiled JS.
 ## 0.16.10
 * Boat Angular generator
   * Remove types from generated mock providers due to a TypeScript which prevents `/*#__PURE__*/` annotation from working
