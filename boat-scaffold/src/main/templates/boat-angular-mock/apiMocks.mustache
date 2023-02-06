@@ -34,10 +34,10 @@ const {{nickname}}Examples = [
 /**
 * Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
 */
-export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider: Provider = /*#__PURE__*/ createMocks({{nickname}}Examples);
+export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider = /*#__PURE__*/ createMocks({{nickname}}Examples);
 
     {{/operation}}
 {{/operations}}
-export const {{classname}}MocksProvider: Provider = /*#__PURE__*/ createMocks({{baseName}}Examples);
+export const {{classname}}MocksProvider = /*#__PURE__*/ createMocks({{baseName}}Examples);
 
 

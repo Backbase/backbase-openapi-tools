@@ -121,7 +121,7 @@ class BoatAngularTemplatesTests {
     @Check
     public void withMocks() {
         assertThat(
-                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = /\\*#__PURE__\\*/ createMocks"),
+                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider = /\\*#__PURE__\\*/ createMocks"),
                 equalTo(this.param.withMocks));
     }
 
