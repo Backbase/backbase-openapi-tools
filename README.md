@@ -27,6 +27,9 @@ BOAT is still under development and subject to change.
   * `spring-mvc` library is removed because it is not supported by OpenAPI Tools anymore
   * Use of `Set` for unique items is now enabled by default as OpenAPI Generator fixed their implementation
 
+## 0.16.11
+* Boat Angular generator
+  * Set `removeComments: false` in generated tsconfig.json files to retain `/*#__PURE__*/` annotation in compiled JS.
 ## 0.16.10
 * Boat Angular generator
   * Remove types from generated mock providers due to a TypeScript which prevents `/*#__PURE__*/` annotation from working
