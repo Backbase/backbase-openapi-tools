@@ -25,20 +25,25 @@ class EndpointAccessControlDefinedRule(config: Config) {
         context.api.paths.orEmpty().values
                 .flatMap { it?.readOperations().orEmpty() }
                 .forEach {
-                    val acEnabledSet : Boolean = notEmpty(it.extensions["x-BBAccessControl"])
-                    val acResourceSet : Boolean = notEmpty(it.extensions["x-BBAccessControl-resource"])
-                    val acFunctionSet : Boolean = notEmpty(it.extensions["x-BBAccessControl-function"])
-                    val acPrivilegeSet : Boolean = notEmpty(it.extensions["x-BBAccessControl-privilege"])
-                    val acExplicitlyDisabled : Boolean = "false" == it.extensions["x-BBAccessControl"].toString()
-                    if (acExplicitlyDisabled) {
-                        if (acResourceSet || acFunctionSet || acPrivilegeSet) {
-                            violations.add(
-                                    context.violation("AC both disabled and defined: ${it.operationId}", it))
-                        }
-                    } else if (!acEnabledSet) {
-                        if (!acResourceSet || !acFunctionSet || !acPrivilegeSet) {
-                            violations.add(
-                                    context.violation("AC info not complete: ${it.extensions}", it))
+                    if (it.extensions == null) {
+                        violations.add(
+                                context.violation("Access Control not defined: ${it.operationId}", it))
+                    } else {
+                        val acEnabledSet: Boolean = notEmpty(it.extensions["x-BBAccessControl"])
+                        val acResourceSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-resource"])
+                        val acFunctionSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-function"])
+                        val acPrivilegeSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-privilege"])
+                        val acExplicitlyDisabled: Boolean = "false" == it.extensions["x-BBAccessControl"].toString()
+                        if (acExplicitlyDisabled) {
+                            if (acResourceSet || acFunctionSet || acPrivilegeSet) {
+                                violations.add(
+                                        context.violation("AC both disabled and defined: ${it.operationId}", it))
+                            }
+                        } else if (!acEnabledSet) {
+                            if (!acResourceSet || !acFunctionSet || !acPrivilegeSet) {
+                                violations.add(
+                                        context.violation("AC info not complete: ${it.extensions}", it))
+                            }
                         }
                     }
                 }
