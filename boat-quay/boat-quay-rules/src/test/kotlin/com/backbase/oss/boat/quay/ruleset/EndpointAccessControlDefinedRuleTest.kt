@@ -19,7 +19,7 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl: false
+                  x-BbAccessControl: false
             """.trimIndent()
         )
 
@@ -39,9 +39,9 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-function: Manage Users
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-function: Manage Users
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 
@@ -61,10 +61,10 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl: true
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-function: Manage Users
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl: true
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-function: Manage Users
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 
@@ -104,9 +104,9 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-function: ""
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-function: ""
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 
@@ -126,8 +126,8 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl-function: Manage Users
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl-function: Manage Users
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 
@@ -147,8 +147,8 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 
@@ -168,8 +168,8 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-function: Manage Users
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-function: Manage Users
             """.trimIndent()
         )
 
@@ -189,10 +189,10 @@ class EndpointAccessControlDefinedRuleTest {
             paths: 
               /client-api/foo:
                 get:
-                  x-BBAccessControl: false
-                  x-BBAccessControl-resource: Users
-                  x-BBAccessControl-function: Manage Users
-                  x-BBAccessControl-privilege: view
+                  x-BbAccessControl: false
+                  x-BbAccessControl-resource: Users
+                  x-BbAccessControl-function: Manage Users
+                  x-BbAccessControl-privilege: view
             """.trimIndent()
         )
 

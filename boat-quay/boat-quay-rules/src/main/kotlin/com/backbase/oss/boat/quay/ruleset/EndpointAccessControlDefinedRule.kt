@@ -29,11 +29,11 @@ class EndpointAccessControlDefinedRule(config: Config) {
                         violations.add(
                                 context.violation("Access Control not defined: ${it.operationId}", it))
                     } else {
-                        val acEnabledSet: Boolean = notEmpty(it.extensions["x-BBAccessControl"])
-                        val acResourceSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-resource"])
-                        val acFunctionSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-function"])
-                        val acPrivilegeSet: Boolean = notEmpty(it.extensions["x-BBAccessControl-privilege"])
-                        val acExplicitlyDisabled: Boolean = "false" == it.extensions["x-BBAccessControl"].toString()
+                        val acEnabledSet: Boolean = notEmpty(it.extensions["x-BbAccessControl"])
+                        val acResourceSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-resource"])
+                        val acFunctionSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-function"])
+                        val acPrivilegeSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-privilege"])
+                        val acExplicitlyDisabled: Boolean = "false" == it.extensions["x-BbAccessControl"].toString()
                         if (acExplicitlyDisabled) {
                             if (acResourceSet || acFunctionSet || acPrivilegeSet) {
                                 violations.add(
