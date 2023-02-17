@@ -15,7 +15,7 @@
     <name>BOAT :: Generate :: Java Client</name>
 
     <properties>
-        <boat-maven-plugin.supportingFilesToGenerate>ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java,ApiException.java,Pair.java</boat-maven-plugin.supportingFilesToGenerate>
+        <boat-maven-plugin.supportingFilesToGenerate>ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java,ApiException.java,Pair.java,ApiResponse.java,JavaTimeFormatter.java</boat-maven-plugin.supportingFilesToGenerate>
     </properties>
 
     <dependencies>

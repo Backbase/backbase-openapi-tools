@@ -3,9 +3,6 @@ allOf:
   - $ref: additional-properties.yaml
 x-implements:
   - Cloneable
-x-extra-annotation: |
-  @javax.persistence.Entity
-  @javax.persistence.Table(name="pojo")
 properties:
   pEnum1:
     $ref: '../components.yaml#/Enum1'
@@ -23,19 +20,12 @@ properties:
     maximum: 10
     exclusiveMaximum: true
   pDate:
-    x-extra-annotation: '@javax.persistence.Column(name="date") @javax.persistence.Access(javax.persistence.AccessType.PROPERTY)'
     type: string
     format: date
   pDateTime:
-    x-extra-annotation: |
-      @javax.persistence.Column(name="date_time")
-      @javax.persistence.Access(javax.persistence.AccessType.PROPERTY)
     type: string
     format: date-time
   pString:
-    x-extra-annotation: >
-      @javax.persistence.Column(name="value")
-      @javax.persistence.Access(javax.persistence.AccessType.PROPERTY)
     type: string
     minLength: 1
     maxLength: 36

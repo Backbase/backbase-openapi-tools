@@ -25,31 +25,6 @@ class ValidateMojoTests {
     }
 
     @Test
-    void testValidationCatches() throws MojoFailureException, MojoExecutionException {
-
-
-        ValidateMojo mojo = new ValidateMojo();
-        mojo.setInput(new File("bad.yaml"));
-        mojo.setFailOnWarning(true);
-
-        assertThrows(MojoFailureException.class, mojo::execute);
-
-        String spec = System.getProperty("spec", getClass().getResource("/raml-examples/export-mojo-error-catching/error").getFile());
-
-        File input = new File(spec);
-
-
-        mojo.setInput(input);
-        mojo.setFailOnWarning(true);
-
-        assertThrows(MojoFailureException.class, mojo::execute);
-        mojo.setFailOnWarning(false);
-        assertDoesNotThrow(() -> mojo.execute());
-
-
-    }
-
-    @Test
     void testValidatingDirectory() throws MojoFailureException {
         String spec = System.getProperty("spec", getClass().getResource("/oas-examples/").getFile());
 

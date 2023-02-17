@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
@@ -58,9 +59,10 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  * created dynamically.
  * </p>
  */
+@Slf4j
 class BoatSpringTemplatesTests {
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
-    static final boolean PROP_FAST = Boolean.valueOf(System.getProperty(PROP_BASE + "fast", "true"));
+    static final boolean PROP_FAST = Boolean.parseBoolean(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-templates-tests");
 
     @BeforeAll
@@ -92,7 +94,7 @@ class BoatSpringTemplatesTests {
                 ? "boat"
                 : IntStream.range(0, CASES.size())
                     .filter(n -> (mask & (1 << n)) != 0)
-                    .mapToObj(n -> CASES.get(n))
+                    .mapToObj(CASES::get)
                     .collect(joining("-", "boat-", ""));
 
             this.useBeanValidation = (mask & 1 << CASES.indexOf("val")) != 0;
@@ -125,9 +127,11 @@ class BoatSpringTemplatesTests {
             }
 
             if (minimal) {
-                cases.add(-1 & ~(1 << CASES.indexOf("flx")));
-                cases.add(-1 & ~(1 << CASES.indexOf("utl")));
-                cases.add(-1);
+                cases.add(~(1 << CASES.indexOf("flx")));
+                //everything except flx & utl (because req & flx together is incorrect
+                cases.add(-514);
+                //everything except req
+                cases.add(~(1 << CASES.indexOf("req")));
             }
 
             return cases.stream().map(Combination::new);
@@ -225,9 +229,9 @@ class BoatSpringTemplatesTests {
 
     @Check
     void useSetForUniqueItems() {
-        assertThat(findPattern("/api/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
+        assertThat(findPattern("/api/.+\\.java$", "java\\.util\\.Set<.+>"),
             equalTo(this.param.useSetForUniqueItems));
-        assertThat(findPattern("/model/.+\\.java$", "(java\\.util\\.)?Set<.+>"),
+        assertThat(findPattern("/model/.+\\.java$", "java\\.util\\.Set<.+>"),
             equalTo(this.param.useSetForUniqueItems));
     }
 
@@ -241,6 +245,7 @@ class BoatSpringTemplatesTests {
 
     private boolean findPattern(String filePattern, String linePattern) {
         final Predicate<String> fileMatch = Pattern.compile(filePattern).asPredicate();
+        log.info("Files: {}", files);
         final List<String> selection = this.files.stream()
             .map(File::getPath)
             .map(path -> path.replace(File.separatorChar, '/'))
@@ -251,9 +256,7 @@ class BoatSpringTemplatesTests {
 
         final Predicate<String> lineMatch = Pattern.compile(linePattern).asPredicate();
         return selection.stream()
-            .filter(file -> contentMatches(file, lineMatch))
-            .findAny()
-            .isPresent();
+            .anyMatch(file -> contentMatches(file, lineMatch));
     }
 
     @SneakyThrows
@@ -278,11 +281,12 @@ class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODEL_TESTS, "true");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
 
-        if (this.param.apiUtil) {
-            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml");
-        } else {
-            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
-        }
+//        if (this.param.apiUtil) {
+            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml,OpenApiGeneratorApplication.java");
+//        } else {
+//            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
+//        }
+
 
         gcf.setApiNameSuffix("-api");
         gcf.setModelNameSuffix(this.param.name);

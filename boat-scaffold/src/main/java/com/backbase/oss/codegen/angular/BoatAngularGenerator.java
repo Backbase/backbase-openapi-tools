@@ -43,6 +43,10 @@ import org.openapitools.codegen.CodegenResponse;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.AbstractTypeScriptClientCodegen;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
+import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.SemVer;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -128,7 +132,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     @Override
     protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
-        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(schema));
+        codegenModel.additionalPropertiesType = getTypeDeclaration(ModelUtils.getAdditionalProperties(openAPI, schema));
         addImport(codegenModel, codegenModel.additionalPropertiesType);
     }
 
@@ -367,7 +371,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     @Override
-    public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> operations, List<Object> allModels) {
+    public OperationsMap postProcessOperationsWithModels(OperationsMap operations, List<ModelMap> allModels) {
         String operationKey = "operations";
         Map<String, Object> objs = (Map<String, Object>) operations.get(operationKey);
         Map<String, Map<String, Object>> pathOperations = new HashMap<>();
@@ -475,7 +479,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
      */
     private CodegenParameter findPathParameterByName(CodegenOperation operation, String parameterName) {
         for (CodegenParameter param : operation.pathParams) {
-            if (param.baseName.equals(parameterName)) {
+            if (parameterName.equals(param.baseName)) {
                 return param;
             }
         }
@@ -483,16 +487,16 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     }
 
     @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        Map<String, Object> result = super.postProcessModels(objs);
+    public ModelsMap postProcessModels(ModelsMap objs) {
+        ModelsMap result = super.postProcessModels(objs);
         return postProcessModelsEnum(result);
     }
 
     @Override
-    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
-        Map<String, Object> result = super.postProcessAllModels(objs);
-        for (Map.Entry<String, Object> entry : result.entrySet()) {
-            Map<String, Object> inner = (Map<String, Object>) entry.getValue();
+    public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        Map<String, ModelsMap> result = super.postProcessAllModels(objs);
+        for (Map.Entry<String, ModelsMap> entry : result.entrySet()) {
+            Map<String, Object> inner = entry.getValue();
             List<Map<String, Object>> models = (List<Map<String, Object>>) inner.get("models");
             for (Map<String, Object> mo : models) {
                 CodegenModel cm = (CodegenModel) mo.get("model");
@@ -633,7 +637,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
      */
     private String convertUsingFileNamingConvention(String originalName) {
         String name = this.removeModelPrefixSuffix(originalName);
-        return camelize(name, true);
+        return camelize(name, CamelizeOption.LOWERCASE_FIRST_LETTER);
     }
 
     @Override

@@ -1,13 +1,18 @@
 package com.backbase.oss.codegen.java;
 
 import static com.backbase.oss.codegen.java.BoatJavaCodeGen.*;
+
 import java.util.Map;
+
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
@@ -116,6 +121,7 @@ class BoatJavaCodeGenTests {
     }
 
     @Test
+    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
     void uniquePropertyToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenProperty prop = new CodegenProperty();
@@ -136,6 +142,7 @@ class BoatJavaCodeGenTests {
     }
 
     @Test
+    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
     void uniqueParameterToSet() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final CodegenParameter param = new CodegenParameter();
@@ -154,4 +161,71 @@ class BoatJavaCodeGenTests {
         assertThat(param.dataType, is("java.util.Set<String>"));
     }
 
+    @Test
+    void setTypeMappingForList() {
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setFullJavaUtil(false);
+        gen.instantiationTypes().put("set", "ArrayList");
+        gen.typeMapping().put("set", "List");
+
+        final CodegenProperty prop = new CodegenProperty();
+        prop.isContainer = true;
+        prop.containerType = "set";
+        prop.setUniqueItems(true);
+        prop.items = new CodegenProperty();
+        prop.items.dataType = "String";
+        prop.baseType = "java.util.Set";
+        prop.dataType = "java.util.HashSet<String>";
+
+        final var model = new CodegenModel();
+
+        gen.postProcessModelProperty(model, prop);
+
+        assertTrue(model.getImports().contains("ArrayList"));
+    }
+
+    @Test
+    void arrayTypeMappingForList() {
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setFullJavaUtil(false);
+        gen.instantiationTypes().put("array", "ArrayList");
+        gen.typeMapping().put("array", "List");
+
+        final CodegenProperty prop = new CodegenProperty();
+        prop.isContainer = true;
+        prop.containerType = "array";
+        prop.setUniqueItems(true);
+        prop.items = new CodegenProperty();
+        prop.items.dataType = "String";
+        prop.baseType = "java.util.Set";
+        prop.dataType = "java.util.HashSet<String>";
+
+        final var model = new CodegenModel();
+
+        gen.postProcessModelProperty(model, prop);
+
+        assertTrue(model.getImports().contains("ArrayList"));
+    }
+
+    @Test
+    void mapTypeMappingForMap() {
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setFullJavaUtil(false);
+        gen.instantiationTypes().put("map", "TreeMap");
+
+        final CodegenProperty prop = new CodegenProperty();
+        prop.isContainer = true;
+        prop.containerType = "map";
+        prop.setUniqueItems(true);
+        prop.items = new CodegenProperty();
+        prop.items.dataType = "String";
+        prop.baseType = "java.util.Set";
+        prop.dataType = "java.util.HashSet<String>";
+
+        final var model = new CodegenModel();
+
+        gen.postProcessModelProperty(model, prop);
+
+        assertTrue(model.getImports().contains("TreeMap"));
+    }
 }

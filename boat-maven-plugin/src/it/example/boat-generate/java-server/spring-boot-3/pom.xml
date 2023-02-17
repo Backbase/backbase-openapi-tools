@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>java-server</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>spring-embedded-sb3</artifactId>
+
+    <name>BOAT :: Generate :: Server Stubs Spring Embedded SB3</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.backbase.oss.boat.example</groupId>
+            <artifactId>models</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.0.Final</version>
+        </dependency>
+
+    </dependencies>
+
+    <packaging>jar</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>java-server</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-spring-boot-embedded</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore-expanded.yaml</inputSpec>
+                            <modelPackage>com.backbase.oss.boat.example.petstore.model</modelPackage>
+                            <apiPackage>com.backbase.oss.boat.example.petstore.api</apiPackage>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

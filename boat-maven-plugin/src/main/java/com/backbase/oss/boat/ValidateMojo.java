@@ -63,12 +63,13 @@ public class ValidateMojo extends AbstractMojo {
         SwaggerParseResult swaggerParseResult =
             openAPIParser.readLocation(inputFile.toURI().toString(), new ArrayList<>(), parseOptions);
 
-        if (swaggerParseResult.getMessages().isEmpty()) {
+        if (swaggerParseResult.getMessages() != null && swaggerParseResult.getMessages().isEmpty()) {
             log.info("OpenAPI: {} is valid", swaggerParseResult.getOpenAPI().getInfo().getTitle());
         } else {
-            for (String message : swaggerParseResult.getMessages()) {
-                processMessages(message, inputFile, swaggerParseResult);
-            }
+            if (swaggerParseResult.getMessages() != null)
+                for (String message : swaggerParseResult.getMessages()) {
+                    processMessages(message, inputFile, swaggerParseResult);
+                }
             if (failOnWarning) {
                 throw new MojoFailureException("Validation errors validating OpenAPI");
             }

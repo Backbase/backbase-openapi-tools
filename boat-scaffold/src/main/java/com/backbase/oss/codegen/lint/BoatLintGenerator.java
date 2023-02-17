@@ -18,12 +18,7 @@ import org.openapitools.codegen.Generator;
 public class BoatLintGenerator extends AbstractDocumentationGenerator {
 
     public BoatLintGenerator(BoatLintConfig config) {
-        super(config);
-    }
-
-    @Override
-    public Generator opts(ClientOptInput opts) {
-        return this;
+        this.opts(new ClientOptInput().config(config));
     }
 
     public List<File> generate() {
@@ -52,7 +47,7 @@ public class BoatLintGenerator extends AbstractDocumentationGenerator {
         // After processing our model, convert it into a map
         Map<String, Object> bundle = convertToBundle(boatLintReport);
         List<File> files = processTemplates(bundle);
-        log.info("Finished creating BOAT Lint for portal: {} in: {} ", boatLintReport.getTitle(), output);
+        log.info("Finished creating BOAT Lint for portal: {} files: {} ", boatLintReport.getTitle(), files);
 
         return files;
     }

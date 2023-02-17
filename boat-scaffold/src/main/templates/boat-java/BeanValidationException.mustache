@@ -2,12 +2,17 @@ package {{invokerPackage}};
 
 import java.util.Set;
 
+{{^useJakartaEe}}
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
-
+{{/useJakartaEe}}
+{{#useJakartaEe}}
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+{{/useJakartaEe}}
 public class BeanValidationException extends ValidationException {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5294733947409491364L;
     Set<ConstraintViolation<Object>> violations;

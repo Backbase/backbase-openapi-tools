@@ -16,7 +16,7 @@
     <name>BOAT :: DOCandLint</name>
 
     <description>
-        Example projects showing exporting RAML to OpenAPI from source files.
+        Example projects showing how to use BOAT
         Specs can be in source files, or retrieved from dependencies
     </description>
 

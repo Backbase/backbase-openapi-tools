@@ -1,6 +1,6 @@
 # Boat OpenAPI generator
 
-The Boat OpenAPI generator is based on the official Open API Generator, version 4.0.3 and it provides several fixes and additional features.
+The Boat OpenAPI generator is based on the official Open API Generator, version 6.2.1, and it provides several fixes and additional features.
 The `boat` plugin has multiple goals:
 
 ## Spring Code Generator

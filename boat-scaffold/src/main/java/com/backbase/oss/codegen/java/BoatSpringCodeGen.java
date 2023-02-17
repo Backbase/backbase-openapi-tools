@@ -1,11 +1,16 @@
 package com.backbase.oss.codegen.java;
 
-import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template.Fragment;
-import java.io.IOException;
-import java.io.Writer;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
+
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template.Fragment;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.servers.Server;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
 import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,14 +18,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
+
     public static final String NAME = "boat-spring";
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
@@ -28,7 +34,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
-    public static final String OPENAPI_NULLABLE = "openApiNullable";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
     public static final String UNIQUE_BASE_TYPE = "java.util.Set";
@@ -116,13 +121,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean useSetForUniqueItems;
 
     /**
-     * Enable OpenAPI Jackson Nullable library
-     */
-    @Setter
-    @Getter
-    protected boolean openApiNullable = true;
-
-    /**
      * Whether to use {@code with} prefix for pojos modifiers.
      */
     @Setter
@@ -130,7 +128,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
     protected boolean useWithModifiers;
 
     public BoatSpringCodeGen() {
+        super();
         this.embeddedTemplateDir = this.templateDir = NAME;
+        this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
@@ -143,8 +143,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
             "Use java.util.Set for arrays that have uniqueItems set to true.", this.useSetForUniqueItems));
-        this.cliOptions.add(CliOption.newBoolean(OPENAPI_NULLABLE,
-            "Enable OpenAPI Jackson Nullable library.", this.openApiNullable));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
@@ -184,12 +182,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
         final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
         // cleared by <generateSuportingFiles>false</generateSuportingFiles>
         final boolean useApiUtil = supFiles != null && (supFiles.isEmpty()
-                        ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
-                        : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
+            ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+            : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles
-                .removeIf(sf -> "apiUtil.mustache".equals(sf.templateFile));
+                .removeIf(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
         }
 
         writePropertyBack("useApiUtil", useApiUtil);
@@ -209,9 +207,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
             this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
         }
-        if (this.additionalProperties.containsKey(OPENAPI_NULLABLE)) {
-            this.openApiNullable = convertPropertyToBoolean(OPENAPI_NULLABLE);
-        }
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
@@ -225,7 +220,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
         writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
         writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(OPENAPI_NULLABLE, this.openApiNullable);
         writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
 
@@ -276,5 +270,22 @@ public class BoatSpringCodeGen extends SpringCodegen {
     private boolean needApiUtil() {
         return this.apiTemplateFiles.containsKey("api.mustache")
             && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
+    }
+
+    /**
+        This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
+        the service interface. There is a relevant httpServletParam.mustache file.
+     */
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        final CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        if (this.addServletRequest) {
+            final CodegenParameter codegenParameter = new CodegenParameter() {
+                public boolean isHttpServletRequest = true;
+            };
+            codegenParameter.paramName = "httpServletRequest";
+            codegenOperation.allParams.add(codegenParameter);
+        }
+        return codegenOperation;
     }
 }

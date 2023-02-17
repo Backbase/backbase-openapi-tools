@@ -1,13 +1,18 @@
 package com.backbase.oss.codegen.doc;
 
+import com.backbase.oss.codegen.CodegenException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -49,14 +54,13 @@ public class BoatCodegenParameter extends CodegenParameter {
     }
 
 
+    @SuppressWarnings("java:S3776")
     public static BoatCodegenParameter fromCodegenParameter(CodegenParameter codegenParameter) {
 
         // Standard properties
         BoatCodegenParameter output = new BoatCodegenParameter();
         output.isFile = codegenParameter.isFile;
-        output.hasMore = codegenParameter.hasMore;
         output.isContainer = codegenParameter.isContainer;
-        output.secondaryParam = codegenParameter.secondaryParam;
         output.baseName = codegenParameter.baseName;
         output.paramName = codegenParameter.paramName;
         output.dataType = codegenParameter.dataType;
@@ -132,8 +136,8 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.isEmail = codegenParameter.isEmail;
         output.isFreeFormObject = codegenParameter.isFreeFormObject;
         output.isAnyType = codegenParameter.isAnyType;
-        output.isListContainer = codegenParameter.isListContainer;
-        output.isMapContainer = codegenParameter.isMapContainer;
+        output.isContainer = codegenParameter.isContainer;
+        output.isMap = codegenParameter.isMap;
         output.isExplode = codegenParameter.isExplode;
         output.style = codegenParameter.style;
 
@@ -151,7 +155,9 @@ public class BoatCodegenParameter extends CodegenParameter {
                 }
             }
         }
-
+        if (output.getContent() == null) {
+            output.setContent(new LinkedHashMap<>());
+        }
         return output;
     }
 

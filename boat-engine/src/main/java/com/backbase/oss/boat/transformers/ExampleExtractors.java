@@ -9,9 +9,10 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.experimental.UtilityClass;
 
 /**

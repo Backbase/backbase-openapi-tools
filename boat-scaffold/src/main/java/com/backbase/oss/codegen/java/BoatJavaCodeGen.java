@@ -1,12 +1,9 @@
 package com.backbase.oss.codegen.java;
 
-import static java.lang.String.format;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 
@@ -24,10 +21,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public static final String REST_TEMPLATE_BEAN_NAME = "restTemplateBeanName";
     public static final String CREATE_API_COMPONENT = "createApiComponent";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
-
-    private static final String JAVA_UTIL_SET_NEW = "new " + "java.util.LinkedHashSet<>()";
     private static final String JAVA_UTIL_SET = "java.util.Set";
-    private static final String JAVA_UTIL_SET_GEN = "java.util.Set<%s>";
 
     @Setter
     @Getter
@@ -52,14 +46,15 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     protected boolean createApiComponent = true;
 
     public BoatJavaCodeGen() {
+        this.useJakartaEe = true;
+        this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
+
         this.embeddedTemplateDir = this.templateDir = NAME;
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
             "Add @Validated to class-level Api interfaces", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
             "Whether to use \"with\" prefix for POJO modifiers", this.useWithModifiers));
-        this.cliOptions.add(CliOption.newBoolean(USE_SET_FOR_UNIQUE_ITEMS,
-            "Use java.util.Set for arrays that have uniqueItems set to true", this.useSetForUniqueItems));
         this.cliOptions.add(CliOption.newBoolean(USE_JACKSON_CONVERSION,
             "Whether to use Jackson to convert query parameters to String", this.useJacksonConversion));
         this.cliOptions.add(CliOption.newBoolean(USE_DEFAULT_API_CLIENT,
@@ -112,9 +107,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
 
         if (!getLibrary().startsWith("jersey")) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerConfiguration.mustache"));
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("ServerVariable.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerConfiguration.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("ServerVariable.mustache"));
         }
+
     }
 
     private void processRestTemplateOpts() {
@@ -128,7 +124,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         }
         writePropertyBack(USE_JACKSON_CONVERSION, this.useJacksonConversion);
         if (this.useJacksonConversion) {
-            this.supportingFiles.removeIf(f -> f.templateFile.equals("RFC3339DateFormat.mustache"));
+            this.supportingFiles.removeIf(f -> f.getTemplateFile().equals("RFC3339DateFormat.mustache"));
         }
 
         if (this.additionalProperties.containsKey(USE_DEFAULT_API_CLIENT)) {
@@ -148,29 +144,21 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
         super.postProcessModelProperty(model, p);
 
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            p.containerType = "set";
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
+        if (!fullJavaUtil) {
+            if ("array".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("array"));
+            } else if ("set".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("set"));
+                boolean canNotBeWrappedToNullable = !openApiNullable || !p.isNullable;
+                if (canNotBeWrappedToNullable) {
+                    model.imports.add("JsonDeserialize");
+                    p.vendorExtensions.put("x-setter-extra-annotation", "@JsonDeserialize(as = " + instantiationTypes.get("set") + ".class)");
+                }
+            } else if ("map".equals(p.containerType)) {
+                model.imports.add(instantiationTypes.get("map"));
+            }
         }
 
     }
 
-    @Override
-    public void postProcessParameter(CodegenParameter p) {
-        super.postProcessParameter(p);
-
-        if (p.isContainer && this.useSetForUniqueItems && p.getUniqueItems()) {
-            // XXX the model set baseType to the container type, why is this different?
-
-            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            p.baseType = JAVA_UTIL_SET;
-            p.dataType = format(JAVA_UTIL_SET_GEN, p.items.dataType);
-            p.datatypeWithEnum = format(JAVA_UTIL_SET_GEN, p.items.datatypeWithEnum);
-            p.defaultValue = JAVA_UTIL_SET_NEW;
-
-        }
-    }
 }
