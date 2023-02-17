@@ -67,6 +67,8 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLang
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
@@ -98,6 +100,8 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     public static final String ADDITIONAL_PROPERTIES = "additional-properties";
     public static final String SERVER_VARIABLES = "server-variables";
     public static final String RESERVED_WORDS_MAPPINGS = "reserved-words-mappings";
+
+    public static final String SCHEMA_MAPPING = "schema-mappings";
 
     /**
      * The build context is only avail when running from within eclipse. It is used to update the
@@ -475,6 +479,12 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     @Parameter(name = "openapiNormalizer", property = "openapi.generator.maven.plugin.openapiNormalizer")
     private List<String> openapiNormalizer;
 
+    /**
+     * A map of scheme and the new one
+     */
+    @Parameter(name = "schemaMappings", property = "openapi.generator.maven.plugin.schemaMappings")
+    private List<String> schemaMappings;
+
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
     }
@@ -775,6 +785,12 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                     applyReservedWordsMappingsKvp(configOptions.get(RESERVED_WORDS_MAPPINGS)
                         .toString(), configurator);
                 }
+
+                // Retained for backwards-compatibility with configOptions -> schema-mappings
+                if (schemaMappings == null && configOptions.containsKey(SCHEMA_MAPPING)) {
+                    applySchemaMappingsKvp(configOptions.get(SCHEMA_MAPPING).toString(),
+                        configurator);
+                }
             }
 
             // Apply Instantiation Types
@@ -818,6 +834,11 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
             if (openapiNormalizer != null && (configOptions == null || !configOptions.containsKey("openapi-normalizer"))) {
                 applyOpenAPINormalizerKvpList(openapiNormalizer, configurator);
+            }
+
+            // Apply Schema Mappings
+            if (schemaMappings != null && (configOptions == null || !configOptions.containsKey(SCHEMA_MAPPING))) {
+                applySchemaMappingsKvpList(schemaMappings, configurator);
             }
 
             if (environmentVariables != null) {

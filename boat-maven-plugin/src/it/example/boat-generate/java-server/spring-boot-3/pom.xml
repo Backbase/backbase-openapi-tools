@@ -10,9 +10,9 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>spring-embedded</artifactId>
+    <artifactId>spring-embedded-sb3</artifactId>
 
-    <name>BOAT :: Generate :: Server Stubs Spring Embedded</name>
+    <name>BOAT :: Generate :: Server Stubs Spring Embedded SB3</name>
 
     <dependencies>
         <dependency>
