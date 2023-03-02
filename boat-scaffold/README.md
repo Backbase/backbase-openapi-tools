@@ -11,8 +11,6 @@ The `boat` plugin has multiple goals:
 | `addServletRequest` | `false` | Adds ServletRequest objects to API method definitions |
 | `useClassLevelBeanValidation` | `false` | Adds @Validated annotation to API interfaces |
 | `useLombokAnnotations` | `false` | Use Lombok annotations to generate properties accessors and `hashCode`/`equals`/`toString` methods |
-| `useSetForUniqueItems` | `false` | Use `java.util.Set` for arrays that has the attribute `uniqueItems` to `true` |
-| `openApiNullable` | `true` | Whether to use the `jackson-databind-nullable` library |
 | `useWithModifiers` | `false` | Generates bean `with` modifiers for fluent style |
 | `useProtectedFields` | `false` | Whether to use protected visibility for model fields |
 
@@ -24,5 +22,4 @@ The `boat` plugin has multiple goals:
 | `restTemplateBeanName` | `none` | The qualifier of the `RestTemplate` used by the `ApiClient` (`resttemplate` only) |
 | `useClassLevelBeanValidation` | `false` | Adds @Validated annotation to API interfaces |
 | `useJacksonConversion` | `false` | Use Jackson to convert query parameters (`resttemplate` only) |
-| `useSetForUniqueItems` | `false` | Use `java.util.Set` for arrays that has the attribute `uniqueItems` to `true` |
 | `useProtectedFields` | `false` | "Whether to use protected visibility for model fields |
