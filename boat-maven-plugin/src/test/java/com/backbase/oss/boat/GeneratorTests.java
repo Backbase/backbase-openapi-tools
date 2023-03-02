@@ -337,4 +337,84 @@ class GeneratorTests {
     }
 
 
+
+
+    @Test
+    void testJavascript() {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
+
+        log.info("Generating client for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-javascript");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName = "boat-javascript";
+        mojo.enablePostProcessFile = true;
+
+        if (Objects.isNull(mojo.additionalProperties)) {
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("apiModulePrefix=PetStore");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
+
+        assertDoesNotThrow(mojo::execute, "javascript client generation should not throw exceptions");
+    }
+
+    @Test
+    void testJavascriptExamplesInComponents() {
+
+        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/pet-store-example-in-components.yaml").getFile());
+
+        log.info("Generating client for: {}", spec);
+
+        GenerateMojo mojo = new GenerateMojo();
+        File input = new File(spec);
+        File output = new File("target/boat-javascript-examples-in-components");
+        if (!output.exists()) {
+            output.mkdirs();
+        }
+
+        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
+        defaultBuildContext.enableLogging(new ConsoleLogger());
+
+        mojo.getLog();
+        mojo.buildContext = defaultBuildContext;
+        mojo.project = new MavenProject();
+        mojo.inputSpec = input.getAbsolutePath();
+        mojo.output = output;
+        mojo.skip = false;
+        mojo.skipIfSpecIsUnchanged = false;
+        mojo.bundleSpecs = true;
+        mojo.dereferenceComponents = true;
+        mojo.generatorName = "boat-javascript";
+        mojo.enablePostProcessFile = true;
+
+        if (Objects.isNull(mojo.additionalProperties)) {
+            mojo.additionalProperties = new LinkedList<>();
+        }
+        mojo.additionalProperties.add("withMocks=true");
+        mojo.additionalProperties.add("npmName=@petstore/http");
+        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
+
+        assertDoesNotThrow(mojo::execute, "javascript client generation should not throw exceptions");
+    }
 }
