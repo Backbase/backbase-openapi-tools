@@ -28,9 +28,24 @@ public class MultipleTagsTests {
 
     }
 
+    @Test
+    public void testCustomSpec() throws OpenAPILoaderException {
+        String spec = System.getProperty("spec");
+        String output = System.getProperty("output", "target/javascript/");
+        if (spec != null) {
+            generate(output, new File(spec));
+        } else {
+            generate(output, getFile("/psd2/psd2-api-1.3.5-20191216v1.yaml"));
+        }
+    }
+
     private void generate(String specName, String output) throws OpenAPILoaderException {
         File spec = getFile(specName);
 
+        generate(output, spec);
+    }
+
+    private static void generate(String output, File spec) throws OpenAPILoaderException {
         OpenAPI openAPI = OpenAPILoader.load(spec);
         BoatJavascriptGenerator generator = new BoatJavascriptGenerator();
         generator.setSkipOverwrite(false);
