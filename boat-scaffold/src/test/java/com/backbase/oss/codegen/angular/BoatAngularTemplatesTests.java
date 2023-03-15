@@ -243,12 +243,12 @@ class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.SPEC_VERSION, this.param.specVersion);
         }
 
-        if (!Objects.isNull(this.param.artifactId)) {
-            cf.addAdditionalProperty(BoatAngularGenerator.ARTIFACT_ID, this.param.artifactId);
+        if (!Objects.isNull(this.param.specArtifactId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_ARTIFACT_ID, this.param.specArtifactId);
         }
 
-        if (!Objects.isNull(this.param.groupId)) {
-            cf.addAdditionalProperty(BoatAngularGenerator.GROUP_ID, this.param.groupId);
+        if (!Objects.isNull(this.param.specGroupId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_GROUP_ID, this.param.specGroupId);
         }
 
         if (!Objects.isNull(this.param.buildDist)) {
