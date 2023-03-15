@@ -62,8 +62,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String NG_VERSION = "ngVersion";
     public static final String FOUNDATION_VERSION = "foundationVersion";
     public static final String SPEC_VERSION = "specVersion";
-    public static final String ARTIFACT_ID = "artifactId";
-    public static final String GROUP_ID = "groupId";
+    public static final String SPEC_ARTIFACT_ID = "specArtifactId";
+    public static final String SPEC_GROUP_ID = "specGroupId";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
@@ -109,8 +109,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
         this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
-        this.cliOptions.add(new CliOption(ARTIFACT_ID, "The maven artifact ID of OpenAPI YAML spec used to generate the NPM package."));
-        this.cliOptions.add(new CliOption(GROUP_ID, "The maven group ID of OpenAPI YAML spec used to generate the NPM package."));
+        this.cliOptions.add(new CliOption(SPEC_ARTIFACT_ID, "The maven artifact ID of OpenAPI YAML spec used to generate the NPM package."));
+        this.cliOptions.add(new CliOption(SPEC_GROUP_ID, "The maven group ID of OpenAPI YAML spec used to generate the NPM package."));
 
     }
 
@@ -206,26 +206,26 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 log.info("  (you can select the spec version by setting the additionalProperty specVersion)");
             });
 
-        processOpt(ARTIFACT_ID,
+        processOpt(SPEC_ARTIFACT_ID,
             value -> {
                 if(StringUtils.isNotEmpty(value)) {
-                    additionalProperties.put(ARTIFACT_ID, value);
+                    additionalProperties.put(SPEC_ARTIFACT_ID, value);
                 }
             },
             () -> {
-                log.info("generating code without OpenAPI YAML ARTIFACT_ID ...");
-                log.info("  (you can select the artifactId by setting the additionalProperty artifactId)");
+                log.info("generating code without OpenAPI YAML SPEC_ARTIFACT_ID ...");
+                log.info("  (you can select the specArtifactId by setting the additionalProperty specArtifactId)");
             });
 
-         processOpt(GROUP_ID,
+         processOpt(SPEC_GROUP_ID,
             value -> {
                 if(StringUtils.isNotEmpty(value)) {
-                    additionalProperties.put(GROUP_ID, value);
+                    additionalProperties.put(SPEC_GROUP_ID, value);
                 }
             },
             () -> {
-                log.info("generating code without OpenAPI YAML GROUP_ID ...");
-                log.info("  (you can select the groupId by setting the additionalProperty groupId)");
+                log.info("generating code without OpenAPI YAML SPEC_GROUP_ID ...");
+                log.info("  (you can select the specGroupId by setting the additionalProperty specGroupId)");
             });    
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
