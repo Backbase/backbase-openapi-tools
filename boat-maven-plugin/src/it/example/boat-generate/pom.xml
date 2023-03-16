@@ -22,7 +22,6 @@
 
     <modules>
         <module>angular</module>
-        <module>javascript</module>
         <module>java-clients</module>
         <module>java-server</module>
     </modules>
