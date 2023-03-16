@@ -21,6 +21,7 @@ BOAT is still under development and subject to change.
 ## 0.17.0
 * General
   * Removed RAML Support
+  * Removed custom JavaScript client
   * Update OpenAPI Tools to 6.2.1
 * Boat Java Generator
   * Jakarta EE 9 compatibility

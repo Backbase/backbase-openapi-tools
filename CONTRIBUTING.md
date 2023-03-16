@@ -2,6 +2,8 @@
 
 Thank you for investing your time in contributing to our project!
 
+To build locally without gpg use `-Dgpg.skip`
+
 ### Pull Request
 
 When you're finished with the changes, create a pull request, also known as a PR.
