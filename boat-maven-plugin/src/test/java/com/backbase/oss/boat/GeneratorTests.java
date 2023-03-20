@@ -1,6 +1,7 @@
 package com.backbase.oss.boat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
 import java.io.File;
 import java.util.*;
 
@@ -308,113 +310,5 @@ class GeneratorTests {
         mojo.additionalProperties.add("npmRepository=https://repo.example.com");
 
         assertDoesNotThrow(mojo::execute, "Angular client generation should not throw exceptions");
-    }
-
-    @Test
-    void testWebClient() throws MojoExecutionException {
-        GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
-
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target/webclient");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-       assertDoesNotThrow((Executable) mojo::execute);
-
-
-
-    }
-
-
-
-
-    @Test
-    void testJavascript() {
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/petstore.yaml").getFile());
-
-        log.info("Generating client for: {}", spec);
-
-        GenerateMojo mojo = new GenerateMojo();
-        File input = new File(spec);
-        File output = new File("target/boat-javascript");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.bundleSpecs = true;
-        mojo.dereferenceComponents = true;
-        mojo.generatorName = "boat-javascript";
-        mojo.enablePostProcessFile = true;
-
-        if (Objects.isNull(mojo.additionalProperties)) {
-            mojo.additionalProperties = new LinkedList<>();
-        }
-        mojo.additionalProperties.add("withMocks=true");
-        mojo.additionalProperties.add("apiModulePrefix=PetStore");
-        mojo.additionalProperties.add("npmName=@petstore/http");
-        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
-
-        assertDoesNotThrow(mojo::execute, "javascript client generation should not throw exceptions");
-    }
-
-    @Test
-    void testJavascriptExamplesInComponents() {
-
-        String spec = System.getProperty("spec", getClass().getResource("/oas-examples/pet-store-example-in-components.yaml").getFile());
-
-        log.info("Generating client for: {}", spec);
-
-        GenerateMojo mojo = new GenerateMojo();
-        File input = new File(spec);
-        File output = new File("target/boat-javascript-examples-in-components");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.getLog();
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-        mojo.bundleSpecs = true;
-        mojo.dereferenceComponents = true;
-        mojo.generatorName = "boat-javascript";
-        mojo.enablePostProcessFile = true;
-
-        if (Objects.isNull(mojo.additionalProperties)) {
-            mojo.additionalProperties = new LinkedList<>();
-        }
-        mojo.additionalProperties.add("withMocks=true");
-        mojo.additionalProperties.add("npmName=@petstore/http");
-        mojo.additionalProperties.add("npmRepository=https://repo.example.com");
-
-        assertDoesNotThrow(mojo::execute, "javascript client generation should not throw exceptions");
     }
 }

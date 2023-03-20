@@ -243,6 +243,14 @@ class BoatAngularTemplatesTests {
             cf.addAdditionalProperty(BoatAngularGenerator.SPEC_VERSION, this.param.specVersion);
         }
 
+        if (!Objects.isNull(this.param.specArtifactId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_ARTIFACT_ID, this.param.specArtifactId);
+        }
+
+        if (!Objects.isNull(this.param.specGroupId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_GROUP_ID, this.param.specGroupId);
+        }
+
         if (!Objects.isNull(this.param.buildDist)) {
             cf.addAdditionalProperty(BoatAngularGenerator.BUILD_DIST, this.param.buildDist);
         }
@@ -277,6 +285,8 @@ class BoatAngularTemplatesTests {
         final String ngVersion;
         final String foundationVersion;
         final String specVersion;
+        final String specArtifactId;
+        final String specGroupId;
         final String buildDist;
         final boolean npmRepository;
         final boolean npmName;
@@ -289,6 +299,8 @@ class BoatAngularTemplatesTests {
             this.ngVersion = ngVersion;
             this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
             this.specVersion = mask == 0 ? "1.0.0" : mask == 1 ? "2.0.0" : null;
+            this.specArtifactId = "specArtifactId";
+            this.specGroupId = "specGroupId";
             this.buildDist = mask > 0 ? caseName(mask) : null;
             this.npmName = (mask & 1) != 0;
             this.npmRepository = (mask & 1 << 1) != 0;
