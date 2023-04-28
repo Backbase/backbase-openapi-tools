@@ -72,7 +72,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
   {{/openApiNullable}}
   {{^openApiNullable}}
-  private {{>nullableDataType}} {{name}} = {{#required}}{{{defaultValue}}}{{/required}}{{^required}}null{{/required}};
+  private {{>nullableDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
   {{/openApiNullable}}
   {{/isContainer}}
   {{^isContainer}}
@@ -108,14 +108,14 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
     {{#openApiNullable}}
     {{^required}}
     if (this.{{name}} == null{{#isNullable}} || !this.{{name}}.isPresent(){{/isNullable}}) {
-      this.{{name}} = {{#isNullable}}JsonNullable.of({{{defaultValue}}}){{/isNullable}}{{^isNullable}}{{{defaultValue}}}{{/isNullable}};
+        this.{{name}} = {{#isNullable}}JsonNullable.of({{/isNullable}}{{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}}{{#isNullable}}){{/isNullable}};
     }
     {{/required}}
     this.{{name}}{{#isNullable}}.get(){{/isNullable}}.add({{name}}Item);
     {{/openApiNullable}}
     {{^openApiNullable}}
     if (this.{{name}} == null) {
-      this.{{name}} = {{{defaultValue}}};
+      this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
     }
     this.{{name}}.add({{name}}Item);
     {{/openApiNullable}}
@@ -129,7 +129,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
   {{^required}}
       if (this.{{name}} == null) {
-        this.{{name}} = JsonNullable.of({{{defaultValue}}});
+        this.{{name}} = JsonNullable.of({{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}});
       }
   {{/required}}
       this.{{name}}.get().put(key, {{name}}Item);
@@ -141,7 +141,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{^required}}
 
       if (this.{{name}} == null) {
-        this.{{name}} = {{{defaultValue}}};
+        this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
       }
   {{/required}}
       this.{{name}}.put(key, {{name}}Item);
@@ -154,7 +154,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{^required}}
 
       if (this.{{name}} == null) {
-      this.{{name}} = {{{defaultValue}}};
+      this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
       }
   {{/required}}
     this.{{name}}.put(key, {{name}}Item);
