@@ -18,7 +18,10 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
-
+## 0.16.12
+* Boat Angular generator
+  * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
+  * Remove licence field from package.json
 ## 0.16.11
 * Boat Angular generator
   * Set `removeComments: false` in generated tsconfig.json files to retain `/*#__PURE__*/` annotation in compiled JS.
