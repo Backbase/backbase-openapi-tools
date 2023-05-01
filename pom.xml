@@ -62,7 +62,7 @@
 
         <lombok.version>1.18.26</lombok.version>
         <jackson.version>2.15.0</jackson.version>
-        <mockito.version>5.2.0</mockito.version>
+        <mockito.version>5.3.1</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.2.9</swagger-core.version>
