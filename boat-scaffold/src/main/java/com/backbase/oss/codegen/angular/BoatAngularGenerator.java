@@ -84,6 +84,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public BoatAngularGenerator() {
         super();
 
+        typeMapping.put("Set", "Array");
+        typeMapping.put("set", "Array");
+
         modifyFeatureSet(features -> features.includeDocumentationFeatures(DocumentationFeature.Readme));
 
         this.outputFolder = "generated-code/boat-angular";
