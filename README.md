@@ -17,6 +17,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.3
+* Boat Angular generator
+  * Map the `Set` type to `Array` by default to avoid breaking changes vs clients generated with 0.16.x. 
 ## 0.17.2
 * Boat Angular generator
   * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
