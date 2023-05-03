@@ -84,6 +84,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public BoatAngularGenerator() {
         super();
 
+        this.openapiNormalizer.put("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "true");
+
         typeMapping.put("Set", "Array");
         typeMapping.put("set", "Array");
 
