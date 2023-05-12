@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
           cache: 'maven'
       - name: Build & Test
         run: mvn -B test
@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
           cache: 'maven'
       - name: Build and Analyze
         env:
@@ -51,7 +51,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
           cache: 'maven'
           server-id: ossrh
           server-username: MAVEN_USERNAME
@@ -106,15 +106,13 @@ jobs:
     needs: [ publish ]
     steps:
 
-      - name: Checkout Main Branch
+      - name: Checkout Branch
         uses: actions/checkout@v3
-        with:
-          ref: main
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
           cache: 'maven'
       - name: Configure Git user
         run: |
@@ -135,8 +133,8 @@ jobs:
         run: |
           git commit -m "[version bump] new dev version" -a
 
-      - name: Push Development Version to Main Branch
+      - name: Push Development Version to Branch
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          branch: ${{github.event.release.target_commitish || 'main'}}
