@@ -36,7 +36,13 @@ BOAT is still under development and subject to change.
   * Jakarta EE 9 compatibility
   * `spring-mvc` library is removed because it is not supported by OpenAPI Tools anymore
   * Use of `Set` for unique items is now enabled by default as OpenAPI Generator fixed their implementation
-
+## 0.16.13
+* Boat Angular generator
+  * `@angular/common` added as a peer dependency in the generated package.json files
+## 0.16.12
+* Boat Angular generator
+  * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
+  * Remove licence field from package.json
 ## 0.16.11
 * Boat Angular generator
   * Set `removeComments: false` in generated tsconfig.json files to retain `/*#__PURE__*/` annotation in compiled JS.
