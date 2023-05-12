@@ -18,6 +18,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.16.13
+* Boat Angular generator
+  * `@angular/common` added as a peer dependency in the generated package.json files
 ## 0.16.12
 * Boat Angular generator
   * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
