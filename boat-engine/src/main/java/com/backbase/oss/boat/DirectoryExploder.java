@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -70,7 +71,7 @@ public class DirectoryExploder {
                 if (Files.notExists(exampleFile)) {
                     Files.createFile(exampleFile);
                 }
-                Files.write(exampleFile, serializedValue.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+                Files.write(exampleFile, serializedValue.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
                 namedExample.getExample().setValue(null);
                 String ref = EXAMPLES_DIR + File.separator + filename;
                 namedExample.getExample().set$ref(ref);

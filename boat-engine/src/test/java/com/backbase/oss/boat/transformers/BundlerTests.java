@@ -19,6 +19,7 @@ import io.swagger.v3.parser.models.RefFormat;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -225,7 +226,7 @@ class BundlerTests {
 
         File output = new File("/Users/jasper/git/tp/backbase-openapi-tools/boat-engine/target/out.yaml");
         output.delete();
-        Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
+        Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
     }
 
 

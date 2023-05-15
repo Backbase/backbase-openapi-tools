@@ -7,6 +7,7 @@ import com.backbase.oss.boat.transformers.Deprecator;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class RemoveDeprecatedMojo extends AbstractMojo {
         try {
             openAPI = OpenAPILoader.load(input);
             new Deprecator().transform(openAPI, null);
-            Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
+            Files.write(output.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
         } catch (OpenAPILoaderException | IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: {}" + input, e);
         }

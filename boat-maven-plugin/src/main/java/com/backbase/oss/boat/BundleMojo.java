@@ -15,6 +15,7 @@ import com.backbase.oss.boat.transformers.ExtensionFilter;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -131,7 +132,7 @@ public class BundleMojo extends AbstractMojo {
                 outputFile = Paths.get(versionedFileName).toFile();
 
             }
-            Files.write(outputFile.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(), StandardOpenOption.CREATE);
+            Files.write(outputFile.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
             log.info("Bundled: {} into: {}", inputFile, outputFile);
         } catch (OpenAPILoaderException | IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: {}" + inputFile, e);
