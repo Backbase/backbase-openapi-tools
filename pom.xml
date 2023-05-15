@@ -199,7 +199,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-models</artifactId>
-                <version>1.6.10</version>
+                <version>1.6.11</version>
             </dependency>
 
             <dependency>
