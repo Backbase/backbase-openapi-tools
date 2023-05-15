@@ -881,13 +881,13 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             if (unAlias) {
                 new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
             if (dereferenceComponents) {
                 new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
 
@@ -895,7 +895,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
 
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes());
+                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
 
