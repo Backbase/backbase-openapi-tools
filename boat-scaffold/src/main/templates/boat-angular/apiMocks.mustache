@@ -1,22 +1,17 @@
-import { createMocks } from '@backbase/foundation-ang/data-http';
-import { Provider } from '@angular/core';
-
-{{#operations}}
+module.exports = [{{#operations}}
     {{#operation}}
-/**
-* Mocks provider for {{{basePathWithoutHost}}}{{pattern}} URL pattern
-*/
-export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}MocksProvider = /*#__PURE__*/ createMocks([{
+        {
         urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
         method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
         responses: [
         {{#responses}}
+
             {{#examples}}
                 {{#isJson}}
-                {
+                    {
                     status: {{{code}}},
                     body: {{{prettyPrintValue}}}
-                },
+                    },
                 {{/isJson}}
                 {{^isJson}}
                     {
@@ -32,45 +27,7 @@ export const {{classname}}{{#lambda.titlecase}}{{nickname}}{{/lambda.titlecase}}
                 },
             {{/hasEmptyBody}}
         {{/responses}}
-    ]
-}]);
-    {{/operation}}
-{{/operations}}
-
-export const {{classname}}MocksProvider = /*#__PURE__*/ createMocks(
-    [{{#operations}}
-    {{#operation}}
-    {
-        urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
-        method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
-        responses: [
-        {{#responses}}
-
-        {{#examples}}
-            {{#isJson}}
-            {
-                status: {{{code}}},
-                body: {{{prettyPrintValue}}}
-            },
-            {{/isJson}}
-            {{^isJson}}
-                {
-                status: {{{code}}},
-                body: "{{#escapeJavascript}}{{{prettyPrintValue}}}{{/escapeJavascript}}"
-                },
-            {{/isJson}}
-        {{/examples}}
-        {{#hasEmptyBody}}
-        {
-          status: {{{code}}},
-          body: ""
+        ]
         },
-        {{/hasEmptyBody}}
-    {{/responses}}
-    ]
-},
     {{/operation}}
 {{/operations}}]
-);
-
-
