@@ -2,10 +2,6 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { {{configurationClassName}}{{#withMocks}}, CONFIG_TOKEN{{/withMocks}} } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
-{{#withMocks}}
-import { DataModulesManager } from "@backbase/foundation-ang/data-http";
-{{/withMocks}}
-
 @NgModule({
   imports:      [],
   declarations: [],
