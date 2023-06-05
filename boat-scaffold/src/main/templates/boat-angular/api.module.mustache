@@ -19,7 +19,6 @@ export class {{apiModuleClassName}} {
     constructor( @Optional() @SkipSelf() parentModule: {{apiModuleClassName}},
                  @Optional() http: HttpClient,
                  {{#withMocks}}
-                 @Optional() dataModulesManager: DataModulesManager | null,
                  config: {{configurationClassName}},
                  {{/withMocks}}
 
