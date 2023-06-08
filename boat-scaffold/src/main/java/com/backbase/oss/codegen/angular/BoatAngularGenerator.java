@@ -223,7 +223,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
-                apiTemplateFiles.put("apiMocks.mustache", ".mocks.js");
+                apiTemplateFiles.put("apiMocks.mustache", ".mocks.array.js");
             }
         });
 
