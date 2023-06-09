@@ -1,0 +1,32 @@
+module.exports = [{{#operations}}
+    {{#operation}}
+{
+  urlPattern: "{{{basePathWithoutHost}}}{{pattern}}",
+  method: "{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}",
+  responses: [
+  {{#responses}}
+    {{#examples}}
+    {{#isJson}}
+    {
+      status: {{{code}}},
+      body: {{{prettyPrintValue}}}
+    },
+    {{/isJson}}
+    {{^isJson}}
+    {
+      status: {{{code}}},
+      body: "{{#escapeJavascript}}{{{prettyPrintValue}}}{{/escapeJavascript}}"
+    },
+    {{/isJson}}
+    {{/examples}}
+    {{#hasEmptyBody}}
+    {
+      status: {{{code}}},
+      body: ""
+    },
+    {{/hasEmptyBody}}
+  {{/responses}}
+  ]
+},
+{{/operation}}
+{{/operations}}]

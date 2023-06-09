@@ -4,8 +4,23 @@
   "description": "OpenAPI client for {{{npmName}}}",
   "backbase": {
     {{#specVersion}}
-    "specVersion": "{{{specVersion}}}"
+    "specVersion": "{{{specVersion}}}",
     {{/specVersion}}
+    {{#specArtifactId}}
+    "specArtifactId": "{{{specArtifactId}}}",
+    {{/specArtifactId}}
+    {{#specGroupId}}
+    "specGroupId": "{{{specGroupId}}}",
+    {{/specGroupId}}
+    {{#inputSpecRelative}}
+    "inputSpecRelative": "{{{inputSpecRelative}}}",
+    {{/inputSpecRelative}}
+    {{#specClassifier}}
+    "specClassifier": "{{{specClassifier}}}",
+    {{/specClassifier}}
+    {{#specType}}
+    "specType": "{{{specType}}}"
+    {{/specType}}
   },
   "keywords": [
     "backbase",

@@ -75,6 +75,8 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     protected String serviceFileSuffix = ".service";
     protected String modelFileSuffix = "";
 
+    private static final String MOCKS_ARRAY_TEMPLATE_NAME = "apiMocks.array.mustache";
+
     public BoatAngularGenerator() {
         super();
 
@@ -105,6 +107,16 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
     }
 
+    @Override
+    public String apiFilename(String templateName, String tag) {
+        String suffix = apiTemplateFiles().get(templateName);
+        String folder = templateName.equals(MOCKS_ARRAY_TEMPLATE_NAME) ? mocksArrayFolder() : apiFileFolder();
+        return folder + File.separator + toApiFilename(tag) + suffix;
+    }
+
+    protected String mocksArrayFolder() {
+        return outputFolder + File.separator + "mocks";
+    }
 
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
@@ -200,6 +212,7 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
                 apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
+                apiTemplateFiles.put(MOCKS_ARRAY_TEMPLATE_NAME, ".mocks.array.js");
             }
         });
 
