@@ -121,6 +121,24 @@ public abstract class ExampleHolder<T> {
         }
     }
 
+    private static class StringExampleHolder extends ExampleHolder<String> {
+
+        private StringExampleHolder(String name, String value) {
+            super(name, value);
+            setContent(value);
+        }
+
+        @Override
+        String getRef() {
+            return null;
+        }
+
+        @Override
+        void replaceRef(String ref) {
+            // do nothing
+        }
+    }
+
     private final String name;
 
     private T example;
@@ -163,8 +181,11 @@ public abstract class ExampleHolder<T> {
             }
         } else if( o instanceof ArrayNode) {
             return new ArrayNodeExampleHolder(name, (ArrayNode) o);
+        } else if (o instanceof String) {
+            return new StringExampleHolder(name, o.toString());
         } else {
-            throw new TransformerException("Unknown type backing example " + o.getClass().getName());
+            throw new TransformerException(String.format(
+                    "Unknown type backing example %s (%s) '%s'", name, o.getClass().getName(), o));
         }
     }
 
