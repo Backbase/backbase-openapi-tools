@@ -121,7 +121,7 @@ class BoatAngularTemplatesTests {
     @Check
     public void withMocks() {
         assertThat(
-                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider = /\\*#__PURE__\\*/ createMocks"),
+                findPattern(selectFiles("/mocks/.+\\.service\\.mocks\\.array\\.js$"), "module.exports"),
                 equalTo(this.param.withMocks));
     }
 
@@ -235,9 +235,6 @@ class BoatAngularTemplatesTests {
         if (!Objects.isNull(this.param.ngVersion)) {
             cf.addAdditionalProperty(BoatAngularGenerator.NG_VERSION, this.param.ngVersion);
         }
-        if (!Objects.isNull(this.param.foundationVersion)) {
-            cf.addAdditionalProperty(BoatAngularGenerator.FOUNDATION_VERSION, this.param.foundationVersion);
-        }
 
         if (!Objects.isNull(this.param.specVersion)) {
             cf.addAdditionalProperty(BoatAngularGenerator.SPEC_VERSION, this.param.specVersion);
@@ -283,7 +280,6 @@ class BoatAngularTemplatesTests {
 
         final String name;
         final String ngVersion;
-        final String foundationVersion;
         final String specVersion;
         final String specArtifactId;
         final String specGroupId;
@@ -297,7 +293,6 @@ class BoatAngularTemplatesTests {
         Combination(int mask, String ngVersion) {
             this.name = caseName(mask) + "-ng-" + ngVersion;
             this.ngVersion = ngVersion;
-            this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
             this.specVersion = mask == 0 ? "1.0.0" : mask == 1 ? "2.0.0" : null;
             this.specArtifactId = "specArtifactId";
             this.specGroupId = "specGroupId";

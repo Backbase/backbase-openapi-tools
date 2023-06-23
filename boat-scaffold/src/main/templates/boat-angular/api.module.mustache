@@ -1,10 +1,6 @@
 import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core';
-import { {{configurationClassName}}{{#withMocks}}, CONFIG_TOKEN{{/withMocks}} } from './configuration';
+import { {{configurationClassName}} } from './configuration';
 import { HttpClient } from '@angular/common/http';
-
-{{#withMocks}}
-import { DataModulesManager } from "@backbase/foundation-ang/data-http";
-{{/withMocks}}
 
 @NgModule({
   imports:      [],
@@ -22,11 +18,6 @@ export class {{apiModuleClassName}} {
 
     constructor( @Optional() @SkipSelf() parentModule: {{apiModuleClassName}},
                  @Optional() http: HttpClient,
-                 {{#withMocks}}
-                 @Optional() dataModulesManager: DataModulesManager | null,
-                 config: {{configurationClassName}},
-                 {{/withMocks}}
-
         ) {
         if (parentModule) {
             throw new Error('{{apiModuleClassName}} is already loaded. Import in your base AppModule only.');
@@ -35,15 +26,5 @@ export class {{apiModuleClassName}} {
             throw new Error('You need to import the HttpClientModule in your AppModule! \n' +
             'See also https://github.com/angular/angular/issues/20575');
         }
-
-        {{#withMocks}}
-        if (dataModulesManager) {
-            dataModulesManager.setModuleConfig(CONFIG_TOKEN, {
-                apiRoot: '',
-                servicePath: config.basePath || '',
-                headers: {},
-            });
-        }
-        {{/withMocks}}
     }
 }

@@ -60,7 +60,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String WITH_MOCKS = "withMocks";
 
     public static final String NG_VERSION = "ngVersion";
-    public static final String FOUNDATION_VERSION = "foundationVersion";
     public static final String SPEC_VERSION = "specVersion";
     public static final String SPEC_ARTIFACT_ID = "specArtifactId";
     public static final String SPEC_GROUP_ID = "specGroupId";
@@ -75,11 +74,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String PATH_NAME_KEY = "pathName";
     public static final String HAS_EXAMPLES = "hasExamples";
     public static final String PATTERN = "pattern";
-    protected String foundationVersion = "6.6.7";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
     protected String modelFileSuffix = "";
+
+    private static final String MOCKS_ARRAY_TEMPLATE_NAME = "apiMocks.array.mustache";
 
     public BoatAngularGenerator() {
         super();
@@ -109,7 +109,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             "Setting this property to true will generate mocks out of the examples.",
             false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
-        this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
@@ -119,6 +118,16 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
 
     }
 
+    @Override
+    public String apiFilename(String templateName, String tag) {
+        String suffix = apiTemplateFiles().get(templateName);
+        String folder = templateName.equals(MOCKS_ARRAY_TEMPLATE_NAME) ? mocksArrayFolder() : apiFileFolder();
+        return folder + File.separator + toApiFilename(tag) + suffix;
+    }
+
+    protected String mocksArrayFolder() {
+        return outputFolder + File.separator + "mocks";
+    }
 
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
@@ -191,15 +200,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             () -> applyAngularVersion(this.ngVersion)
         );
 
-        processOpt(FOUNDATION_VERSION,
-            value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
-            () -> {
-                SemVer version = new SemVer(this.foundationVersion);
-                additionalProperties.put(FOUNDATION_VERSION, version);
-                log.info("generating code with foundation-ang {} ...", version);
-                log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
-            });
-
         processOpt(SPEC_VERSION,
             value -> {
                 if(StringUtils.isNotEmpty(value)) {
@@ -231,11 +231,11 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             () -> {
                 log.info("generating code without OpenAPI YAML SPEC_GROUP_ID ...");
                 log.info("  (you can select the specGroupId by setting the additionalProperty specGroupId)");
-            });    
+            });
 
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
-                apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
+                apiTemplateFiles.put(MOCKS_ARRAY_TEMPLATE_NAME, ".mocks.array.js");
             }
         });
 
