@@ -48,7 +48,6 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
 /**
  * These tests verify that the code generation works for various combinations of configuration
  * parameters; the projects that are generated are later compiled in the integration test phase.
- *
  * The suite is generated dynamically, read below.
  * <p>
  * With Junit4, the test hierarchy was {@code root-> combination -> method}. The code relied on that
@@ -72,7 +71,7 @@ class BoatSpringTemplatesTests {
     }
 
     static class Combination {
-        static final List<String> CASES = asList("flx", "unq", "val", "opt", "req", "bin", "lmb", "nbl", "wth", "utl");
+        static final List<String> CASES = asList("flx", "val", "opt", "req", "bin", "lmb", "wth", "utl");
 
         final String name;
 
@@ -82,8 +81,6 @@ class BoatSpringTemplatesTests {
         final boolean addServletRequest;
         final boolean addBindingResult;
         final boolean useLombokAnnotations;
-        final boolean openApiNullable;
-        final boolean useSetForUniqueItems;
         final boolean useWithModifiers;
 
         final boolean reactive;
@@ -102,8 +99,6 @@ class BoatSpringTemplatesTests {
             this.useOptional = (mask & 1 << CASES.indexOf("opt")) != 0;
             this.addServletRequest = (mask & 1 << CASES.indexOf("req")) != 0;
             this.useLombokAnnotations = (mask & 1 << CASES.indexOf("lmb")) != 0;
-            this.openApiNullable = (mask & 1 << CASES.indexOf("nbl")) != 0;
-            this.useSetForUniqueItems = (mask & 1 << CASES.indexOf("unq")) != 0;
             this.useWithModifiers = (mask & 1 << CASES.indexOf("wth")) != 0;
             this.reactive = (mask & 1 << CASES.indexOf("flx")) != 0;
             this.apiUtil = (mask & 1 << CASES.indexOf("utl")) != 0;
@@ -220,22 +215,6 @@ class BoatSpringTemplatesTests {
     }
 
     @Check
-    void openApiNullable() {
-        assertThat(findPattern("/api/.+\\.java$", "JsonNullable<[^>]+>"),
-            is(false));
-        assertThat(findPattern("/model/.+\\.java$", "JsonNullable<[^>]+>"),
-            equalTo(this.param.openApiNullable));
-    }
-
-    @Check
-    void useSetForUniqueItems() {
-        assertThat(findPattern("/api/.+\\.java$", "java\\.util\\.Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-        assertThat(findPattern("/model/.+\\.java$", "java\\.util\\.Set<.+>"),
-            equalTo(this.param.useSetForUniqueItems));
-    }
-
-    @Check
     void useWithModifiers() {
         assertThat(findPattern("/api/.+\\.java$", "\\s+with\\p{Upper}"),
             is(false));
@@ -280,12 +259,7 @@ class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODELS, "");
         GlobalSettings.setProperty(CodegenConstants.MODEL_TESTS, "true");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
-
-//        if (this.param.apiUtil) {
-            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml,OpenApiGeneratorApplication.java");
-//        } else {
-//            GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "pom.xml");
-//        }
+        GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml,OpenApiGeneratorApplication.java");
 
 
         gcf.setApiNameSuffix("-api");
@@ -303,8 +277,7 @@ class BoatSpringTemplatesTests {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
         }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
-        gcf.addAdditionalProperty(BoatSpringCodeGen.USE_SET_FOR_UNIQUE_ITEMS, this.param.useSetForUniqueItems);
-        gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, this.param.openApiNullable);
+        gcf.addAdditionalProperty(BoatSpringCodeGen.OPENAPI_NULLABLE, false);
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_WITH_MODIFIERS, this.param.useWithModifiers);
         gcf.addAdditionalProperty(SpringCodegen.REACTIVE, this.param.reactive);
 

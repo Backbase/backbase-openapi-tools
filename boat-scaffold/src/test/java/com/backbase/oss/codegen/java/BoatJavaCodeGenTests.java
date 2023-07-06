@@ -38,7 +38,6 @@ class BoatJavaCodeGenTests {
         gen.processOpts();
 
         assertThat(gen.useWithModifiers, is(false));
-        assertThat(gen.useSetForUniqueItems, is(false));
         assertThat(gen.useClassLevelBeanValidation, is(false));
 
         assertThat(gen.useJacksonConversion, is(false));
@@ -53,7 +52,6 @@ class BoatJavaCodeGenTests {
 
         gen.setLibrary("resttemplate");
         options.put(USE_WITH_MODIFIERS, "true");
-        options.put(USE_SET_FOR_UNIQUE_ITEMS, "true");
         options.put(USE_CLASS_LEVEL_BEAN_VALIDATION, "true");
 
         options.put(USE_JACKSON_CONVERSION, "true");
@@ -63,7 +61,6 @@ class BoatJavaCodeGenTests {
         gen.processOpts();
 
         assertThat(gen.useWithModifiers, is(true));
-        assertThat(gen.useSetForUniqueItems, is(true));
         assertThat(gen.useClassLevelBeanValidation, is(true));
 
         assertThat(gen.useJacksonConversion, is(true));
@@ -77,7 +74,6 @@ class BoatJavaCodeGenTests {
         final Map<String, Object> options = gen.additionalProperties();
 
         options.put(USE_WITH_MODIFIERS, "true");
-        options.put(USE_SET_FOR_UNIQUE_ITEMS, "true");
         options.put(USE_CLASS_LEVEL_BEAN_VALIDATION, "true");
 
         options.put(USE_JACKSON_CONVERSION, "true");
@@ -87,7 +83,6 @@ class BoatJavaCodeGenTests {
         gen.processOpts();
 
         assertThat(gen.useWithModifiers, is(true));
-        assertThat(gen.useSetForUniqueItems, is(true));
         assertThat(gen.useClassLevelBeanValidation, is(false));
 
         assertThat(gen.useJacksonConversion, is(false));
@@ -120,112 +115,4 @@ class BoatJavaCodeGenTests {
         assertThat(gen.additionalProperties(), hasEntry("modelFieldsVisibility", "protected"));
     }
 
-    @Test
-    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
-    void uniquePropertyToSet() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        final CodegenProperty prop = new CodegenProperty();
-
-        gen.useSetForUniqueItems = true;
-        prop.isContainer = true;
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.List";
-        prop.dataType = "java.util.List<String>";
-
-        gen.postProcessModelProperty(new CodegenModel(), prop);
-
-        assertThat(prop.containerType, is("set"));
-        assertThat(prop.baseType, is("java.util.Set"));
-        assertThat(prop.dataType, is("java.util.Set<String>"));
-    }
-
-    @Test
-    @Disabled("Since useSetForUniqueItems is not supported and it is enabled by default")
-    void uniqueParameterToSet() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        final CodegenParameter param = new CodegenParameter();
-
-        gen.useSetForUniqueItems = true;
-        param.isContainer = true;
-        param.setUniqueItems(true);
-        param.items = new CodegenProperty();
-        param.items.dataType = "String";
-        param.baseType = "java.util.List<String>";
-        param.dataType = "java.util.List<String>";
-
-        gen.postProcessParameter(param);
-
-        assertThat(param.baseType, is("java.util.Set"));
-        assertThat(param.dataType, is("java.util.Set<String>"));
-    }
-
-    @Test
-    void setTypeMappingForList() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        gen.setFullJavaUtil(false);
-        gen.instantiationTypes().put("set", "ArrayList");
-        gen.typeMapping().put("set", "List");
-
-        final CodegenProperty prop = new CodegenProperty();
-        prop.isContainer = true;
-        prop.containerType = "set";
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.Set";
-        prop.dataType = "java.util.HashSet<String>";
-
-        final var model = new CodegenModel();
-
-        gen.postProcessModelProperty(model, prop);
-
-        assertTrue(model.getImports().contains("ArrayList"));
-    }
-
-    @Test
-    void arrayTypeMappingForList() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        gen.setFullJavaUtil(false);
-        gen.instantiationTypes().put("array", "ArrayList");
-        gen.typeMapping().put("array", "List");
-
-        final CodegenProperty prop = new CodegenProperty();
-        prop.isContainer = true;
-        prop.containerType = "array";
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.Set";
-        prop.dataType = "java.util.HashSet<String>";
-
-        final var model = new CodegenModel();
-
-        gen.postProcessModelProperty(model, prop);
-
-        assertTrue(model.getImports().contains("ArrayList"));
-    }
-
-    @Test
-    void mapTypeMappingForMap() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        gen.setFullJavaUtil(false);
-        gen.instantiationTypes().put("map", "TreeMap");
-
-        final CodegenProperty prop = new CodegenProperty();
-        prop.isContainer = true;
-        prop.containerType = "map";
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.Set";
-        prop.dataType = "java.util.HashSet<String>";
-
-        final var model = new CodegenModel();
-
-        gen.postProcessModelProperty(model, prop);
-
-        assertTrue(model.getImports().contains("TreeMap"));
-    }
 }

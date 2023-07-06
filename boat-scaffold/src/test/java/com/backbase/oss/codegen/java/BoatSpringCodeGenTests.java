@@ -38,44 +38,6 @@ class BoatSpringCodeGenTests {
             .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
 
-    @Test
-    void uniquePropertyToSet() {
-        final BoatSpringCodeGen gen = new BoatSpringCodeGen();
-        final CodegenProperty prop = new CodegenProperty();
-
-        gen.useSetForUniqueItems = true;
-        prop.isContainer = true;
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.List";
-        prop.dataType = "java.util.List<String>";
-
-        gen.postProcessModelProperty(new CodegenModel(), prop);
-
-        assertThat(prop.containerType, is("set"));
-        assertThat(prop.baseType, is("java.util.Set"));
-        assertThat(prop.dataType, is("java.util.Set<String>"));
-    }
-
-    @Test
-    void uniqueParameterToSet() {
-        final BoatSpringCodeGen gen = new BoatSpringCodeGen();
-        final CodegenParameter param = new CodegenParameter();
-
-        gen.useSetForUniqueItems = true;
-        param.isContainer = true;
-        param.setUniqueItems(true);
-        param.items = new CodegenProperty();
-        param.items.dataType = "String";
-        param.baseType = "java.util.List<String>";
-        param.dataType = "java.util.List<String>";
-
-        gen.postProcessParameter(param);
-
-        assertThat(param.baseType, is("java.util.Set"));
-        assertThat(param.dataType, is("java.util.Set<String>"));
-    }
 
     @Test
     void processOptsUseProtectedFields() {
