@@ -12,7 +12,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -261,18 +260,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public String toDefaultValue(CodegenProperty cp, Schema schema) {
         schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
         if (ModelUtils.isArraySchema(schema) && (schema.getDefault() == null)) {
-                if (cp.isNullable || containerDefaultToNull) {
-                    return null;
-                } else {
-                    if (ModelUtils.isSet(schema)) {
-                        return String.format(Locale.ROOT, "new %s<>()",
-                            instantiationTypes().getOrDefault("set", "LinkedHashSet"));
-                    } else {
-                        return String.format(Locale.ROOT, "new %s<>()",
-                            instantiationTypes().getOrDefault("array", "ArrayList"));
-                    }
-                }
-
+            return BoatJavaCodeGen.getArrayDefaultValue(cp, schema, containerDefaultToNull,
+                instantiationTypes().getOrDefault("set", "LinkedHashSet"),
+                instantiationTypes().getOrDefault("array", "ArrayList"));
         }
         return super.toDefaultValue(cp, schema);
     }

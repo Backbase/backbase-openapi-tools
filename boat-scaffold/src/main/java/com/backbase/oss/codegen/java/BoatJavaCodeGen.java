@@ -122,20 +122,25 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public String toDefaultValue(CodegenProperty cp, Schema schema) {
         schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
         if (ModelUtils.isArraySchema(schema) && (schema.getDefault() == null)) {
-                if (cp.isNullable || containerDefaultToNull) {
-                    return null;
-                } else {
-                    if (ModelUtils.isSet(schema)) {
-                        return String.format(Locale.ROOT, "new %s<>()",
-                            instantiationTypes().getOrDefault("set", "LinkedHashSet"));
-                    } else {
-                        return String.format(Locale.ROOT, "new %s<>()",
-                            instantiationTypes().getOrDefault("array", "ArrayList"));
-                    }
-                }
-
+            return getArrayDefaultValue(cp, schema, containerDefaultToNull,
+                instantiationTypes().getOrDefault("set", "LinkedHashSet"),
+                instantiationTypes().getOrDefault("array", "ArrayList"));
         }
         return super.toDefaultValue(cp, schema);
     }
 
+    public static String getArrayDefaultValue(CodegenProperty cp, Schema schema,
+        boolean containerDefaultToNull, String setType, String arrayType) {
+        if (cp.isNullable || containerDefaultToNull) {
+            return null;
+        } else {
+            if (ModelUtils.isSet(schema)) {
+                return String.format(Locale.ROOT, "new %s<>()",
+                    setType);
+            } else {
+                return String.format(Locale.ROOT, "new %s<>()",
+                    arrayType);
+            }
+        }
+    }
 }
