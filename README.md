@@ -17,6 +17,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.5
+* Boat engine
+  * Fix: Processing of a single string type example on media-type.
 ## 0.17.4
 * Boat Angular generator
   * New format for Angular mocks, which are now export an array with responses.
