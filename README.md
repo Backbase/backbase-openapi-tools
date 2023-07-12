@@ -42,6 +42,11 @@ BOAT is still under development and subject to change.
   * Jakarta EE 9 compatibility
   * `spring-mvc` library is removed because it is not supported by OpenAPI Tools anymore
   * Use of `Set` for unique items is now enabled by default as OpenAPI Generator fixed their implementation
+## 0.16.15
+* Boat engine
+  * Fix: Processing of a single string type example on media-type.
+* Boat Angular generator
+  * New format for Angular mocks, which are now export an array with responses.
 ## 0.16.13
 * Boat Angular generator
   * `@angular/common` added as a peer dependency in the generated package.json files
