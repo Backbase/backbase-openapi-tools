@@ -1,34 +1,28 @@
 package com.backbase.oss.codegen.java;
 
+import io.swagger.v3.oas.models.media.Schema;
+import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
+import org.openapitools.codegen.utils.ModelUtils;
 
 public class BoatJavaCodeGen extends JavaClientCodegen {
 
     public static final String NAME = "boat-java";
 
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String USE_SET_FOR_UNIQUE_ITEMS = "useSetForUniqueItems";
-
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String USE_JACKSON_CONVERSION = "useJacksonConversion";
-
     public static final String USE_DEFAULT_API_CLIENT = "useDefaultApiClient";
     public static final String REST_TEMPLATE_BEAN_NAME = "restTemplateBeanName";
     public static final String CREATE_API_COMPONENT = "createApiComponent";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
-    private static final String JAVA_UTIL_SET = "java.util.Set";
-
     @Setter
     @Getter
     protected boolean useWithModifiers;
-    @Setter
-    @Getter
-    protected boolean useSetForUniqueItems;
     @Setter
     @Getter
     protected boolean useClassLevelBeanValidation;
@@ -76,26 +70,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
-        if (WEBCLIENT.equals(getLibrary())) {
-            this.useSetForUniqueItems = false;
-        }
-
         if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
             this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
         }
         writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-
-        if (this.additionalProperties.containsKey(USE_SET_FOR_UNIQUE_ITEMS)) {
-            this.useSetForUniqueItems = convertPropertyToBoolean(USE_SET_FOR_UNIQUE_ITEMS);
-        }
-        writePropertyBack(USE_SET_FOR_UNIQUE_ITEMS, this.useSetForUniqueItems);
-
-        if (this.useSetForUniqueItems) {
-            this.typeMapping.put("set", JAVA_UTIL_SET);
-
-            this.importMapping.put("Set", JAVA_UTIL_SET);
-            this.importMapping.put("LinkedHashSet", "java.util.LinkedHashSet");
-        }
 
         if (RESTTEMPLATE.equals(getLibrary())) {
             processRestTemplateOpts();
@@ -141,24 +119,28 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     }
 
     @Override
-    public void postProcessModelProperty(CodegenModel model, CodegenProperty p) {
-        super.postProcessModelProperty(model, p);
-
-        if (!fullJavaUtil) {
-            if ("array".equals(p.containerType)) {
-                model.imports.add(instantiationTypes.get("array"));
-            } else if ("set".equals(p.containerType)) {
-                model.imports.add(instantiationTypes.get("set"));
-                boolean canNotBeWrappedToNullable = !openApiNullable || !p.isNullable;
-                if (canNotBeWrappedToNullable) {
-                    model.imports.add("JsonDeserialize");
-                    p.vendorExtensions.put("x-setter-extra-annotation", "@JsonDeserialize(as = " + instantiationTypes.get("set") + ".class)");
-                }
-            } else if ("map".equals(p.containerType)) {
-                model.imports.add(instantiationTypes.get("map"));
-            }
+    public String toDefaultValue(CodegenProperty cp, Schema schema) {
+        schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
+        if (ModelUtils.isArraySchema(schema) && (schema.getDefault() == null)) {
+            return getArrayDefaultValue(cp, schema, containerDefaultToNull,
+                instantiationTypes().getOrDefault("set", "LinkedHashSet"),
+                instantiationTypes().getOrDefault("array", "ArrayList"));
         }
-
+        return super.toDefaultValue(cp, schema);
     }
 
+    public static String getArrayDefaultValue(CodegenProperty cp, Schema schema,
+        boolean containerDefaultToNull, String setType, String arrayType) {
+        if (cp.isNullable || containerDefaultToNull) {
+            return null;
+        } else {
+            if (ModelUtils.isSet(schema)) {
+                return String.format(Locale.ROOT, "new %s<>()",
+                    setType);
+            } else {
+                return String.format(Locale.ROOT, "new %s<>()",
+                    arrayType);
+            }
+        }
+    }
 }
