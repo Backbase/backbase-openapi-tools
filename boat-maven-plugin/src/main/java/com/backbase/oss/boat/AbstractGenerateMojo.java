@@ -23,6 +23,7 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("useOptional", "false");
         options.put("useJakartaEe", "true");
         options.put("useSpringBoot3", "true");
+        options.put("containerDefaultToNull", "true");
 
         this.generatorName = generatorName;
         this.generateSupportingFiles = generateSupportingFiles;
