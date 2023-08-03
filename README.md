@@ -17,6 +17,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.7
+* Boat maven plugin
+  * Fix: Added 'containerDefaultToNull' default option to the MOJO generator
 ## 0.17.6
 * Boat engine
   * Fix: Processing of a single string type example on media-type.
