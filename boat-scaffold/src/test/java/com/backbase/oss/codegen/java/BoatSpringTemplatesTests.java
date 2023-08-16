@@ -75,6 +75,9 @@ import org.openapitools.codegen.languages.features.OptionalFeatures;
  */
 @Slf4j
 class BoatSpringTemplatesTests {
+    private static final File GH_ACTIONS_M2_SETTINGS_FILE = new File("/home/runner/.m2/settings.xml");
+    private static final File GH_ACTIONS_M2_REPOSITORY_DIR = new File("/home/runner/.m2/repository");
+    private static File M2_REPOSITORY_DIR_IN_USE;
     static final String PROP_BASE = BoatSpringTemplatesTests.class.getSimpleName() + ".";
     static final boolean PROP_FAST = Boolean.parseBoolean(System.getProperty(PROP_BASE + "fast", "true"));
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-templates-tests");
@@ -83,6 +86,20 @@ class BoatSpringTemplatesTests {
     static public void setUpClass() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT));
         FileUtils.deleteDirectory(new File(TEST_OUTPUT, "src"));
+
+        File userHome = new File(System.getProperty("user.home"));
+        File userDefaultRepoLocation = new File(userHome, ".m2" + File.separatorChar + "repository");
+        if (GH_ACTIONS_M2_REPOSITORY_DIR.exists()) {
+            M2_REPOSITORY_DIR_IN_USE = GH_ACTIONS_M2_REPOSITORY_DIR;
+        } else if (userDefaultRepoLocation.exists()) {
+            M2_REPOSITORY_DIR_IN_USE = userDefaultRepoLocation;
+        } else {
+            File tempRepo = Files.createTempDirectory(
+                BoatSpringTemplatesTests.class.getSimpleName() + "_mvn_repo").toFile();
+            log.warn("m2 repo not found in paths: {}, {}. Using temp repo in {} which may slow down test execution",
+                GH_ACTIONS_M2_REPOSITORY_DIR, userDefaultRepoLocation, tempRepo);
+            M2_REPOSITORY_DIR_IN_USE = tempRepo;
+        }
     }
 
     static class Combination {
@@ -264,17 +281,12 @@ class BoatSpringTemplatesTests {
     }
 
     private static String[] generateMavenCliArgs() {
-        File ghActionsSettingsFile = new File("/home/runner/.m2/settings.xml");
-        File ghActionsRepoDir = new File("/home/runner/.m2/repository");
         List<String> args = new ArrayList<>();
-        if (ghActionsSettingsFile.exists()) {
+        if (GH_ACTIONS_M2_SETTINGS_FILE.exists()) {
             args.add("--settings");
-            args.add(ghActionsSettingsFile.getAbsolutePath());
+            args.add(GH_ACTIONS_M2_SETTINGS_FILE.getAbsolutePath());
         }
-        if (ghActionsRepoDir.exists()) {
-            args.add("-Dmaven.repo.local");
-            args.add(ghActionsRepoDir.getAbsolutePath());
-        }
+        args.add("-Dmaven.repo.local=" + M2_REPOSITORY_DIR_IN_USE.getAbsolutePath());
         args.add("clean");
         args.add("compile");
         return args.stream().toArray(String[]::new);
