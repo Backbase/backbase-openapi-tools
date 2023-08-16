@@ -281,8 +281,9 @@ class BoatSpringTemplatesTests {
                 Constructor<?> constructor = modelClass.getConstructor(String.class, String.class, String.class);
                 Object modelObject1 = constructor.newInstance("OK_status", "ref123", "EUR");
                 Object modelObject2 = constructor.newInstance("BAD_status", "ref456", "USD");
-                List<?> modelObjects = List.of(modelObject1, modelObject2);
 
+                // serialize and deserialize list
+                List<?> modelObjects = List.of(modelObject1, modelObject2);
                 String serializedObjects = objectMapper.writeValueAsString(modelObjects);
                 Object[] deserializedModelObjects = objectMapper.readValue(
                     serializedObjects,
@@ -291,9 +292,13 @@ class BoatSpringTemplatesTests {
                         TypeBindings.emptyBindings()
                     )
                 );
-
                 assertEquals(modelObjects.size(), deserializedModelObjects.length);
                 assertEquals(modelObject1.getClass(), deserializedModelObjects[0].getClass());
+
+                // serialize and deserialize single object
+                String serializedObject1 = objectMapper.writeValueAsString(modelObject1);
+                Object deserializedObject1 = objectMapper.readValue(serializedObject1, modelClass);
+                assertEquals(modelClass, deserializedObject1.getClass());
 
             } catch (Exception e) {
                 log.warn("Verification error", e);
