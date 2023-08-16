@@ -34,6 +34,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -249,7 +250,8 @@ class BoatSpringTemplatesTests {
         final String initialDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
         try {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, projectDir.getAbsolutePath());
-            String[] args = {"clean", "compile"};
+            String[] args = generateMavenCliArgs();
+            log.info("mvn cli args: {}", Arrays.toString(args));
             int compileStatus = mavenCli.doMain(args, projectDir.getAbsolutePath(), System.out, System.out);
             assertEquals(0, compileStatus, "Could not compile generated project in dir: " + projectDir);
         } finally {
@@ -259,6 +261,18 @@ class BoatSpringTemplatesTests {
                 System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, initialDir);
             }
         }
+    }
+
+    private static String[] generateMavenCliArgs() {
+        File ghActionsSettingsFile = new File("/home/runner/.m2/settings.xml");
+        List<String> args = new ArrayList<>();
+        if (ghActionsSettingsFile.exists()) {
+            args.add("--settings");
+            args.add(ghActionsSettingsFile.getAbsolutePath());
+        }
+        args.add("clean");
+        args.add("compile");
+        return args.stream().toArray(String[]::new);
     }
 
     private void verifyGeneratedClasses(File projectDir) throws Exception {
