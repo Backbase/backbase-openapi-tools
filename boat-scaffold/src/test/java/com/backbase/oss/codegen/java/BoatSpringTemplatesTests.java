@@ -265,10 +265,15 @@ class BoatSpringTemplatesTests {
 
     private static String[] generateMavenCliArgs() {
         File ghActionsSettingsFile = new File("/home/runner/.m2/settings.xml");
+        File ghActionsRepoDir = new File("/home/runner/.m2/repository");
         List<String> args = new ArrayList<>();
         if (ghActionsSettingsFile.exists()) {
             args.add("--settings");
             args.add(ghActionsSettingsFile.getAbsolutePath());
+        }
+        if (ghActionsRepoDir.exists()) {
+            args.add("-Dmaven.repo.local");
+            args.add(ghActionsRepoDir.getAbsolutePath());
         }
         args.add("clean");
         args.add("compile");
