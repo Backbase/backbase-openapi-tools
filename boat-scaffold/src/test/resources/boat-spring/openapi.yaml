@@ -98,3 +98,21 @@ components:
         currencyCode:
           type: string
           description: Currency of the payment request
+    MultiLinePaymentRequest:
+      required:
+        - lines
+      type: object
+      properties:
+        lines:
+          type: array
+          description: Payment request details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+    PaymentRequestLine:
+      required:
+        - accountId
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier of the related Account

@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -36,16 +36,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.maven.cli.MavenCli;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
@@ -298,14 +300,13 @@ class BoatSpringTemplatesTests {
             new URL[]{classesDir.toURI().toURL()},
             BoatSpringTemplatesTests.class.getClassLoader()
         );
-        String testedModelClassName = buildTestedModelClassName();
-        verifyModelClassSerializesAndDeserializesFromJson(classLoader, testedModelClassName);
+        verifyReceivableRequestModelJsonConversion(classLoader);
+        verifyMultiLineRequest(classLoader);
     }
 
-    private void verifyModelClassSerializesAndDeserializesFromJson(ClassLoader classLoader,
-        String testedModelClassName) throws InterruptedException {
+    private void verifyReceivableRequestModelJsonConversion(ClassLoader classLoader) throws InterruptedException {
+        String testedModelClassName = buildReceivableRequestModelClassName();
         var objectMapper = new ObjectMapper();
-        final AtomicReference<Exception> exceptionRef = new AtomicReference<>();
         Runnable verification = () -> {
             try {
                 Class<?> modelClass = classLoader.loadClass(testedModelClassName);
@@ -332,19 +333,32 @@ class BoatSpringTemplatesTests {
                 assertEquals(modelClass, deserializedObject1.getClass());
 
             } catch (Exception e) {
-                log.warn("Verification error", e);
-                exceptionRef.set(e);
+                throw new UnhandledException(e);
             }
         };
+        runVerification(verification, classLoader);
+    }
 
-        runVerification(verification, classLoader).join();
-        assertNull(exceptionRef.get(), "Classes verification failed");
+    private void verifyMultiLineRequest(ClassLoader classLoader) throws InterruptedException {
+        String testedModelClassName = buildMultiLineRequestModelClassName();
+        Runnable verification = () -> {
+            try {
+                Class<?> modelClass = classLoader.loadClass(testedModelClassName);
+                Constructor<?> constructor = modelClass.getConstructor();
+                Object modelObject = constructor.newInstance();
+                List<?> listProperty = (List<?>) modelClass.getDeclaredMethod("getLines").invoke(modelObject);
+                assertNotNull(listProperty);
+            } catch (Exception e) {
+                throw new UnhandledException(e);
+            }
+        };
+        runVerification(verification, classLoader);
     }
 
     /**
      * Build proper class name for `ReceivableRequest`.
      */
-    private String buildTestedModelClassName() {
+    private String buildReceivableRequestModelClassName() {
         var modelPackage = param.name.replace('-', '.') + ".model";
         var classNameSuffix = org.apache.commons.lang3.StringUtils.capitalize(
             param.name.indexOf('-') > -1
@@ -354,14 +368,21 @@ class BoatSpringTemplatesTests {
         return modelPackage + ".ReceivableRequest" + classNameSuffix;
     }
 
-    private Thread runVerification(Runnable verification, ClassLoader classLoader) {
-        var verificationThread = new Thread(verification);
-        verificationThread.setName("verify-classes-" + param.name);
-        verificationThread.setContextClassLoader(classLoader);
-        verificationThread.setUncaughtExceptionHandler(
-            (t1, e) -> log.error("Uncaught exception in classes verifier: ", e));
-        verificationThread.start();
-        return verificationThread;
+    private String buildMultiLineRequestModelClassName() {
+        var modelPackage = param.name.replace('-', '.') + ".model";
+        var classNameSuffix = org.apache.commons.lang3.StringUtils.capitalize(
+            param.name.indexOf('-') > -1
+                ? CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, param.name)
+                : param.name
+        );
+        return modelPackage + ".MultiLinePaymentRequest" + classNameSuffix;
+    }
+
+    private void runVerification(Runnable verification, ClassLoader classLoader) throws InterruptedException {
+        var thread = new ExceptionInterceptingThread(verification, "verify-classes-" + param.name, classLoader);
+        thread.start();
+        thread.join();
+        assertThat(thread.getUncaughtExceptions(), Matchers.empty());
     }
 
     private boolean findPattern(String filePattern, String linePattern) {
@@ -413,9 +434,9 @@ class BoatSpringTemplatesTests {
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, true);
         gcf.addAdditionalProperty(BoatSpringCodeGen.ADD_SERVLET_REQUEST, this.param.addServletRequest);
         gcf.addAdditionalProperty(BoatSpringCodeGen.ADD_BINDING_RESULT,this.param.addBindingResult);
-        if(this.param.addBindingResult){
+        if (this.param.addBindingResult) {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, true);
-        }else {
+        } else {
             gcf.addAdditionalProperty(BeanValidationFeatures.USE_BEANVALIDATION, this.param.useBeanValidation);
         }
         gcf.addAdditionalProperty(BoatSpringCodeGen.USE_LOMBOK_ANNOTATIONS, this.param.useLombokAnnotations);
@@ -464,5 +485,19 @@ class BoatSpringTemplatesTests {
         final ClientOptInput coi = gcf.toClientOptInput();
 
         return new DefaultGenerator().opts(coi).generate();
+    }
+
+    private class ExceptionInterceptingThread extends Thread {
+        @Getter
+        private final List<Throwable> uncaughtExceptions = new ArrayList<>();
+
+        public ExceptionInterceptingThread(Runnable target, String name, ClassLoader classLoader) {
+            super(target, name);
+            setContextClassLoader(classLoader);
+            setUncaughtExceptionHandler((t, e) -> {
+                log.warn("Uncaught exception in classes verifier: ", e);
+                uncaughtExceptions.add(e);
+            });
+        }
     }
 }
