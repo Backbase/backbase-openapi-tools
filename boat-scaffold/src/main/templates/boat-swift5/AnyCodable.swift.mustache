@@ -1,0 +1,178 @@
+import Foundation
+
+struct AnyCodable {
+    let value: Any
+
+    init(_ value: Any?) {
+        self.value = value ?? ()
+    }
+}
+
+extension AnyCodable: Codable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self.init(())
+        } else if let bool = try? container.decode(Bool.self) {
+            self.init(bool)
+        } else if let int = try? container.decode(Int.self) {
+            self.init(int)
+        } else if let double = try? container.decode(Double.self) {
+            self.init(double)
+        } else if let string = try? container.decode(String.self) {
+            self.init(string)
+        } else if let array = try? container.decode([AnyCodable].self) {
+            self.init(array.map(\.value))
+        } else if let dictionary = try? container.decode([String: AnyCodable].self) {
+            self.init(dictionary.mapValues(\.value))
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable value cannot be decoded")
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch value {
+        // prevent Swift from treating NSCFNumber and NSCFBoolean as Bool and Int, respectively.
+        case let number as NSNumber:
+            try encode(nsNumber: number, into: &container)
+        case is NSNull:
+            try container.encodeNil()
+        case is Void:
+            try container.encodeNil()
+        case let bool as Bool:
+            try container.encode(bool)
+        case let int as Int:
+            try container.encode(int)
+        case let double as Double:
+            try container.encode(double)
+        case let string as String:
+            try container.encode(string)
+        case let array as [Any?]:
+            try container.encode(array.map(AnyCodable.init))
+        case let dictionary as [String: Any?]:
+            try container.encode(dictionary.mapValues(AnyCodable.init))
+        default:
+            let context = EncodingError.Context(codingPath: container.codingPath, debugDescription: "AnyCodable value cannot be encoded")
+            throw EncodingError.invalidValue(value, context)
+        }
+    }
+    
+    private func encode(nsNumber: NSNumber, into container: inout SingleValueEncodingContainer) throws {
+        switch Character(Unicode.Scalar(UInt8(nsNumber.objCType.pointee)))  {
+        case "c", "C":
+            try container.encode(nsNumber.boolValue)
+        case "s":
+            try container.encode(nsNumber.int8Value)
+        case "i":
+            try container.encode(nsNumber.int16Value)
+        case "l":
+            try container.encode(nsNumber.int32Value)
+        case "q":
+            try container.encode(nsNumber.int64Value)
+        case "S":
+            try container.encode(nsNumber.uint8Value)
+        case "I":
+            try container.encode(nsNumber.uint16Value)
+        case "L":
+            try container.encode(nsNumber.uint32Value)
+        case "Q":
+            try container.encode(nsNumber.uint64Value)
+        case "f":
+            try container.encode(nsNumber.floatValue)
+        case "d":
+            try container.encode(nsNumber.doubleValue)
+        default:
+            let context = EncodingError.Context(codingPath: container.codingPath, debugDescription: "NSNumber can not be encoded because its type is not handled")
+            throw EncodingError.invalidValue(nsNumber, context)
+        }
+    }
+
+}
+
+extension AnyCodable: Equatable {
+    static func ==(lhs: AnyCodable, rhs: AnyCodable) -> Bool {
+        switch (lhs.value, rhs.value) {
+        case is (Void, Void):
+            return true
+        case let (lhs as Bool, rhs as Bool):
+            return lhs == rhs
+        case let (lhs as Int, rhs as Int):
+            return lhs == rhs
+        case let (lhs as Double, rhs as Double):
+            return lhs == rhs
+        case let (lhs as String, rhs as String):
+            return lhs == rhs
+        case (let lhs as [String: AnyCodable], let rhs as [String: AnyCodable]):
+            return lhs == rhs
+        case (let lhs as [AnyCodable], let rhs as [AnyCodable]):
+            return lhs == rhs
+        default:
+            return false
+        }
+    }
+}
+
+extension AnyCodable: CustomStringConvertible {
+    var description: String {
+        switch value {
+        case is Void:
+            return String(describing: nil as Any?)
+        case let value as CustomStringConvertible:
+            return value.description
+        default:
+            return String(describing: value)
+        }
+    }
+}
+
+extension AnyCodable: CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch value {
+        case let value as CustomDebugStringConvertible:
+            return "AnyCodable(\(value.debugDescription))"
+        default:
+            return "AnyCodable(\(self.description))"
+        }
+    }
+}
+
+extension AnyCodable: ExpressibleByNilLiteral,
+                      ExpressibleByBooleanLiteral,
+                      ExpressibleByIntegerLiteral,
+                      ExpressibleByFloatLiteral,
+                      ExpressibleByStringLiteral,
+                      ExpressibleByArrayLiteral,
+                      ExpressibleByDictionaryLiteral {
+    init(nilLiteral: ()) {
+        self.init(nil as Any?)
+    }
+
+    init(booleanLiteral value: Bool) {
+        self.init(value)
+    }
+
+    init(integerLiteral value: Int) {
+        self.init(value)
+    }
+
+    init(floatLiteral value: Double) {
+        self.init(value)
+    }
+
+    init(extendedGraphemeClusterLiteral value: String) {
+        self.init(value)
+    }
+
+    init(stringLiteral value: String) {
+        self.init(value)
+    }
+
+    init(arrayLiteral elements: Any...) {
+        self.init(elements)
+    }
+
+    init(dictionaryLiteral elements: (AnyHashable, Any)...) {
+        self.init(Dictionary<AnyHashable, Any>(elements, uniquingKeysWith: { (first, _) in first }))
+    }
+}

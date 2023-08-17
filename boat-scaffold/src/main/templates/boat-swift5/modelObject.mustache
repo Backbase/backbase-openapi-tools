@@ -1,0 +1,181 @@
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} struct {{classname}}: Codable, Equatable {
+{{#allVars}}
+{{#isEnum}}
+{{> modelInlineEnumDeclaration}}
+{{/isEnum}}
+{{/allVars}}
+{{#allVars}}
+{{#isEnum}}
+    {{#description}}/** {{description}} */
+    {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{name}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
+{{/isEnum}}
+{{^isEnum}}
+    {{#description}}/** {{description}} */
+    {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{name}}: {{{datatype}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
+    {{#objcCompatible}}
+    {{#vendorExtensions.x-swift-optional-scalar}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{name}}Num: NSNumber? {
+        get {
+            return {{name}}.map({ return NSNumber(value: $0) })
+        }
+    }
+    {{/vendorExtensions.x-swift-optional-scalar}}
+    {{/objcCompatible}}
+{{/isEnum}}
+{{/allVars}}
+
+{{#hasVars}}
+    @available(*, deprecated, message: "This initializer is deprecated, use the initializer and the setters of {{classname}}.Builder class.")
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init({{#allVars}}{{name}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}? = nil{{/isNullable}}{{/required}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allVars}}) {
+        {{#allVars}}
+        self.{{name}} = {{name}}
+        {{/allVars}}
+    }
+{{/hasVars}}
+
+{{#hasVars}}
+    /// Builder class for {{classname}} DTO.
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} final class Builder: Equatable {
+    {{#allVars}}
+        {{#description}}/** {{description}} */
+        {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} {{#required}}let{{/required}}{{^required}}private(set) var{{/required}} {{> param_builder}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/required}}
+    {{^isEnum}}
+        {{#objcCompatible}}
+        {{#vendorExtensions.x-swift-optional-scalar}}
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{name}}Num: NSNumber? {
+            get {
+                return {{name}}.map({ return NSNumber(value: $0) })
+            }
+        }
+        {{/vendorExtensions.x-swift-optional-scalar}}
+        {{/objcCompatible}}
+    {{/isEnum}}
+    {{/allVars}}
+
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init({{#requiredVars}}{{^-first}}, {{/-first}}{{> param_builder}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/requiredVars}}) {
+            {{#requiredVars}}
+            self.{{name}} = {{name}}
+            {{/requiredVars}}
+        }
+
+    {{#allVars}}
+    {{^required}}
+        /// Setter method for {{name}} property.
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func set({{> param_builder}}?) -> Self {
+            self.{{name}} = {{name}}
+            return self
+        }
+    {{/required}}
+    {{/allVars}}
+
+        /// Builder initializer method for {{classname}} DTO.
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func build() -> {{classname}} {
+            return {{classname}}({{#allVars}}{{name}}: {{name}}{{^-last}}, 
+                    {{/-last}}{{/allVars}})
+        }
+
+        public static func ==(lhs: Builder, rhs: Builder) -> Bool {
+            return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
+            {{/-last}}{{/allVars}}
+        }
+    }
+{{/hasVars}}
+{{#additionalPropertiesType}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var additionalProperties: [String:{{{additionalPropertiesType}}}] = [:]
+
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} subscript(key: String) -> {{{additionalPropertiesType}}}? {
+        get {
+            if let value = additionalProperties[key] {
+                return value
+            }
+            return nil
+        }
+
+        set {
+            additionalProperties[key] = newValue
+        }
+    }
+{{/additionalPropertiesType}}
+
+    // Encodable protocol methods
+
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func encode(to encoder: Encoder) throws {
+        {{#hasVars}}
+        var container = encoder.container(keyedBy: String.self)
+        {{/hasVars}}
+        {{#allVars}}
+        {{#isFreeFormObject}}{{#required}}{{#isNullable}}let {{{name}}}AnyCodable: {{#isMapContainer}}[String:AnyCodable]?{{/isMapContainer}}{{^isMapContainer}}AnyCodable?{{/isMapContainer}}
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+        } else {
+            {{{name}}}AnyCodable = nil
+        }
+        {{/isNullable}}{{/required}}{{^required}}let {{{name}}}AnyCodable: {{#isMapContainer}}[String:AnyCodable]?{{/isMapContainer}}{{^isMapContainer}}AnyCodable?{{/isMapContainer}}
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+        } else {
+            {{{name}}}AnyCodable = nil
+        }
+        {{/required}}{{#required}}{{^isNullable}}let {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+        {{/isNullable}}{{/required}}{{/isFreeFormObject}}{{#isDate}}{{#required}}{{#isNullable}}let {{{name}}}Str: String?
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}Str = CodableHelper.dateFormatter.string(from: {{{name}}})
+        } else {
+            {{{name}}}Str = nil
+        }
+        {{/isNullable}}{{/required}}{{^required}}let {{{name}}}Str: String?
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}Str = CodableHelper.dateFormatter.string(from: {{{name}}})
+        } else {
+            {{{name}}}Str = nil
+        }
+        {{/required}}{{#required}}{{^isNullable}}let {{{name}}}Str = CodableHelper.dateFormatter.string(from: {{{name}}})
+        {{/isNullable}}{{/required}}{{/isDate}}{{#isDateTime}}{{#required}}{{#isNullable}}let {{{name}}}Str: String?
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}Str = CodableHelper.dateTimeFormatter.string(from: {{{name}}})
+        } else {
+            {{{name}}}Str = nil
+        }
+        {{/isNullable}}{{/required}}{{^required}}let {{{name}}}Str: String?
+        if let {{{name}}} = {{{name}}} {
+            {{{name}}}Str = CodableHelper.dateTimeFormatter.string(from: {{{name}}})
+        } else {
+            {{{name}}}Str = nil
+        }
+        {{/required}}{{#required}}{{^isNullable}}let {{{name}}}Str = CodableHelper.dateTimeFormatter.string(from: {{{name}}})
+        {{/isNullable}}{{/required}}{{/isDateTime}}{{#isFreeFormObject}}try container.encode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{name}}}AnyCodable, forKey: "{{{baseName}}}"){{/isFreeFormObject}}{{^isFreeFormObject}}{{#isDate}}try container.encode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{name}}}Str, forKey: "{{{baseName}}}"){{/isDate}}{{^isDate}}{{#isDateTime}}try container.encode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{name}}}Str, forKey: "{{{baseName}}}"){{/isDateTime}}{{^isDateTime}}try container.encode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{name}}}, forKey: "{{{baseName}}}"){{/isDateTime}}{{/isDate}}{{/isFreeFormObject}}
+        {{/allVars}}
+        {{#additionalPropertiesType}}
+        try container.encodeMap(additionalProperties)
+        {{/additionalPropertiesType}}
+    }
+
+    // Decodable protocol methods
+
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init(from decoder: Decoder) throws {
+        {{#hasVars}}
+        let container = try decoder.container(keyedBy: String.self)
+        {{/hasVars}}
+        {{#allVars}}
+        {{#isFreeFormObject}}{{name}} = (try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{#isMapContainer}}[String:AnyCodable].self{{/isMapContainer}}{{^isMapContainer}}{{#isListContainer}}[AnyCodable]{{/isListContainer}}{{^isListContainer}}AnyCodable{{/isListContainer}}.self{{/isMapContainer}}, forKey: "{{{baseName}}}")){{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}{{#isMapContainer}}.mapValues { $0.value }{{/isMapContainer}}{{^isMapContainer}}{{#isListContainer}}.map({ $0.value}){{/isListContainer}}{{^isListContainer}}.value{{/isListContainer}}{{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}{{#isDate}}{{name}} = try CodableHelper.decodeDate{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDate}}{{^isDate}}{{#isDateTime}}{{name}} = try CodableHelper.decodeDateTime{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDateTime}}{{^isDateTime}}{{name}} = try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{datatypeWithEnum}}}.self, forKey: "{{{baseName}}}"){{/isDateTime}}{{/isDate}}{{/isFreeFormObject}}
+        {{/allVars}}
+        {{#additionalPropertiesType}}
+        var nonAdditionalPropertyKeys = Set<String>()
+        {{#allVars}}
+        nonAdditionalPropertyKeys.insert("{{{baseName}}}")
+        {{/allVars}}
+        additionalProperties = try container.decodeMap({{{additionalPropertiesType}}}.self, excludedKeys: nonAdditionalPropertyKeys)
+        {{/additionalPropertiesType}}
+    }
+
+    public static func ==(lhs: {{classname}}, rhs: {{classname}}) -> Bool {
+        return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
+        {{/-last}}{{/allVars}}
+    }
+
+{{^additionalPropertiesType}}{{#vendorExtensions.x-codegen-has-escaped-property-names}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} enum CodingKeys: String, CodingKey, CaseIterable { {{#allVars}}
+        case {{name}}{{#vendorExtensions.x-codegen-escaped-property-name}} = "{{{baseName}}}"{{/vendorExtensions.x-codegen-escaped-property-name}}{{/allVars}}
+    }
+{{/vendorExtensions.x-codegen-has-escaped-property-names}}{{/additionalPropertiesType}}
+}
