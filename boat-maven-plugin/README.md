@@ -43,6 +43,20 @@ Same with `generate` but with opinionated defaults for Spring
             <useOptional>false</useOptional>
             <apiPackage>com.backbase.product.api.service.v2</apiPackage>
             <modelPackage>com.backbase.product.api.service.v2.model</modelPackage>
+            <useJakartaEe>true</useJakartaEe>
+            <useSpringBoot3>true</useSpringBoot3>
+            <containerDefaultToNull>false</containerDefaultToNull>
+        </configOptions>
+    </configuration>
+
+... explicit `configOptions` override default ones, e.g. in sample below `containerDefaultToNull` overrides default (i.e. `false`) with `true`
+
+    <configuration>
+        <inputSpec>${project.basedir}/../api/product-service-api/src/main/resources/openapi.yaml</inputSpec>
+        <apiPackage>com.backbase.product.api.service.v2</apiPackage>
+        <modelPackage>com.backbase.product.api.service.v2.model</modelPackage>
+        <configOptions>
+            <containerDefaultToNull>true</containerDefaultToNull>
         </configOptions>
     </configuration>
 

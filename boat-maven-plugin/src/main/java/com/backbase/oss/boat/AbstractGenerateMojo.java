@@ -2,13 +2,16 @@ package com.backbase.oss.boat;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+@Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
 
-    public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive, boolean generateSupportingFiles)
-            throws MojoExecutionException, MojoFailureException {
+    public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive,
+        boolean generateSupportingFiles) throws MojoExecutionException, MojoFailureException {
+
         Map<String, String> options = new HashMap<>();
         options.put("library", library);
         options.put("java8", "true");
@@ -23,7 +26,7 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("useOptional", "false");
         options.put("useJakartaEe", "true");
         options.put("useSpringBoot3", "true");
-        options.put("containerDefaultToNull", "true");
+        options.put("containerDefaultToNull", "false");
 
         this.generatorName = generatorName;
         this.generateSupportingFiles = generateSupportingFiles;
@@ -32,12 +35,26 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         this.generateModelDocumentation = !isEmbedded;
         this.generateModelTests = !isEmbedded;
         this.skipOverwrite = true;
-        this.configOptions = options;
+        if (this.configOptions == null) {
+            this.configOptions = options;
+        } else {
+            this.configOptions = mergeOptions(options, this.configOptions);
+        }
+        log.debug("Using configOptions={}", this.configOptions);
 
-        if(isEmbedded) {
-            this.supportingFilesToGenerate = "ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,ApiKeyAuth.java,JavaTimeFormatter.java";
+        if (isEmbedded) {
+            this.supportingFilesToGenerate = "ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,"
+                + "ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,"
+                + "HttpBearerAuth.java,ApiKeyAuth.java,JavaTimeFormatter.java";
         }
         super.execute();
+    }
+
+    private static Map<?, ?> mergeOptions(Map<String, String> defaultOptions, Map<?, ?> overrides) {
+        var merged = new HashMap<>();
+        merged.putAll(defaultOptions);
+        merged.putAll(overrides);
+        return merged;
     }
 }
 
