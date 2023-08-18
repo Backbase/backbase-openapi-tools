@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
+import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -585,8 +586,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
     }
     @Override
     public String toOperationId(String operationId) {
-        // DOUBT POINT: was camelize(sanitizeName(operationId), true) but was changed
-        operationId = camelize(sanitizeName(operationId));
+        operationId = camelize(sanitizeName(operationId), CamelizeOption.LOWERCASE_FIRST_CHAR);
 
         // Throw exception if method name is empty.
         // This should not happen but keep the check just in case
@@ -596,8 +596,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
 
         // method name cannot use reserved keyword, e.g. return
         if (isReservedWord(operationId)) {
-            // DOUBT POINT: was camelize(("call_" + operationId), true) but was changed
-            String newOperationId = camelize(("call_" + operationId));
+            String newOperationId = camelize(("call_" + operationId), CamelizeOption.LOWERCASE_FIRST_CHAR);
             LOGGER.warn(operationId + " (reserved word) cannot be used as method name."
                     + " Renamed to " + newOperationId);
             return newOperationId;
@@ -605,9 +604,8 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
 
         // operationId starts with a number
         if (operationId.matches("^\\d.*")) {
-            // DOUBT POINT: was camelize(sanitizeName("call_" + operationId), true) but was changed
-            LOGGER.warn(operationId + " (starting with a number) cannot be used as method name. Renamed to " + camelize(sanitizeName("call_" + operationId)));
-            operationId = camelize(sanitizeName("call_" + operationId));
+            LOGGER.warn(operationId + " (starting with a number) cannot be used as method name. Renamed to " + camelize(sanitizeName("call_" + operationId)), CamelizeOption.LOWERCASE_FIRST_CHAR);
+            operationId = camelize(sanitizeName("call_" + operationId), CamelizeOption.LOWERCASE_FIRST_CHAR);
         }
 
         return operationId;
@@ -625,7 +623,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
 
         // camelize the variable name
         // pet_id => petId
-        name = camelize(name);
+        name = camelize(name, CamelizeOption.LOWERCASE_FIRST_CHAR);
 
         // for reserved word or word starting with number, append _
         if (isReservedWord(name) || name.matches("^\\d.*")) {
@@ -649,7 +647,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
 
         // camelize(lower) the variable name
         // pet_id => petId
-        name = camelize(name);
+        name = camelize(name, CamelizeOption.LOWERCASE_FIRST_CHAR);
 
         // for reserved word or word starting with number, append _
         if (isReservedWord(name) || name.matches("^\\d.*")) {
@@ -765,18 +763,18 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
             String startingNumbers = startWithNumberMatcher.group(0);
             String nameWithoutStartingNumbers = name.substring(startingNumbers.length());
 
-            return "_" + startingNumbers + camelize(nameWithoutStartingNumbers);
+            return "_" + startingNumbers + camelize(nameWithoutStartingNumbers, CamelizeOption.LOWERCASE_FIRST_CHAR);
         }
 
         // for symbol, e.g. $, #
         if (getSymbolName(name) != null) {
-            return camelize(WordUtils.capitalizeFully(getSymbolName(name).toUpperCase(Locale.ROOT)));
+            return camelize(WordUtils.capitalizeFully(getSymbolName(name).toUpperCase(Locale.ROOT)), CamelizeOption.LOWERCASE_FIRST_CHAR);
         }
 
         // Camelize only when we have a structure defined below
         Boolean camelized = false;
         if (name.matches("[A-Z][a-z0-9]+[a-zA-Z0-9]*")) {
-            name = camelize(name);
+            name = camelize(name, CamelizeOption.LOWERCASE_FIRST_CHAR);
             camelized = true;
         }
 
@@ -804,7 +802,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
 
         char[] separators = {'-', '_', ' ', ':', '(', ')'};
         return camelize(WordUtils.capitalizeFully(StringUtils.lowerCase(name), separators)
-                        .replaceAll("[-_ :\\(\\)]", ""));
+                        .replaceAll("[-_ :\\(\\)]", ""), CamelizeOption.LOWERCASE_FIRST_CHAR);
     }
     @Override
     public String toEnumName(CodegenProperty property) {
@@ -827,62 +825,62 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         }
     }
 
-    @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        Map<String, Object> postProcessedModelsEnum = postProcessModelsEnum(objs);
+//    @Override
+//    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
+//        Map<String, Object> postProcessedModelsEnum = postProcessModelsEnum(objs);
+//
+//        // We iterate through the list of models, and also iterate through each of the
+//        // properties for each model. For each property, if:
+//        //
+//        // CodegenProperty.name != CodegenProperty.baseName
+//        //
+//        // then we set
+//        //
+//        // CodegenProperty.vendorExtensions["x-codegen-escaped-property-name"] = true
+//        //
+//        // Also, if any property in the model has x-codegen-escaped-property-name=true, then we mark:
+//        //
+//        // CodegenModel.vendorExtensions["x-codegen-has-escaped-property-names"] = true
+//        //
+//        List<Object> models = (List<Object>) postProcessedModelsEnum.get("models");
+//        for (Object _mo : models) {
+//            Map<String, Object> mo = (Map<String, Object>) _mo;
+//            CodegenModel cm = (CodegenModel) mo.get("model");
+//            boolean modelHasPropertyWithEscapedName = false;
+//            for (CodegenProperty prop : cm.allVars) {
+//                if (!prop.name.equals(prop.baseName)) {
+//                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
+//                    modelHasPropertyWithEscapedName = true;
+//                }
+//            }
+//            if (modelHasPropertyWithEscapedName) {
+//                cm.vendorExtensions.put("x-codegen-has-escaped-property-names", true);
+//            }
+//        }
+//
+//        return postProcessedModelsEnum;
+//    }
 
-        // We iterate through the list of models, and also iterate through each of the
-        // properties for each model. For each property, if:
-        //
-        // CodegenProperty.name != CodegenProperty.baseName
-        //
-        // then we set
-        //
-        // CodegenProperty.vendorExtensions["x-codegen-escaped-property-name"] = true
-        //
-        // Also, if any property in the model has x-codegen-escaped-property-name=true, then we mark:
-        //
-        // CodegenModel.vendorExtensions["x-codegen-has-escaped-property-names"] = true
-        //
-        List<Object> models = (List<Object>) postProcessedModelsEnum.get("models");
-        for (Object _mo : models) {
-            Map<String, Object> mo = (Map<String, Object>) _mo;
-            CodegenModel cm = (CodegenModel) mo.get("model");
-            boolean modelHasPropertyWithEscapedName = false;
-            for (CodegenProperty prop : cm.allVars) {
-                if (!prop.name.equals(prop.baseName)) {
-                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
-                    modelHasPropertyWithEscapedName = true;
-                }
-            }
-            if (modelHasPropertyWithEscapedName) {
-                cm.vendorExtensions.put("x-codegen-has-escaped-property-names", true);
-            }
-        }
-
-        return postProcessedModelsEnum;
-    }
-
-    /*
-     Iterate over all models to call fixInheritance
-    */
-    @Override
-    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
-        Map<String, Object> postProcessedModels = super.postProcessAllModels(objs);
-
-        Iterator it = postProcessedModels.entrySet().iterator();
-        while (it.hasNext()) {
-            Map<String, Object> model = (Map<String, Object>) ((Map.Entry)it.next()).getValue();
-            List<Object> models = (List<Object>) model.get("models");
-            for (Object _mo : models) {
-                Map<String, Object> mo = (Map<String, Object>) _mo;
-                CodegenModel cm = (CodegenModel) mo.get("model");
-                fixInheritance(cm);
-            }
-        }
-
-        return postProcessedModels;
-    }
+//    /*
+//     Iterate over all models to call fixInheritance
+//    */
+//    @Override
+//    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
+//        Map<String, Object> postProcessedModels = super.postProcessAllModels(objs);
+//
+//        Iterator it = postProcessedModels.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map<String, Object> model = (Map<String, Object>) ((Map.Entry)it.next()).getValue();
+//            List<Object> models = (List<Object>) model.get("models");
+//            for (Object _mo : models) {
+//                Map<String, Object> mo = (Map<String, Object>) _mo;
+//                CodegenModel cm = (CodegenModel) mo.get("model");
+//                fixInheritance(cm);
+//            }
+//        }
+//
+//        return postProcessedModels;
+//    }
 
     /*
     There's no inheritance for Swift structs, we're adding all parent vars
@@ -951,117 +949,117 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         }
     }
 
-    @Override
-    public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
-        Map<String, Object> objectMap = (Map<String, Object>) objs.get("operations");
+//    @Override
+//    public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
+//        Map<String, Object> objectMap = (Map<String, Object>) objs.get("operations");
+//
+//        HashMap<String, CodegenModel> modelMaps = new HashMap<String, CodegenModel>();
+//        for (Object o : allModels) {
+//            HashMap<String, Object> h = (HashMap<String, Object>) o;
+//            CodegenModel m = (CodegenModel) h.get("model");
+//            modelMaps.put(m.classname, m);
+//        }
+//
+//        List<CodegenOperation> operations = (List<CodegenOperation>) objectMap.get("operation");
+//        for (CodegenOperation operation : operations) {
+//            for (CodegenParameter cp : operation.allParams) {
+//                cp.vendorExtensions.put("x-swift-example", constructExampleCode(cp, modelMaps));
+//            }
+//        }
+//        return objs;
+//    }
 
-        HashMap<String, CodegenModel> modelMaps = new HashMap<String, CodegenModel>();
-        for (Object o : allModels) {
-            HashMap<String, Object> h = (HashMap<String, Object>) o;
-            CodegenModel m = (CodegenModel) h.get("model");
-            modelMaps.put(m.classname, m);
-        }
+//    public String constructExampleCode(CodegenParameter codegenParameter, HashMap<String, CodegenModel> modelMaps) {
+//        if (codegenParameter.isListContainer) { // array
+//            return "[" + constructExampleCode(codegenParameter.items, modelMaps) + "]";
+//        } else if (codegenParameter.isMapContainer) { // TODO: map, file type
+//            return "\"TODO\"";
+//        } else if (languageSpecificPrimitives.contains(codegenParameter.dataType)) { // primitive type
+//            if ("String".equals(codegenParameter.dataType) || "Character".equals(codegenParameter.dataType)) {
+//                if (StringUtils.isEmpty(codegenParameter.example)) {
+//                    return "\"" + codegenParameter.example + "\"";
+//                } else {
+//                    return "\"" + codegenParameter.paramName + "_example\"";
+//                }
+//            } else if ("Bool".equals(codegenParameter.dataType)) { // boolean
+//                if (Boolean.parseBoolean(codegenParameter.example)) {
+//                    return "true";
+//                } else {
+//                    return "false";
+//                }
+//            } else if ("URL".equals(codegenParameter.dataType)) { // URL
+//                return "URL(string: \"https://example.com\")!";
+//            } else if ("Date".equals(codegenParameter.dataType)) { // date
+//                return "Date()";
+//            } else { // numeric
+//                if (StringUtils.isEmpty(codegenParameter.example)) {
+//                    return codegenParameter.example;
+//                } else {
+//                    return "987";
+//                }
+//            }
+//        } else { // model
+//            // look up the model
+//            if (modelMaps.containsKey(codegenParameter.dataType)) {
+//                return constructExampleCode(modelMaps.get(codegenParameter.dataType), modelMaps);
+//            } else {
+//                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenParameter.dataType);
+//                return "TODO";
+//            }
+//        }
+//    }
 
-        List<CodegenOperation> operations = (List<CodegenOperation>) objectMap.get("operation");
-        for (CodegenOperation operation : operations) {
-            for (CodegenParameter cp : operation.allParams) {
-                cp.vendorExtensions.put("x-swift-example", constructExampleCode(cp, modelMaps));
-            }
-        }
-        return objs;
-    }
+//    public String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps) {
+//        if (codegenProperty.isListContainer) { // array
+//            return "[" + constructExampleCode(codegenProperty.items, modelMaps) + "]";
+//        } else if (codegenProperty.isMapContainer) { // TODO: map, file type
+//            return "\"TODO\"";
+//        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
+//            if ("String".equals(codegenProperty.dataType) || "Character".equals(codegenProperty.dataType)) {
+//                if (StringUtils.isEmpty(codegenProperty.example)) {
+//                    return "\"" + codegenProperty.example + "\"";
+//                } else {
+//                    return "\"" + codegenProperty.name + "_example\"";
+//                }
+//            } else if ("Bool".equals(codegenProperty.dataType)) { // boolean
+//                if (Boolean.parseBoolean(codegenProperty.example)) {
+//                    return "true";
+//                } else {
+//                    return "false";
+//                }
+//            } else if ("URL".equals(codegenProperty.dataType)) { // URL
+//                return "URL(string: \"https://example.com\")!";
+//            } else if ("Date".equals(codegenProperty.dataType)) { // date
+//                return "Date()";
+//            } else { // numeric
+//                if (StringUtils.isEmpty(codegenProperty.example)) {
+//                    return codegenProperty.example;
+//                } else {
+//                    return "123";
+//                }
+//            }
+//        } else {
+//            // look up the model
+//            if (modelMaps.containsKey(codegenProperty.dataType)) {
+//                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps);
+//            } else {
+//                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
+//                return "\"TODO\"";
+//            }
+//        }
+//    }
 
-    public String constructExampleCode(CodegenParameter codegenParameter, HashMap<String, CodegenModel> modelMaps) {
-        if (codegenParameter.isListContainer) { // array
-            return "[" + constructExampleCode(codegenParameter.items, modelMaps) + "]";
-        } else if (codegenParameter.isMapContainer) { // TODO: map, file type
-            return "\"TODO\"";
-        } else if (languageSpecificPrimitives.contains(codegenParameter.dataType)) { // primitive type
-            if ("String".equals(codegenParameter.dataType) || "Character".equals(codegenParameter.dataType)) {
-                if (StringUtils.isEmpty(codegenParameter.example)) {
-                    return "\"" + codegenParameter.example + "\"";
-                } else {
-                    return "\"" + codegenParameter.paramName + "_example\"";
-                }
-            } else if ("Bool".equals(codegenParameter.dataType)) { // boolean
-                if (Boolean.parseBoolean(codegenParameter.example)) {
-                    return "true";
-                } else {
-                    return "false";
-                }
-            } else if ("URL".equals(codegenParameter.dataType)) { // URL
-                return "URL(string: \"https://example.com\")!";
-            } else if ("Date".equals(codegenParameter.dataType)) { // date
-                return "Date()";
-            } else { // numeric
-                if (StringUtils.isEmpty(codegenParameter.example)) {
-                    return codegenParameter.example;
-                } else {
-                    return "987";
-                }
-            }
-        } else { // model
-            // look up the model
-            if (modelMaps.containsKey(codegenParameter.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenParameter.dataType), modelMaps);
-            } else {
-                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenParameter.dataType);
-                return "TODO";
-            }
-        }
-    }
-
-    public String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps) {
-        if (codegenProperty.isListContainer) { // array
-            return "[" + constructExampleCode(codegenProperty.items, modelMaps) + "]";
-        } else if (codegenProperty.isMapContainer) { // TODO: map, file type
-            return "\"TODO\"";
-        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
-            if ("String".equals(codegenProperty.dataType) || "Character".equals(codegenProperty.dataType)) {
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return "\"" + codegenProperty.example + "\"";
-                } else {
-                    return "\"" + codegenProperty.name + "_example\"";
-                }
-            } else if ("Bool".equals(codegenProperty.dataType)) { // boolean
-                if (Boolean.parseBoolean(codegenProperty.example)) {
-                    return "true";
-                } else {
-                    return "false";
-                }
-            } else if ("URL".equals(codegenProperty.dataType)) { // URL
-                return "URL(string: \"https://example.com\")!";
-            } else if ("Date".equals(codegenProperty.dataType)) { // date
-                return "Date()";
-            } else { // numeric
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return codegenProperty.example;
-                } else {
-                    return "123";
-                }
-            }
-        } else {
-            // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps);
-            } else {
-                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
-                return "\"TODO\"";
-            }
-        }
-    }
-
-    public String constructExampleCode(CodegenModel codegenModel, HashMap<String, CodegenModel> modelMaps) {
-        String example;
-        example = codegenModel.name + "(";
-        List<String> propertyExamples = new ArrayList<>();
-        for (CodegenProperty codegenProperty : codegenModel.vars) {
-            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps));
-        }
-        example += StringUtils.join(propertyExamples, ", ");
-        example += ")";
-        return example;
-    }
+//    public String constructExampleCode(CodegenModel codegenModel, HashMap<String, CodegenModel> modelMaps) {
+//        String example;
+//        example = codegenModel.name + "(";
+//        List<String> propertyExamples = new ArrayList<>();
+//        for (CodegenProperty codegenProperty : codegenModel.vars) {
+//            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps));
+//        }
+//        example += StringUtils.join(propertyExamples, ", ");
+//        example += ")";
+//        return example;
+//    }
 
 
 }
