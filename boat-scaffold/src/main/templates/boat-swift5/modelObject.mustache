@@ -75,7 +75,7 @@
         }
 
         public static func ==(lhs: Builder, rhs: Builder) -> Bool {
-            return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
+            return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMap}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMap}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
             {{/-last}}{{/allVars}}
         }
     }
@@ -104,19 +104,19 @@
         var container = encoder.container(keyedBy: String.self)
         {{/hasVars}}
         {{#allVars}}
-        {{#isFreeFormObject}}{{#required}}{{#isNullable}}let {{{name}}}AnyCodable: {{#isMapContainer}}[String:AnyCodable]?{{/isMapContainer}}{{^isMapContainer}}AnyCodable?{{/isMapContainer}}
+        {{#isFreeFormObject}}{{#required}}{{#isNullable}}let {{{name}}}AnyCodable: {{#isMap}}[String:AnyCodable]?{{/isMap}}{{^isMap}}AnyCodable?{{/isMap}}
         if let {{{name}}} = {{{name}}} {
-            {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+            {{{name}}}AnyCodable = {{#isMap}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable({{{name}}}){{/isMap}}
         } else {
             {{{name}}}AnyCodable = nil
         }
-        {{/isNullable}}{{/required}}{{^required}}let {{{name}}}AnyCodable: {{#isMapContainer}}[String:AnyCodable]?{{/isMapContainer}}{{^isMapContainer}}AnyCodable?{{/isMapContainer}}
+        {{/isNullable}}{{/required}}{{^required}}let {{{name}}}AnyCodable: {{#isMap}}[String:AnyCodable]?{{/isMap}}{{^isMap}}AnyCodable?{{/isMap}}
         if let {{{name}}} = {{{name}}} {
-            {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+            {{{name}}}AnyCodable = {{#isMap}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable({{{name}}}){{/isMap}}
         } else {
             {{{name}}}AnyCodable = nil
         }
-        {{/required}}{{#required}}{{^isNullable}}let {{{name}}}AnyCodable = {{#isMapContainer}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable({{{name}}}){{/isMapContainer}}
+        {{/required}}{{#required}}{{^isNullable}}let {{{name}}}AnyCodable = {{#isMap}}{{{name}}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable({{{name}}}){{/isMap}}
         {{/isNullable}}{{/required}}{{/isFreeFormObject}}{{#isDate}}{{#required}}{{#isNullable}}let {{{name}}}Str: String?
         if let {{{name}}} = {{{name}}} {
             {{{name}}}Str = CodableHelper.dateFormatter.string(from: {{{name}}})
@@ -157,7 +157,7 @@
         let container = try decoder.container(keyedBy: String.self)
         {{/hasVars}}
         {{#allVars}}
-        {{#isFreeFormObject}}{{name}} = (try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{#isMapContainer}}[String:AnyCodable].self{{/isMapContainer}}{{^isMapContainer}}{{#isListContainer}}[AnyCodable]{{/isListContainer}}{{^isListContainer}}AnyCodable{{/isListContainer}}.self{{/isMapContainer}}, forKey: "{{{baseName}}}")){{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}{{#isMapContainer}}.mapValues { $0.value }{{/isMapContainer}}{{^isMapContainer}}{{#isListContainer}}.map({ $0.value}){{/isListContainer}}{{^isListContainer}}.value{{/isListContainer}}{{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}{{#isDate}}{{name}} = try CodableHelper.decodeDate{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDate}}{{^isDate}}{{#isDateTime}}{{name}} = try CodableHelper.decodeDateTime{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDateTime}}{{^isDateTime}}{{name}} = try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{datatypeWithEnum}}}.self, forKey: "{{{baseName}}}"){{/isDateTime}}{{/isDate}}{{/isFreeFormObject}}
+        {{#isFreeFormObject}}{{name}} = (try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{#isMap}}[String:AnyCodable].self{{/isMap}}{{^isMap}}{{#isListContainer}}[AnyCodable]{{/isListContainer}}{{^isListContainer}}AnyCodable{{/isListContainer}}.self{{/isMap}}, forKey: "{{{baseName}}}")){{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}{{#isMap}}.mapValues { $0.value }{{/isMap}}{{^isMap}}{{#isListContainer}}.map({ $0.value}){{/isListContainer}}{{^isListContainer}}.value{{/isListContainer}}{{/isMap}}{{/isFreeFormObject}}{{^isFreeFormObject}}{{#isDate}}{{name}} = try CodableHelper.decodeDate{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDate}}{{^isDate}}{{#isDateTime}}{{name}} = try CodableHelper.decodeDateTime{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}(from: container, forKey: "{{{baseName}}}"){{/isDateTime}}{{^isDateTime}}{{name}} = try container.decode{{#required}}{{#isNullable}}IfPresent{{/isNullable}}{{/required}}{{^required}}IfPresent{{/required}}({{{datatypeWithEnum}}}.self, forKey: "{{{baseName}}}"){{/isDateTime}}{{/isDate}}{{/isFreeFormObject}}
         {{/allVars}}
         {{#additionalPropertiesType}}
         var nonAdditionalPropertyKeys = Set<String>()
@@ -169,7 +169,7 @@
     }
 
     public static func ==(lhs: {{classname}}, rhs: {{classname}}) -> Bool {
-        return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
+        return {{^hasVars}}true{{/hasVars}}{{#allVars}}{{#isFreeFormObject}}{{#isMap}}lhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{name}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{name}}) == AnyCodable(rhs.{{name}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{name}} == rhs.{{name}}{{/isFreeFormObject}}{{^-last}} &&
         {{/-last}}{{/allVars}}
     }
 
