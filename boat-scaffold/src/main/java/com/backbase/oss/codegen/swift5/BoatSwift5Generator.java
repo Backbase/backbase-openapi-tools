@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
+import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -689,14 +692,10 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         Iterator<CodegenProperty> iterator = codegenProperties.iterator();
         while (iterator.hasNext()) {
             CodegenProperty codegenProperty = iterator.next();
-//            if (codegenProperty.isFreeFormObject && codegenProperty.isMapContainer && codegenProperty.items.isFreeFormObject == false) {
-//            MISSING: isMapContainer
-            if (codegenProperty.isFreeFormObject && !codegenProperty.items.isFreeFormObject) {
+            if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
                 codegenProperty.isFreeFormObject = false;
             }
-//            if (codegenProperty.isMapContainer && codegenProperty.items.isFreeFormObject) {
-//            MISSING: isMapContainer
-            if (codegenProperty.items.isFreeFormObject) {
+            if (codegenProperty.isMap && codegenProperty.items.isFreeFormObject) {
                 codegenProperty.isFreeFormObject = true;
             }
         }
@@ -825,62 +824,66 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         }
     }
 
-//    @Override
-//    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-//        Map<String, Object> postProcessedModelsEnum = postProcessModelsEnum(objs);
-//
-//        // We iterate through the list of models, and also iterate through each of the
-//        // properties for each model. For each property, if:
-//        //
-//        // CodegenProperty.name != CodegenProperty.baseName
-//        //
-//        // then we set
-//        //
-//        // CodegenProperty.vendorExtensions["x-codegen-escaped-property-name"] = true
-//        //
-//        // Also, if any property in the model has x-codegen-escaped-property-name=true, then we mark:
-//        //
-//        // CodegenModel.vendorExtensions["x-codegen-has-escaped-property-names"] = true
-//        //
-//        List<Object> models = (List<Object>) postProcessedModelsEnum.get("models");
-//        for (Object _mo : models) {
-//            Map<String, Object> mo = (Map<String, Object>) _mo;
-//            CodegenModel cm = (CodegenModel) mo.get("model");
-//            boolean modelHasPropertyWithEscapedName = false;
-//            for (CodegenProperty prop : cm.allVars) {
-//                if (!prop.name.equals(prop.baseName)) {
-//                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
-//                    modelHasPropertyWithEscapedName = true;
-//                }
-//            }
-//            if (modelHasPropertyWithEscapedName) {
-//                cm.vendorExtensions.put("x-codegen-has-escaped-property-names", true);
-//            }
-//        }
-//
-//        return postProcessedModelsEnum;
-//    }
+    @Override
+    public ModelsMap postProcessModelsEnum(ModelsMap objs) {
+        return super.postProcessModelsEnum(objs);
+    }
 
-//    /*
-//     Iterate over all models to call fixInheritance
-//    */
-//    @Override
-//    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
-//        Map<String, Object> postProcessedModels = super.postProcessAllModels(objs);
-//
-//        Iterator it = postProcessedModels.entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map<String, Object> model = (Map<String, Object>) ((Map.Entry)it.next()).getValue();
-//            List<Object> models = (List<Object>) model.get("models");
-//            for (Object _mo : models) {
-//                Map<String, Object> mo = (Map<String, Object>) _mo;
-//                CodegenModel cm = (CodegenModel) mo.get("model");
-//                fixInheritance(cm);
-//            }
-//        }
-//
-//        return postProcessedModels;
-//    }
+    @Override
+    public ModelsMap postProcessModels(ModelsMap objs) {
+
+        ModelsMap modelsMap = postProcessModelsEnum(objs);
+
+        // We iterate through the list of models, and also iterate through each of the
+        // properties for each model. For each property, if:
+        //
+        // CodegenProperty.name != CodegenProperty.baseName
+        //
+        // then we set
+        //
+        // CodegenProperty.vendorExtensions["x-codegen-escaped-property-name"] = true
+        //
+        // Also, if any property in the model has x-codegen-escaped-property-name=true, then we mark:
+        //
+        // CodegenModel.vendorExtensions["x-codegen-has-escaped-property-names"] = true
+        //
+        List<ModelMap> models = modelsMap.getModels();
+
+        for (ModelMap _mm: models) {
+           CodegenModel cm = _mm.getModel();
+            boolean modelHasPropertyWithEscapedName = false;
+            for (CodegenProperty prop: cm.allVars) {
+                if(!prop.name.equals(prop.baseName)){
+                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
+                    modelHasPropertyWithEscapedName = true;
+                }
+            }
+            if (modelHasPropertyWithEscapedName) {
+                cm.vendorExtensions.put("x-codegen-has-escaped-property-names", true);
+            }
+        }
+        return modelsMap;
+    }
+
+    /*
+     Iterate over all models to call fixInheritance
+    */
+    @Override
+    public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+
+        Map<String, ModelsMap> postProcessedModels = super.postProcessAllModels(objs);
+        Iterator it = postProcessedModels.entrySet().iterator();
+        while (it.hasNext()){
+            Map<String, Object> model = (Map<String, Object>) ((Map.Entry)it.next()).getValue();
+            List<Object> models = (List<Object>) model.get("models");
+            for(Object _mo: models) {
+                Map<String, Object> mo = (Map<String, Object>) _mo;
+                CodegenModel cm = (CodegenModel) mo.get("model");
+                fixInheritance(cm);
+            }
+        }
+        return  postProcessedModels;
+    }
 
     /*
     There's no inheritance for Swift structs, we're adding all parent vars
@@ -949,117 +952,118 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         }
     }
 
-//    @Override
-//    public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
-//        Map<String, Object> objectMap = (Map<String, Object>) objs.get("operations");
-//
-//        HashMap<String, CodegenModel> modelMaps = new HashMap<String, CodegenModel>();
-//        for (Object o : allModels) {
-//            HashMap<String, Object> h = (HashMap<String, Object>) o;
-//            CodegenModel m = (CodegenModel) h.get("model");
-//            modelMaps.put(m.classname, m);
-//        }
-//
-//        List<CodegenOperation> operations = (List<CodegenOperation>) objectMap.get("operation");
-//        for (CodegenOperation operation : operations) {
-//            for (CodegenParameter cp : operation.allParams) {
-//                cp.vendorExtensions.put("x-swift-example", constructExampleCode(cp, modelMaps));
-//            }
-//        }
-//        return objs;
-//    }
+    @Override
+    public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
+        String operationKey = "operations";
+        Map<String, Object> operations = (Map<String, Object>) objs.get(operationKey);
 
-//    public String constructExampleCode(CodegenParameter codegenParameter, HashMap<String, CodegenModel> modelMaps) {
-//        if (codegenParameter.isListContainer) { // array
-//            return "[" + constructExampleCode(codegenParameter.items, modelMaps) + "]";
-//        } else if (codegenParameter.isMapContainer) { // TODO: map, file type
-//            return "\"TODO\"";
-//        } else if (languageSpecificPrimitives.contains(codegenParameter.dataType)) { // primitive type
-//            if ("String".equals(codegenParameter.dataType) || "Character".equals(codegenParameter.dataType)) {
-//                if (StringUtils.isEmpty(codegenParameter.example)) {
-//                    return "\"" + codegenParameter.example + "\"";
-//                } else {
-//                    return "\"" + codegenParameter.paramName + "_example\"";
-//                }
-//            } else if ("Bool".equals(codegenParameter.dataType)) { // boolean
-//                if (Boolean.parseBoolean(codegenParameter.example)) {
-//                    return "true";
-//                } else {
-//                    return "false";
-//                }
-//            } else if ("URL".equals(codegenParameter.dataType)) { // URL
-//                return "URL(string: \"https://example.com\")!";
-//            } else if ("Date".equals(codegenParameter.dataType)) { // date
-//                return "Date()";
-//            } else { // numeric
-//                if (StringUtils.isEmpty(codegenParameter.example)) {
-//                    return codegenParameter.example;
-//                } else {
-//                    return "987";
-//                }
-//            }
-//        } else { // model
-//            // look up the model
-//            if (modelMaps.containsKey(codegenParameter.dataType)) {
-//                return constructExampleCode(modelMaps.get(codegenParameter.dataType), modelMaps);
-//            } else {
-//                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenParameter.dataType);
-//                return "TODO";
-//            }
-//        }
-//    }
+        HashMap<String, CodegenModel> modelMaps = new HashMap<String, CodegenModel>();
 
-//    public String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps) {
-//        if (codegenProperty.isListContainer) { // array
-//            return "[" + constructExampleCode(codegenProperty.items, modelMaps) + "]";
-//        } else if (codegenProperty.isMapContainer) { // TODO: map, file type
-//            return "\"TODO\"";
-//        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
-//            if ("String".equals(codegenProperty.dataType) || "Character".equals(codegenProperty.dataType)) {
-//                if (StringUtils.isEmpty(codegenProperty.example)) {
-//                    return "\"" + codegenProperty.example + "\"";
-//                } else {
-//                    return "\"" + codegenProperty.name + "_example\"";
-//                }
-//            } else if ("Bool".equals(codegenProperty.dataType)) { // boolean
-//                if (Boolean.parseBoolean(codegenProperty.example)) {
-//                    return "true";
-//                } else {
-//                    return "false";
-//                }
-//            } else if ("URL".equals(codegenProperty.dataType)) { // URL
-//                return "URL(string: \"https://example.com\")!";
-//            } else if ("Date".equals(codegenProperty.dataType)) { // date
-//                return "Date()";
-//            } else { // numeric
-//                if (StringUtils.isEmpty(codegenProperty.example)) {
-//                    return codegenProperty.example;
-//                } else {
-//                    return "123";
-//                }
-//            }
-//        } else {
-//            // look up the model
-//            if (modelMaps.containsKey(codegenProperty.dataType)) {
-//                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps);
-//            } else {
-//                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
-//                return "\"TODO\"";
-//            }
-//        }
-//    }
+        for(Object o: allModels) {
+            HashMap<String, Object> h = (HashMap<String, Object>) o;
+            CodegenModel m = (CodegenModel) h.get("model");
+            modelMaps.put(m.classname, m);
+        }
 
-//    public String constructExampleCode(CodegenModel codegenModel, HashMap<String, CodegenModel> modelMaps) {
-//        String example;
-//        example = codegenModel.name + "(";
-//        List<String> propertyExamples = new ArrayList<>();
-//        for (CodegenProperty codegenProperty : codegenModel.vars) {
-//            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps));
-//        }
-//        example += StringUtils.join(propertyExamples, ", ");
-//        example += ")";
-//        return example;
-//    }
+        List<CodegenOperation> ops = (List<CodegenOperation>) operations.get("operation");
+        for(CodegenOperation op: ops){
+            for(CodegenParameter cp: op.allParams) {
+                cp.vendorExtensions.put("x-swift-example", constructExampleCode(cp, modelMaps));
+            }
+        }
 
+        return  objs;
+    }
 
+    public String constructExampleCode(CodegenParameter codegenParameter, HashMap<String, CodegenModel> modelMaps) {
+        if (codegenParameter.isArray) { // array
+            return "[" + constructExampleCode(codegenParameter.items, modelMaps) + "]";
+        } else if (codegenParameter.isMap) { // TODO: map, file type
+            return "\"TODO\"";
+        } else if (languageSpecificPrimitives.contains(codegenParameter.dataType)) { // primitive type
+            if ("String".equals(codegenParameter.dataType) || "Character".equals(codegenParameter.dataType)) {
+                if (StringUtils.isEmpty(codegenParameter.example)) {
+                    return "\"" + codegenParameter.example + "\"";
+                } else {
+                    return "\"" + codegenParameter.paramName + "_example\"";
+                }
+            } else if ("Bool".equals(codegenParameter.dataType)) { // boolean
+                if (Boolean.parseBoolean(codegenParameter.example)) {
+                    return "true";
+                } else {
+                    return "false";
+                }
+            } else if ("URL".equals(codegenParameter.dataType)) { // URL
+                return "URL(string: \"https://example.com\")!";
+            } else if ("Date".equals(codegenParameter.dataType)) { // date
+                return "Date()";
+            } else { // numeric
+                if (StringUtils.isEmpty(codegenParameter.example)) {
+                    return codegenParameter.example;
+                } else {
+                    return "987";
+                }
+            }
+        } else { // model
+            // look up the model
+            if (modelMaps.containsKey(codegenParameter.dataType)) {
+                return constructExampleCode(modelMaps.get(codegenParameter.dataType), modelMaps);
+            } else {
+                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenParameter.dataType);
+                return "TODO";
+            }
+        }
+    }
+
+    public String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps) {
+        if (codegenProperty.isArray) { // array
+            return "[" + constructExampleCode(codegenProperty.items, modelMaps) + "]";
+        } else if (codegenProperty.isMap) { // TODO: map, file type
+            return "\"TODO\"";
+        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
+            if ("String".equals(codegenProperty.dataType) || "Character".equals(codegenProperty.dataType)) {
+                if (StringUtils.isEmpty(codegenProperty.example)) {
+                    return "\"" + codegenProperty.example + "\"";
+                } else {
+                    return "\"" + codegenProperty.name + "_example\"";
+                }
+            } else if ("Bool".equals(codegenProperty.dataType)) { // boolean
+                if (Boolean.parseBoolean(codegenProperty.example)) {
+                    return "true";
+                } else {
+                    return "false";
+                }
+            } else if ("URL".equals(codegenProperty.dataType)) { // URL
+                return "URL(string: \"https://example.com\")!";
+            } else if ("Date".equals(codegenProperty.dataType)) { // date
+                return "Date()";
+            } else { // numeric
+                if (StringUtils.isEmpty(codegenProperty.example)) {
+                    return codegenProperty.example;
+                } else {
+                    return "123";
+                }
+            }
+        } else {
+            // look up the model
+            if (modelMaps.containsKey(codegenProperty.dataType)) {
+                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps);
+            } else {
+                //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
+                return "\"TODO\"";
+            }
+        }
+    }
+
+    public String constructExampleCode(CodegenModel codegenModel, HashMap<String, CodegenModel> modelMaps) {
+        String example;
+        example = codegenModel.name + "(";
+        List<String> propertyExamples = new ArrayList<>();
+        for (CodegenProperty codegenProperty : codegenModel.vars) {
+            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps));
+        }
+        example += StringUtils.join(propertyExamples, ", ");
+        example += ")";
+        return example;
+    }
 }

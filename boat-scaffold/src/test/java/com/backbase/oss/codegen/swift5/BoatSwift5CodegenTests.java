@@ -35,20 +35,14 @@ public class BoatSwift5CodegenTests {
     public void testShouldNotBreakNonReservedWord(){
         assertEquals(boatSwift5Generator.toEnumVarName("Error",null),"error");
     }
-    // Original Test https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/java/org/openapitools/codegen/swift5/Swift5ClientCodegenTest.java#L77
-    // return value varies
     @Test
     public void testCapitalizeWithDash() {
         assertEquals(boatSwift5Generator.toEnumVarName("ENTRY-NAME",null), "entryName");
     }
-    // Original test https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/java/org/openapitools/codegen/swift5/Swift5ClientCodegenTest.java#L82
-    // return value varies
     @Test
     public void testCapitalizeWithSpace() {
         assertEquals(boatSwift5Generator.toEnumVarName("ENTRY NAME",null), "entryName");
     }
-    // Original test https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/java/org/openapitools/codegen/swift5/Swift5ClientCodegenTest.java#L87
-    // return value varies
     @Test
     public void testCapitalizeWithUnderscore() {
         assertEquals(boatSwift5Generator.toEnumVarName("ENTRY_NAME",null), "entryName");
@@ -60,5 +54,9 @@ public class BoatSwift5CodegenTests {
     @Test
     public void testToModelName() {
         assertEquals(boatSwift5Generator.toModelName("Response"), "ModelResponse");
+    }
+    @Test
+    public void testToVarName(){
+        assertEquals(boatSwift5Generator.toVarName("something else"), "somethingElse");
     }
 }
