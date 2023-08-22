@@ -639,6 +639,9 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                     case "html2":
                         generatorName = "boat-docs";
                         break;
+                    case "boat-swift5":
+                        generatorName = "boat-swift5";
+                        break;
                     default:
                         // use the original generator
                 }
