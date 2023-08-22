@@ -1,10 +1,13 @@
 package com.backbase.oss.codegen.swift5;
 
+import io.swagger.v3.oas.models.media.Schema;
 import org.junit.jupiter.api.Test;
+import io.swagger.v3.oas.models.media.StringSchema;
 
+import java.util.Arrays;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BoatSwift5CodegenTests {
@@ -22,6 +25,85 @@ public class BoatSwift5CodegenTests {
     public void testEscapeReservedWord(){
         assertEquals(boatSwift5CodeGen.escapeReservedWord("String"), "_String");
     }
+    @Test
+    public void testToModelNameWithNumber(){
+        assertEquals(boatSwift5CodeGen.toModelName("200Return"), "Model200Return");
+    }
+    @Test
+    public void testToModelNameWithoutTransformation(){
+        assertEquals(boatSwift5CodeGen.toModelName("Something"), "Something");
+    }
+    @Test
+    public void testToModelFileName(){
+        assertEquals(boatSwift5CodeGen.toModelFilename("Something"), "Something");
+    }
+    @Test
+    public void testToApiNameWithEmptyString(){
+        assertEquals(boatSwift5CodeGen.toApiName(""), "DefaultAPI");
+    }
+    @Test
+    public void testToApiNameWithNonEmptyString(){
+        assertEquals(boatSwift5CodeGen.toApiName("Pets"), "PetsAPI");
+    }
+    @Test
+    public void testApiDocFileFolder() {
+        assertEquals(boatSwift5CodeGen.apiDocFileFolder(),"generated-code/swift/docs/");
+    }
+    @Test
+    public void testModelDocFileFolder(){
+        assertEquals(boatSwift5CodeGen.modelDocFileFolder(),"generated-code/swift/docs/");
+    }
+    @Test
+    public void testToModelDocFileName(){
+        assertEquals(boatSwift5CodeGen.toModelDocFilename("something"), "Something");
+    }
+    @Test
+    public void testToApiDocFilename(){
+        assertEquals(boatSwift5CodeGen.toApiDocFilename("Something"), "SomethingAPI");
+    }
+    @Test
+    public void testToOperationIDEmptyStringID(){
+        Exception exp = assertThrows(RuntimeException.class, () -> {
+            boatSwift5CodeGen.toOperationId(" ");
+        });
+        String expectedMessage = "Empty method name (operationId) not allowed";
+        String actualMessage = exp.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+    @Test
+    public void testToOperationIdIsReservedWord(){
+        assertEquals(boatSwift5CodeGen.toOperationId("return"), "callReturn");
+    }
+    @Test
+    public void testToOperationIDStartsWithNumber(){
+        assertEquals(boatSwift5CodeGen.toOperationId("45Return"),"call45Return");
+    }
+    @Test
+    public void testToVarNameWithNumbers(){
+        assertEquals(boatSwift5CodeGen.toVarName("56Today"),"_56Today");
+    }
+    @Test
+    public void testToVarNameWithUppercase(){
+        assertEquals(boatSwift5CodeGen.toVarName("TODAY"),"TODAY");
+    }
+    @Test
+    public void testToParamNameWithNumbers(){
+        assertEquals(boatSwift5CodeGen.toParamName("56Today"),"_56Today");
+    }
+    @Test
+    public void testToParamNameWithUppercase(){
+        assertEquals(boatSwift5CodeGen.toParamName("TODAY"),"TODAY");
+    }
+    @Test
+    public void testEscapeQuotationMark(){
+        assertEquals(boatSwift5CodeGen.escapeQuotationMark("\"Today\""),"Today");
+    }
+    @Test
+    public void testEscapeUnsafeCharacters(){
+        assertEquals(boatSwift5CodeGen.escapeUnsafeCharacters("*/Today"),"*_/Today");
+    }
+
     @Test
     public void testModelFileFolder() {
         assertEquals(boatSwift5CodeGen.modelFileFolder(), "generated-code/swift/Classes/OpenAPIs/Models");
@@ -57,5 +139,21 @@ public class BoatSwift5CodegenTests {
     @Test
     public void testToVarName(){
         assertEquals(boatSwift5CodeGen.toVarName("something else"), "somethingElse");
+    }
+    @Test
+    public void testGetHelp(){
+        assertEquals(boatSwift5CodeGen.getHelp(), "Generates a Swift 5.x client library");
+    }
+    @Test
+    public void testProcessOpts(){
+        final String openAPIDevs = "OpenAPI Devs";
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5CodeGen.POD_AUTHORS, openAPIDevs);
+
+        boatSwift5CodeGen.processOpts();
+        final Boolean useDBSDataProvider = (Boolean) boatSwift5CodeGen.additionalProperties().get("useDBSDataProvider");
+        assertEquals(useDBSDataProvider, true);
+
+        final String podAuthors = (String) boatSwift5CodeGen.additionalProperties().get(BoatSwift5CodeGen.POD_AUTHORS);
+        assertEquals(podAuthors, openAPIDevs);
     }
 }
