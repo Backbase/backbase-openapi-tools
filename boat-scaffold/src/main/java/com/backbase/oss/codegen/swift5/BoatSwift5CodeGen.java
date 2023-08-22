@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.openapitools.codegen.*;
+import org.openapitools.codegen.languages.Swift5ClientCodegen;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
@@ -23,8 +24,8 @@ import java.util.regex.Pattern;
 
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
-public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BoatSwift5Generator.class);
+public class BoatSwift5CodeGen extends Swift5ClientCodegen {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BoatSwift5CodeGen.class);
 
     public static final String PROJECT_NAME = "projectName";
     public static final String RESPONSE_AS = "responseAs";
@@ -69,7 +70,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
     /**
      * Constructor for the Swift5 language codegen module
      */
-    public BoatSwift5Generator() {
+    public BoatSwift5CodeGen() {
         super();
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata).build();
@@ -78,7 +79,7 @@ public class BoatSwift5Generator extends DefaultCodegen implements CodegenConfig
         modelTemplateFiles.put("model.mustache", ".swift");
         apiTemplateFiles.put("api.mustache", ".swift");
         apiTemplateFiles.put("api_parameters.mustache", "RequestParams.swift");
-        embeddedTemplateDir = templateDir = "swift5";
+        embeddedTemplateDir = templateDir = "boat-swift5";
         apiPackage = File.separator + "APIs";
         modelPackage = File.separator + "Models";
         modelDocTemplateFiles.put("model_doc.mustache", ".md");

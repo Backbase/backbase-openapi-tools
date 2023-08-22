@@ -1,7 +1,6 @@
 package com.backbase.oss.codegen.swift5;
 
 import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.CodegenProperty;
 
 import java.util.Objects;
 
@@ -9,54 +8,54 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class BoatSwift5CodegenTests {
-    BoatSwift5Generator boatSwift5Generator = new BoatSwift5Generator();
+    BoatSwift5CodeGen boatSwift5CodeGen = new BoatSwift5CodeGen();
 
     @Test
     public void testGeneratorName() {
-        assert Objects.equals(boatSwift5Generator.getName(), "boat-swift5");
+        assert Objects.equals(boatSwift5CodeGen.getName(), "boat-swift5");
     }
     @Test
     public void testTag() {
-        assertEquals(boatSwift5Generator.getTag().toString(), "CLIENT");
+        assertEquals(boatSwift5CodeGen.getTag().toString(), "CLIENT");
     }
     @Test
     public void testEscapeReservedWord(){
-        assertEquals(boatSwift5Generator.escapeReservedWord("String"), "_String");
+        assertEquals(boatSwift5CodeGen.escapeReservedWord("String"), "_String");
     }
     @Test
     public void testModelFileFolder() {
-        assertEquals(boatSwift5Generator.modelFileFolder(), "generated-code/swift/Classes/OpenAPIs/Models");
+        assertEquals(boatSwift5CodeGen.modelFileFolder(), "generated-code/swift/Classes/OpenAPIs/Models");
     }
     @Test
     public void testApiFileFolder(){
-        assertEquals(boatSwift5Generator.apiFileFolder(), "generated-code/swift/Classes/OpenAPIs/APIs");
+        assertEquals(boatSwift5CodeGen.apiFileFolder(), "generated-code/swift/Classes/OpenAPIs/APIs");
     }
     @Test
     public void testShouldNotBreakNonReservedWord(){
-        assertEquals(boatSwift5Generator.toEnumVarName("Error",null),"error");
+        assertEquals(boatSwift5CodeGen.toEnumVarName("Error",null),"error");
     }
     @Test
     public void testCapitalizeWithDash() {
-        assertEquals(boatSwift5Generator.toEnumVarName("ENTRY-NAME",null), "entryName");
+        assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY-NAME",null), "entryName");
     }
     @Test
     public void testCapitalizeWithSpace() {
-        assertEquals(boatSwift5Generator.toEnumVarName("ENTRY NAME",null), "entryName");
+        assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY NAME",null), "entryName");
     }
     @Test
     public void testCapitalizeWithUnderscore() {
-        assertEquals(boatSwift5Generator.toEnumVarName("ENTRY_NAME",null), "entryName");
+        assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY_NAME",null), "entryName");
     }
     @Test
     public void testToParamNameReturnsCorrectString(){
-        assertEquals(boatSwift5Generator.toParamName("created-at"),"createdAt");
+        assertEquals(boatSwift5CodeGen.toParamName("created-at"),"createdAt");
     }
     @Test
     public void testToModelName() {
-        assertEquals(boatSwift5Generator.toModelName("Response"), "ModelResponse");
+        assertEquals(boatSwift5CodeGen.toModelName("Response"), "ModelResponse");
     }
     @Test
     public void testToVarName(){
-        assertEquals(boatSwift5Generator.toVarName("something else"), "somethingElse");
+        assertEquals(boatSwift5CodeGen.toVarName("something else"), "somethingElse");
     }
 }
