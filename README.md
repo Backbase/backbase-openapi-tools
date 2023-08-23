@@ -17,6 +17,9 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.10
+* Boat maven plugin
+  * Fix: When using Multipart, generate with `@RequestPart` instead of `@RequestParam`
 ## 0.17.9
 * Boat Maven plugin
   * Fix: [containerDefaultToNull=true is not backward compatible](https://github.com/Backbase/backbase-openapi-tools/issues/604)

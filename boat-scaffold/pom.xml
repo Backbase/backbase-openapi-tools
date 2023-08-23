@@ -152,6 +152,13 @@
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>${maven.resolver.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-core</artifactId>
+            <version>3.24.9</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
