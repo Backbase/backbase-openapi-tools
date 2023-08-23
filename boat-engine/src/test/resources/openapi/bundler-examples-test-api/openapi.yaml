@@ -22,6 +22,10 @@ paths:
                 $ref: '#/components/schemas/UserPostResponse'
               example:
                 $ref: ./examples/user-post-response.json
+            csv:
+              example: |-
+                UserId,Username 
+                aaaa-bbbb-cccc,John
     post:
       summary: Single example
       requestBody:

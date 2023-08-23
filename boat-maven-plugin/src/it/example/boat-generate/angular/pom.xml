@@ -46,6 +46,9 @@
                             <output>${project.basedir}/target/http-module</output>
                             <reservedWordsMappings>delete=delete,function=function,new=new</reservedWordsMappings>
                             <additionalProperties>npmName=${codegen.npmPackage.name},npmVersion=${codegen.npmPackage.version},withMocks=${codegen.generateMocks},buildDist=${codegen.buildDist},serviceSuffix=${codegen.serviceSuffix},apiModulePrefix=${codegen.apiModulePrefix}</additionalProperties>
+                            <configOptions>
+                                <ngVersion>13.0.0</ngVersion>
+                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>

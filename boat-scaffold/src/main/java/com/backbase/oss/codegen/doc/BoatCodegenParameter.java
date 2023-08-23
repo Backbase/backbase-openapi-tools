@@ -54,6 +54,7 @@ public class BoatCodegenParameter extends CodegenParameter {
     }
 
 
+    @SuppressWarnings("java:S3776")
     public static BoatCodegenParameter fromCodegenParameter(CodegenParameter codegenParameter) {
 
         // Standard properties

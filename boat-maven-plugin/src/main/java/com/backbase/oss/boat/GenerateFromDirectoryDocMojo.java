@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,12 +84,10 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
                         StandardOpenOption.CREATE,
                         StandardOpenOption.APPEND);
 
-            } catch (IOException e) {
+            } catch (IOException | InvalidPathException e) {
                 log.error("Failed to write BOAT markers to: {}", markersDirectory, e);
                 throw new MojoExecutionException("Failed to write BOAT markers", e);
-
             }
-
         }
     }
 

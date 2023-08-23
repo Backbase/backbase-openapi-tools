@@ -17,16 +17,55 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
-
+## 0.17.7
+* Boat maven plugin
+  * Fix: Added 'containerDefaultToNull' default option to the MOJO generator
+## 0.17.6
+* Boat engine
+  * Fix: Processing of a single string type example on media-type.
+## 0.17.4
+* Boat Angular generator
+  * New format for Angular mocks, which are now export an array with responses.
+## 0.17.3
+* Boat Angular generator
+  * Map the `Set` type to `Array` by default to avoid breaking changes vs clients generated with 0.16.x. 
+## 0.17.2
+* Boat Angular generator
+  * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
+  * Remove licence field from package.json
+## 0.17.1
+* Boat Angular generator
+  * Added artifact information to generated package.json
 ## 0.17.0
 * General
   * Removed RAML Support
+  * Removed custom JavaScript client
   * Update OpenAPI Tools to 6.2.1
 * Boat Java Generator
   * Jakarta EE 9 compatibility
   * `spring-mvc` library is removed because it is not supported by OpenAPI Tools anymore
   * Use of `Set` for unique items is now enabled by default as OpenAPI Generator fixed their implementation
-
+## 0.16.15
+* Boat engine
+  * Fix: Processing of a single string type example on media-type.
+* Boat Angular generator
+  * New format for Angular mocks, which are now export an array with responses.
+## 0.16.13
+* Boat Angular generator
+  * `@angular/common` added as a peer dependency in the generated package.json files
+## 0.16.12
+* Boat Angular generator
+  * Remove leading comment from typescript files so that there are fewer differences between files when regenerating with a new spec version (info moved to README)
+  * Remove licence field from package.json
+## 0.16.11
+* Boat Angular generator
+  * Set `removeComments: false` in generated tsconfig.json files to retain `/*#__PURE__*/` annotation in compiled JS.
+## 0.16.10
+* Boat Angular generator
+  * Remove types from generated mock providers due to a TypeScript which prevents `/*#__PURE__*/` annotation from working
+## 0.16.9
+* Boat Angular generator
+  * Use of `/*#__PURE__*/` for `createMocks` function call in templates to enable tree-shaking
 ## 0.16.6
 * Boat Angular generator
   * Use `^` instead of `>=` for `devDependencies` in the generated project, so project will be built using correct target version of ng-packagr & the Angular CLI

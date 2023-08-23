@@ -1,9 +1,5 @@
 import { HttpParameterCodec } from '@angular/common/http';
 
-{{#withMocks}}
-import { InjectionToken } from '@angular/core';
-{{/withMocks}}
-
 export interface {{configurationParametersInterfaceName}} {
     apiKeys?: {[ key: string ]: string};
     username?: string;
@@ -146,8 +142,3 @@ export class {{configurationClassName}} {
             : value;
     }
 }
-
-{{#withMocks}}
-export const CONFIG_TOKEN = new InjectionToken('api-data-module {{configurationClassName}}');
-{{/withMocks}}
-

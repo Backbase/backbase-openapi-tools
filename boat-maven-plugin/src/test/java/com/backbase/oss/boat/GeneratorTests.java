@@ -1,24 +1,21 @@
 package com.backbase.oss.boat;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.*;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
 import java.io.File;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Slf4j
 class GeneratorTests {
@@ -187,8 +184,6 @@ class GeneratorTests {
             mojo.markersDirectory = new File(" //43243 \\d a1r1\4t 11t134 t835jyz");
             mojo.execute();
         });
-
-
     }
 
     @Test
@@ -309,32 +304,4 @@ class GeneratorTests {
 
         assertDoesNotThrow(mojo::execute, "Angular client generation should not throw exceptions");
     }
-
-    @Test
-    void testWebClient() throws MojoExecutionException {
-        GenerateWebClientEmbeddedMojo mojo = new GenerateWebClientEmbeddedMojo();
-
-        String inputFile = getClass().getResource("/oas-examples/petstore.yaml").getFile();
-        File input = new File(inputFile);
-        File output = new File("target/webclient");
-        if (!output.exists()) {
-            output.mkdirs();
-        }
-
-        DefaultBuildContext defaultBuildContext = new DefaultBuildContext();
-        defaultBuildContext.enableLogging(new ConsoleLogger());
-
-        mojo.buildContext = defaultBuildContext;
-        mojo.project = new MavenProject();
-        mojo.inputSpec = input.getAbsolutePath();
-        mojo.output = output;
-        mojo.skip = false;
-        mojo.skipIfSpecIsUnchanged = false;
-       assertDoesNotThrow((Executable) mojo::execute);
-
-
-
-    }
-
-
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -61,7 +62,7 @@ public class BatchOpenApiDiff {
                 }
                 if (writeChangeLogToSeparateFile) {
                     Path changeLogFile = newOpenAPIPath.getParent().resolve("changelog.md");
-                    Files.write(changeLogFile, changelogMarkdown.getBytes(), StandardOpenOption.CREATE);
+                    Files.write(changeLogFile, changelogMarkdown.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
                 }
                 newOpenAPI.addExtension(X_CHANGELOG, changeLog);
                 success.put(newOpenAPIPath.toFile(), newOpenAPI);
@@ -106,7 +107,7 @@ public class BatchOpenApiDiff {
 
         diffedApi.addExtension("x-compared", true);
         log.debug("Writing change log back into OpenAPI");
-        Files.write(openApiFilePath, SerializerUtils.toYamlString(diffedApi).getBytes(), StandardOpenOption.CREATE);
+        Files.write(openApiFilePath, SerializerUtils.toYamlString(diffedApi).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
     }
 
     private static String renderChangeLog(List<ChangedOpenApi> changeLog) {

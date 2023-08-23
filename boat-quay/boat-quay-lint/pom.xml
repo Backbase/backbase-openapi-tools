@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>boat-quay</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.17.10-SNAPSHOT</version>
     </parent>
 
     <artifactId>boat-quay-lint</artifactId>
@@ -17,7 +17,7 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.7.22</kotlin.version>
+        <kotlin.version>1.9.0</kotlin.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
     </properties>
 
@@ -67,6 +67,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-trail-resources</artifactId>
             <version>${project.version}</version>
@@ -80,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>

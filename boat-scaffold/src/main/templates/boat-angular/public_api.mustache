@@ -8,9 +8,5 @@ export * from './api.module';
 {{#operations}}
 export * from './api/{{ classFilename }}';
 {{/operations}}
-
-{{#withMocks}}
-export * from './api/{{ classFilename }}.mocks';
-{{/withMocks}}
 {{/apis}}
 {{/apiInfo}}

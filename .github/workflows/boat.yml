@@ -37,29 +37,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify sonar:sonar
-  publish:
-    if: "!contains(github.event.head_commit.message, '[version bump]')"
-    runs-on: ubuntu-latest
-    needs: [ test, sonar ]
-    steps:
-      - name: Checkout project
-        uses: actions/checkout@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'microsoft'
-          java-version: '17'
-          cache: 'maven'
-
-      - name: Publish SNAPSHOT
-        uses: samuelmeuli/action-maven-publish@v1
-        with:
-          maven_args: "-DskipTests=true"
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B verify sonar:sonar -Dgpg.skip

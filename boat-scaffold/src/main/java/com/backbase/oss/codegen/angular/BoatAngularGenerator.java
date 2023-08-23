@@ -60,8 +60,9 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String WITH_MOCKS = "withMocks";
 
     public static final String NG_VERSION = "ngVersion";
-    public static final String FOUNDATION_VERSION = "foundationVersion";
     public static final String SPEC_VERSION = "specVersion";
+    public static final String SPEC_ARTIFACT_ID = "specArtifactId";
+    public static final String SPEC_GROUP_ID = "specGroupId";
     public static final String API_MODULE_PREFIX = "apiModulePrefix";
     public static final String SERVICE_SUFFIX = "serviceSuffix";
     public static final String BUILD_DIST = "buildDist";
@@ -73,14 +74,20 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
     public static final String PATH_NAME_KEY = "pathName";
     public static final String HAS_EXAMPLES = "hasExamples";
     public static final String PATTERN = "pattern";
-    protected String foundationVersion = "6.6.7";
     protected String ngVersion = "10.0.0";
     protected String serviceSuffix = "Service";
     protected String serviceFileSuffix = ".service";
     protected String modelFileSuffix = "";
 
+    private static final String MOCKS_ARRAY_TEMPLATE_NAME = "apiMocks.array.mustache";
+
     public BoatAngularGenerator() {
         super();
+
+        this.openapiNormalizer.put("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "true");
+
+        typeMapping.put("Set", "Array");
+        typeMapping.put("set", "Array");
 
         modifyFeatureSet(features -> features.includeDocumentationFeatures(DocumentationFeature.Readme));
 
@@ -102,13 +109,25 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             "Setting this property to true will generate mocks out of the examples.",
             false));
         this.cliOptions.add(new CliOption(NG_VERSION, "The version of Angular. (At least 10.0.0)").defaultValue(this.ngVersion));
-        this.cliOptions.add(new CliOption(FOUNDATION_VERSION, "The version of foundation-ang library.").defaultValue(this.foundationVersion));
         this.cliOptions.add(new CliOption(API_MODULE_PREFIX, "The prefix of the generated ApiModule."));
         this.cliOptions.add(new CliOption(SERVICE_SUFFIX, "The suffix of the generated service.").defaultValue(this.serviceSuffix));
         this.cliOptions.add(new CliOption(BUILD_DIST, "Path to build package to"));
         this.cliOptions.add(new CliOption(SPEC_VERSION, "The version of OpenAPI YAML spec used to generate the NPM package."));
+        this.cliOptions.add(new CliOption(SPEC_ARTIFACT_ID, "The maven artifact ID of OpenAPI YAML spec used to generate the NPM package."));
+        this.cliOptions.add(new CliOption(SPEC_GROUP_ID, "The maven group ID of OpenAPI YAML spec used to generate the NPM package."));
+
     }
 
+    @Override
+    public String apiFilename(String templateName, String tag) {
+        String suffix = apiTemplateFiles().get(templateName);
+        String folder = templateName.equals(MOCKS_ARRAY_TEMPLATE_NAME) ? mocksArrayFolder() : apiFileFolder();
+        return folder + File.separator + toApiFilename(tag) + suffix;
+    }
+
+    protected String mocksArrayFolder() {
+        return outputFolder + File.separator + "mocks";
+    }
 
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
@@ -181,15 +200,6 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             () -> applyAngularVersion(this.ngVersion)
         );
 
-        processOpt(FOUNDATION_VERSION,
-            value -> additionalProperties.put(FOUNDATION_VERSION, new SemVer(value)),
-            () -> {
-                SemVer version = new SemVer(this.foundationVersion);
-                additionalProperties.put(FOUNDATION_VERSION, version);
-                log.info("generating code with foundation-ang {} ...", version);
-                log.info("  (you can select the angular version by setting the additionalProperty foundationVersion)");
-            });
-
         processOpt(SPEC_VERSION,
             value -> {
                 if(StringUtils.isNotEmpty(value)) {
@@ -201,9 +211,31 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
                 log.info("  (you can select the spec version by setting the additionalProperty specVersion)");
             });
 
+        processOpt(SPEC_ARTIFACT_ID,
+            value -> {
+                if(StringUtils.isNotEmpty(value)) {
+                    additionalProperties.put(SPEC_ARTIFACT_ID, value);
+                }
+            },
+            () -> {
+                log.info("generating code without OpenAPI YAML SPEC_ARTIFACT_ID ...");
+                log.info("  (you can select the specArtifactId by setting the additionalProperty specArtifactId)");
+            });
+
+         processOpt(SPEC_GROUP_ID,
+            value -> {
+                if(StringUtils.isNotEmpty(value)) {
+                    additionalProperties.put(SPEC_GROUP_ID, value);
+                }
+            },
+            () -> {
+                log.info("generating code without OpenAPI YAML SPEC_GROUP_ID ...");
+                log.info("  (you can select the specGroupId by setting the additionalProperty specGroupId)");
+            });
+
         processBooleanOpt(WITH_MOCKS, withMocks -> {
             if (Boolean.TRUE.equals(withMocks)) {
-                apiTemplateFiles.put("apiMocks.mustache", ".mocks.ts");
+                apiTemplateFiles.put(MOCKS_ARRAY_TEMPLATE_NAME, ".mocks.array.js");
             }
         });
 
@@ -266,7 +298,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             final String rxjsVersion = "rxjsVersion";
             final String zonejsVersion = "zonejsVersion";
 
-            if (angularVersion.atLeast("14.0.0")) {
+            if (angularVersion.atLeast("16.0.0")) {
+                additionalProperties.put(tsVersion, "5.1.6");
+                additionalProperties.put(ngPackagrVersion, "16.1.0");
+                additionalProperties.put(rxjsVersion, "7.8.1");
+                additionalProperties.put(zonejsVersion, "0.13.1");
+            } else if (angularVersion.atLeast("14.0.0")) {
                 additionalProperties.put(tsVersion, "4.6.4");
                 additionalProperties.put(ngPackagrVersion, "14.2.2");
                 additionalProperties.put(rxjsVersion, "7.5.0");

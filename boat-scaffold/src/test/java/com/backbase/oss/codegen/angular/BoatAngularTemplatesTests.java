@@ -121,7 +121,7 @@ class BoatAngularTemplatesTests {
     @Check
     public void withMocks() {
         assertThat(
-                findPattern(selectFiles("/api/.+\\.service\\.mocks\\.ts$"), "MocksProvider: Provider = createMocks"),
+                findPattern(selectFiles("/mocks/.+\\.service\\.mocks\\.array\\.js$"), "module.exports"),
                 equalTo(this.param.withMocks));
     }
 
@@ -235,12 +235,17 @@ class BoatAngularTemplatesTests {
         if (!Objects.isNull(this.param.ngVersion)) {
             cf.addAdditionalProperty(BoatAngularGenerator.NG_VERSION, this.param.ngVersion);
         }
-        if (!Objects.isNull(this.param.foundationVersion)) {
-            cf.addAdditionalProperty(BoatAngularGenerator.FOUNDATION_VERSION, this.param.foundationVersion);
-        }
 
         if (!Objects.isNull(this.param.specVersion)) {
             cf.addAdditionalProperty(BoatAngularGenerator.SPEC_VERSION, this.param.specVersion);
+        }
+
+        if (!Objects.isNull(this.param.specArtifactId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_ARTIFACT_ID, this.param.specArtifactId);
+        }
+
+        if (!Objects.isNull(this.param.specGroupId)) {
+            cf.addAdditionalProperty(BoatAngularGenerator.SPEC_GROUP_ID, this.param.specGroupId);
         }
 
         if (!Objects.isNull(this.param.buildDist)) {
@@ -275,8 +280,9 @@ class BoatAngularTemplatesTests {
 
         final String name;
         final String ngVersion;
-        final String foundationVersion;
         final String specVersion;
+        final String specArtifactId;
+        final String specGroupId;
         final String buildDist;
         final boolean npmRepository;
         final boolean npmName;
@@ -287,8 +293,9 @@ class BoatAngularTemplatesTests {
         Combination(int mask, String ngVersion) {
             this.name = caseName(mask) + "-ng-" + ngVersion;
             this.ngVersion = ngVersion;
-            this.foundationVersion = mask == 0 ? "6.0.0" : mask == 1 ? "7.0.0" : null;
             this.specVersion = mask == 0 ? "1.0.0" : mask == 1 ? "2.0.0" : null;
+            this.specArtifactId = "specArtifactId";
+            this.specGroupId = "specGroupId";
             this.buildDist = mask > 0 ? caseName(mask) : null;
             this.npmName = (mask & 1) != 0;
             this.npmRepository = (mask & 1 << 1) != 0;
@@ -327,6 +334,7 @@ class BoatAngularTemplatesTests {
                 cases.add(-1);
             }
             final String[] ngVersions = {
+                "16.0.0",
                 "14.0.0",
                 "13.0.0",
                 "12.0.0",

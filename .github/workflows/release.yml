@@ -37,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify sonar:sonar
+        run: mvn -B verify sonar:sonar -Dgpg.skip
 
   publish:
     if: "!contains(github.event.head_commit.message, '[version bump]')"
@@ -53,6 +53,11 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
           cache: 'maven'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
 
       - name: Configure Git user
         run: |
@@ -77,15 +82,17 @@ jobs:
           mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false -B
 
       - name: Build and Publish
-        uses: samuelmeuli/action-maven-publish@v1
-        with:
-          maven_args: "-DskipTests=true"
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          mvn \
+            --no-transfer-progress \
+            --batch-mode \
+            -DskipTests=true \
+            deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Commit files
         run: |
@@ -99,10 +106,8 @@ jobs:
     needs: [ publish ]
     steps:
 
-      - name: Checkout Main Branch
+      - name: Checkout Branch
         uses: actions/checkout@v3
-        with:
-          ref: main
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -128,8 +133,8 @@ jobs:
         run: |
           git commit -m "[version bump] new dev version" -a
 
-      - name: Push Development Version to Main Branch
+      - name: Push Development Version to Branch
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          branch: ${{github.event.release.target_commitish || 'main'}}

@@ -4,8 +4,23 @@
   "description": "OpenAPI client for {{{npmName}}}",
   "backbase": {
     {{#specVersion}}
-    "specVersion": "{{{specVersion}}}"
+    "specVersion": "{{{specVersion}}}",
     {{/specVersion}}
+    {{#specArtifactId}}
+    "specArtifactId": "{{{specArtifactId}}}",
+    {{/specArtifactId}}
+    {{#specGroupId}}
+    "specGroupId": "{{{specGroupId}}}",
+    {{/specGroupId}}
+    {{#inputSpecRelative}}
+    "inputSpecRelative": "{{{inputSpecRelative}}}",
+    {{/inputSpecRelative}}
+    {{#specClassifier}}
+    "specClassifier": "{{{specClassifier}}}",
+    {{/specClassifier}}
+    {{#specType}}
+    "specType": "{{{specType}}}"
+    {{/specType}}
   },
   "keywords": [
     "backbase",
@@ -15,15 +30,11 @@
     "openapi-client",
     "openapi-generator"
   ],
-  "license": "Unlicense",
   "scripts": {
     "build": "ng-packagr -p ng-package.json"
   },
   "peerDependencies": {
     "@angular/core": ">={{ngVersion}}",
-    {{#withMocks}}
-    "@backbase/foundation-ang": ">={{foundationVersion}}",
-    {{/withMocks}}
     "rxjs": ">={{rxjsVersion}}"
   },
   "devDependencies": {
@@ -37,9 +48,6 @@
     "@ngrx/store": "^{{ngVersion}}",
     "ng-packagr": "^{{ngPackagrVersion}}",
     "reflect-metadata": "^0.1.3",
-    {{#withMocks}}
-    "@backbase/foundation-ang": "^{{foundationVersion}}",
-    {{/withMocks}}
     "rxjs": "^{{rxjsVersion}}",
     "typescript": "~{{{tsVersion}}}",
     "zone.js": "^{{zonejsVersion}}"

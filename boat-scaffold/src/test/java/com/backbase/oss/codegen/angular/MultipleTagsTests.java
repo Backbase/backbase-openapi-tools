@@ -16,6 +16,7 @@ public class MultipleTagsTests {
     public void testSingleTags() throws OpenAPILoaderException {
 
         String specName = "petstore";
+
         generate("/oas-examples/" + specName + ".yaml", "target/angular/" + specName);
     }
 

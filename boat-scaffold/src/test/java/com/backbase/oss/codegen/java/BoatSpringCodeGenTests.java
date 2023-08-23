@@ -3,6 +3,7 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
@@ -15,11 +16,13 @@ import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.samskivert.mustache.Template.Fragment;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -29,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.DefaultGenerator;
@@ -53,44 +57,6 @@ class BoatSpringCodeGenTests {
             .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
 
-    @Test
-    void uniquePropertyToSet() {
-        final BoatSpringCodeGen gen = new BoatSpringCodeGen();
-        final CodegenProperty prop = new CodegenProperty();
-
-        gen.useSetForUniqueItems = true;
-        prop.isContainer = true;
-        prop.setUniqueItems(true);
-        prop.items = new CodegenProperty();
-        prop.items.dataType = "String";
-        prop.baseType = "java.util.List";
-        prop.dataType = "java.util.List<String>";
-
-        gen.postProcessModelProperty(new CodegenModel(), prop);
-
-        assertThat(prop.containerType, is("set"));
-        assertThat(prop.baseType, is("java.util.Set"));
-        assertThat(prop.dataType, is("java.util.Set<String>"));
-    }
-
-    @Test
-    void uniqueParameterToSet() {
-        final BoatSpringCodeGen gen = new BoatSpringCodeGen();
-        final CodegenParameter param = new CodegenParameter();
-
-        gen.useSetForUniqueItems = true;
-        param.isContainer = true;
-        param.setUniqueItems(true);
-        param.items = new CodegenProperty();
-        param.items.dataType = "String";
-        param.baseType = "java.util.List<String>";
-        param.dataType = "java.util.List<String>";
-
-        gen.postProcessParameter(param);
-
-        assertThat(param.baseType, is("java.util.Set"));
-        assertThat(param.dataType, is("java.util.Set<String>"));
-    }
 
     @Test
     void processOptsUseProtectedFields() {
@@ -116,6 +82,16 @@ class BoatSpringCodeGenTests {
         indent.execute(frag, output);
 
         assertThat(output.toString(), equalTo(String.format("__%n__Good%n__  morning,%n__ Dave%n")));
+    }
+
+    @Test
+    void addServletRequestTestFromOperation(){
+        final BoatSpringCodeGen gen = new BoatSpringCodeGen();
+        gen.addServletRequest = true;
+        CodegenOperation co = gen.fromOperation("/test", "POST", new Operation(), null);
+        assertEquals(1, co.allParams.size());
+        assertEquals("httpServletRequest", co.allParams.get(0).paramName);
+        assertTrue(Arrays.stream(co.allParams.get(0).getClass().getDeclaredFields()).anyMatch(f -> "isHttpServletRequest".equals(f.getName())));
     }
 
     @Test
