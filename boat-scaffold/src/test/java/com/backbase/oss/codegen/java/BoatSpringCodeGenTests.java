@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.samskivert.mustache.Template.Fragment;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.parser.OpenAPIParser;
@@ -23,6 +24,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -103,17 +105,17 @@ class BoatSpringCodeGenTests {
         clientOptInput.config(codegen);
         clientOptInput.openAPI(openApiInput);
 
-        var files = new DefaultGenerator().opts(clientOptInput).generate();
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
 
-        var testApi = files.stream().filter(file -> file.getName().equals("TestApi.java"))
+        File testApi = files.stream().filter(file -> file.getName().equals("TestApi.java"))
             .findFirst()
             .get();
-        var testPostMethod = StaticJavaParser.parse(testApi)
+        MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)
             .findAll(MethodDeclaration.class)
             .get(1);
 
-        var filesParam = testPostMethod.getParameterByName("files").get();
-        var contentParam = testPostMethod.getParameterByName("content").get();
+        Parameter filesParam = testPostMethod.getParameterByName("files").get();
+        Parameter contentParam = testPostMethod.getParameterByName("content").get();
 
         assertTrue(filesParam.getAnnotationByName("RequestPart").isPresent());
         assertTrue(contentParam.getAnnotationByName("RequestPart").isPresent());
