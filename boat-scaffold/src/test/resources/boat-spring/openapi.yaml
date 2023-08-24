@@ -101,11 +101,29 @@ components:
     MultiLinePaymentRequest:
       required:
         - lines
+        - uniqueLines
       type: object
       properties:
         lines:
           type: array
           description: Payment request details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        uniqueLines:
+          type: array
+          uniqueItems: true
+          description: Payment request details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        optionalLines:
+          type: array
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        optionalUniqueLines:
+          type: array
+          uniqueItems: true
+          description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
     PaymentRequestLine:

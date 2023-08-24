@@ -1,7 +1,9 @@
 package com.backbase.oss.codegen.java;
 
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+
+import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import io.swagger.v3.oas.models.media.Schema;
-import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
@@ -120,27 +122,9 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
     @Override
     public String toDefaultValue(CodegenProperty cp, Schema schema) {
-        schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
-        if (ModelUtils.isArraySchema(schema) && (schema.getDefault() == null)) {
-            return getArrayDefaultValue(cp, schema, containerDefaultToNull,
-                instantiationTypes().getOrDefault("set", "LinkedHashSet"),
-                instantiationTypes().getOrDefault("array", "ArrayList"));
-        }
-        return super.toDefaultValue(cp, schema);
-    }
-
-    public static String getArrayDefaultValue(CodegenProperty cp, Schema schema,
-        boolean containerDefaultToNull, String setType, String arrayType) {
-        if (cp.isNullable || containerDefaultToNull) {
-            return null;
-        } else {
-            if (ModelUtils.isSet(schema)) {
-                return String.format(Locale.ROOT, "new %s<>()",
-                    setType);
-            } else {
-                return String.format(Locale.ROOT, "new %s<>()",
-                    arrayType);
-            }
-        }
+        final Schema referencedSchema = ModelUtils.getReferencedSchema(this.openAPI, schema);
+        return getCollectionCodegenValue(cp, referencedSchema, containerDefaultToNull, instantiationTypes())
+            .map(CodegenValueType::getValue)
+            .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
     }
 }
