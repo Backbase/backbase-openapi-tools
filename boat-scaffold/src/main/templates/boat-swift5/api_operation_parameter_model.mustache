@@ -24,7 +24,7 @@
 {{/allParams}}
 
 {{#hasParams}}
-    internal init({{#allParams}}{{paramName}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+    internal init({{#allParams}}{{paramName}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{^-last}}, {{/-last}}{{/allParams}}) {
         {{#allParams}}
         self.{{paramName}} = {{paramName}}
         {{/allParams}}
