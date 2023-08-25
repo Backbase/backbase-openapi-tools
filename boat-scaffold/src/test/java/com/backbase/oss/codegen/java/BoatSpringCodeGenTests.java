@@ -15,15 +15,15 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.samskivert.mustache.Template.Fragment;
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
@@ -42,7 +42,7 @@ class BoatSpringCodeGenTests {
     @BeforeAll
     static void before() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT));
-        FileUtils.deleteDirectory(new File(TEST_OUTPUT, "src"));
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT));
     }
 
     @Test
