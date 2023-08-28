@@ -1,1 +1,1 @@
-{{paramName}}: {{#isEnum}}{{#isArray}}[{{classname}}.{{operationIdCamelCase}}RequestParams.{{enumName}}]{{/isArray}}{{^isArray}}{{classname}}.{{operationIdCamelCase}}RequestParams.{{{datatypeWithEnum}}}{{/isArray}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}
+{{paramName}}: {{#isEnum}}{{#isListContainer}}[{{classname}}.{{operationIdCamelCase}}RequestParams.{{enumName}}]{{/isListContainer}}{{^isListContainer}}{{classname}}.{{operationIdCamelCase}}RequestParams.{{{datatypeWithEnum}}}{{/isListContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}

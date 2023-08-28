@@ -1,1 +1,1 @@
-"{{baseName}}": {{#isQueryParam}}(wrappedValue: {{/isQueryParam}}{{paramName}}{{^required}}?{{/required}}.encodeToJSON(){{#isQueryParam}}, isExplode: {{isExplode}}){{/isQueryParam}}
+"{{baseName}}": {{#isFreeFormObject}}(params.{{paramName}} as{{^required}}?{{/required}} String){{^required}}?{{/required}}.encodeToJSON(){{/isFreeFormObject}}{{^isFreeFormObject}}params.{{paramName}}{{^required}}?{{/required}}.{{#isDateTime}}encodeToJSONDateTime{{/isDateTime}}{{^isDateTime}}encodeToJSON{{/isDateTime}}(){{/isFreeFormObject}}

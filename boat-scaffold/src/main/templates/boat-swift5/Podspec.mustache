@@ -1,41 +1,35 @@
 Pod::Spec.new do |s|
-  s.name = '{{projectName}}'{{#projectDescription}}
-  s.summary = '{{.}}'{{/projectDescription}}
-  s.ios.deployment_target = '14.0'
+  s.name = '{{projectName}}'
+  s.version = '{{podVersion}}'{{#projectDescription}}
+  s.summary = '{{projectDescription}}'{{/projectDescription}}{{#podDescription}}
+  s.description = '{{podDescription}}'{{/podDescription}}
+  s.license = '{{#podLicense}}{{& podLicense}}{{/podLicense}}'{{^podLicense}}'Proprietary'{{/podLicense}}
+  s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/OpenAPITools/openapi-generator{{/podHomepage}}'{{#podAuthors}}
+  s.author = '{{podAuthors}}'{{/podAuthors}}
 
-  s.version = '{{podVersion}}{{^podVersion}}{{#apiInfo}}{{version}}{{/apiInfo}}{{^apiInfo}}}0.0.1{{/apiInfo}}{{/podVersion}}'
-  s.source = {{#podSource}}{{& podSource}}{{/podSource}}{{^podSource}}{ :git => 'git@github.com:OpenAPITools/openapi-generator.git', :tag => 'v{{#apiInfo}}{{version}}{{/apiInfo}}{{^apiInfo}}}0.0.1{{/apiInfo}}' }{{/podSource}}
-  {{#podAuthors}}
-  s.authors = '{{.}}'
-  {{/podAuthors}}
-  {{#podSocialMediaURL}}
-  s.social_media_url = '{{.}}'
-  {{/podSocialMediaURL}}
-  s.license = {{#podLicense}}{{& podLicense}}{{/podLicense}}{{^podLicense}}'Proprietary'{{/podLicense}}
-  s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/OpenAPITools/openapi-generator{{/podHomepage}}'
-  s.summary = '{{podSummary}}{{^podSummary}}{{projectName}} Swift SDK{{/podSummary}}'
-  {{#podDescription}}
-  s.description = '{{.}}'
-  {{/podDescription}}
-  {{#podScreenshots}}
-  s.screenshots = {{& podScreenshots}}
-  {{/podScreenshots}}
+  s.platform = :ios
+  s.ios.deployment_target = '14.0'
   {{#podDocumentationURL}}
-  s.documentation_url = '{{.}}'
+  s.documentation_url = '{{podDocumentationURL}}'
   {{/podDocumentationURL}}
-  s.source_files = '{{swiftPackagePath}}{{^swiftPackagePath}}{{#useSPMFileStructure}}Sources/{{projectName}}{{/useSPMFileStructure}}{{^useSPMFileStructure}}{{projectName}}/Classes{{/useSPMFileStructure}}{{/swiftPackagePath}}/**/*.swift'
+
+  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.source = { :git => "https://github.com/backbase-rnd/mobile-foundation-client-collection-ios", :tag => "{{{podVersion}}}" }
+  s.source_files = '{{projectName}}/Classes/**/*.swift'
+
+  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.vendored_frameworks = '{{projectName}}.xcframework'
 
   # ――― Dependencies ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.dependency 'Backbase', '>= 9.0'
   s.dependency 'ClientCommonGen2', '~> 1.0'
-  s.dependency 'AnyCodable-FlightSchool', '~> 0.6'
-  {{#useAlamofire}}
-  s.dependency 'Alamofire', '~> 5.7'
-  {{/useAlamofire}}
   {{#usePromiseKit}}
-  s.dependency 'PromiseKit/CorePromise', '~> 6.15'
+  s.dependency 'PromiseKit/CorePromise', '~> 6.12.0'
   {{/usePromiseKit}}
   {{#useRxSwift}}
-  s.dependency 'RxSwift', '~> 6.2'
+  s.dependency 'RxSwift', '~> 5.0.0'
   {{/useRxSwift}}
+  {{#useAlamofire}}
+  s.dependency 'Alamofire', '~> 4.9.1'
+  {{/useAlamofire}}
 end
