@@ -44,7 +44,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen {
         apiTemplateFiles.put("api_parameters.mustache", "RequestParams.swift");
 
         modelTemplateFiles.put("model.mustache", ".swift");
-        apiTemplateFiles.put("api.mustache", ".swift");
         embeddedTemplateDir = templateDir = "boat-swift5";
         modelDocTemplateFiles.put("model_doc.mustache", ".md");
         apiDocTemplateFiles.put("api_doc.mustache", ".md");
