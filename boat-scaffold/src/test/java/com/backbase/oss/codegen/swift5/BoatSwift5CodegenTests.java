@@ -27,8 +27,7 @@ public class BoatSwift5CodegenTests {
     public void testProcessOptsSetDBSDataProvider() {
         final BoatSwift5Codegen gen = new BoatSwift5Codegen();
         final Map<String, Object> options = gen.additionalProperties();
-
-        options.put("useDBSDataProvider", true);
+        gen.setLibrary("dbsDataProvider");
 
         gen.processOpts();
         gen.postProcess();
