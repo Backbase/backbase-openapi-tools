@@ -66,10 +66,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
-
-        if (getLibrary().equals(LIBRARY_DBS)) {
-            additionalProperties.put("useDBSDataProvider", true);
-        }
+        additionalProperties.put("useDBSDataProvider", getLibrary().equals(LIBRARY_DBS));
     }
 
     @Override
