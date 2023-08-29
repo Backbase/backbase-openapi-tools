@@ -39,6 +39,24 @@ paths:
       responses:
         "204":
           description: OK
+  /payments:
+    post:
+      tags:
+        - payments
+      summary: post
+      description: Create payments
+      operationId: createPayments
+      requestBody:
+        description: Create payments
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MultiLinePaymentRequest'
+      responses:
+        "204":
+          description: OK
 
 components:
   schemas:
@@ -109,8 +127,8 @@ components:
         name:
           type: string
           description: Request name
-          minLength: 1
-          maxLength: 36
+          minLength: 3
+          maxLength: 251
         lines:
           type: array
           description: Payment request details
@@ -139,7 +157,7 @@ components:
           items:
             type: string
             minLength: 5
-            maxLength: 36
+            maxLength: 361
     PaymentRequestLine:
       required:
         - accountId
