@@ -1,15 +1,5 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
@@ -22,16 +12,6 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -42,6 +22,23 @@ import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.languages.SpringCodegen;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class BoatSpringCodeGenTests {
 
@@ -177,7 +174,10 @@ class BoatSpringCodeGenTests {
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
                 assertThat(violations, Matchers.hasSize(1));
                 assertThat(violations.stream().findFirst().get().getPropertyPath().toString(), Matchers.equalTo("name"));
-                assertThat(violations.stream().findFirst().get().getMessage(), Matchers.equalTo("must not be null"));
+                assertThat(
+                    violations.stream().findFirst().get().getMessageTemplate(),
+                    Matchers.equalTo("{jakarta.validation.constraints.NotNull.message}")
+                );
             } catch (Exception e) {
                 throw new UnhandledException(e);
             }
@@ -204,8 +204,23 @@ class BoatSpringCodeGenTests {
                 arrangementIds.add("1");
                 arrangementIds.add("");
 
-//                Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-//                assertThat(violations, Matchers.hasSize(1));
+                // add PaymentRequestLine to lines
+                Collection<Object> lines = (Collection<Object>) requestObject.getClass()
+                    .getDeclaredMethod("getLines")
+                    .invoke(requestObject);
+                Class<?> lineObjectClass = projectClassLoader.loadClass(modelPackage + ".PaymentRequestLine");
+                Object lineObject = lineObjectClass.getConstructor().newInstance();
+                lineObject.getClass()
+                    .getDeclaredMethod("setAccountId", String.class)
+                    .invoke(lineObject, "invalidId");
+                lines.add(lineObject);
+
+                // validate
+                Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
+                assertThat(violations, Matchers.hasSize(3));
+
+                assertViolationsCount(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
+                assertViolationsCount(violations, "{jakarta.validation.constraints.Size.message}", 2);
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -214,5 +229,14 @@ class BoatSpringCodeGenTests {
         verificationRunner.runVerification(
             Verification.builder().runnable(verifyCollectionItems).displayName("validations").build()
         );
+    }
+
+    private static void assertViolationsCount(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {
+        long actualCount = violations.stream()
+            .map(ConstraintViolation::getMessageTemplate)
+            .filter(messageTemplate::equals)
+            .count();
+        assertEquals(count, actualCount,
+            String.format("Number of violations '%s', count mismatch", messageTemplate));
     }
 }

@@ -70,10 +70,10 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{#isContainer}}
     {{#useBeanValidation}}@Valid{{/useBeanValidation}}
     {{#openApiNullable}}
-      private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+      private {{>collectionDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
-      private {{>nullableDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+      private {{>collectionDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
     {{/openApiNullable}}
   {{/isContainer}}
   {{^isContainer}}
