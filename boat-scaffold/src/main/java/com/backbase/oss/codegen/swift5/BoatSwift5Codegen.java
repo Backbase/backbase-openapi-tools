@@ -1,33 +1,12 @@
 package com.backbase.oss.codegen.swift5;
 
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.Schema;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.openapitools.codegen.*;
 import org.openapitools.codegen.languages.Swift5ClientCodegen;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-import org.openapitools.codegen.model.ModelMap;
-import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.model.OperationMap;
-import org.openapitools.codegen.model.OperationsMap;
-import org.openapitools.codegen.utils.CamelizeOption;
-import org.openapitools.codegen.utils.ModelUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public class BoatSwift5Codegen extends Swift5ClientCodegen {
 
-    protected static final String LIBRARY_DBS = "dbsDataProvider";
-
-    protected boolean nonPublicApi = false;
+    private static final String LIBRARY_DBS = "dbsDataProvider";
 
     /**
      * Constructor for the swift5 language codegen module.
