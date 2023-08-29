@@ -274,7 +274,7 @@ public {{classname}}() {
   {{#allVars}}
     {{#isOverridden}}
       @Override
-      public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
+      public {{classname}} {{#useWithModifiers}}with{{nameInCamelCase}}{{/useWithModifiers}}{{^useWithModifiers}}{{name}}{{/useWithModifiers}}({{{datatypeWithEnum}}} {{name}}) {
       {{#vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{setter}}(JsonNullable.<{{{datatypeWithEnum}}}>of({{name}}));
       {{/vendorExtensions.x-is-jackson-optional-nullable}}
