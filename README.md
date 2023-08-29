@@ -17,6 +17,10 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+
+## 0.17.12
+* BoatJavaCodeGen, BoatSpringCodeGen
+  * Fix: [always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)](https://github.com/Backbase/backbase-openapi-tools/issues/615)
 ## 0.17.11
 * BoatJavaCodeGen, BoatSpringCodeGen
   * Fix: always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
