@@ -1,9 +1,11 @@
 package com.backbase.oss.codegen.java;
 
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
+import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import io.swagger.v3.oas.models.Operation;
@@ -258,12 +260,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     @Override
     public String toDefaultValue(CodegenProperty cp, Schema schema) {
-        schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
-        if (ModelUtils.isArraySchema(schema) && (schema.getDefault() == null)) {
-            return BoatJavaCodeGen.getArrayDefaultValue(cp, schema, containerDefaultToNull,
-                instantiationTypes().getOrDefault("set", "LinkedHashSet"),
-                instantiationTypes().getOrDefault("array", "ArrayList"));
-        }
-        return super.toDefaultValue(cp, schema);
+        final Schema referencedSchema = ModelUtils.getReferencedSchema(this.openAPI, schema);
+        return getCollectionCodegenValue(cp, referencedSchema, containerDefaultToNull, instantiationTypes())
+            .map(CodegenValueType::getValue)
+            .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
     }
 }
