@@ -1,0 +1,1 @@
+{{#openApiNullable}}{{#isNullable}}JsonNullable<{{/isNullable}}{{/openApiNullable}}{{{baseType}}}<{{#items}}{{#isPrimitiveType}}{{>beanValidationCore}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#useBeanValidation}}@Valid {{/useBeanValidation}}{{/isPrimitiveType}}{{/items}}{{{items.datatypeWithEnum}}}>{{#openApiNullable}}{{#isNullable}}>{{/isNullable}}{{/openApiNullable}}

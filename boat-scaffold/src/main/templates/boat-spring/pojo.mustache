@@ -68,13 +68,24 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
     {{{vendorExtensions.x-field-extra-annotation}}}
   {{/vendorExtensions.x-field-extra-annotation}}
   {{#isContainer}}
-    {{#useBeanValidation}}@Valid{{/useBeanValidation}}
-    {{#openApiNullable}}
-      private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
-    {{/openApiNullable}}
-    {{^openApiNullable}}
-      private {{>nullableDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
-    {{/openApiNullable}}
+    {{#isArray}}
+      {{#useBeanValidation}}@Valid{{/useBeanValidation}}
+      {{#openApiNullable}}
+        private {{>collectionDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+      {{/openApiNullable}}
+      {{^openApiNullable}}
+        private {{>collectionDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+      {{/openApiNullable}}
+    {{/isArray}}
+    {{^isArray}}
+      {{#useBeanValidation}}@Valid{{/useBeanValidation}}
+      {{#openApiNullable}}
+        private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+      {{/openApiNullable}}
+      {{^openApiNullable}}
+        private {{>nullableDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+      {{/openApiNullable}}
+    {{/isArray}}
   {{/isContainer}}
   {{^isContainer}}
     {{#isDate}}

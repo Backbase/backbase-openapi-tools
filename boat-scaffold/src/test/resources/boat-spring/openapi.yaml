@@ -39,9 +39,33 @@ paths:
       responses:
         "204":
           description: OK
+  /payments:
+    post:
+      tags:
+        - payments
+      summary: post
+      description: Create payments
+      operationId: createPayments
+      requestBody:
+        description: Create payments
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MultiLinePaymentRequest'
+      responses:
+        "204":
+          description: OK
 
 components:
   schemas:
+    Additions:
+      title: Additions
+      type: object
+      additionalProperties:
+        type: string
+      description: Additional properties
     TransactionsPatchRequestBody:
       required:
       - id
@@ -100,10 +124,19 @@ components:
           description: Currency of the payment request
     MultiLinePaymentRequest:
       required:
+        - name
         - lines
         - uniqueLines
+        - arrangementIds
       type: object
       properties:
+        name:
+          type: string
+          description: Request name
+          minLength: 3
+          maxLength: 251
+        additions:
+          $ref: '#/components/schemas/Additions'
         lines:
           type: array
           description: Payment request details
@@ -120,12 +153,25 @@ components:
           description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
+        optionalNullableLines:
+          type: array
+          nullable: true
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
         optionalUniqueLines:
           type: array
           uniqueItems: true
           description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
+        arrangementIds:
+          description: Internal arrangement ids
+          type: array
+          items:
+            type: string
+            minLength: 5
+            maxLength: 361
     PaymentRequestLine:
       required:
         - accountId
@@ -133,4 +179,5 @@ components:
       properties:
         accountId:
           type: string
+          pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
           description: Unique identifier of the related Account

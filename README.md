@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.13
+* boat-spring
+  * Fix: generate validation constraints on primitive collection items types (updates in pojo.mustache and new collectionDataType.mustache)
 ## 0.17.12
 * BoatJavaCodeGen, BoatSpringCodeGen
   * Fix: Always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
