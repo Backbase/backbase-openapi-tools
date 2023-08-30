@@ -1,5 +1,15 @@
 package com.backbase.oss.codegen.java;
 
+import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
@@ -12,6 +22,16 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -22,23 +42,6 @@ import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.languages.SpringCodegen;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-
-import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class BoatSpringCodeGenTests {
 
@@ -130,6 +133,7 @@ class BoatSpringCodeGenTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void shouldGenerateValidations() throws InterruptedException {
 
         var modelPackage = "com.backbase.model";

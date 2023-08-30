@@ -170,6 +170,11 @@
             <version>5.0.0-M1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

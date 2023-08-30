@@ -60,6 +60,12 @@ paths:
 
 components:
   schemas:
+    Additions:
+      title: Additions
+      type: object
+      additionalProperties:
+        type: string
+      description: Additional properties
     TransactionsPatchRequestBody:
       required:
       - id
@@ -129,6 +135,8 @@ components:
           description: Request name
           minLength: 3
           maxLength: 251
+        additions:
+          $ref: '#/components/schemas/Additions'
         lines:
           type: array
           description: Payment request details
@@ -142,6 +150,12 @@ components:
             $ref: '#/components/schemas/PaymentRequestLine'
         optionalLines:
           type: array
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        optionalNullableLines:
+          type: array
+          nullable: true
           description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
