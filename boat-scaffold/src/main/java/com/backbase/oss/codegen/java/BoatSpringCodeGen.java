@@ -1,32 +1,36 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.List;
-import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.*;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 import org.openapitools.codegen.utils.ModelUtils;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 public class BoatSpringCodeGen extends SpringCodegen {
 
@@ -149,6 +153,75 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
+    }
+
+    /*
+     * Overridden to be able to override the private <code>replaceBeanValidationCollectionType</code> method.
+     */
+    @Override
+    public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
+        CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
+        if (!isListOrSet(codegenParameter)) {
+            return codegenParameter;
+        } else {
+            codegenParameter.datatypeWithEnum = replaceBeanValidationCollectionType(codegenParameter.items, codegenParameter.datatypeWithEnum);
+            codegenParameter.dataType = replaceBeanValidationCollectionType(codegenParameter.items, codegenParameter.dataType);
+            return codegenParameter;
+        }
+    }
+
+    /*
+     * Overridden to be able to override the private <code>replaceBeanValidationCollectionType</code> method.
+     */
+    @Override
+    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
+        CodegenProperty codegenProperty = super.fromProperty(name, p, required, schemaIsFromAdditionalProperties);
+        if (!isListOrSet(codegenProperty)) {
+            return codegenProperty;
+        } else {
+            codegenProperty.datatypeWithEnum = replaceBeanValidationCollectionType(codegenProperty.items, codegenProperty.datatypeWithEnum);
+            codegenProperty.dataType = replaceBeanValidationCollectionType(codegenProperty.items, codegenProperty.dataType);
+            return codegenProperty;
+        }
+    }
+
+    /**
+     * "overridden" to fix invalid code when the data type is a collection of a fully qualified classname.
+     * eg. <code>Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto></code>
+     *
+     * @param codegenProperty
+     * @param dataType
+     * @return
+     */
+    String replaceBeanValidationCollectionType(CodegenProperty codegenProperty, String dataType) {
+        if (!useBeanValidation || isEmpty(dataType) || !codegenProperty.isModel || isResponseType(codegenProperty)) {
+            return dataType;
+        }
+        String result = dataType;
+        if (!contains(dataType, "@Valid")) {
+            result = dataType.replace("<", "<@Valid ");
+        }
+        Matcher m = Pattern.compile("^(.+\\<)(@Valid) ([a-z\\.]+)([A-Z].*)(\\>)$").matcher(dataType);
+        if (m.matches()) {
+            // Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>
+            result = m.group(1) + m.group(3) + m.group(2) + " " + m.group(4) + m.group(5);
+        }
+        return result;
+    }
+
+    // Copied, but not modified
+    private static boolean isListOrSet(CodegenProperty codegenProperty) {
+        return codegenProperty.isContainer && !codegenProperty.isMap;
+    }
+
+    // Copied, but not modified
+    private static boolean isListOrSet(CodegenParameter codegenParameter) {
+        return codegenParameter.isContainer && !codegenParameter.isMap;
+    }
+
+    // Copied, but not modified
+    private static boolean isResponseType(CodegenProperty codegenProperty) {
+        return codegenProperty.baseName.toLowerCase(Locale.ROOT).contains("response");
     }
 
     @Override
