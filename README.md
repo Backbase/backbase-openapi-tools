@@ -20,7 +20,9 @@ BOAT is still under development and subject to change.
 
 ## 0.17.12
 * BoatJavaCodeGen, BoatSpringCodeGen
-  * Fix: [always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)](https://github.com/Backbase/backbase-openapi-tools/issues/615)
+  * Fix: Always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
+  * Fix: [validated pojo referenced class causes invalid code to be generated](https://github.com/Backbase/backbase-openapi-tools/issues/615)
+  * Fix: boat-java pojo template to support `useWithModifier` to generate `withSomething` methods; fixes referencing 'common' classes generated using boat-spring templates.
 ## 0.17.11
 * BoatJavaCodeGen, BoatSpringCodeGen
   * Fix: always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
