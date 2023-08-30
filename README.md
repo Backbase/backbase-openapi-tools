@@ -13,8 +13,6 @@ It currently consists of
 * [Code Generator](boat-maven-plugin/README.md) based on [openapi-generator.tech](https://openapi-generator.tech/) with optimized templates and fixes.
 * Lint mojo based on Zalando Zally and Backbase API
 
-The project is very much Work In Progress and will be published on maven central when considered ready enough. 
-
 # Release Notes
 BOAT is still under development and subject to change.
 
