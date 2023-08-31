@@ -232,12 +232,25 @@ class BoatSpringCodeGenTests {
                     .invoke(lineObject, "invalidId");
                 lines.add(lineObject);
 
+                // add mapStrings
+                Map<String, String> mapStrings = (Map<String, String>) requestObject.getClass()
+                    .getDeclaredMethod("getMapStrings")
+                    .invoke(requestObject);
+                mapStrings.put("key1", "abc");
+                mapStrings.put("key2", "abcdefghijklmnopq");
+
                 // validate
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(3));
+                assertThat(violations, Matchers.hasSize(5));
 
-                assertViolationsCount(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
-                assertViolationsCount(violations, "{jakarta.validation.constraints.Size.message}", 2);
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
+                assertViolationsCountByPath(violations, "lines[0].accountId", 1);
+
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 4);
+                assertViolationsCountByPath(violations, "arrangementIds[0].<list element>", 1);
+                assertViolationsCountByPath(violations, "arrangementIds[1].<list element>", 1);
+                assertViolationsCountByPath(violations, "mapStrings[key1].<map value>", 1);
+                assertViolationsCountByPath(violations, "mapStrings[key2].<map value>", 1);
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -248,12 +261,22 @@ class BoatSpringCodeGenTests {
         );
     }
 
-    private static void assertViolationsCount(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {
+    private static void assertViolationsCountByMessage(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {
         long actualCount = violations.stream()
             .map(ConstraintViolation::getMessageTemplate)
             .filter(messageTemplate::equals)
             .count();
         assertEquals(count, actualCount,
             String.format("Number of violations '%s', count mismatch", messageTemplate));
+    }
+
+    private static void assertViolationsCountByPath(Set<ConstraintViolation<Object>> violations, String propertyPath, int count) {
+        long actualCount = violations.stream()
+            .map(ConstraintViolation::getPropertyPath)
+            .map(String::valueOf)
+            .filter(propertyPath::equals)
+            .count();
+        assertEquals(count, actualCount,
+            String.format("Number of violations '%s', count mismatch", propertyPath));
     }
 }

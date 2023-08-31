@@ -172,6 +172,37 @@ components:
             type: string
             minLength: 5
             maxLength: 361
+        uniqueArrangementIds:
+          description: Unique internal arrangement ids
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+            maxLength: 224
+        uuidPatterns:
+          description: List of UUID patterns
+          type: array
+          items:
+            type: string
+            pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+            description: UUID pattern
+        mapObjects:
+          minProperties: 0
+          maxProperties: 4
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/PaymentRequestLine'
+          description: "Transaction data map"
+        mapStrings:
+          minProperties: 0
+          maxProperties: 5
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 7
+            maxLength: 10
+          description: "Transaction data string map"
     PaymentRequestLine:
       required:
         - accountId
