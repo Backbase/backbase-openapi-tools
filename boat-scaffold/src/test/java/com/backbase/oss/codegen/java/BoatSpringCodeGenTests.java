@@ -32,9 +32,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
@@ -225,12 +227,7 @@ class BoatSpringCodeGenTests {
                 Collection<Object> lines = (Collection<Object>) requestObject.getClass()
                     .getDeclaredMethod("getLines")
                     .invoke(requestObject);
-                Class<?> lineObjectClass = projectClassLoader.loadClass(modelPackage + ".PaymentRequestLine");
-                Object lineObject = lineObjectClass.getConstructor().newInstance();
-                lineObject.getClass()
-                    .getDeclaredMethod("setAccountId", String.class)
-                    .invoke(lineObject, "invalidId");
-                lines.add(lineObject);
+                lines.add(newPaymeyntRequestLineObject(modelPackage, projectClassLoader, "invalidId"));
 
                 // add mapStrings
                 Map<String, String> mapStrings = (Map<String, String>) requestObject.getClass()
@@ -239,18 +236,32 @@ class BoatSpringCodeGenTests {
                 mapStrings.put("key1", "abc");
                 mapStrings.put("key2", "abcdefghijklmnopq");
 
+                // add mapObjects
+                Map<String, Object> mapObjects = (Map<String, Object>) requestObject.getClass()
+                    .getDeclaredMethod("getMapObjects")
+                    .invoke(requestObject);
+                mapObjects.put(
+                    "key1",
+                    newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
+                );
+                mapObjects.put(
+                    "key2",
+                    newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
+                );
+
                 // validate
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(5));
+                assertThat(violations, Matchers.hasSize(6));
 
                 assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
                 assertViolationsCountByPath(violations, "lines[0].accountId", 1);
 
-                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 4);
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 5);
                 assertViolationsCountByPath(violations, "arrangementIds[0].<list element>", 1);
                 assertViolationsCountByPath(violations, "arrangementIds[1].<list element>", 1);
                 assertViolationsCountByPath(violations, "mapStrings[key1].<map value>", 1);
                 assertViolationsCountByPath(violations, "mapStrings[key2].<map value>", 1);
+                assertViolationsCountByPath(violations, "mapObjects", 1);
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -259,6 +270,17 @@ class BoatSpringCodeGenTests {
         verificationRunner.runVerification(
             Verification.builder().runnable(verifyCollectionItems).displayName("validations").build()
         );
+    }
+
+    @NotNull
+    private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
+        throws Exception {
+        Class<?> lineObjectClass = projectClassLoader.loadClass(modelPackage + ".PaymentRequestLine");
+        Object lineObject = lineObjectClass.getConstructor().newInstance();
+        lineObject.getClass()
+            .getDeclaredMethod("setAccountId", String.class)
+            .invoke(lineObject, id);
+        return lineObject;
     }
 
     private static void assertViolationsCountByMessage(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {

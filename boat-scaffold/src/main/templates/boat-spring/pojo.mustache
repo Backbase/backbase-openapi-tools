@@ -67,24 +67,25 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{#vendorExtensions.x-field-extra-annotation}}
     {{{vendorExtensions.x-field-extra-annotation}}}
   {{/vendorExtensions.x-field-extra-annotation}}
+  {{#trimAndIndent4}}
   {{#isContainer}}
     {{#isMap}}
       {{#useBeanValidation}}@Valid{{/useBeanValidation}}
       {{#openApiNullable}}
-        private {{>mapDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+        private {{#toOneLine}}{{>mapDataType}}{{/toOneLine}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
       {{/openApiNullable}}
       {{^openApiNullable}}
-        private {{>mapDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+        private {{#toOneLine}}{{>mapDataType}}{{/toOneLine}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
       {{/openApiNullable}}
     {{/isMap}}
     {{^isMap}}
       {{#isArray}}
         {{#useBeanValidation}}@Valid{{/useBeanValidation}}
         {{#openApiNullable}}
-          private {{>collectionDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
+          private {{#toOneLine}}{{>collectionDataType}}{{/toOneLine}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
         {{/openApiNullable}}
         {{^openApiNullable}}
-          private {{>collectionDataType}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+          private {{#toOneLine}}{{>collectionDataType}}{{/toOneLine}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
         {{/openApiNullable}}
       {{/isArray}}
       {{^isArray}}
@@ -112,6 +113,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
       private {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
   {{/isContainer}}
+  {{/trimAndIndent4}}
 {{/vars}}
 {{#generatedConstructorWithRequiredArgs}}
   {{#hasRequired}}

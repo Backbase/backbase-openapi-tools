@@ -1,1 +1,21 @@
-{{#openApiNullable}}{{#isNullable}}JsonNullable<{{/isNullable}}{{/openApiNullable}}{{{baseType}}}{{#items}}<String, {{#isPrimitiveType}}{{>beanValidationCore}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#useBeanValidation}}@Valid {{/useBeanValidation}}{{/isPrimitiveType}}{{/items}}{{{items.datatypeWithEnum}}}>{{#openApiNullable}}{{#isNullable}}>{{/isNullable}}{{/openApiNullable}}
+{{#openApiNullable}}
+  {{#isNullable}}JsonNullable<{{/isNullable}}
+{{/openApiNullable}}
+{{! apply map type with String as key type }}
+{{{baseType}}}<String,
+{{! apply validation on map values }}
+{{#useBeanValidation}}
+  {{#items}}
+    {{#isPrimitiveType}}
+      {{>beanValidationCore}}
+    {{/isPrimitiveType}}
+    {{^isPrimitiveType}}
+      @Valid
+    {{/isPrimitiveType}}
+  {{/items}}
+{{/useBeanValidation}}
+{{! apply map value type with closing bracket }}
+{{{items.datatypeWithEnum}}}>
+{{#openApiNullable}}
+  {{#isNullable}}>{{/isNullable}}
+{{/openApiNullable}}

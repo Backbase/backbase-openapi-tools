@@ -57,6 +57,46 @@ paths:
       responses:
         "204":
           description: OK
+    get:
+      tags:
+        - payments
+      summary: post
+      description: Get payments
+      operationId: getPayments
+      parameters:
+        - name: uuidParam
+          in: query
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+        - name: from
+          in: query
+          description: Page Number
+          required: false
+          style: form
+          explode: true
+          schema:
+            minimum: 0
+            type: integer
+            format: int32
+            default: 0
+        - name: approvalTypeIds
+          in: query
+          description: List of identifiers
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of identifiers
+            items:
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+      responses:
+        "200":
+          description: OK
 
 components:
   schemas:
@@ -189,7 +229,7 @@ components:
             description: UUID pattern
         mapObjects:
           minProperties: 0
-          maxProperties: 4
+          maxProperties: 1
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PaymentRequestLine'
