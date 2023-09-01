@@ -94,6 +94,20 @@ paths:
             items:
               type: string
               pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+        - name: headerParams
+          in: header
+          description: List of headers
+          required: false
+          style: form
+          explode: true
+          schema:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of headers
+            items:
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
       responses:
         "200":
           description: OK
