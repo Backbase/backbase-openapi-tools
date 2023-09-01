@@ -1,14 +1,11 @@
 package com.backbase.oss.codegen.swift5;
 
-import com.backbase.oss.codegen.java.BoatJavaCodeGen;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 
 public class BoatSwift5CodegenTests {

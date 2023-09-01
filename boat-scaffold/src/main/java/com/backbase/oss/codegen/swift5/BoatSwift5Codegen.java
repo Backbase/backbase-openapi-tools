@@ -6,9 +6,7 @@ import org.openapitools.codegen.meta.Stability;
 
 public class BoatSwift5Codegen extends Swift5ClientCodegen {
 
-    protected static final String LIBRARY_DBS = "dbsDataProvider";
-
-    protected boolean nonPublicApi = false;
+    private static final String LIBRARY_DBS = "dbsDataProvider";
 
     /**
      * Constructor for the BoatSwift5Codegen codegen module.

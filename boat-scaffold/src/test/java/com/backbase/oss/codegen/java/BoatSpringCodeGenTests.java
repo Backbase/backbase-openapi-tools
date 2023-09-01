@@ -3,31 +3,47 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.samskivert.mustache.Template.Fragment;
+import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
-
+import org.openapitools.codegen.DefaultGenerator;
 
 class BoatSpringCodeGenTests {
+
+    static final String PROP_BASE = BoatSpringCodeGenTests.class.getSimpleName() + ".";
+    static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-spring-codegen-tests");
+
+    @BeforeAll
+    static void before() throws IOException {
+        Files.createDirectories(Paths.get(TEST_OUTPUT));
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT));
+    }
 
     @Test
     void clientOptsUnicity() {
@@ -74,4 +90,37 @@ class BoatSpringCodeGenTests {
         assertEquals("httpServletRequest", co.allParams.get(0).paramName);
         assertTrue(Arrays.stream(co.allParams.get(0).getClass().getDeclaredFields()).anyMatch(f -> "isHttpServletRequest".equals(f.getName())));
     }
+
+    @Test
+    void multipartWithFileAndObject() throws IOException {
+        var codegen = new BoatSpringCodeGen();
+        var input = new File("src/test/resources/boat-spring/multipart.yaml");
+        codegen.setLibrary("spring-boot");
+        codegen.setInterfaceOnly(true);
+        codegen.setOutputDir(TEST_OUTPUT + "/multipart");
+        codegen.setInputSpec(input.getAbsolutePath());
+
+        var openApiInput = new OpenAPIParser().readLocation(input.getAbsolutePath(), null, new ParseOptions()).getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File testApi = files.stream().filter(file -> file.getName().equals("TestApi.java"))
+            .findFirst()
+            .get();
+        MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)
+            .findAll(MethodDeclaration.class)
+            .get(1);
+
+        Parameter filesParam = testPostMethod.getParameterByName("files").get();
+        Parameter contentParam = testPostMethod.getParameterByName("content").get();
+
+        assertTrue(filesParam.getAnnotationByName("RequestPart").isPresent());
+        assertTrue(contentParam.getAnnotationByName("RequestPart").isPresent());
+        assertThat(contentParam.getTypeAsString(), equalTo("TestObjectPart"));
+        assertThat(filesParam.getTypeAsString(), equalTo("List<MultipartFile>"));
+    }
+
 }

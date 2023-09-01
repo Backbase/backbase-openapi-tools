@@ -69,4 +69,68 @@ components:
           format: date-time
           x-java-type: java.time.OffsetDateTime
       x-java-type: com.backbase.integration.transaction.external.rest.spec.v2.transactions.TransactionsPatchRequestBody
-  
+    ReceivableRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaymentRequest'
+        - required:
+            - status
+            - currencyCode
+            - referenceNumber
+          type: object
+          properties:
+            status:
+              type: string
+              description: Status of the request
+            paymentRequestType:
+              type: string
+              default: ReceivableRequest
+    PaymentRequest:
+      required:
+        - currencyCode
+        - referenceNumber
+      type: object
+      discriminator:
+        propertyName: paymentRequestType
+      properties:
+        referenceNumber:
+          type: string
+          description: Reference number
+        currencyCode:
+          type: string
+          description: Currency of the payment request
+    MultiLinePaymentRequest:
+      required:
+        - lines
+        - uniqueLines
+      type: object
+      properties:
+        lines:
+          type: array
+          description: Payment request details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        uniqueLines:
+          type: array
+          uniqueItems: true
+          description: Payment request details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        optionalLines:
+          type: array
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+        optionalUniqueLines:
+          type: array
+          uniqueItems: true
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
+    PaymentRequestLine:
+      required:
+        - accountId
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier of the related Account

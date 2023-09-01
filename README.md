@@ -17,6 +17,18 @@ The project is very much Work In Progress and will be published on maven central
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.11
+* BoatJavaCodeGen, BoatSpringCodeGen
+  * Fix: always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
+## 0.17.10
+* Boat maven plugin
+  * Fix: When using Multipart, generate with `@RequestPart` instead of `@RequestParam`
+## 0.17.9
+* Boat Maven plugin
+  * Fix: [containerDefaultToNull=true is not backward compatible](https://github.com/Backbase/backbase-openapi-tools/issues/604)
+## 0.17.8
+* Boat Spring generator
+  * Fix: [Serialization / deserialization issues of JsonSubTypes due to incorrect usage of JsonIgnoreProperties](https://github.com/Backbase/backbase-openapi-tools/issues/601)
 ## 0.17.7
 * Boat maven plugin
   * Fix: Added 'containerDefaultToNull' default option to the MOJO generator
