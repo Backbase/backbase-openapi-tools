@@ -16,6 +16,10 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.14
+* boat-spring
+  * added validation constraints on primitive collection items types in request params (see `collectionDataTypeParam.mustache`)
+  * added validation constraints on primitive map value types (see `mapDataType.mustache`) 
 ## 0.17.13
 * boat-spring
   * Fix: generate validation constraints on primitive collection items types (updates in pojo.mustache and new collectionDataType.mustache)
