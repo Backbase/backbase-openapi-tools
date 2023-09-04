@@ -19,7 +19,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <auto-service.version>1.0-rc7</auto-service.version>
-        <dokka.version>1.8.20</dokka.version>
+        <dokka.version>1.9.0</dokka.version>
         <zally.version>2.1.1</zally.version>
     </properties>
 
