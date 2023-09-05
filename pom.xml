@@ -54,7 +54,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <sonar.organization>backbase-technology-prototyping</sonar.organization>
+        <sonar.organization>backbase</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <openapi-generator.version>6.6.0</openapi-generator.version>
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
