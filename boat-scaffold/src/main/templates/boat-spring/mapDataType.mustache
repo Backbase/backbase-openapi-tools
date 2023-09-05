@@ -1,8 +1,9 @@
 {{#openApiNullable}}
   {{#isNullable}}JsonNullable<{{/isNullable}}
 {{/openApiNullable}}
-{{! apply collection type e.g. Set, List }}
-{{{baseType}}}<
+{{! apply map type with String as key type }}
+{{{baseType}}}<String,
+{{! apply validation on map values }}
 {{#useBeanValidation}}
   {{#items}}
     {{#isPrimitiveType}}
@@ -13,7 +14,7 @@
     {{/isPrimitiveType}}
   {{/items}}
 {{/useBeanValidation}}
-{{! apply collection item type }}
+{{! apply map value type with closing bracket }}
 {{{items.datatypeWithEnum}}}>
 {{#openApiNullable}}
   {{#isNullable}}>{{/isNullable}}
