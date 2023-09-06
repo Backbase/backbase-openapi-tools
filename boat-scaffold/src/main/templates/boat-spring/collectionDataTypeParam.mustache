@@ -10,12 +10,12 @@
         @Valid
       {{/isPrimitiveType}}
     {{/items}}
-    {{{items.datatypeWithEnum}}}>
+    {{{items.dataType}}}>
   {{/useBeanValidation}}
   {{^useBeanValidation}}
     {{#uniqueItems}}java.util.Set{{/uniqueItems}}
     {{^uniqueItems}}java.util.List{{/uniqueItems}}
-    <{{{dataType}}}>
+    <{{{items.dataType}}}>
   {{/useBeanValidation}}
 {{/isArray}}
 {{^isArray}}
