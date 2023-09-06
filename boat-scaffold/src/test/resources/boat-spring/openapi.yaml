@@ -64,6 +64,20 @@ paths:
       description: Get payments
       operationId: getPayments
       parameters:
+        - name: status
+          in: query
+          description: Status
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ENTERED
+                - READY
+                - ACCEPTED
         - name: uuidParam
           in: query
           schema:
@@ -266,3 +280,12 @@ components:
           type: string
           pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
           description: Unique identifier of the related Account
+        status:
+          description: Status
+          type: array
+          items:
+            type: string
+            enum:
+              - GOOD
+              - BAD
+              - UGLY
