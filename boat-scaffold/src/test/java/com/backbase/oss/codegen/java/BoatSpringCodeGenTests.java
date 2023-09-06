@@ -13,8 +13,11 @@ import static org.mockito.Mockito.when;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.samskivert.mustache.Template.Fragment;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Operation;
@@ -23,6 +26,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -149,7 +153,7 @@ class BoatSpringCodeGenTests {
     }
     @Test
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException {
+    void shouldGenerateValidations() throws InterruptedException, FileNotFoundException {
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
@@ -173,6 +177,28 @@ class BoatSpringCodeGenTests {
         clientOptInput.openAPI(openApiInput);
 
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File paymentsApiFile = files.stream().filter(file -> file.getName().equals("PaymentsApi.java"))
+            .findFirst()
+            .get();
+        MethodDeclaration getPaymentsMethod = StaticJavaParser.parse(paymentsApiFile)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "getPayments".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        assertHasCollectionParamWithType(getPaymentsMethod, "approvalTypeIds", "List", "String");
+        assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
+        assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
+
+        File PaymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
+            .findFirst()
+            .get();
+        MethodDeclaration getStatus = StaticJavaParser.parse(PaymentRequestLine)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "getStatus".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
 
         // compile generated project
         var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());
@@ -300,5 +326,26 @@ class BoatSpringCodeGenTests {
             .count();
         assertEquals(count, actualCount,
             String.format("Number of violations '%s', count mismatch", propertyPath));
+    }
+
+    private static void assertHasCollectionParamWithType(MethodDeclaration method, String paramName, String collectionType, String itemType) {
+        Parameter parameter = method.getParameterByName(paramName).get();
+        assertEquals(ClassOrInterfaceType.class, parameter.getType().getClass());
+        assertEquals(collectionType, ((ClassOrInterfaceType) parameter.getType()).getName().toString());
+        NodeList<Type> argumentTypes = ((ClassOrInterfaceType) parameter.getType())
+            .getTypeArguments()
+            .orElseThrow();
+        ClassOrInterfaceType actualItemType = argumentTypes.getFirst().orElseThrow().stream()
+            .map(ClassOrInterfaceType.class::cast)
+            .findFirst()
+            .orElseThrow();
+        assertEquals(itemType, actualItemType.getName().toString());
+    }
+
+    private static void assertMethodCollectionReturnType(MethodDeclaration method, String collectionType, String itemType) {
+        assertEquals(collectionType, ((ClassOrInterfaceType) method.getType()).getName().toString());
+        ClassOrInterfaceType collectionItemType = (ClassOrInterfaceType) ((ClassOrInterfaceType) method.getType())
+            .getTypeArguments().get().getFirst().get();
+        assertEquals(itemType, collectionItemType.getName().toString());
     }
 }
