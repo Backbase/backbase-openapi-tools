@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.15
+* boat-spring
+  * fix: incorrectly used enum param on collection items (see `collectionDataTypeParam.mustache`)
 ## 0.17.14
 * boat-spring
   * added validation constraints on primitive collection items types in request params (see `collectionDataTypeParam.mustache`)
