@@ -64,6 +64,24 @@ paths:
       description: Get payments
       operationId: getPayments
       parameters:
+        - name: status
+          in: query
+          description: Status
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ENTERED
+                - READY
+                - ACCEPTED
+                - PROCESSED
+                - REJECTED
+                - CANCELLED
+                - CANCELLATION_PENDING
         - name: uuidParam
           in: query
           schema:
