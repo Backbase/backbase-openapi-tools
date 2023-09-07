@@ -140,6 +140,7 @@ public class BoatCodegenParameter extends CodegenParameter {
         output.isMap = codegenParameter.isMap;
         output.isExplode = codegenParameter.isExplode;
         output.style = codegenParameter.style;
+        output.isArray = codegenParameter.isArray;
 
         if (codegenParameter instanceof BoatCodegenParameter) {
             output.examples = ((BoatCodegenParameter) codegenParameter).examples;

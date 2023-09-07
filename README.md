@@ -16,6 +16,10 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.16
+* BOAT Angular Generator
+  * added `@angular/common` as peer dependency in the generated package.json files
+  * replace usages of `isListContainer` with `isArray` in api.service template
 ## 0.17.15
 * boat-spring
   * fix: incorrectly used enum param on collection items (see `collectionDataTypeParam.mustache`)
