@@ -13,8 +13,11 @@ import static org.mockito.Mockito.when;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.samskivert.mustache.Template.Fragment;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Operation;
@@ -23,6 +26,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -32,9 +36,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
@@ -147,7 +153,7 @@ class BoatSpringCodeGenTests {
     }
     @Test
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException {
+    void shouldGenerateValidations() throws InterruptedException, FileNotFoundException {
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
@@ -171,6 +177,28 @@ class BoatSpringCodeGenTests {
         clientOptInput.openAPI(openApiInput);
 
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File paymentsApiFile = files.stream().filter(file -> file.getName().equals("PaymentsApi.java"))
+            .findFirst()
+            .get();
+        MethodDeclaration getPaymentsMethod = StaticJavaParser.parse(paymentsApiFile)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "getPayments".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        assertHasCollectionParamWithType(getPaymentsMethod, "approvalTypeIds", "List", "String");
+        assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
+        assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
+
+        File PaymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
+            .findFirst()
+            .get();
+        MethodDeclaration getStatus = StaticJavaParser.parse(PaymentRequestLine)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "getStatus".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
 
         // compile generated project
         var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());
@@ -225,19 +253,41 @@ class BoatSpringCodeGenTests {
                 Collection<Object> lines = (Collection<Object>) requestObject.getClass()
                     .getDeclaredMethod("getLines")
                     .invoke(requestObject);
-                Class<?> lineObjectClass = projectClassLoader.loadClass(modelPackage + ".PaymentRequestLine");
-                Object lineObject = lineObjectClass.getConstructor().newInstance();
-                lineObject.getClass()
-                    .getDeclaredMethod("setAccountId", String.class)
-                    .invoke(lineObject, "invalidId");
-                lines.add(lineObject);
+                lines.add(newPaymeyntRequestLineObject(modelPackage, projectClassLoader, "invalidId"));
+
+                // add mapStrings
+                Map<String, String> mapStrings = (Map<String, String>) requestObject.getClass()
+                    .getDeclaredMethod("getMapStrings")
+                    .invoke(requestObject);
+                mapStrings.put("key1", "abc");
+                mapStrings.put("key2", "abcdefghijklmnopq");
+
+                // add mapObjects
+                Map<String, Object> mapObjects = (Map<String, Object>) requestObject.getClass()
+                    .getDeclaredMethod("getMapObjects")
+                    .invoke(requestObject);
+                mapObjects.put(
+                    "key1",
+                    newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
+                );
+                mapObjects.put(
+                    "key2",
+                    newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
+                );
 
                 // validate
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(3));
+                assertThat(violations, Matchers.hasSize(6));
 
-                assertViolationsCount(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
-                assertViolationsCount(violations, "{jakarta.validation.constraints.Size.message}", 2);
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
+                assertViolationsCountByPath(violations, "lines[0].accountId", 1);
+
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 5);
+                assertViolationsCountByPath(violations, "arrangementIds[0].<list element>", 1);
+                assertViolationsCountByPath(violations, "arrangementIds[1].<list element>", 1);
+                assertViolationsCountByPath(violations, "mapStrings[key1].<map value>", 1);
+                assertViolationsCountByPath(violations, "mapStrings[key2].<map value>", 1);
+                assertViolationsCountByPath(violations, "mapObjects", 1);
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -248,12 +298,54 @@ class BoatSpringCodeGenTests {
         );
     }
 
-    private static void assertViolationsCount(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {
+    @NotNull
+    private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
+        throws Exception {
+        Class<?> lineObjectClass = projectClassLoader.loadClass(modelPackage + ".PaymentRequestLine");
+        Object lineObject = lineObjectClass.getConstructor().newInstance();
+        lineObject.getClass()
+            .getDeclaredMethod("setAccountId", String.class)
+            .invoke(lineObject, id);
+        return lineObject;
+    }
+
+    private static void assertViolationsCountByMessage(Set<ConstraintViolation<Object>> violations, String messageTemplate, int count) {
         long actualCount = violations.stream()
             .map(ConstraintViolation::getMessageTemplate)
             .filter(messageTemplate::equals)
             .count();
         assertEquals(count, actualCount,
             String.format("Number of violations '%s', count mismatch", messageTemplate));
+    }
+
+    private static void assertViolationsCountByPath(Set<ConstraintViolation<Object>> violations, String propertyPath, int count) {
+        long actualCount = violations.stream()
+            .map(ConstraintViolation::getPropertyPath)
+            .map(String::valueOf)
+            .filter(propertyPath::equals)
+            .count();
+        assertEquals(count, actualCount,
+            String.format("Number of violations '%s', count mismatch", propertyPath));
+    }
+
+    private static void assertHasCollectionParamWithType(MethodDeclaration method, String paramName, String collectionType, String itemType) {
+        Parameter parameter = method.getParameterByName(paramName).get();
+        assertEquals(ClassOrInterfaceType.class, parameter.getType().getClass());
+        assertEquals(collectionType, ((ClassOrInterfaceType) parameter.getType()).getName().toString());
+        NodeList<Type> argumentTypes = ((ClassOrInterfaceType) parameter.getType())
+            .getTypeArguments()
+            .orElseThrow();
+        ClassOrInterfaceType actualItemType = argumentTypes.getFirst().orElseThrow().stream()
+            .map(ClassOrInterfaceType.class::cast)
+            .findFirst()
+            .orElseThrow();
+        assertEquals(itemType, actualItemType.getName().toString());
+    }
+
+    private static void assertMethodCollectionReturnType(MethodDeclaration method, String collectionType, String itemType) {
+        assertEquals(collectionType, ((ClassOrInterfaceType) method.getType()).getName().toString());
+        ClassOrInterfaceType collectionItemType = (ClassOrInterfaceType) ((ClassOrInterfaceType) method.getType())
+            .getTypeArguments().get().getFirst().get();
+        assertEquals(itemType, collectionItemType.getName().toString());
     }
 }

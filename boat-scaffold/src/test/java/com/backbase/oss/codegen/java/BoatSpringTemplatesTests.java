@@ -193,6 +193,10 @@ class BoatSpringTemplatesTests {
             equalTo(this.param.useBeanValidation||this.param.addBindingResult));
         assertThat(findPattern("/model/.+\\.java$", "@Valid"),
             equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+        assertThat(findPattern("/model/MultiLinePaymentRequest.*\\.java$", "List<@Pattern\\(regexp"),
+            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+        assertThat(findPattern("/model/MultiLinePaymentRequest.*\\.java$", "Map<String, @Size\\(min = 7, max = 10\\)"),
+            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
     }
 
     @Check
