@@ -71,16 +71,38 @@
         <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
     </properties>
 
-    <modules>
-        <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
-        <module>boat-trail-resources</module>
-        <module>boat-engine</module>
-        <module>boat-scaffold</module>
-        <module>boat-quay</module>
-        <module>boat-maven-plugin</module>
-        <!-- Code Coverage Project -->
-        <module>tests</module>
-    </modules>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
+                <module>boat-trail-resources</module>
+                <module>boat-engine</module>
+                <module>boat-scaffold</module>
+                <module>boat-quay</module>
+                <module>boat-maven-plugin</module>
+                <!-- Code Coverage Project -->
+                <module>tests</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>sonatype-deploy</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
+                <module>boat-trail-resources</module>
+                <module>boat-engine</module>
+                <module>boat-scaffold</module>
+                <module>boat-quay</module>
+                <module>boat-maven-plugin</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
