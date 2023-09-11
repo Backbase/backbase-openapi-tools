@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenProperty;
 
+import java.util.Objects;
+
 public class BoatSpringCodegenProperty extends CodegenProperty {
 
     @Getter
@@ -139,4 +141,18 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
                 .append("',simpleName:'").append(simpleName)
                 .append("'").toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) &&
+                o instanceof BoatSpringCodegenProperty &&
+                Objects.equals(((BoatSpringCodegenProperty)o).packageName, this.packageName) &&
+                Objects.equals(((BoatSpringCodegenProperty)o).simpleName, this.simpleName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), packageName, simpleName);
+    }
+
 }

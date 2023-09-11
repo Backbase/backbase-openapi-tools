@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenParameter;
 
+import java.util.Objects;
+
 public class BoatSpringCodegenParameter extends CodegenParameter {
 
     @Getter
@@ -117,6 +119,7 @@ public class BoatSpringCodegenParameter extends CodegenParameter {
         }
     }
 
+    @Override
     public String toString() {
         return new StringBuilder(super.toString())
                 .append("packageName:'").append(packageName)
@@ -124,4 +127,16 @@ public class BoatSpringCodegenParameter extends CodegenParameter {
                 .append("'").toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) &&
+                o instanceof BoatSpringCodegenParameter &&
+                Objects.equals(((BoatSpringCodegenParameter)o).packageName, this.packageName) &&
+                Objects.equals(((BoatSpringCodegenParameter)o).simpleName, this.simpleName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), packageName, simpleName);
+    }
 }
