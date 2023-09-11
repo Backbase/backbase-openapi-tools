@@ -87,6 +87,7 @@ jobs:
             --no-transfer-progress \
             --batch-mode \
             -DskipTests=true \
+            -Psonatype-deploy \
             deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
