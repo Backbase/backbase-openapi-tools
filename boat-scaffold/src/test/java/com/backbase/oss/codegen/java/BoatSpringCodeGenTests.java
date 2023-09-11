@@ -26,7 +26,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -153,7 +152,10 @@ class BoatSpringCodeGenTests {
     }
     @Test
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException, FileNotFoundException {
+    void shouldGenerateValidations() throws InterruptedException, IOException {
+
+        final String REFERENCED_CLASS_NAME = "com.backbase.oss.codegen.java.ValidatedPojo";
+        final String REFERENCED_ENUM_NAME = "com.backbase.oss.codegen.java.CommonEnum";
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
@@ -163,8 +165,11 @@ class BoatSpringCodeGenTests {
         var codegen = new BoatSpringCodeGen();
         codegen.setLibrary("spring-boot");
         codegen.setInterfaceOnly(true);
+        codegen.setSkipDefaultInterface(true);
         codegen.setOutputDir(output);
         codegen.setInputSpec(input.getAbsolutePath());
+        codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
+        codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
         codegen.additionalProperties().put(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, Boolean.TRUE.toString());
         codegen.setModelPackage(modelPackage);
@@ -199,6 +204,15 @@ class BoatSpringCodeGenTests {
             .filter(it -> "getStatus".equals(it.getName().toString()))
             .findFirst().orElseThrow();
         assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+
+        FileUtils.copyToFile(
+                getClass().getResourceAsStream("/boat-spring/ValidatedPojo.java"),
+                new File(output + "/src/main/java/"
+                        + REFERENCED_CLASS_NAME.replaceAll("\\.", "/") + "/ValidatedPojo.java"));
+        FileUtils.copyToFile(
+                getClass().getResourceAsStream("/boat-spring/CommonEnum.java"),
+                new File(output + "/src/main/java/"
+                        + REFERENCED_ENUM_NAME.replaceAll("\\.", "/") + "/CommonEnum.java"));
 
         // compile generated project
         var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());

@@ -9,12 +9,15 @@
       {{>beanValidationCore}}
     {{/isPrimitiveType}}
     {{^isPrimitiveType}}
-      @Valid
+      {{packageName}}@Valid
     {{/isPrimitiveType}}
   {{/items}}
 {{/useBeanValidation}}
+{{^useBeanValidation}}
+{{items.packageName}}
+{{/useBeanValidation}}
 {{! apply collection item type }}
-{{{items.datatypeWithEnum}}}>
+{{items.simpleName}}>
 {{#openApiNullable}}
   {{#isNullable}}>{{/isNullable}}
 {{/openApiNullable}}

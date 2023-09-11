@@ -4,13 +4,12 @@
     {{^uniqueItems}}java.util.List{{/uniqueItems}}<
     {{#items}}
       {{#isPrimitiveType}}
-        {{>beanValidationCore}}
+        {{>beanValidationCore}} {{{dataType}}}>
       {{/isPrimitiveType}}
       {{^isPrimitiveType}}
-        @Valid
+        {{packageName}}@Valid {{simpleName}}>
       {{/isPrimitiveType}}
     {{/items}}
-    {{{items.dataType}}}>
   {{/useBeanValidation}}
   {{^useBeanValidation}}
     {{#uniqueItems}}java.util.Set{{/uniqueItems}}
