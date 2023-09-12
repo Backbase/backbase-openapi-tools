@@ -107,10 +107,16 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     {{/isDateTime}}
     {{#openApiNullable}}
+      {{#required}}
+        @NotNull
+      {{/required}}
       {{#useBeanValidation}}{{>beanValidationCore}}{{/useBeanValidation}}
       private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
+      {{#required}}
+        @NotNull
+      {{/required}}
       {{#useBeanValidation}}{{>beanValidationCore}}{{/useBeanValidation}}
       private {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}

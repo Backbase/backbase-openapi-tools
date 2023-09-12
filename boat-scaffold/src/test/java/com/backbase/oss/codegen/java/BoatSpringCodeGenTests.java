@@ -215,7 +215,9 @@ class BoatSpringCodeGenTests {
             .get();
         CompilationUnit paymentRequestUnit = StaticJavaParser.parse(paymentRequest);
         assertFieldAnnotation(paymentRequestUnit, "currencyCode;", "Pattern");
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode;", "NotNull");
         assertFieldAnnotation(paymentRequestUnit, "reference;", "Size");
+        assertFieldAnnotation(paymentRequestUnit, "reference;", "NotNull");
 
 
         // assert annotation
