@@ -3,8 +3,7 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -13,9 +12,12 @@ import static org.mockito.Mockito.when;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.samskivert.mustache.Template.Fragment;
@@ -26,6 +28,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -36,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -195,15 +200,25 @@ class BoatSpringCodeGenTests {
         assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
         assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
 
-        File PaymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
+        File paymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
             .findFirst()
             .get();
-        MethodDeclaration getStatus = StaticJavaParser.parse(PaymentRequestLine)
+        MethodDeclaration getStatus = StaticJavaParser.parse(paymentRequestLine)
             .findAll(MethodDeclaration.class)
             .stream()
             .filter(it -> "getStatus".equals(it.getName().toString()))
             .findFirst().orElseThrow();
         assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+
+        File paymentRequest = files.stream().filter(file -> file.getName().equals("PaymentRequest.java"))
+            .findFirst()
+            .get();
+        CompilationUnit paymentRequestUnit = StaticJavaParser.parse(paymentRequest);
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode;", "Pattern");
+        assertFieldAnnotation(paymentRequestUnit, "reference;", "Size");
+
+
+        // assert annotation
 
         FileUtils.copyToFile(
                 getClass().getResourceAsStream("/boat-spring/ValidatedPojo.java"),
@@ -310,6 +325,15 @@ class BoatSpringCodeGenTests {
         verificationRunner.runVerification(
             Verification.builder().runnable(verifyCollectionItems).displayName("validations").build()
         );
+    }
+
+    private static void assertFieldAnnotation(
+            CompilationUnit unit, String fieldName, String annotationName) throws FileNotFoundException {
+        assertThat(unit
+                .findAll(FieldDeclaration.class)
+                .stream()
+                .filter(field -> field.getVariable(0).getName().equals(fieldName))
+                .map(f -> f.getAnnotationByName(annotationName)), notNullValue());
     }
 
     @NotNull

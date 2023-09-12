@@ -211,9 +211,11 @@ components:
       properties:
         referenceNumber:
           type: string
+          minLength: 6
           description: Reference number
         currencyCode:
           type: string
+          pattern: '^[A-Z]{3}$'
           description: Currency of the payment request
     MultiLinePaymentRequest:
       required:
