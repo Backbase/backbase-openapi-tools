@@ -115,7 +115,7 @@ public class BoatSpringCodegenParameter extends CodegenParameter {
             simpleName = StringUtils.substringAfterLast(dataType, ".");
         } else {
             packageName = "";
-            simpleName = datatypeWithEnum;
+            simpleName = dataType;
         }
     }
 
