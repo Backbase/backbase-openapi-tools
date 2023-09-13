@@ -110,14 +110,23 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
       {{#required}}
         @NotNull
       {{/required}}
-      {{#useBeanValidation}}{{>beanValidationCore}}{{/useBeanValidation}}
+      {{#useBeanValidation}}
+        @Valid
+        {{#required}}
+          @NotNull
+        {{/required}}
+        {{>beanValidationCore}}
+      {{/useBeanValidation}}
       private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
     {{^openApiNullable}}
-      {{#required}}
-        @NotNull
-      {{/required}}
-      {{#useBeanValidation}}{{>beanValidationCore}}{{/useBeanValidation}}
+      {{#useBeanValidation}}
+        @Valid
+        {{#required}}
+          @NotNull
+        {{/required}}
+        {{>beanValidationCore}}
+      {{/useBeanValidation}}
       private {{>nullableDataType}} {{name}}{{#isNullable}} = null{{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
     {{/openApiNullable}}
   {{/isContainer}}

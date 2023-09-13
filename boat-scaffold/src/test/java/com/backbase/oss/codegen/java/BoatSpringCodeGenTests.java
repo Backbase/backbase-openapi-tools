@@ -33,12 +33,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -214,10 +209,11 @@ class BoatSpringCodeGenTests {
             .findFirst()
             .get();
         CompilationUnit paymentRequestUnit = StaticJavaParser.parse(paymentRequest);
-        assertFieldAnnotation(paymentRequestUnit, "currencyCode;", "Pattern");
-        assertFieldAnnotation(paymentRequestUnit, "currencyCode;", "NotNull");
-        assertFieldAnnotation(paymentRequestUnit, "reference;", "Size");
-        assertFieldAnnotation(paymentRequestUnit, "reference;", "NotNull");
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "Pattern");
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "NotNull");
+        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "Size");
+        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "NotNull");
+        assertFieldAnnotation(paymentRequestUnit, "requestLine", "Valid");
 
 
         // assert annotation
@@ -331,11 +327,15 @@ class BoatSpringCodeGenTests {
 
     private static void assertFieldAnnotation(
             CompilationUnit unit, String fieldName, String annotationName) throws FileNotFoundException {
-        assertThat(unit
+        Optional<FieldDeclaration> fieldDeclaration = unit
                 .findAll(FieldDeclaration.class)
                 .stream()
-                .filter(field -> field.getVariable(0).getName().equals(fieldName))
-                .map(f -> f.getAnnotationByName(annotationName)), notNullValue());
+                .filter(field -> field.getVariable(0).getName().getIdentifier().equals(fieldName))
+                .findFirst();
+        assertThat("Expect field declaration to be present: " + fieldName,
+                fieldDeclaration.isPresent(), is(true));
+        assertThat("Expect annotation to be present: " + annotationName,
+                fieldDeclaration.get().getAnnotationByName(annotationName).isPresent(), is(true));
     }
 
     @NotNull
