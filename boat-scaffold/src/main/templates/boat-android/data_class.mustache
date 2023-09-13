@@ -1,0 +1,58 @@
+{{#gson}}
+import com.google.gson.annotations.SerializedName
+{{/gson}}
+{{#moshi}}
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+{{/moshi}}
+import java.util.Objects
+{{#parcelizeModels}}import android.os.Parcelable
+import kotlinx.parcelize.Parcelize{{/parcelizeModels}}
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.backbase.android.common.utils.dates.DBSDateTimeFormats
+
+/**
+ * {{{description}}}
+{{>data_class_fields_docs}}
+ */
+{{#parcelizeModels}}
+@Parcelize
+{{/parcelizeModels}}
+{{#moshi}}@JsonClass(generateAdapter = true){{/moshi}}
+class {{{classname}}} internal constructor(
+{{>data_class_fields}}
+) {{#parcelizeModels}}: Parcelable {{/parcelizeModels}}{
+
+{{>data_class_inner_enums}}
+
+  override fun hashCode() = Objects.hash({{>data_class_hashCode}})
+
+  override fun equals(other: Any?):Boolean = other is {{classname}}
+    {{>data_class_equals_fields_comparisons}}
+
+  override fun toString() = "{{classname}}({{>data_class_toString_fields}})"
+
+  /**
+   * A builder for [{{classname}}].
+   */
+  class Builder {
+
+{{>data_class_builder_fields}}
+
+      /**
+       * Builds an instance of [{{classname}}].
+       */
+      fun build() = {{classname}}({{>data_class_builder_build_parameters}})
+  }
+}
+
+/**
+ * Builds an instance of [{{classname}}] with the [initializer] parameters.
+ */
+@Suppress("FunctionName") // DSL initializer
+@JvmSynthetic // Hide from Java callers who should use Builder
+fun {{classname}}(initializer: {{classname}}.Builder.() -> Unit): {{classname}} {
+    return {{classname}}.Builder().apply(initializer).build()
+}
