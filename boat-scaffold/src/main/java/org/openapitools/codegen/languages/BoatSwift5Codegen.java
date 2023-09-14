@@ -95,12 +95,11 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     */
     private void fixInheritance(CodegenModel codegenModel, CodegenModel parentModel) {
         if (parentModel != null) {
-            if (!parentModel.vars.isEmpty()) {
-                codegenModel.allVars.addAll(parentModel.vars);
+            if (!parentModel.allVars.isEmpty()) {
+                codegenModel.allVars.addAll(parentModel.allVars);
                 codegenModel.requiredVars.addAll(parentModel.requiredVars);
             }
         }
         codegenModel.removeAllDuplicatedProperty();
     }
 }
-
