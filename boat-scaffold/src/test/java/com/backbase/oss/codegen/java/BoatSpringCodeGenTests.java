@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,8 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.samskivert.mustache.Template.Fragment;
@@ -215,6 +218,17 @@ class BoatSpringCodeGenTests {
         assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "NotNull");
         assertFieldAnnotation(paymentRequestUnit, "requestLine", "Valid");
 
+        File multiLinePaymentRequest = files.stream().filter(f -> f.getName().equals("MultiLinePaymentRequest.java"))
+                .findFirst()
+                .get();
+        CompilationUnit multiLinePaymentRequestUnit = StaticJavaParser.parse(multiLinePaymentRequest);
+
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "arrangementIds", "NotNull");
+        assertFieldValueAssignment(
+                multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
+        assertFieldValueAssignment(
+                multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
 
         // assert annotation
 
@@ -286,13 +300,26 @@ class BoatSpringCodeGenTests {
                 Map<String, String> mapStrings = (Map<String, String>) requestObject.getClass()
                     .getDeclaredMethod("getMapStrings")
                     .invoke(requestObject);
+                // mapStrings is optional, so it is null
+                assertTrue(mapStrings == null);
+                // but putMethod should not fail
+                requestObject.getClass()
+                        .getDeclaredMethod("putMapStringsItem", String.class, String.class)
+                        .invoke(requestObject, "key0000", "asdasdasd");
+
+                // mapStrings not null after that
+                mapStrings = (Map<String, String>) requestObject.getClass()
+                        .getDeclaredMethod("getMapStrings")
+                        .invoke(requestObject);
+                assertTrue(mapStrings != null);
                 mapStrings.put("key1", "abc");
                 mapStrings.put("key2", "abcdefghijklmnopq");
 
-                // add mapObjects
-                Map<String, Object> mapObjects = (Map<String, Object>) requestObject.getClass()
-                    .getDeclaredMethod("getMapObjects")
-                    .invoke(requestObject);
+                // add mapObjects - which is optional, so initially null
+                Map<String, Object> mapObjects = new HashMap<>();
+                requestObject.getClass()
+                    .getDeclaredMethod("setMapObjects", Map.class)
+                    .invoke(requestObject, mapObjects);
                 mapObjects.put(
                     "key1",
                     newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
@@ -327,16 +354,41 @@ class BoatSpringCodeGenTests {
 
     private static void assertFieldAnnotation(
             CompilationUnit unit, String fieldName, String annotationName) throws FileNotFoundException {
-        Optional<FieldDeclaration> fieldDeclaration = unit
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+        assertThat("Expect annotation to be present on field: " + annotationName + " " + fieldName,
+                fieldDeclaration.getAnnotationByName(annotationName).isPresent(), is(true));
+    }
+
+    private static void assertFieldValueAssignment(
+            CompilationUnit unit, String fieldName, String valueAssignment) throws FileNotFoundException {
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+
+        Optional<com.github.javaparser.ast.expr.Expression> expression = fieldDeclaration.getChildNodes()
+                .stream()
+                .filter(n -> n instanceof VariableDeclarator)
+                .map(n -> ((VariableDeclarator)n).getInitializer())
+                .findFirst().orElseThrow(
+                        () -> new RuntimeException("VariableDeclarator not found on Field " + fieldName));
+        if (expression.isEmpty()) {
+            assertThat("Expected value " + valueAssignment + " for field " + fieldName,  valueAssignment == null);
+        } else {
+            Expression expr = expression.get();
+            // Depending on 'toString' implementation is shaky but works for now...
+            assertThat(expr.toString(), is(valueAssignment));
+        }
+    }
+
+    private static FieldDeclaration findFieldDeclaration(CompilationUnit unit, String fieldName) {
+        Optional<FieldDeclaration> result = unit
                 .findAll(FieldDeclaration.class)
                 .stream()
                 .filter(field -> field.getVariable(0).getName().getIdentifier().equals(fieldName))
                 .findFirst();
         assertThat("Expect field declaration to be present: " + fieldName,
-                fieldDeclaration.isPresent(), is(true));
-        assertThat("Expect annotation to be present: " + annotationName,
-                fieldDeclaration.get().getAnnotationByName(annotationName).isPresent(), is(true));
+                result.isPresent(), is(true));
+        return result.get();
     }
+
 
     @NotNull
     private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
