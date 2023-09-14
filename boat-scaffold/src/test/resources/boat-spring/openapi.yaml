@@ -304,6 +304,7 @@ components:
     PaymentRequestLine:
       required:
         - accountId
+        - additionalPropertiesMap
       type: object
       properties:
         accountId:
@@ -319,6 +320,17 @@ components:
               - GOOD
               - BAD
               - UGLY
+        additionalPropertiesMap:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              one:
+                type: string
+              two:
+                type: number
+
+
     ValidatedPojo:
       required:
         - name

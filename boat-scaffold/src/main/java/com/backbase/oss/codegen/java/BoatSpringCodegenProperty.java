@@ -133,6 +133,10 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
             packageName = "";
             simpleName = datatypeWithEnum;
         }
+        if (this.additionalProperties != null && this.required) {
+            defaultValue = "new HashMap<>()";
+            isMap = true;
+        }
     }
     @Override
     public String toString() {

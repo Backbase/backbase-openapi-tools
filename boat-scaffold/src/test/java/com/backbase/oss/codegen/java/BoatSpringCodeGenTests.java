@@ -202,12 +202,14 @@ class BoatSpringCodeGenTests {
         File paymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
             .findFirst()
             .get();
-        MethodDeclaration getStatus = StaticJavaParser.parse(paymentRequestLine)
+        CompilationUnit paymentRequestLineUnit = StaticJavaParser.parse(paymentRequestLine);
+        MethodDeclaration getStatus = paymentRequestLineUnit
             .findAll(MethodDeclaration.class)
             .stream()
             .filter(it -> "getStatus".equals(it.getName().toString()))
             .findFirst().orElseThrow();
         assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        assertFieldValueAssignment(paymentRequestLineUnit, "additionalPropertiesMap", "new HashMap<>()");
 
         File paymentRequest = files.stream().filter(file -> file.getName().equals("PaymentRequest.java"))
             .findFirst()
