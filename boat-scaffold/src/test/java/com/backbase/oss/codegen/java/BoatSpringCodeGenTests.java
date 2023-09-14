@@ -171,6 +171,7 @@ class BoatSpringCodeGenTests {
         codegen.setSkipDefaultInterface(true);
         codegen.setOutputDir(output);
         codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setContainerDefaultToNull(true);
         codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
         codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());

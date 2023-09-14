@@ -133,9 +133,6 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
             packageName = "";
             simpleName = datatypeWithEnum;
         }
-        if (!required) {
-            defaultValue = null;
-        }
     }
     @Override
     public String toString() {
