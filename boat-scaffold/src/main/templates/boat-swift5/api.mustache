@@ -105,41 +105,6 @@ extension {{projectName}}API {
 
     {{/isEnum}}
     {{/allParams}}
-{{^usePromiseKit}}
-{{^useRxSwift}}
-{{^useResult}}
-{{^useCombine}}
-{{^useCall}}
-    /**
-     {{#summary}}
-     {{{summary}}}
-     {{/summary}}{{#allParams}}
-     - parameter {{paramName}}: ({{#isFormParam}}form{{/isFormParam}}{{#isQueryParam}}query{{/isQueryParam}}{{#isPathParam}}path{{/isPathParam}}{{#isHeaderParam}}header{{/isHeaderParam}}{{#isBodyParam}}body{{/isBodyParam}}) {{description}} {{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{/allParams}}
-     - parameter apiResponseQueue: The queue on which api response is dispatched.
-     - parameter completion: completion handler to receive the data and the error objects
-     */{{#isDeprecated}}
-    @available(*, deprecated{{#vendorExtensions.x-BbApiDeprecation-description}}, message: "{{{vendorExtensions.x-BbApiDeprecation-description}}}"{{/vendorExtensions.x-BbApiDeprecation-description}}){{/isDeprecated}}
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue, completion: @escaping ((_ data: {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}?,_ error: Error?) -> Void)) {
-        {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
-            switch result {
-            {{#returnType}}
-            case let .success(response):
-                completion(response.body, nil)
-            {{/returnType}}
-            {{^returnType}}
-            case .success:
-                completion((), nil)
-            {{/returnType}}
-            case let .failure(error):
-                completion(nil, error)
-            }
-        }
-    }
-{{/useCall}}
-{{/useCombine}}
-{{/useResult}}
-{{/useRxSwift}}
-{{/usePromiseKit}}
 {{#usePromiseKit}}
     /**
      {{#summary}}
@@ -149,9 +114,9 @@ extension {{projectName}}API {
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>
      */
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}} {{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}} {{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
         let deferred = Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>.pending()
-        {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
+        {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
             switch result {
             {{#returnType}}
             case let .success(response):
@@ -177,9 +142,9 @@ extension {{projectName}}API {
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>
      */
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
         return Observable.create { observer -> Disposable in
-            {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
+            {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 {{#returnType}}
                 case let .success(response):
@@ -208,9 +173,9 @@ extension {{projectName}}API {
      - returns: AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error> {
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue) -> AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error> {
         return Future<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>.init { promisse in
-            {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
+            {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 {{#returnType}}
                 case let .success(response):
@@ -236,8 +201,8 @@ extension {{projectName}}API {
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the result
      */
-    open func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue, completion: @escaping ((_ result: Result<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>) -> Void)) {
-        {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
+    open func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue, completion: @escaping ((_ result: Result<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>) -> Void)) {
+        {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
             switch result {
             {{#returnType}}
             case let .success(response):
@@ -253,7 +218,6 @@ extension {{projectName}}API {
         }
     }
 {{/useResult}}
-    
     {{#hasParams}}
     /**
      {{#summary}}
@@ -282,10 +246,10 @@ extension {{projectName}}API {
      @available(*, deprecated, message: "This method is deprecated in favor of the alternative method with {{classname}}.{{operationIdCamelCase}}RequestParams class.")
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}Call({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}_{{operationId}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allParams}}) throws -> Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}> {
         guard let dataProvider = dataProvider else { throw CallError.missingDataProvider }
-        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{^secondaryParam}}var{{/secondaryParam}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
+        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{#-first}}var{{/-first}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
         let {{paramName}}PathItem = "\({{#isEnum}}{{paramName}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}.rawValue{{/isContainer}}{{/isEnum}}{{^isEnum}}APIHelper.mapValueToPathItem({{paramName}}){{/isEnum}})"
         path = path.replacingOccurrences(of: "{{=<% %>=}}{<%baseName%>}<%={{ }}=%>", with: {{paramName}}PathItem, options: .literal, range: nil){{/pathParams}}
-        {{#pathParams}}{{^secondaryParam}}path = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""{{/secondaryParam}}{{/pathParams}}
+        {{#pathParams}}{{#-first}}path = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""{{/-first}}{{/pathParams}}
         {{#bodyParam}}
         let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: {{paramName}})
         {{/bodyParam}}
@@ -314,18 +278,18 @@ extension {{projectName}}API {
             {{> _param_deprecated}}{{^-last}}, {{/-last}}
             {{/queryParams}}
         ]{{/hasQueryParams}}
-        let urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false){{#headerParams}}{{^secondaryParam}}
-        let nillableHeaders: [String: Any?] = [{{/secondaryParam}}
+        let urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false){{#headerParams}}{{#-first}}
+        let nillableHeaders: [String: Any?] = [{{/-first}}
             {{> _param_deprecated}}{{^-last}}, {{/-last}}{{#-last}}
         ]
         let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders){{/-last}}{{/headerParams}}
         guard let url = urlComponents?.url else { throw CallError.invalidUrl }
-        let request = try RequestBuilder.createURLRequest(requestUrl: url, 
-                                                          method: "{{httpMethod}}",
-                                                          queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
-                                                          bodyParameters: parameters,
-                                                          bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{^secondaryParam}},
-                                                          headers: headerParameters{{/secondaryParam}}{{/headerParams}})
+        let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
+                                                                            method: "{{httpMethod}}",
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            bodyParameters: parameters,
+                                                                            bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
+                                                                            headers: headerParameters{{/-first}}{{/headerParams}})
         return Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}>(dataProvider: dataProvider, request: request)
     }
     {{/hasParams}}
@@ -354,10 +318,10 @@ extension {{projectName}}API {
      @available(*, deprecated{{#vendorExtensions.x-bb-api-deprecation-description}}, message: "{{{vendorExtensions.x-bb-api-deprecation-description}}}"{{/vendorExtensions.x-bb-api-deprecation-description}}){{/isDeprecated}}
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}Call({{#hasParams}}params: {{classname}}.{{operationIdCamelCase}}RequestParams{{/hasParams}}) throws -> Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}> {
         guard let dataProvider = dataProvider else { throw CallError.missingDataProvider }
-        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{^secondaryParam}}var{{/secondaryParam}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
+        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{#-first}}var{{/-first}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
         let {{paramName}}PathItem = "\({{#isEnum}}params.{{{paramName}}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}.rawValue{{/isContainer}}{{/isEnum}}{{^isEnum}}APIHelper.mapValueToPathItem(params.{{{paramName}}}){{/isEnum}})"
         path = path.replacingOccurrences(of: "{{=<% %>=}}{<%baseName%>}<%={{ }}=%>", with: {{{paramName}}}PathItem, options: .literal, range: nil){{/pathParams}}
-        {{#pathParams}}{{^secondaryParam}}path = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""{{/secondaryParam}}{{/pathParams}}
+        {{#pathParams}}{{#-first}}path = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""{{/-first}}{{/pathParams}}
         {{#bodyParam}}
         let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: params.{{{paramName}}})
         {{/bodyParam}}
@@ -386,18 +350,18 @@ extension {{projectName}}API {
             {{> _param}}{{^-last}}, {{/-last}}
             {{/queryParams}}
         ]{{/hasQueryParams}}
-        let urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false){{#headerParams}}{{^secondaryParam}}
-        let nillableHeaders: [String: Any?] = [{{/secondaryParam}}
+        let urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false){{#headerParams}}{{#-first}}
+        let nillableHeaders: [String: Any?] = [{{/-first}}
             {{> _param}}{{^-last}},{{/-last}}{{#-last}}
         ]
         let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders){{/-last}}{{/headerParams}}
         guard let url = urlComponents?.url else { throw CallError.invalidUrl }
-        let request = try RequestBuilder.createURLRequest(requestUrl: url, 
-                                                          method: "{{httpMethod}}",
-                                                          queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
-                                                          bodyParameters: parameters,
-                                                          bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{^secondaryParam}},
-                                                          headers: headerParameters{{/secondaryParam}}{{/headerParams}})
+        let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
+                                                                            method: "{{httpMethod}}",
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            bodyParameters: parameters,
+                                                                            bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
+                                                                            headers: headerParameters{{/-first}}{{/headerParams}})
         return Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}>(dataProvider: dataProvider, request: request)
     }
 {{/operation}}
