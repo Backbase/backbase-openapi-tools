@@ -214,11 +214,11 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
         CodegenParameter codegenParameter = super.fromParameter(parameter, imports);
         if (!isListOrSet(codegenParameter)) {
-            return codegenParameter;
+            return new BoatSpringCodegenParameter(codegenParameter);
         } else {
             codegenParameter.datatypeWithEnum = replaceBeanValidationCollectionType(codegenParameter.items, codegenParameter.datatypeWithEnum);
             codegenParameter.dataType = replaceBeanValidationCollectionType(codegenParameter.items, codegenParameter.dataType);
-            return codegenParameter;
+            return new BoatSpringCodegenParameter(codegenParameter);
         }
     }
 
@@ -229,11 +229,11 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
         CodegenProperty codegenProperty = super.fromProperty(name, p, required, schemaIsFromAdditionalProperties);
         if (!isListOrSet(codegenProperty)) {
-            return codegenProperty;
+            return new BoatSpringCodegenProperty(codegenProperty);
         } else {
             codegenProperty.datatypeWithEnum = replaceBeanValidationCollectionType(codegenProperty.items, codegenProperty.datatypeWithEnum);
             codegenProperty.dataType = replaceBeanValidationCollectionType(codegenProperty.items, codegenProperty.dataType);
-            return codegenProperty;
+            return new BoatSpringCodegenProperty(codegenProperty);
         }
     }
 

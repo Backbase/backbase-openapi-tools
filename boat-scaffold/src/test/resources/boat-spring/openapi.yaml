@@ -21,6 +21,31 @@ paths:
     $ref: paths/map-types.yaml
   /map-types/{id}/{ids}:
     $ref: paths/map-types-ids.yaml
+  /validated-pojos:
+    put:
+      tags:
+        - validated-pojos
+      summary: get
+      description: Get pojos that are valid
+      operationId: getPojos
+      parameters:
+        - name: yesNoMaybe
+          in: query
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/CommonEnum'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatedPojos'
+              example:
+                name: "valid name"
+
   /transactions:
     patch:
       tags:
@@ -180,16 +205,21 @@ components:
       required:
         - currencyCode
         - referenceNumber
+        - requiredTags
       type: object
       discriminator:
         propertyName: paymentRequestType
       properties:
         referenceNumber:
           type: string
+          minLength: 6
           description: Reference number
         currencyCode:
           type: string
+          pattern: '^[A-Z]{3}$'
           description: Currency of the payment request
+        requestLine:
+          $ref: '#/components/schemas/PaymentRequestLine'
     MultiLinePaymentRequest:
       required:
         - name
@@ -287,6 +317,7 @@ components:
     PaymentRequestLine:
       required:
         - accountId
+        - additionalPropertiesMap
       type: object
       properties:
         accountId:
@@ -302,3 +333,53 @@ components:
               - GOOD
               - BAD
               - UGLY
+        additionalPropertiesMap:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              one:
+                type: string
+              two:
+                type: number
+
+
+    ValidatedPojo:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 36
+    ValidatedPojos:
+      title: ValidatedPojos
+      properties:
+        validStrings:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 2
+          items:
+            type: string
+            minLength: 1
+        validPojos:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/ValidatedPojo'
+        mainPojo:
+          $ref: '#/components/schemas/ValidatedPojo'
+
+      required:
+        - mainPojo
+        - validPojos
+    CommonEnum:
+      type: string
+      enum:
+        - YES
+        - NO
+        - INVALID

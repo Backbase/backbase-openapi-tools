@@ -3,19 +3,24 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.samskivert.mustache.Template.Fragment;
@@ -39,6 +44,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -155,7 +163,10 @@ class BoatSpringCodeGenTests {
     }
     @Test
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException, FileNotFoundException {
+    void shouldGenerateValidations() throws InterruptedException, IOException {
+
+        final String REFERENCED_CLASS_NAME = "com.backbase.oss.codegen.java.ValidatedPojo";
+        final String REFERENCED_ENUM_NAME = "com.backbase.oss.codegen.java.CommonEnum";
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
@@ -165,8 +176,12 @@ class BoatSpringCodeGenTests {
         var codegen = new BoatSpringCodeGen();
         codegen.setLibrary("spring-boot");
         codegen.setInterfaceOnly(true);
+        codegen.setSkipDefaultInterface(true);
         codegen.setOutputDir(output);
         codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setContainerDefaultToNull(true);
+        codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
+        codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
         codegen.additionalProperties().put(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, Boolean.TRUE.toString());
         codegen.setModelPackage(modelPackage);
@@ -192,15 +207,50 @@ class BoatSpringCodeGenTests {
         assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
         assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
 
-        File PaymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
+        File paymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
             .findFirst()
             .get();
-        MethodDeclaration getStatus = StaticJavaParser.parse(PaymentRequestLine)
+        CompilationUnit paymentRequestLineUnit = StaticJavaParser.parse(paymentRequestLine);
+        MethodDeclaration getStatus = paymentRequestLineUnit
             .findAll(MethodDeclaration.class)
             .stream()
             .filter(it -> "getStatus".equals(it.getName().toString()))
             .findFirst().orElseThrow();
         assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        assertFieldValueAssignment(paymentRequestLineUnit, "additionalPropertiesMap", "new HashMap<>()");
+
+        File paymentRequest = files.stream().filter(file -> file.getName().equals("PaymentRequest.java"))
+            .findFirst()
+            .get();
+        CompilationUnit paymentRequestUnit = StaticJavaParser.parse(paymentRequest);
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "Pattern");
+        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "NotNull");
+        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "Size");
+        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "NotNull");
+        assertFieldAnnotation(paymentRequestUnit, "requestLine", "Valid");
+
+        File multiLinePaymentRequest = files.stream().filter(f -> f.getName().equals("MultiLinePaymentRequest.java"))
+                .findFirst()
+                .get();
+        CompilationUnit multiLinePaymentRequestUnit = StaticJavaParser.parse(multiLinePaymentRequest);
+
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "arrangementIds", "NotNull");
+        assertFieldValueAssignment(
+                multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
+        assertFieldValueAssignment(
+                multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
+
+        // assert annotation
+
+        FileUtils.copyToFile(
+                getClass().getResourceAsStream("/boat-spring/ValidatedPojo.java"),
+                new File(output + "/src/main/java/"
+                        + REFERENCED_CLASS_NAME.replaceAll("\\.", "/") + "/ValidatedPojo.java"));
+        FileUtils.copyToFile(
+                getClass().getResourceAsStream("/boat-spring/CommonEnum.java"),
+                new File(output + "/src/main/java/"
+                        + REFERENCED_ENUM_NAME.replaceAll("\\.", "/") + "/CommonEnum.java"));
 
         // compile generated project
         var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());
@@ -273,13 +323,26 @@ class BoatSpringCodeGenTests {
                 Map<String, String> mapStrings = (Map<String, String>) requestObject.getClass()
                     .getDeclaredMethod("getMapStrings")
                     .invoke(requestObject);
+                // mapStrings is optional, so it is null
+                assertTrue(mapStrings == null);
+                // but putMethod should not fail
+                requestObject.getClass()
+                        .getDeclaredMethod("putMapStringsItem", String.class, String.class)
+                        .invoke(requestObject, "key0000", "asdasdasd");
+
+                // mapStrings not null after that
+                mapStrings = (Map<String, String>) requestObject.getClass()
+                        .getDeclaredMethod("getMapStrings")
+                        .invoke(requestObject);
+                assertTrue(mapStrings != null);
                 mapStrings.put("key1", "abc");
                 mapStrings.put("key2", "abcdefghijklmnopq");
 
-                // add mapObjects
-                Map<String, Object> mapObjects = (Map<String, Object>) requestObject.getClass()
-                    .getDeclaredMethod("getMapObjects")
-                    .invoke(requestObject);
+                // add mapObjects - which is optional, so initially null
+                Map<String, Object> mapObjects = new HashMap<>();
+                requestObject.getClass()
+                    .getDeclaredMethod("setMapObjects", Map.class)
+                    .invoke(requestObject, mapObjects);
                 mapObjects.put(
                     "key1",
                     newPaymeyntRequestLineObject(modelPackage, projectClassLoader, UUID.randomUUID().toString())
@@ -312,6 +375,44 @@ class BoatSpringCodeGenTests {
             Verification.builder().runnable(verifyCollectionItems).displayName("validations").build()
         );
     }
+
+    private static void assertFieldAnnotation(
+            CompilationUnit unit, String fieldName, String annotationName) throws FileNotFoundException {
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+        assertThat("Expect annotation to be present on field: " + annotationName + " " + fieldName,
+                fieldDeclaration.getAnnotationByName(annotationName).isPresent(), is(true));
+    }
+
+    private static void assertFieldValueAssignment(
+            CompilationUnit unit, String fieldName, String valueAssignment) throws FileNotFoundException {
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+
+        Optional<com.github.javaparser.ast.expr.Expression> expression = fieldDeclaration.getChildNodes()
+                .stream()
+                .filter(n -> n instanceof VariableDeclarator)
+                .map(n -> ((VariableDeclarator)n).getInitializer())
+                .findFirst().orElseThrow(
+                        () -> new RuntimeException("VariableDeclarator not found on Field " + fieldName));
+        if (expression.isEmpty()) {
+            assertThat("Expected value " + valueAssignment + " for field " + fieldName,  valueAssignment == null);
+        } else {
+            Expression expr = expression.get();
+            // Depending on 'toString' implementation is shaky but works for now...
+            assertThat(expr.toString(), is(valueAssignment));
+        }
+    }
+
+    private static FieldDeclaration findFieldDeclaration(CompilationUnit unit, String fieldName) {
+        Optional<FieldDeclaration> result = unit
+                .findAll(FieldDeclaration.class)
+                .stream()
+                .filter(field -> field.getVariable(0).getName().getIdentifier().equals(fieldName))
+                .findFirst();
+        assertThat("Expect field declaration to be present: " + fieldName,
+                result.isPresent(), is(true));
+        return result.get();
+    }
+
 
     @NotNull
     private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
