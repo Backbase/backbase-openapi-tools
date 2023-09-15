@@ -13,6 +13,9 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
     @Getter
     public String simpleName;
 
+    @Getter
+    public boolean isStringTypedNumberFormatted;
+
     public BoatSpringCodegenProperty(CodegenProperty codegenProperty) {
         super();
         super.openApiType =                         codegenProperty.openApiType;
@@ -137,6 +140,9 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
             defaultValue = "new HashMap<>()";
             isMap = true;
         }
+        this.isStringTypedNumberFormatted =
+                "string".equalsIgnoreCase(this.openApiType) && "number".equalsIgnoreCase(this.getFormat());
+
     }
     @Override
     public String toString() {

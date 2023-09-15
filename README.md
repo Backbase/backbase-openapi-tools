@@ -21,6 +21,7 @@ BOAT is still under development and subject to change.
   * Fix [Broken pojo field validations, https://github.com/Backbase/backbase-openapi-tools/issues/633]
   * Fix Add `@NotNull` for required properties.
   * Fix initiation of `required` property that has `additionalProperties` (generated as Map) when using `containerDefaultToNull=true`
+  * Fix [json output of string typed, number formatted properties, https://github.com/Backbase/backbase-openapi-tools/pull/635]
 ## 0.17.17
   * Fix [`createApiComponent` option in springtemplate generator is ignored](https://github.com/Backbase/backbase-openapi-tools/issues/630)
 ## 0.17.16

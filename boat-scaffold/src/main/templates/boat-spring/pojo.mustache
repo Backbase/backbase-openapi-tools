@@ -273,11 +273,25 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
     @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")
   {{/swagger1AnnotationLibrary}}
   {{#jackson}}
-    @JsonProperty("{{baseName}}")
+    {{#isStringTypedNumberFormatted}}
+      @JsonIgnore
+    {{/isStringTypedNumberFormatted}}
+    {{^isStringTypedNumberFormatted}}
+      @JsonProperty("{{baseName}}")
+    {{/isStringTypedNumberFormatted}}
   {{/jackson}}
   public {{>nullableDataType}} {{getter}}() {
   return {{name}};
   }
+
+  {{#jackson}}
+    {{#isStringTypedNumberFormatted}}
+      @JsonProperty("{{baseName}}")
+      public String {{getter}}AsPlainString() {
+        return {{name}}.toPlainString();
+      }
+    {{/isStringTypedNumberFormatted}}
+  {{/jackson}}
 
   {{#vendorExtensions.x-setter-extra-annotation}}
     {{{vendorExtensions.x-setter-extra-annotation}}}

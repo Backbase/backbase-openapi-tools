@@ -49,6 +49,8 @@ import org.hibernate.validator.constraints.*;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 {{/withXml}}
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 {{/jackson}}
 {{#swagger2AnnotationLibrary}}
 import io.swagger.v3.oas.annotations.media.Schema;

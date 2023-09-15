@@ -150,7 +150,21 @@ paths:
       responses:
         "200":
           description: OK
-
+  /string-typed-number-formatted-properties:
+    get:
+      responses:
+        200:
+          description: Success!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string-typed-number-formatted-value:
+                    type: string
+                    format: number
+                  number-typed-value:
+                    type: number
 components:
   schemas:
     Additions:

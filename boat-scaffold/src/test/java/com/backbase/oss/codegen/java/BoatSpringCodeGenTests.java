@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.backbase.oss.codegen.java.BoatSpringCodeGen.NewLineIndent;
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -153,6 +155,78 @@ class BoatSpringCodeGenTests {
                 codegenProperty,"Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
         assertEquals("Set<com.backbase.dbs.arrangement.commons.model.@Valid TranslationItemDto>", result);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldOutputStingTypedNumberFormattedPropertyAsString() throws InterruptedException, IOException {
+
+        var modelPackage = "com.backbase.model";
+        var input = new File("src/test/resources/boat-spring/openapi.yaml");
+        var output = TEST_OUTPUT + "/shouldOutputStingTypedNumberFormattedPropertyAsString";
+
+        // generate project
+        var codegen = new BoatSpringCodeGen();
+        codegen.setLibrary("spring-boot");
+        codegen.setInterfaceOnly(true);
+        codegen.setSkipDefaultInterface(true);
+        codegen.setOutputDir(output);
+        codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setContainerDefaultToNull(true);
+        codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
+        codegen.additionalProperties().put(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, Boolean.TRUE.toString());
+        codegen.setModelPackage(modelPackage);
+
+        var openApiInput = new OpenAPIParser()
+                .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+                .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File pojoFile = files.stream()
+                .filter(file -> file.getName().equals("StringTypedNumberFormattedPropertiesGet200Response.java"))
+                .findFirst()
+                .get();
+        CompilationUnit pojoFileUnit = StaticJavaParser.parse(pojoFile);
+
+        //assertFieldAnnotation(pojoFileUnit, "stringTypedNumberFormattedValue", "JsonFormat");
+
+        // Compile
+        var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());
+        var projectDir = new File(output);
+        int compilationStatus = compiler.compile(projectDir);
+        assertEquals(0, compilationStatus);
+
+        // verify
+        ClassLoader projectClassLoader = compiler.getProjectClassLoader(projectDir);
+        var verificationRunner = new VerificationRunner(projectClassLoader);
+
+        Runnable verifyDefaultValues = () -> {
+            try {
+                var className = modelPackage + ".StringTypedNumberFormattedPropertiesGet200Response";
+                Class<?> clazz = projectClassLoader.loadClass(className);
+                Object object = clazz.getConstructor().newInstance();
+                BigDecimal theNumber = new BigDecimal("12.34").setScale(2);
+                clazz.getDeclaredMethod("setNumberTypedValue", BigDecimal.class).invoke(object, theNumber);
+                clazz.getDeclaredMethod("setStringTypedNumberFormattedValue", BigDecimal.class)
+                        .invoke(object, theNumber);
+                String jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+                assertThat(jsonString,
+                        containsString("\"number-typed-value\" : 12.34"));
+                assertThat(jsonString,
+                        containsString("\"string-typed-number-formatted-value\" : \"12.34\""));
+            } catch (Exception e) {
+                throw new UnhandledException(e);
+            }
+        };
+        verificationRunner.runVerification(
+                Verification.builder().runnable(verifyDefaultValues).displayName("validations").build()
+        );
+
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     void shouldGenerateValidations() throws InterruptedException, IOException {
