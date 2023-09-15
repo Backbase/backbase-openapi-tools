@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -398,7 +399,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         super.postProcessModelProperty(model, property);
 
         if ("string".equalsIgnoreCase(property.openApiType) && ("number".equals(property.dataFormat) || "integer".equals(property.dataFormat))) {
-            if (!property.vendorExtensions.containsKey("x-extra-annotation")) {
+            boolean isString = Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
+                .anyMatch("string"::equalsIgnoreCase);
+            if (!isString && !property.vendorExtensions.containsKey("x-extra-annotation")) {
                 property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = ToStringSerializer.class)");
                 model.imports.add("ToStringSerializer");
                 model.imports.add("JsonSerialize");
