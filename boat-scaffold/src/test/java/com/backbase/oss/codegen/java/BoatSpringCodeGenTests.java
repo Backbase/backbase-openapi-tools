@@ -38,6 +38,14 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -335,11 +343,23 @@ class BoatSpringCodeGenTests {
                 Class<?> requestClass = projectClassLoader.loadClass(className);
                 Object requestObject = requestClass.getConstructor().newInstance();
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(1));
-                assertThat(violations.stream().findFirst().get().getPropertyPath().toString(), Matchers.equalTo("name"));
+                assertThat(violations, Matchers.hasSize(3));
                 assertThat(
-                    violations.stream().findFirst().get().getMessageTemplate(),
-                    Matchers.equalTo("{jakarta.validation.constraints.NotNull.message}")
+                    violations.stream()
+                        .map(ConstraintViolation::getPropertyPath)
+                        .map(Objects::toString)
+                        .sorted()
+                        .collect(Collectors.toList()),
+                    Matchers.hasItems("amountNumber", "amountStringAsNumber", "name")
+                );
+                assertThat(
+                    violations.stream()
+                        .map(ConstraintViolation::getMessageTemplate)
+                        .map(Objects::toString)
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList()),
+                    Matchers.hasItems("{jakarta.validation.constraints.NotNull.message}")
                 );
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -408,9 +428,10 @@ class BoatSpringCodeGenTests {
 
                 // validate
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(6));
+                assertThat(violations, Matchers.hasSize(8));
 
                 assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.NotNull.message}", 2);
                 assertViolationsCountByPath(violations, "lines[0].accountId", 1);
 
                 assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 5);
