@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelsMap;
@@ -26,6 +27,15 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
                 .build();
         supportedLibraries.put(LIBRARY_DBS, "HTTP client: DBSDataProvider");
         setLibrary(LIBRARY_DBS);
+
+        // This overrides the AnyCodable to Any.
+        typeMapping.put("AnyType", "Any");
+        typeMapping.put("object", "Any");
+
+        supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache",
+                sourceFolder,
+                "AnyCodable.swift"));
+
     }
 
     @Override
@@ -59,12 +69,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         Map<String, ModelsMap> postProcessedModels = super.postProcessAllModels(objs);
-
         Iterator it = postProcessedModels.entrySet().iterator();
+
         while (it.hasNext()) {
             Map.Entry<String, ModelsMap> entry = (Map.Entry)it.next();
-            CodegenModel model = ModelUtils.getModelByName((String)entry.getKey(), objs);
-            addParentProperties(model, objs);
+            CodegenModel model = ModelUtils.getModelByName(entry.getKey(), postProcessedModels);
+            addParentProperties(model, postProcessedModels);
         }
         return postProcessedModels;
     }
@@ -103,3 +113,4 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         codegenModel.removeAllDuplicatedProperty();
     }
 }
+
