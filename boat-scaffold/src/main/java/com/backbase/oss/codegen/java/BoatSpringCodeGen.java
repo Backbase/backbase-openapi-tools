@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
@@ -390,5 +391,18 @@ public class BoatSpringCodeGen extends SpringCodegen {
         return getCollectionCodegenValue(cp, referencedSchema, containerDefaultToNull, instantiationTypes())
             .map(CodegenValueType::getValue)
             .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
+    }
+
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+        super.postProcessModelProperty(model, property);
+
+        if ("string".equalsIgnoreCase(property.openApiType) && ("number".equals(property.dataFormat) || "integer".equals(property.dataFormat))) {
+            if (!property.vendorExtensions.containsKey("x-extra-annotation")) {
+                property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = ToStringSerializer.class)");
+                model.imports.add("ToStringSerializer");
+                model.imports.add("JsonSerialize");
+            }
+        }
     }
 }
