@@ -6,6 +6,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -54,6 +58,8 @@ import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
@@ -164,14 +170,15 @@ class BoatSpringCodeGenTests {
     }
     @Test
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException, IOException {
+    void shouldGenerateValidations(boolean useLombok, boolean bigDecimalsAsStrings) throws InterruptedException, IOException {
 
         final String REFERENCED_CLASS_NAME = "com.backbase.oss.codegen.java.ValidatedPojo";
         final String REFERENCED_ENUM_NAME = "com.backbase.oss.codegen.java.CommonEnum";
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
-        var output = TEST_OUTPUT + "/shouldGenerateValidations";
+        var output = TEST_OUTPUT + String.format("/shouldGenerateValidations_lombok-%s_bigDecString-%s", useLombok,
+            bigDecimalsAsStrings);
 
         // generate project
         var codegen = new BoatSpringCodeGen();
@@ -181,8 +188,8 @@ class BoatSpringCodeGenTests {
         codegen.setOutputDir(output);
         codegen.setInputSpec(input.getAbsolutePath());
         codegen.setContainerDefaultToNull(true);
-        codegen.setSerializeBigDecimalAsString(false);
-        codegen.setUseLombokAnnotations(false);
+        codegen.setSerializeBigDecimalAsString(bigDecimalsAsStrings);
+        codegen.setUseLombokAnnotations(useLombok);
         codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
         codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
@@ -214,12 +221,14 @@ class BoatSpringCodeGenTests {
             .findFirst()
             .get();
         CompilationUnit paymentRequestLineUnit = StaticJavaParser.parse(paymentRequestLine);
-        MethodDeclaration getStatus = paymentRequestLineUnit
-            .findAll(MethodDeclaration.class)
-            .stream()
-            .filter(it -> "getStatus".equals(it.getName().toString()))
-            .findFirst().orElseThrow();
-        assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        if (!useLombok) {
+            MethodDeclaration getStatus = paymentRequestLineUnit
+                .findAll(MethodDeclaration.class)
+                .stream()
+                .filter(it -> "getStatus".equals(it.getName().toString()))
+                .findFirst().orElseThrow();
+            assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        }
         assertFieldValueAssignment(paymentRequestLineUnit, "additionalPropertiesMap", "new HashMap<>()");
 
         File paymentRequest = files.stream().filter(file -> file.getName().equals("PaymentRequest.java"))
@@ -278,7 +287,7 @@ class BoatSpringCodeGenTests {
                         .map(Objects::toString)
                         .sorted()
                         .collect(Collectors.toList()),
-                    Matchers.hasItems("amountNumber", "amountStringAsNumber", "name")
+                    Matchers.hasItems("amountNumber", "amountNumberAsString", "name")
                 );
                 assertThat(
                     violations.stream()
@@ -391,13 +400,19 @@ class BoatSpringCodeGenTests {
                     .invoke(requestObject, new BigDecimal("100.123"));
 
                 requestObject.getClass()
-                    .getDeclaredMethod("setAmountStringAsNumber", BigDecimal.class)
+                    .getDeclaredMethod("setAmountNumberAsString", BigDecimal.class)
                     .invoke(requestObject, new BigDecimal("200.123"));
 
                 String json = mapper.writeValueAsString(requestObject);
                 Map<String, Object> deserialized = mapper.readValue(json, Map.class);
-                assertThat(deserialized.get("amountStringAsNumber").getClass(), is(String.class));
-                assertThat(deserialized.get("amountNumber").getClass(), Matchers.not(is(String.class)));
+                assertThat(
+                    deserialized.get("amountNumberAsString").getClass(),
+                    is(String.class)
+                );
+                assertThat(
+                    deserialized.get("amountNumber").getClass(),
+                    bigDecimalsAsStrings ? is(String.class) : Matchers.not(is(String.class))
+                );
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
@@ -449,7 +464,6 @@ class BoatSpringCodeGenTests {
                 result.isPresent(), is(true));
         return result.get();
     }
-
 
     @NotNull
     private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
