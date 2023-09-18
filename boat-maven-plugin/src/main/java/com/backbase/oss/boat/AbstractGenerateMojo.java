@@ -1,14 +1,23 @@
 package com.backbase.oss.boat;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
+
+    private static final Collection<String> EMBEDDED_SUPPORTING_FILES = List.of(
+        "ApiClient.java", "BeanValidationException.java", "RFC3339DateFormat.java", "ServerConfiguration.java",
+        "ServerVariable.java", "StringUtil.java", "Authentication.java", "HttpBasicAuth.java", "HttpBearerAuth.java",
+        "ApiKeyAuth.java", "JavaTimeFormatter.java"
+    );
 
     public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive,
         boolean generateSupportingFiles) throws MojoExecutionException, MojoFailureException {
@@ -43,13 +52,27 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         }
         log.debug("Using configOptions={}", this.configOptions);
 
+        Stream<String> supportingFiles = Optional.ofNullable(getGeneratorSpecificSupportingFiles())
+            .filter(CollectionUtils::isNotEmpty)
+            .map(Collection::stream)
+            .orElse(Stream.empty());
+
         if (isEmbedded) {
-            this.supportingFilesToGenerate = "ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,"
-                + "ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,"
-                + "HttpBearerAuth.java,ApiKeyAuth.java,JavaTimeFormatter.java";
+            supportingFiles = Stream.concat(supportingFiles, EMBEDDED_SUPPORTING_FILES.stream());
         }
-        this.supportingFilesToGenerate = StringUtils.join(",", supportingFilesToGenerate, "BigDecimalCustomSerializer.java");
+
+        this.supportingFilesToGenerate = supportingFiles
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .distinct()
+            .sorted()
+            .collect(Collectors.joining(","));
+
         super.execute();
+    }
+
+    protected Collection<String> getGeneratorSpecificSupportingFiles() {
+        return Collections.emptySet();
     }
 
     private static Map<?, ?> mergeOptions(Map<String, String> defaultOptions, Map<?, ?> overrides) {
