@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: Arrangement Support
   version: '1.0'
-  
+
 paths:
   /simple-types:
     $ref: paths/simple-types.yaml
@@ -49,7 +49,7 @@ paths:
   /transactions:
     patch:
       tags:
-      - transactions
+        - transactions
       summary: patch
       description: Updates list of transactions
       operationId: patchTransactions
@@ -150,7 +150,21 @@ paths:
       responses:
         "200":
           description: OK
-
+  /string-typed-number-formatted-properties:
+    get:
+      responses:
+        200:
+          description: Success!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string-typed-number-formatted-value:
+                    type: string
+                    format: number
+                  number-typed-value:
+                    type: number
 components:
   schemas:
     Additions:
@@ -161,7 +175,7 @@ components:
       description: Additional properties
     TransactionsPatchRequestBody:
       required:
-      - id
+        - id
       type: object
       properties:
         id:
@@ -236,6 +250,12 @@ components:
           minLength: 3
           maxLength: 251
         amountNumberAsString:
+          description: The amount string in number format
+          type: string
+          format: number
+          minimum: -999.99999
+          maximum: 999.99999
+        amountNumberAsStringOptional:
           description: The amount string in number format
           type: string
           format: number

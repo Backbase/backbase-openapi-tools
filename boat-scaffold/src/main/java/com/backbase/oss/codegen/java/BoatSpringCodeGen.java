@@ -14,6 +14,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
@@ -298,7 +300,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void processOpts() {
         super.processOpts();
 
-
         // Whether it's using ApiUtil or not.
         // cases:
         // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
@@ -315,6 +316,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
 
         writePropertyBack("useApiUtil", useApiUtil);
+
+        this.supportingFiles.add(new SupportingFile(
+            "BigDecimalCustomSerializer.mustache",
+            new File(this.getSourceFolder(), basePackage.replaceAll("\\.", File.separator)).getPath(),
+            "BigDecimalCustomSerializer.java"
+        ).doNotOverwrite());
+        this.importMapping.put("BigDecimalCustomSerializer", basePackage + ".BigDecimalCustomSerializer");
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -396,16 +404,27 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+
         super.postProcessModelProperty(model, property);
 
-        if ("string".equalsIgnoreCase(property.openApiType) && ("number".equals(property.dataFormat) || "integer".equals(property.dataFormat))) {
-            boolean isString = Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
-                .anyMatch("string"::equalsIgnoreCase);
-            if (!isString && !property.vendorExtensions.containsKey("x-extra-annotation")) {
-                property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = ToStringSerializer.class)");
-                model.imports.add("ToStringSerializer");
-                model.imports.add("JsonSerialize");
-            }
+        if (shouldSerializeBigDecimalAsString(property)) {
+            property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)");
+            model.imports.add("BigDecimalCustomSerializer");
+            model.imports.add("JsonSerialize");
         }
+    }
+
+    private boolean shouldSerializeBigDecimalAsString(CodegenProperty property) {
+        return (serializeBigDecimalAsString && ("decimal".equalsIgnoreCase(property.baseType) || "bigdecimal".equalsIgnoreCase(property.baseType)))
+            || (isApiStringFormattedAsNumber(property) && !isDataTypeString(property));
+    }
+
+    private boolean isApiStringFormattedAsNumber(CodegenProperty property) {
+        return "string".equalsIgnoreCase(property.openApiType) && "number".equalsIgnoreCase(property.dataFormat);
+    }
+
+    private boolean isDataTypeString(CodegenProperty property) {
+        return Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
+            .anyMatch("string"::equalsIgnoreCase);
     }
 }
