@@ -237,7 +237,7 @@ components:
     MultiLinePaymentRequest:
       required:
         - name
-        - amountStringAsNumber
+        - amountNumberAsString
         - amountNumber
         - lines
         - uniqueLines
@@ -249,7 +249,13 @@ components:
           description: Request name
           minLength: 3
           maxLength: 251
-        amountStringAsNumber:
+        amountNumberAsString:
+          description: The amount string in number format
+          type: string
+          format: number
+          minimum: -999.99999
+          maximum: 999.99999
+        amountNumberAsStringOptional:
           description: The amount string in number format
           type: string
           format: number

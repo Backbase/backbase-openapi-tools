@@ -350,7 +350,7 @@ class BoatSpringCodeGenTests {
                         .map(Objects::toString)
                         .sorted()
                         .collect(Collectors.toList()),
-                    Matchers.hasItems("amountNumber", "amountStringAsNumber", "name")
+                    Matchers.hasItems("amountNumber", "amountNumberAsString", "name")
                 );
                 assertThat(
                     violations.stream()
@@ -486,7 +486,6 @@ class BoatSpringCodeGenTests {
                 result.isPresent(), is(true));
         return result.get();
     }
-
 
     @NotNull
     private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
