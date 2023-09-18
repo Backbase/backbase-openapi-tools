@@ -3,6 +3,7 @@ package com.backbase.oss.boat;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -47,6 +48,7 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
                 + "ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,"
                 + "HttpBearerAuth.java,ApiKeyAuth.java,JavaTimeFormatter.java";
         }
+        this.supportingFilesToGenerate = StringUtils.join(",", supportingFilesToGenerate, "BigDecimalCustomSerializer.java");
         super.execute();
     }
 

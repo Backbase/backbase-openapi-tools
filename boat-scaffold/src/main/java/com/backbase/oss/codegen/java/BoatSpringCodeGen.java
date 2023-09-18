@@ -321,7 +321,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "BigDecimalCustomSerializer.mustache",
             new File(this.getSourceFolder(), basePackage.replaceAll("\\.", File.separator)).getPath(),
             "BigDecimalCustomSerializer.java"
-        ).doNotOverwrite());
+        ));
         this.importMapping.put("BigDecimalCustomSerializer", basePackage + ".BigDecimalCustomSerializer");
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
