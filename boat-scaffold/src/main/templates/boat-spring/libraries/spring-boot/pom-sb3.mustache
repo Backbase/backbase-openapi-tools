@@ -226,5 +226,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+{{#useLombokAnnotations}}
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <version>1.18.28</version>
+          <scope>provided</scope>
+        </dependency>
+{{/useLombokAnnotations}}
     </dependencies>
 </project>
