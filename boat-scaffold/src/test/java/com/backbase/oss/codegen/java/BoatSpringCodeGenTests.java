@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -62,6 +63,7 @@ import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.jackson.nullable.JsonNullableModule;
 
 class BoatSpringCodeGenTests {
 
@@ -383,6 +385,8 @@ class BoatSpringCodeGenTests {
         );
 
         var mapper = new ObjectMapper();
+        mapper.registerModule(new JsonNullableModule());
+
         Runnable verifySerDes = () -> {
             try {
                 var className = modelPackage + ".MultiLinePaymentRequest";
@@ -401,15 +405,19 @@ class BoatSpringCodeGenTests {
                     .invoke(requestObject, new BigDecimal("200.123"));
 
                 String json = mapper.writeValueAsString(requestObject);
-                Map<String, Object> deserialized = mapper.readValue(json, Map.class);
-                assertThat(
-                    deserialized.get("amountNumberAsString").getClass(),
-                    is(String.class)
-                );
-                assertThat(
-                    deserialized.get("amountNumber").getClass(),
-                    bigDecimalsAsStrings ? is(String.class) : Matchers.not(is(String.class))
-                );
+                Object deserializedPojo = mapper.readValue(json, requestObject.getClass());
+
+                Object deserializedAmountNumber = deserializedPojo.getClass()
+                    .getDeclaredMethod("getAmountNumber")
+                    .invoke(deserializedPojo);
+                assertThat(deserializedAmountNumber, isA(BigDecimal.class));
+                assertEquals(new BigDecimal("100.123"), deserializedAmountNumber);
+
+                Object deserializedAmountNumberAsString = deserializedPojo.getClass()
+                    .getDeclaredMethod("getAmountNumberAsString")
+                    .invoke(deserializedPojo);
+                assertThat(deserializedAmountNumberAsString, isA(BigDecimal.class));
+                assertEquals(new BigDecimal("200.123"), deserializedAmountNumberAsString);
 
             } catch (Exception e) {
                 throw new UnhandledException(e);
