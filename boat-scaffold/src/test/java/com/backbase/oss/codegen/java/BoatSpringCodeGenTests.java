@@ -3,9 +3,7 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -36,6 +34,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -392,9 +392,11 @@ class BoatSpringCodeGenTests {
 
                 requestObject.getClass()
                     .getDeclaredMethod("setAmountStringAsNumber", BigDecimal.class)
-                    .invoke(requestObject, new BigDecimal("200.123"));
+                    .invoke(requestObject, BigDecimal.valueOf (12334535345456700.12345634534534578901));
 
                 String json = mapper.writeValueAsString(requestObject);
+                assertThat(json, containsString("amountNumber\":100."));
+                assertThat(json, containsString("amountStringAsNumber\":\"12334535345456700.12345634534534578901"));
                 Map<String, Object> deserialized = mapper.readValue(json, Map.class);
                 assertThat(deserialized.get("amountStringAsNumber").getClass(), is(String.class));
                 assertThat(deserialized.get("amountNumber").getClass(), Matchers.not(is(String.class)));
