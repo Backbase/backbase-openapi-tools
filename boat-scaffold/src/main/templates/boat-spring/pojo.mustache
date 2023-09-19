@@ -288,7 +288,7 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
     {{#isStringTypedNumberFormatted}}
       @JsonProperty("{{baseName}}")
       public String {{getter}}AsPlainString() {
-        return {{name}}.toPlainString();
+        return java.util.Optional.ofNullable({{name}}).map(BigDecimal::toPlainString).orElse(null);
       }
     {{/isStringTypedNumberFormatted}}
   {{/jackson}}

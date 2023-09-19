@@ -3,10 +3,13 @@ package com.backbase.oss.codegen.java;
 import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,7 +23,6 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -38,21 +40,31 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.jackson.nullable.JsonNullableModule;
 
 class BoatSpringCodeGenTests {
 
@@ -227,16 +239,18 @@ class BoatSpringCodeGenTests {
 
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {"true,true", "true,false", "false,true", "false,false"})
     @SuppressWarnings("unchecked")
-    void shouldGenerateValidations() throws InterruptedException, IOException {
+    void shouldGenerateValidations(boolean useLombok, boolean bigDecimalsAsStrings) throws InterruptedException, IOException {
 
         final String REFERENCED_CLASS_NAME = "com.backbase.oss.codegen.java.ValidatedPojo";
         final String REFERENCED_ENUM_NAME = "com.backbase.oss.codegen.java.CommonEnum";
 
         var modelPackage = "com.backbase.model";
         var input = new File("src/test/resources/boat-spring/openapi.yaml");
-        var output = TEST_OUTPUT + "/shouldGenerateValidations";
+        var output = TEST_OUTPUT + String.format("/shouldGenerateValidations_lombok-%s_bigDecString-%s", useLombok,
+            bigDecimalsAsStrings);
 
         // generate project
         var codegen = new BoatSpringCodeGen();
@@ -246,6 +260,8 @@ class BoatSpringCodeGenTests {
         codegen.setOutputDir(output);
         codegen.setInputSpec(input.getAbsolutePath());
         codegen.setContainerDefaultToNull(true);
+        codegen.setSerializeBigDecimalAsString(bigDecimalsAsStrings);
+        codegen.setUseLombokAnnotations(useLombok);
         codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
         codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
@@ -277,12 +293,14 @@ class BoatSpringCodeGenTests {
             .findFirst()
             .get();
         CompilationUnit paymentRequestLineUnit = StaticJavaParser.parse(paymentRequestLine);
-        MethodDeclaration getStatus = paymentRequestLineUnit
-            .findAll(MethodDeclaration.class)
-            .stream()
-            .filter(it -> "getStatus".equals(it.getName().toString()))
-            .findFirst().orElseThrow();
-        assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        if (!useLombok) {
+            MethodDeclaration getStatus = paymentRequestLineUnit
+                .findAll(MethodDeclaration.class)
+                .stream()
+                .filter(it -> "getStatus".equals(it.getName().toString()))
+                .findFirst().orElseThrow();
+            assertMethodCollectionReturnType(getStatus, "List", "StatusEnum");
+        }
         assertFieldValueAssignment(paymentRequestLineUnit, "additionalPropertiesMap", "new HashMap<>()");
 
         File paymentRequest = files.stream().filter(file -> file.getName().equals("PaymentRequest.java"))
@@ -332,28 +350,38 @@ class BoatSpringCodeGenTests {
         Runnable verifyDefaultValues = () -> {
             try {
                 var className = modelPackage + ".MultiLinePaymentRequest";
-                Class<?> requestClass = projectClassLoader.loadClass(className);
-                Object requestObject = requestClass.getConstructor().newInstance();
+                Object requestObject = newInstanceOf(className, projectClassLoader);
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(1));
-                assertThat(violations.stream().findFirst().get().getPropertyPath().toString(), Matchers.equalTo("name"));
+                assertThat(violations, Matchers.hasSize(3));
                 assertThat(
-                    violations.stream().findFirst().get().getMessageTemplate(),
-                    Matchers.equalTo("{jakarta.validation.constraints.NotNull.message}")
+                    violations.stream()
+                        .map(ConstraintViolation::getPropertyPath)
+                        .map(Objects::toString)
+                        .sorted()
+                        .collect(Collectors.toList()),
+                    Matchers.hasItems("amountNumber", "amountNumberAsString", "name")
+                );
+                assertThat(
+                    violations.stream()
+                        .map(ConstraintViolation::getMessageTemplate)
+                        .map(Objects::toString)
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList()),
+                    Matchers.hasItems("{jakarta.validation.constraints.NotNull.message}")
                 );
             } catch (Exception e) {
                 throw new UnhandledException(e);
             }
         };
         verificationRunner.runVerification(
-            Verification.builder().runnable(verifyDefaultValues).displayName("validations").build()
+            Verification.builder().runnable(verifyDefaultValues).displayName("defaultValues").build()
         );
 
         Runnable verifyCollectionItems = () -> {
             try {
                 var className = modelPackage + ".MultiLinePaymentRequest";
-                Class<?> requestClass = projectClassLoader.loadClass(className);
-                Object requestObject = requestClass.getConstructor().newInstance();
+                Object requestObject = newInstanceOf(className, projectClassLoader);
 
                 // set name on MultiLinePaymentRequest
                 requestObject.getClass()
@@ -408,9 +436,10 @@ class BoatSpringCodeGenTests {
 
                 // validate
                 Set<ConstraintViolation<Object>> violations = validator.validate(requestObject);
-                assertThat(violations, Matchers.hasSize(6));
+                assertThat(violations, Matchers.hasSize(8));
 
                 assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Pattern.message}", 1);
+                assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.NotNull.message}", 2);
                 assertViolationsCountByPath(violations, "lines[0].accountId", 1);
 
                 assertViolationsCountByMessage(violations, "{jakarta.validation.constraints.Size.message}", 5);
@@ -425,8 +454,56 @@ class BoatSpringCodeGenTests {
             }
         };
         verificationRunner.runVerification(
-            Verification.builder().runnable(verifyCollectionItems).displayName("validations").build()
+            Verification.builder().runnable(verifyCollectionItems).displayName("collectionItems").build()
         );
+
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JsonNullableModule());
+
+        Runnable verifySerDes = () -> {
+            try {
+                var className = modelPackage + ".MultiLinePaymentRequest";
+                Object requestObject = newInstanceOf(className, projectClassLoader);
+
+                requestObject.getClass()
+                    .getDeclaredMethod("setName", String.class)
+                    .invoke(requestObject, "someName");
+
+                requestObject.getClass()
+                    .getDeclaredMethod("setAmountNumber", BigDecimal.class)
+                    .invoke(requestObject, new BigDecimal("100.123"));
+
+                requestObject.getClass()
+                    .getDeclaredMethod("setAmountNumberAsString", BigDecimal.class)
+                    .invoke(requestObject, new BigDecimal("200.123"));
+
+                String json = mapper.writeValueAsString(requestObject);
+                Object deserializedPojo = mapper.readValue(json, requestObject.getClass());
+
+                Object deserializedAmountNumber = deserializedPojo.getClass()
+                    .getDeclaredMethod("getAmountNumber")
+                    .invoke(deserializedPojo);
+                assertThat(deserializedAmountNumber, isA(BigDecimal.class));
+                assertEquals(new BigDecimal("100.123"), deserializedAmountNumber);
+
+                Object deserializedAmountNumberAsString = deserializedPojo.getClass()
+                    .getDeclaredMethod("getAmountNumberAsString")
+                    .invoke(deserializedPojo);
+                assertThat(deserializedAmountNumberAsString, isA(BigDecimal.class));
+                assertEquals(new BigDecimal("200.123"), deserializedAmountNumberAsString);
+
+            } catch (Exception e) {
+                throw new UnhandledException(e);
+            }
+        };
+        verificationRunner.runVerification(
+            Verification.builder().runnable(verifySerDes).displayName("json-ser-des").build()
+        );
+    }
+
+    private static Object newInstanceOf(String className, ClassLoader classLoader) throws Exception {
+        Class<?> requestClass = classLoader.loadClass(className);
+        return requestClass.getConstructor().newInstance();
     }
 
     private static void assertFieldAnnotation(
@@ -465,7 +542,6 @@ class BoatSpringCodeGenTests {
                 result.isPresent(), is(true));
         return result.get();
     }
-
 
     @NotNull
     private static Object newPaymeyntRequestLineObject(String modelPackage, ClassLoader projectClassLoader, String id)
