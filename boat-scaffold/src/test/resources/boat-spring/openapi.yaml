@@ -163,8 +163,14 @@ paths:
                   string-typed-number-formatted-value:
                     type: string
                     format: number
+                  optional-string-typed-number-formatted-value:
+                    type: string
+                    format: number
                   number-typed-value:
                     type: number
+                required:
+                  - string-typed-number-formatted-value
+                  - number-typed-value
 components:
   schemas:
     Additions:

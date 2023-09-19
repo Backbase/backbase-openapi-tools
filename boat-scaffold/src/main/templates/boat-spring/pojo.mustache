@@ -57,10 +57,9 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
     @SerializedName("{{baseName}}")
   {{/gson}}
   {{#useLombokAnnotations}}
-  @lombok.Getter{{#swagger1AnnotationLibrary}}(onMethod_ = @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")){{/swagger1AnnotationLibrary}}
-  @lombok.Setter
   @lombok.EqualsAndHashCode.Include
   @lombok.ToString.Include
+  // Not using @lombok.Getter ;there might be special getter/setter methods. Keeping this comment to not break the test.
   {{#vendorExtensions.x-extra-annotation}}
   {{#indent4}}{{{vendorExtensions.x-extra-annotation}}}{{/indent4}}{{/vendorExtensions.x-extra-annotation}}
   {{/useLombokAnnotations}}
@@ -241,7 +240,6 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{! end feature: fluent setter methods }}
   {{! begin feature: getter and setter }}
 
-{{^useLombokAnnotations}}
   /**
   {{#description}}
     * {{{.}}}
@@ -296,10 +294,13 @@ public class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{^parent}}
   {{#vendorExtensions.x-setter-extra-annotation}}
     {{{vendorExtensions.x-setter-extra-annotation}}}
   {{/vendorExtensions.x-setter-extra-annotation}}
+  {{#jackson}}
+    @JsonProperty("{{baseName}}")
+  {{/jackson}}
   public void {{setter}}({{>nullableDataType}} {{name}}) {
   this.{{name}} = {{name}};
   }
-  {{/useLombokAnnotations}}
+
   {{! end feature: getter and setter }}
   {{/vars}}
   {{#parentVars}}

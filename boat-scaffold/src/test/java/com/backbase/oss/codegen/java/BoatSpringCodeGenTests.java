@@ -8,8 +8,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -220,7 +220,7 @@ class BoatSpringCodeGenTests {
                 var className = modelPackage + ".StringTypedNumberFormattedPropertiesGet200Response";
                 Class<?> clazz = projectClassLoader.loadClass(className);
                 Object object = clazz.getConstructor().newInstance();
-                BigDecimal theNumber = new BigDecimal("12.34").setScale(2);
+                BigDecimal theNumber = BigDecimal.valueOf(12.34);
                 clazz.getDeclaredMethod("setNumberTypedValue", BigDecimal.class).invoke(object, theNumber);
                 clazz.getDeclaredMethod("setStringTypedNumberFormattedValue", BigDecimal.class)
                         .invoke(object, theNumber);
@@ -229,6 +229,14 @@ class BoatSpringCodeGenTests {
                         containsString("\"number-typed-value\" : 12.34"));
                 assertThat(jsonString,
                         containsString("\"string-typed-number-formatted-value\" : \"12.34\""));
+                // Deserialize
+                object = new ObjectMapper().readValue(jsonString, clazz);
+                assertThat(clazz.getDeclaredMethod("getNumberTypedValue").invoke(object),
+                        is(theNumber));
+                assertThat(clazz.getDeclaredMethod("getStringTypedNumberFormattedValue").invoke(object),
+                        is(theNumber));
+                assertNull(clazz.getDeclaredMethod("getOptionalStringTypedNumberFormattedValue").invoke(object));
+
             } catch (Exception e) {
                 throw new UnhandledException(e);
             }
