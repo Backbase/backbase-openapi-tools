@@ -1,12 +1,5 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
@@ -14,6 +7,17 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.*;
+import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.templating.mustache.IndentedLambda;
+import org.openapitools.codegen.utils.ModelUtils;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -22,19 +26,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.config.GlobalSettings;
-import org.openapitools.codegen.languages.SpringCodegen;
-import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import org.openapitools.codegen.utils.ModelUtils;
+import java.util.stream.Stream;
+
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 @Slf4j
 public class BoatSpringCodeGen extends SpringCodegen {
@@ -296,7 +295,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void processOpts() {
         super.processOpts();
 
-
         // Whether it's using ApiUtil or not.
         // cases:
         // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
@@ -313,6 +311,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
 
         writePropertyBack("useApiUtil", useApiUtil);
+
+        this.supportingFiles.add(new SupportingFile(
+            "BigDecimalCustomSerializer.mustache",
+            new File(this.getSourceFolder(), basePackage.replaceAll("\\\\.", File.separator)).getPath(),
+            "BigDecimalCustomSerializer.java"
+        ));
+        this.importMapping.put("BigDecimalCustomSerializer", basePackage + ".BigDecimalCustomSerializer");
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -390,5 +395,31 @@ public class BoatSpringCodeGen extends SpringCodegen {
         return getCollectionCodegenValue(cp, referencedSchema, containerDefaultToNull, instantiationTypes())
             .map(CodegenValueType::getValue)
             .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
+    }
+
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+
+        super.postProcessModelProperty(model, property);
+
+        if (shouldSerializeBigDecimalAsString(property)) {
+            property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)");
+            model.imports.add("BigDecimalCustomSerializer");
+            model.imports.add("JsonSerialize");
+        }
+    }
+
+    private boolean shouldSerializeBigDecimalAsString(CodegenProperty property) {
+        return (serializeBigDecimalAsString && ("decimal".equalsIgnoreCase(property.baseType) || "bigdecimal".equalsIgnoreCase(property.baseType)))
+            || (isApiStringFormattedAsNumber(property) && !isDataTypeString(property));
+    }
+
+    private boolean isApiStringFormattedAsNumber(CodegenProperty property) {
+        return "string".equalsIgnoreCase(property.openApiType) && "number".equalsIgnoreCase(property.dataFormat);
+    }
+
+    private boolean isDataTypeString(CodegenProperty property) {
+        return Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
+            .anyMatch("string"::equalsIgnoreCase);
     }
 }

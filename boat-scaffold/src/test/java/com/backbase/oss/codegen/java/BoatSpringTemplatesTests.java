@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -376,7 +375,8 @@ class BoatSpringTemplatesTests {
         GlobalSettings.setProperty(CodegenConstants.MODELS, "");
         GlobalSettings.setProperty(CodegenConstants.MODEL_TESTS, "true");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "true");
-        GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java,pom.xml,OpenApiGeneratorApplication.java");
+        GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES,
+            "ApiUtil.java,pom.xml,OpenApiGeneratorApplication.java,BigDecimalCustomSerializer.java");
 
 
         gcf.setApiNameSuffix("-api");
