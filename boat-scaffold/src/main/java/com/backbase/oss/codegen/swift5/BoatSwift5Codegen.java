@@ -1,10 +1,11 @@
-package org.openapitools.codegen.languages;
+package com.backbase.oss.codegen.swift5;
 
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.languages.Swift5ClientCodegen;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelsMap;

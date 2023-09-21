@@ -1,10 +1,12 @@
-package org.openapitools.codegen.languages;
+package com.backbase.oss.codegen.swift5;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
+
+import com.backbase.oss.codegen.swift5.BoatSwift5Codegen;
 import org.junit.jupiter.api.Test;
 
 

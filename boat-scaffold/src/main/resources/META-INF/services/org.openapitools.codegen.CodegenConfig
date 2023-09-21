@@ -3,4 +3,4 @@ com.backbase.oss.codegen.java.BoatJavaCodeGen
 com.backbase.oss.codegen.doc.BoatDocsGenerator
 com.backbase.oss.codegen.angular.BoatAngularGenerator
 com.backbase.oss.codegen.marina.BoatMarinaGenerator
-org.openapitools.codegen.languages.Swift5ClientCodegen
+com.backbase.oss.codegen.swift5.BoatSwift5Codegen
