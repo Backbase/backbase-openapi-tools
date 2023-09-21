@@ -15,6 +15,9 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.19
+* boat-spring
+  * Fix [List of Maps of Strings generated code does not compile. ,https://github.com/Backbase/backbase-openapi-tools/issues/647]
 ## 0.17.18
 * boat-spring
   * Fix [Regression on putting valid annotation on FQCN,https://github.com/Backbase/backbase-openapi-tools/issues/619]

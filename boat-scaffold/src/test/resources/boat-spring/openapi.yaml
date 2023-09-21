@@ -45,6 +45,29 @@ paths:
                 $ref: '#/components/schemas/ValidatedPojos'
               example:
                 name: "valid name"
+  /lists-of-maps-of-strings:
+    put:
+      tags:
+        - lists-of-maps-of-strings
+      summary: get
+      description: Get an object with a list property that contains maps of string to string.
+      operationId: getMapsOfStringsObjects
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  maps:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: string
+              example:
+                name: "valid name"
 
   /transactions:
     patch:
