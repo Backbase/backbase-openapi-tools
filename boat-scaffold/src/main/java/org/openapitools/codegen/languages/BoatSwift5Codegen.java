@@ -1,4 +1,4 @@
-package com.backbase.oss.codegen.swift5;
+package org.openapitools.codegen.languages;
 
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
