@@ -31,11 +31,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
         // Set the default template directory
         embeddedTemplateDir = templateDir = getName();
-
-        // This overrides the AnyCodable to Any.
-        typeMapping.put("AnyType", "Any");
-        typeMapping.put("object", "Any");
-
     }
 
     @Override
