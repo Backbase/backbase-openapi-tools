@@ -98,7 +98,6 @@ jobs:
       - name: Commit files
         run: |
           git commit -m "[version bump]" -a
-          git tag -a release-$NEW_VERSION -m "[version bump]"
           git push origin release-$NEW_VERSION
 
   bump:
