@@ -29,13 +29,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         supportedLibraries.put(LIBRARY_DBS, "HTTP client: DBSDataProvider");
         setLibrary(LIBRARY_DBS);
 
+        // Set the default template directory
+        embeddedTemplateDir = templateDir = getName();
+
         // This overrides the AnyCodable to Any.
         typeMapping.put("AnyType", "Any");
         typeMapping.put("object", "Any");
-
-        supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache",
-                sourceFolder,
-                "AnyCodable.swift"));
 
     }
 
@@ -53,6 +52,8 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     public void processOpts() {
         super.processOpts();
         additionalProperties.put("useDBSDataProvider", getLibrary().equals(LIBRARY_DBS));
+        supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", sourceFolder, "AnyCodable.swift"));
+        this.supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", this.sourceFolder, "AnyCodable.swift"));
     }
 
     // Fix issues with generating arrays with Set.
