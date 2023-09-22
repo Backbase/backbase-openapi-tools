@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.SupportingFile;
-import org.openapitools.codegen.languages.Swift5ClientCodegen;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelsMap;
@@ -79,7 +78,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     // Fix for inheritance bug
     private void addParentProperties(CodegenModel model, Map<String, ModelsMap> objs) {
         Set<String> parents = model.allOf;
-        if (parents == null || parents.size() == 0) {
+        if (parents == null || parents.isEmpty()) {
             return;
         }
 
@@ -88,7 +87,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             fixInheritance(model, parentModel);
 
             Set<String> parentsOfParent = parentModel.allOf;
-            if (parentsOfParent != null && parentsOfParent.size() > 0) {
+            if (parentsOfParent != null && !parentsOfParent.isEmpty()) {
                 // then recursively add all the parent properties of the parents.
                 addParentProperties(parentModel, objs);
             }
@@ -97,7 +96,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
     /*
      Fix for inheritance bug
-     There is no inheritance for Swift structs so we're adding all parent vars
+     There is no inheritance for Swift structs, so we're adding all parent vars
      recursively to the models allVars list while making sure we don't have duplicates.
     */
     private void fixInheritance(CodegenModel codegenModel, CodegenModel parentModel) {
