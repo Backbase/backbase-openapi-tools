@@ -1,7 +1,19 @@
 package com.backbase.oss.boat;
 
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.backbase.oss.codegen.java.BoatJavaCodeGen;
 import com.backbase.oss.codegen.java.BoatSpringCodeGen;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -10,16 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.DefaultCodegen;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class GenerateMojoTests {
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
@@ -80,6 +82,10 @@ class GenerateMojoTests {
                 "RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java",
             mojo.supportingFilesToGenerate
         );
+        assertThat(
+            mojo.getGeneratorSpecificSupportingFiles(),
+            containsInAnyOrder("BigDecimalCustomSerializer.java")
+        );
     }
 
     @Test
@@ -91,9 +97,13 @@ class GenerateMojoTests {
         assertThat(mojo.generatorName, equalTo(BoatSpringCodeGen.NAME));
         assertEquals(
             "ApiClient.java,ApiKeyAuth.java,Authentication.java,BeanValidationException.java," +
-                "BigDecimalCustomSerializer.java,HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java," +
+                "HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java," +
                 "RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java",
             mojo.supportingFilesToGenerate
+        );
+        assertThat(
+            mojo.getGeneratorSpecificSupportingFiles(),
+            containsInAnyOrder("BigDecimalCustomSerializer.java")
         );
     }
 

@@ -4,10 +4,12 @@ import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodege
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import io.swagger.v3.oas.models.media.Schema;
+import java.io.File;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
 
@@ -118,6 +120,17 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             this.createApiComponent = convertPropertyToBoolean(CREATE_API_COMPONENT);
         }
         writePropertyBack(CREATE_API_COMPONENT, this.createApiComponent);
+
+        if (useJacksonConversion) {
+            final var serializerTemplate = "BigDecimalCustomSerializer";
+            String targetDir = (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator);
+            String importPackage = targetDir.replace("\\", ".").replace("/", ".");
+            if (importPackage.length() > 0 && !importPackage.endsWith(".")) {
+                importPackage += ".";
+            }
+            this.supportingFiles.add(new SupportingFile(serializerTemplate + ".mustache", targetDir, serializerTemplate + ".java"));
+            this.importMapping.put(serializerTemplate, importPackage + serializerTemplate);
+        }
     }
 
     @Override
