@@ -47,7 +47,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         super.processOpts();
         additionalProperties.put("useDBSDataProvider", getLibrary().equals(LIBRARY_DBS));
         supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", sourceFolder, "AnyCodable.swift"));
-        this.supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", this.sourceFolder, "AnyCodable.swift"));
     }
 
     // Fix issues with generating arrays with Set.
