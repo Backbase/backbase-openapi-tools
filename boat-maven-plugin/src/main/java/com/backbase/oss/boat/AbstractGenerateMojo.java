@@ -1,14 +1,12 @@
 package com.backbase.oss.boat;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
@@ -52,27 +50,11 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         }
         log.debug("Using configOptions={}", this.configOptions);
 
-        Stream<String> supportingFiles = Optional.ofNullable(getGeneratorSpecificSupportingFiles())
-            .filter(CollectionUtils::isNotEmpty)
-            .map(Collection::stream)
-            .orElse(Stream.empty());
-
         if (isEmbedded) {
-            supportingFiles = Stream.concat(supportingFiles, EMBEDDED_SUPPORTING_FILES.stream());
+            this.supportingFilesToGenerate = uniqueJoin(EMBEDDED_SUPPORTING_FILES);
         }
 
-        this.supportingFilesToGenerate = supportingFiles
-            .map(String::trim)
-            .filter(StringUtils::isNotEmpty)
-            .distinct()
-            .sorted()
-            .collect(Collectors.joining(","));
-
         super.execute();
-    }
-
-    protected Collection<String> getGeneratorSpecificSupportingFiles() {
-        return Collections.emptySet();
     }
 
     private static Map<?, ?> mergeOptions(Map<String, String> defaultOptions, Map<?, ?> overrides) {

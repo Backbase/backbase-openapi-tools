@@ -1,5 +1,12 @@
 package com.backbase.oss.codegen.java;
 
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
+
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
@@ -7,16 +14,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.*;
-import org.openapitools.codegen.config.GlobalSettings;
-import org.openapitools.codegen.languages.SpringCodegen;
-import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import org.openapitools.codegen.utils.ModelUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -27,13 +24,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.templating.mustache.IndentedLambda;
+import org.openapitools.codegen.utils.ModelUtils;
 
 @Slf4j
 public class BoatSpringCodeGen extends SpringCodegen {
@@ -118,7 +123,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
                 return;
             }
             String formatted = text
-                .replaceAll("\\n", SINGLE_SPACE)
+                .replace("\\n", SINGLE_SPACE)
                 .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
                 .replaceAll("\\< ", "<")
                 .replaceAll(" >", ">")
@@ -312,12 +317,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         writePropertyBack("useApiUtil", useApiUtil);
 
+        final var serializerTemplate = "BigDecimalCustomSerializer";
         this.supportingFiles.add(new SupportingFile(
-            "BigDecimalCustomSerializer.mustache",
-            new File(this.getSourceFolder(), basePackage.replaceAll("\\\\.", File.separator)).getPath(),
-            "BigDecimalCustomSerializer.java"
+            serializerTemplate + ".mustache",
+            (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+            serializerTemplate + ".java"
         ));
-        this.importMapping.put("BigDecimalCustomSerializer", basePackage + ".BigDecimalCustomSerializer");
+        this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -359,11 +365,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Override
     public void postProcessParameter(CodegenParameter p) {
         super.postProcessParameter(p);
-
-        if (p.isContainer) {
-            if (!this.reactive) {
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            }
+        if (p.isContainer && !this.reactive) {
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
         }
     }
 

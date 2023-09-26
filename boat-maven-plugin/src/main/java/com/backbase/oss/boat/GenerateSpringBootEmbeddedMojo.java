@@ -1,11 +1,10 @@
 package com.backbase.oss.boat;
 
+import java.util.Collection;
+import java.util.Set;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * Generating Server Stubs using Spring Boot.
