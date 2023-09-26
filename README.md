@@ -16,6 +16,10 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.21
+* boat-spring, boat-java
+  * Issue 649: missing BigDecimalCustomSerializer.java (#650) @walaniam
+* BOAT Android (#637) @charbelmkh
 ## 0.17.18
 * boat-spring
   * Fix [Regression on putting valid annotation on FQCN,https://github.com/Backbase/backbase-openapi-tools/issues/619]
