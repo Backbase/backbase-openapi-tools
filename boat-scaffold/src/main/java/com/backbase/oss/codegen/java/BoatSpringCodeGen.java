@@ -123,10 +123,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
                 return;
             }
             String formatted = text
-                .replaceAll("\\n", SINGLE_SPACE)
+                .replace("\\n", SINGLE_SPACE)
                 .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
-                .replaceAll("\\< ", "<")
-                .replaceAll(" >", ">")
+                .replace("\\< ", "<")
+                .replace(" >", ">")
                 .trim();
 
             if (log.isTraceEnabled()) {
@@ -323,7 +323,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
             (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
             serializerTemplate + ".java"
         ));
-        this.importMapping.put("BigDecimalCustomSerializer", modelPackage + ".BigDecimalCustomSerializer");
+        this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -365,11 +365,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Override
     public void postProcessParameter(CodegenParameter p) {
         super.postProcessParameter(p);
-
-        if (p.isContainer) {
-            if (!this.reactive) {
-                p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
-            }
+        if (p.isContainer && !this.reactive) {
+            p.baseType = p.dataType.replaceAll("^([^<]+)<.+>$", "$1");
         }
     }
 
