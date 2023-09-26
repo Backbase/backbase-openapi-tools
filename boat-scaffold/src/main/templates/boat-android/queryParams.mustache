@@ -1,0 +1,19 @@
+{{#queryParams}}
+
+        if (params.{{{paramName}}} != null) {
+            queryParams["{{{paramName}}}"] =
+        {{#isContainer}}
+            {{#isExplode}}
+                //explode=true
+                (params.{{{paramName}}}{{^required}}?{{/required}}.toList(){{^required}}?{{/required}}.map { it.toString() } {{^required}}?: listOf(""){{/required}})
+            {{/isExplode}}
+            {{^isExplode}}
+                //explode=false
+                listOf({{>api_parameter}})
+            {{/isExplode}}
+        {{/isContainer}}
+        {{^isContainer}}
+            listOf({{>api_parameter}})
+        {{/isContainer}}
+        }
+{{/queryParams}}

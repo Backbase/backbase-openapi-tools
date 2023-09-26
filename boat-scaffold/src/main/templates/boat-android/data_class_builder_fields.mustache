@@ -1,0 +1,8 @@
+{{#vars}}
+      /**
+       * See [{{classname}}.{{{name}}}].
+       */
+        var {{{name}}}: {{#isEnum}} {{#isListContainer}} kotlin.collections.List<{{classname}}.{{{nameInCamelCase}}}> {{/isListContainer}} {{^isListContainer}} {{classname}}.{{{nameInCamelCase}}} {{/isListContainer}} {{/isEnum}} {{^isEnum}} {{{dataType}}} {{/isEnum}} ? = {{#defaultValue}} {{#isEnum}}null{{/isEnum}}{{^isEnum}}{{#isNumber}}java.math.BigDecimal({{{defaultValue}}}) {{/isNumber}} {{^isNumber}} {{{defaultValue}}} {{/isNumber}} {{/isEnum}} {{/defaultValue}} {{^defaultValue}} null {{/defaultValue}}
+
+{{/vars}}
+{{#parentModel}}{{>data_class_builder_fields}}{{/parentModel}}

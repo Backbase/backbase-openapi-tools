@@ -1,0 +1,202 @@
+buildscript {
+    ext.retailGroup = 'com.backbase.android.retail'
+    ext.appGroup = "${retailGroup}.app"
+
+    ext.rootGroup = 'com.backbase.android.clients'
+    ext.projectVersions = [
+            minSdk: 23,
+            targetSdk: 33,
+            buildTools: "33.0.0",
+            versionName: '2.0.0'
+    ]
+
+    //region Dependency declarations
+    ext.versions = [
+            annotations: '1.1.0',
+            apacheCommonsLang: '3.8',
+            appCompat: '1.1.0',
+            backbaseSdk: '7.3.0',
+            coreKtx: '1.1.0',
+            dokka: '1.7.10',
+            gson: '2.8.5',
+            junit: '4.13',
+            junitAndroid: '1.1.1',
+            kotlin: '1.7.10',
+            kotlinCoroutines: '1.3.0',
+            mockK: '1.9.3',
+            moshi: '1.15.0',
+            material: '1.1.0',
+            multiDex: '2.0.0',
+            okhttp3: '3.14.9',
+            robolectric: '4.3.1',
+            rxJava1: '1.3.8',
+            testCore: '1.2.0',
+            testOrchestrator: '1.2.0',
+            testRules: '1.2.0',
+            testRunner: '1.2.0',
+            truth: '1.0',
+            wc3: '7.0.0',
+    ]
+
+    ext.deps = [
+            accessControlClient: "com.backbase.android.clients:access-control-client:$versions.wc3",
+            annotations: "androidx.annotation:annotation:$versions.annotations",
+            apacheCommonsLang: "org.apache.commons:commons-lang3:$versions.apacheCommonsLang",
+            apacheHttpClient: "org.apache.httpcomponents:httpclient:$versions.apacheHttpClient",
+            appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
+            backbaseIdentitySdk: 'com.backbase.android.identity:identitysdk:1.3.0',
+            backbaseSdk: "com.backbase.android.sdk:backbase:$versions.backbaseSdk",
+            commonUtils: "com.backbase.android.common:common-utils:$versions.wc3",
+            coreKtx: "androidx.core:core-ktx:$versions.coreKtx",
+            desugarJdkLibs: 'com.android.tools:desugar_jdk_libs:1.0.9',
+            gson: "com.google.code.gson:gson:$versions.gson",
+            junit: "junit:junit:$versions.junit",
+            junitAndroid: "androidx.test.ext:junit:$versions.junitAndroid",
+            kotlinCoroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.kotlinCoroutines",
+            kotlinCoroutinesTest: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.kotlinCoroutines",
+            kotlinStdLib: "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin",
+            kotlinReflect: "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
+            material: "com.google.android.material:material:$versions.material",
+            mockK: "io.mockk:mockk:$versions.mockK",
+            mockWebServer: "com.squareup.okhttp3:mockwebserver:$versions.okhttp3",
+            moshi: "com.squareup.moshi:moshi-kotlin:$versions.moshi",
+            moshiAdapters: "com.squareup.moshi:moshi-adapters:$versions.moshi",
+            moshiCodegen: "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
+            multiDex: "androidx.multidex:multidex:$versions.multiDex",
+            okhttp3: "com.squareup.okhttp3:okhttp:$versions.okhttp3",
+            robolectric: "org.robolectric:robolectric:$versions.robolectric",
+            rxJava1: "io.reactivex:rxjava:$versions.rxJava1",
+            testCore: "androidx.test:core:$versions.testCore",
+            testOrchestrator: "androidx.test:orchestrator:$versions.testOrchestrator",
+            testRules: "androidx.test:rules:$versions.testRules",
+            testRunner: "androidx.test:runner:$versions.testRunner",
+            truth: "com.google.truth:truth:$versions.truth",
+            clientsCommon: "$rootGroup:clients-common:$projectVersions.versionName",
+    ]
+    //endregion
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.0'
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+        classpath 'org.jetbrains.kotlinx:binary-compatibility-validator:0.9.0'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.24.14'
+        classpath 'dev.drewhamilton.poko:poko-gradle-plugin:0.11.0'
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+allprojects { project ->
+    repositories {
+        google()
+        // These variables must be set up on your machine's global gradle.properties:
+        maven {
+            url = 'https://artifacts.backbase.com/android3'
+            credentials {
+                username = mvnUser
+                password = mvnPass
+            }
+        }
+        maven {
+            url = 'https://artifacts.backbase.com/android-retail3'
+            credentials {
+                username = mvnUser
+                password = mvnPass
+            }
+        }
+        maven {
+            url = 'https://artifacts.backbase.com/android-wealth3'
+            credentials {
+                username = mvnUser
+                password = mvnPass
+            }
+        }
+        maven {
+            url = 'https://artifacts.backbase.com/android-flow-development'
+            credentials {
+                username = mvnUser
+                password = mvnPass
+            }
+        }
+        maven {
+            url = 'https://artifacts.backbase.com/android-identity'
+            credentials {
+                username = mvnUser
+                password = mvnPass
+            }
+        }
+        mavenCentral()
+        jcenter()
+    }
+
+    //noinspection UnnecessaryQualifiedReference
+    project.plugins.withType(com.android.build.gradle.LibraryPlugin) {
+        group = rootGroup
+
+        //region Disable BuildConfig for libraries
+        project.android.libraryVariants.all { variant ->
+            // TODO WORKAROUND: replace with https://issuetracker.google.com/issues/72050365 once released.
+            variant.generateBuildConfigProvider.get().enabled = false
+        }
+        //endregion
+    }
+
+    project.plugins.withType(JavaLibraryPlugin) {
+        group = rootGroup
+    }
+}
+apply plugin: 'com.android.library'
+apply plugin: 'dev.drewhamilton.poko'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'org.jetbrains.dokka'
+
+group rootGroup
+ext.artifactName = '{{{artifactId}}}'
+version = '{{artifactVersion}}'
+
+poko {
+    // Add this if you want to use the old annotation
+    // Skip this if you want to use the new default Poko annotation
+    pokoAnnotation = "dev.drewhamilton.extracare.DataApi"
+}
+
+android {
+  namespace '{{packageName}}'
+  compileSdk projectVersions.targetSdk
+  defaultConfig {
+    minSdk projectVersions.minSdk
+    versionName '{{artifactVersion}}'
+    consumerProguardFiles 'bb-clients-proguard-rules.pro'
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  compileOptions {
+    coreLibraryDesugaringEnabled true
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+
+  kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_11
+  }
+}
+
+dependencies {
+  kapt deps.moshiCodegen
+  implementation deps.kotlinStdLib
+  implementation deps.kotlinReflect
+  implementation deps.annotations
+  implementation deps.moshi
+  implementation deps.moshiAdapters
+  implementation deps.backbaseSdk
+  implementation deps.commonUtils
+  implementation deps.clientsCommon
+  coreLibraryDesugaring deps.desugarJdkLibs
+}
