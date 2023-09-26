@@ -1,0 +1,95 @@
+/**
+ {{#allParams}}* @param {{paramName}} {{{description}}} {{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#isFile}}
+ * @param {{paramName}}FileName{{#isContainer}}s{{/isContainer}} the name of the file(s) whose content is [{{paramName}}]. Optional only if the related file(s) optional.
+ * @param {{paramName}}ContentType{{#isContainer}}s{{/isContainer}} the mime type of the file(s) whose content is [{{paramName}}]. Optional only if the related file(s) optional.
+ {{/isFile}}{{^isFile}}{{#isMultipart}}{{#isFormParam}}
+ * @param {{paramName}}ContentType the mime type of [{{paramName}}]. Optional. Defaults to text/plain for primitives and application/json for everything else.
+ {{/isFormParam}}{{/isMultipart}}{{/isFile}}{{/allParams}}
+ */
+{{#hasParams}}@DataApi {{/hasParams}}class {{{operationIdCamelCase}}} internal constructor(
+  {{#allParams}}
+
+  val {{{paramName}}}: {{{dataType}}}{{^required}}? = null{{/required}},
+
+  {{#isMultipart}}
+  {{#isFormParam}}
+  {{^isFile}}
+  val {{{paramName}}}ContentType: String? = null,
+  {{/isFile}}
+  {{/isFormParam}}
+  {{/isMultipart}}
+
+  {{#isFile}}
+  {{^isContainer}}
+  val {{{paramName}}}FileName: String{{^required}}? = null{{/required}},
+  val {{{paramName}}}ContentType: String{{^required}}? = null{{/required}}
+  {{/isContainer}}
+
+  {{#isContainer}}
+  val {{{paramName}}}FileNames: List<String>{{^required}}? = null{{/required}},
+  val {{{paramName}}}ContentTypes: List<String>{{^required}}? = null{{/required}},
+  {{/isContainer}}
+  {{/isFile}}
+  {{/allParams}}
+) {
+
+  class Builder {
+    {{#allParams}}
+    var {{{paramName}}}: {{{dataType}}}? = null
+    {{#isMultipart}}
+    {{#isFormParam}}
+    {{^isFile}}
+    var {{{paramName}}}ContentType: String? = null
+    {{/isFile}}
+    {{/isFormParam}}
+    {{/isMultipart}}
+    {{#isFile}}
+    {{^isContainer}}
+    var {{{paramName}}}FileName: String? = null
+    var {{{paramName}}}ContentType: String? = null
+    {{/isContainer}}
+    {{#isContainer}}
+    var {{{paramName}}}FileNames: List<String>? = null
+    var {{{paramName}}}ContentTypes: List<String>? = null
+    {{/isContainer}}
+    {{/isFile}}
+    {{/allParams}}
+
+    fun build() = {{{operationIdCamelCase}}}(
+      {{#allParams}}
+      {{#required}}
+      requireNotNull({{{paramName}}}),
+      {{/required}}
+      {{^required}}
+      {{{paramName}}},
+      {{/required}}
+      {{#isMultipart}}
+      {{#isFormParam}}
+      {{^isFile}}
+      requireNotNull({{{paramName}}}ContentType),
+      {{/isFile}}
+      {{/isFormParam}}
+      {{/isMultipart}}
+      {{#isFile}}
+      {{^isContainer}}
+      requireNotNull({{{paramName}}}FileName),
+      requireNotNull({{{paramName}}}ContentType),
+      {{/isContainer}}
+      {{#isContainer}}
+      requireNotNull({{{paramName}}}FileNames),
+      requireNotNull({{{paramName}}}ContentTypes),
+      {{/isContainer}}
+      {{/isFile}}
+      {{/allParams}}
+    )
+  }
+}
+
+/**
+ * Builds an instance of [{{{operationIdCamelCase}}}] with the [initializer] parameters.
+ */
+@Suppress("FunctionName") // DSL initializer
+@JvmSynthetic // Hide from Java callers who should use Builder
+fun {{{operationIdCamelCase}}}(initializer: {{{operationIdCamelCase}}}.Builder.() -> Unit): {{{operationIdCamelCase}}} {
+    return {{{operationIdCamelCase}}}.Builder().apply(initializer).build()
+}
