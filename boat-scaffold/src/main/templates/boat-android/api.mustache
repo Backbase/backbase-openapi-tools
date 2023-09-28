@@ -1,0 +1,138 @@
+{{>licenseInfo}}
+package {{apiPackage}}
+
+{{#imports}}import {{import}}
+{{/imports}}
+import java.net.URI
+import com.backbase.android.dbs.DBSClient
+import com.backbase.android.common.utils.dbs.MutableParams
+import com.backbase.android.common.utils.dbs.Params
+import com.backbase.android.dbs.DBSDataProvider
+import com.backbase.android.common.utils.dbs.DBSDataImpl
+import com.backbase.android.common.utils.dbs.CustomNetworkDBSProvider
+import com.backbase.android.Backbase
+import com.backbase.android.utils.net.MultiPartWrapper
+import com.backbase.android.utils.net.PartContent
+import com.backbase.android.utils.net.request.RequestMethods
+import com.backbase.android.utils.net.request.Request
+import android.content.Context
+
+import com.squareup.moshi.Types
+import com.squareup.moshi.Moshi
+
+import dev.drewhamilton.extracare.DataApi
+
+import com.backbase.android.clients.common.Call
+import com.backbase.android.clients.common.MultipartCall
+import com.backbase.android.clients.common.ResponseBodyParser
+import com.backbase.android.clients.common.MoshiResponseBodyParser
+import com.backbase.android.clients.common.buildRequest
+import com.backbase.android.clients.common.serializeToHttpRequestPart
+
+{{#operations}}
+/**
+ * API root for {{classname}}.
+ *
+ * @param context the current android context.
+ * @param moshi the json library instance.
+ * @param parser the response body parser for DTOs returned by the REST API.
+ * @param serverUri the server URI where the REST API can be reached.
+ * @param provider the DBS data provider.
+ * @param backbase the backbase sdk instance.
+ */
+class {{classname}}(
+    val context: Context,
+    val moshi: Moshi,
+    val parser: ResponseBodyParser,
+    var serverUri: URI,
+    var provider: DBSDataProvider = CustomNetworkDBSProvider(context),
+    var backbase: Backbase = requireNotNull(Backbase.getInstance()) { "The Backbase instance must not be null!" }
+) : DBSClient, DBSDataImpl(backbase) {
+
+    override fun setBaseURI(baseUri: URI) {
+        this.serverUri = baseUri
+    }
+
+    override fun getBaseURI() = this.serverUri
+
+    override fun setDataProvider(provider: DBSDataProvider?) {
+        this.provider = requireNotNull(provider) { "The provider must not be null!" }
+    }
+
+    override fun getDataProvider(): DBSDataProvider? = provider
+
+    {{#operation}}
+
+    /**
+     * {{summary}}
+     * {{notes}}
+     * @param params the params of this request.
+     * @return the request that can be executed to perform the {{{operationId}}} operation.{{#isDeprecated}}
+     * @deprecated{{/isDeprecated}}
+     */{{#isDeprecated}}
+    @Deprecated(message = "This operation is deprecated. Do not use"){{/isDeprecated}}
+    fun {{operationId}}(params: {{classname}}Params.{{{operationIdCamelCase}}}): {{^isMultipart}}{{#isListContainer}}Call<{{{returnType}}}>{{/isListContainer}}{{^isListContainer}}Call<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}>{{/isListContainer}}{{/isMultipart}}{{#isMultipart}}{{#isListContainer}}MultipartCall<{{{returnType}}}>{{/isListContainer}}{{^isListContainer}}MultipartCall<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}>{{/isListContainer}}{{/isMultipart}} {
+        {{^isMultipart}}
+        val bodyType = {{#bodyParam}}{{>api_parameter_model_type}}{{/bodyParam}} {{^hasBodyParam}}{{#hasFormParams}}Types.newParameterizedType(Map::class.java, String::class.java, String::class.java){{/hasFormParams}}{{/hasBodyParam}}{{^hasBodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{/hasBodyParam}}
+        val serializedBody: kotlin.String? = {{#bodyParam}}moshi.adapter<{{{dataType}}}>(bodyType).toJson(params.{{{paramName}}}){{/bodyParam}}{{^hasBodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{#hasFormParams}}moshi.adapter<Map<String, String>>(bodyType).toJson(mapOf({{#formParams}}"{{{baseName}}}" to params.{{{paramName}}}?.toString(){{#hasMore}}, {{/hasMore}}{{/formParams}})){{/hasFormParams}}{{/hasBodyParam}}
+        val headers: MutableMap<String,String> = mutableMapOf<String,String>()
+        {{#hasConsumes}}{{#consumes.0}}headers["Content-Type"] = "{{mediaType}}"{{/consumes.0}}{{/hasConsumes}}
+        {{#hasHeaderParams}}
+        {{#headerParams}}
+        headers["{{{baseName}}}"] = {{#isContainer}}params.{{{paramName}}}.joinToString(separator = collectionDelimiter("{{collectionFormat}}")){{/isContainer}}{{^isContainer}}params.{{paramName}}.toString(){{/isContainer}}
+        {{/headerParams}}
+        {{/hasHeaderParams}}
+
+        {{/isMultipart}}
+        val queryParams = mutableMapOf<String, List<String>>()
+        val path = "{{{path}}}"{{#pathParams}}.replace("{" + "{{{paramName}}}" + "}", params.{{{paramName}}}.toString()){{/pathParams}}
+
+        {{>queryParams}}
+
+        val request = buildRequest(RequestMethods.{{{httpMethod}}}, serverUri, path, queryParams, backbase)
+        {{^isMultipart}}
+        request.body = serializedBody
+        request.headers = headers{{#isMapContainer}}
+
+        return Call<{{{returnType}}}>(request, provider, parser, Types.newParameterizedType(Map::class.java, String::class.java, {{{returnBaseType}}}::class.java)){{/isMapContainer}}{{^isMapContainer}}{{#isListContainer}}
+        return Call<{{{returnType}}}>(request, provider, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java)){{/isListContainer}}{{^isListContainer}}{{#isArray}}
+        return Call<{{{returnType}}}>(request, provider, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java)){{/isArray}}{{^isArray}}
+        return Call<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}>(request, provider, parser, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}::class.java){{/isArray}}{{/isListContainer}}{{/isMapContainer}}
+        {{/isMultipart}}
+        {{#isMultipart}}
+        val multiPartWrapper = MultiPartWrapper("multipart/form-data")
+        {{#formParams}}
+        {{#isFile}}{{#isContainer}} /* an array of files */
+        if (params.{{{paramName}}} != null && params.{{{paramName}}}FileNames != null && params.{{{paramName}}}ContentTypes != null) {
+            {{{paramName}}}.filterNotNull().forEachIndexed { fileIndex, fileElement ->
+                multiPartWrapper.addPart(PartContent("{{{paramName}}}", params.{{{paramName}}}FileNames[fileIndex], fileElement, params.{{{paramName}}}ContentTypes[fileIndex]))
+            }
+        }
+        {{/isContainer}}{{/isFile}}
+        {{#isFile}}{{^isContainer}} /* single file */
+        if (params.{{{paramName}}} != null && params.{{{paramName}}}FileName != null && params.{{{paramName}}}ContentType != null) {
+            multiPartWrapper.addPart(PartContent("{{{paramName}}}", params.{{paramName}}FileName, params.{{{paramName}}}, params.{{{paramName}}}ContentType))
+        }
+        {{/isContainer}}{{/isFile}}
+        {{^isFile}} /* not a file */
+        if (params.{{{paramName}}} != null) {
+            val nonFileContentType = params.{{{paramName}}}ContentType ?: "{{#isPrimitive}}text/plain{{/isPrimitive}}{{^isPrimitive}}application/json{{/isPrimitive}}"
+            multiPartWrapper.addPart(PartContent("{{{paramName}}}", "", {{>api_parameter}}.toString().toByteArray(), nonFileContentType))
+        }
+        {{/isFile}}
+        {{/formParams}}
+
+        {{#isListContainer}}
+        return MultipartCall<{{{returnType}}}>(request, multiPartWrapper, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java))
+        {{/isListContainer}}
+        {{^isListContainer}}
+        return MultipartCall<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}>(request, multiPartWrapper, parser, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}::class.java)
+        {{/isListContainer}}
+        {{/isMultipart}}
+    }
+
+    {{/operation}}
+}
+{{/operations}}
+
+{{>api_parameters}}

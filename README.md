@@ -13,10 +13,41 @@ It currently consists of
 * [Code Generator](boat-maven-plugin/README.md) based on [openapi-generator.tech](https://openapi-generator.tech/) with optimized templates and fixes.
 * Lint mojo based on Zalando Zally and Backbase API
 
-The project is very much Work In Progress and will be published on maven central when considered ready enough. 
-
 # Release Notes
 BOAT is still under development and subject to change.
+
+## 0.17.21
+* boat-spring, boat-java
+  * Issue 649: missing BigDecimalCustomSerializer.java (#650) @walaniam
+* BOAT Android (#637) @charbelmkh
+## 0.17.18
+* boat-spring
+  * Fix [Regression on putting valid annotation on FQCN,https://github.com/Backbase/backbase-openapi-tools/issues/619]
+  * Fix [Broken pojo field validations, https://github.com/Backbase/backbase-openapi-tools/issues/633]
+  * Fix Add `@NotNull` for required properties.
+  * Fix initiation of `required` property that has `additionalProperties` (generated as Map) when using `containerDefaultToNull=true`
+  * Fix [`createApiComponent` option in springtemplate generator is ignored](https://github.com/Backbase/backbase-openapi-tools/issues/630)
+  * Fix https://github.com/Backbase/backbase-openapi-tools/issues/635
+  * Fix [List of Maps of Strings generated code does not compile. ,https://github.com/Backbase/backbase-openapi-tools/issues/647]
+## 0.17.16
+* BOAT Angular Generator
+  * added `@angular/common` as peer dependency in the generated package.json files
+  * replace usages of `isListContainer` with `isArray` in api.service template
+## 0.17.15
+* boat-spring
+  * fix: incorrectly used enum param on collection items (see `collectionDataTypeParam.mustache`)
+## 0.17.14
+* boat-spring
+  * added validation constraints on primitive collection items types in request params (see `collectionDataTypeParam.mustache`)
+  * added validation constraints on primitive map value types (see `mapDataType.mustache`) 
+## 0.17.13
+* boat-spring
+  * Fix: generate validation constraints on primitive collection items types (updates in pojo.mustache and new collectionDataType.mustache)
+## 0.17.12
+* BoatJavaCodeGen, BoatSpringCodeGen
+  * Fix: Always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)
+  * Fix: [validated pojo referenced class causes invalid code to be generated](https://github.com/Backbase/backbase-openapi-tools/issues/615)
+  * Fix: boat-java pojo template to support `useWithModifier` to generate `withSomething` methods; fixes referencing 'common' classes generated using boat-spring templates.
 ## 0.17.11
 * BoatJavaCodeGen, BoatSpringCodeGen
   * Fix: always generate collection initializer when array is required in the schema (even if containerDefaultToNull=true)

@@ -1,0 +1,13 @@
+{{#description}}
+    /* {{{description}}} */
+{{/description}}
+    {{#moshi}}
+    @Json(name = "{{{baseName}}}")
+    {{/moshi}}
+    {{#gson}}
+    @SerializedName("{{name}}")
+    {{/gson}}
+{{#isDeprecated}}
+    @Deprecated(message = "This field has been deprecated")
+{{/isDeprecated}}
+    val {{{name}}}: {{#isFreeFormObject}}@kotlinx.android.parcel.RawValue {{/isFreeFormObject}}{{#isEnum}}{{#isListContainer}}kotlin.collections.List<{{classname}}.{{{nameInCamelCase}}}>{{/isListContainer}}{{^isListContainer}}{{classname}}.{{{nameInCamelCase}}}{{/isListContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}

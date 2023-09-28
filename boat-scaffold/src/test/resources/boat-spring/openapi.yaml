@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: Arrangement Support
   version: '1.0'
-  
+
 paths:
   /simple-types:
     $ref: paths/simple-types.yaml
@@ -21,10 +21,58 @@ paths:
     $ref: paths/map-types.yaml
   /map-types/{id}/{ids}:
     $ref: paths/map-types-ids.yaml
+  /validated-pojos:
+    put:
+      tags:
+        - validated-pojos
+      summary: get
+      description: Get pojos that are valid
+      operationId: getPojos
+      parameters:
+        - name: yesNoMaybe
+          in: query
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/CommonEnum'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatedPojos'
+              example:
+                name: "valid name"
+  /lists-of-maps-of-strings:
+    put:
+      tags:
+        - lists-of-maps-of-strings
+      summary: get
+      description: Get an object with a list property that contains maps of string to string.
+      operationId: getMapsOfStringsObjects
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  maps:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: string
+              example:
+                name: "valid name"
+
   /transactions:
     patch:
       tags:
-      - transactions
+        - transactions
       summary: patch
       description: Updates list of transactions
       operationId: patchTransactions
@@ -39,12 +87,118 @@ paths:
       responses:
         "204":
           description: OK
-
+  /payments:
+    post:
+      tags:
+        - payments
+      summary: post
+      description: Create payments
+      operationId: createPayments
+      requestBody:
+        description: Create payments
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MultiLinePaymentRequest'
+      responses:
+        "204":
+          description: OK
+    get:
+      tags:
+        - payments
+      summary: post
+      description: Get payments
+      operationId: getPayments
+      parameters:
+        - name: status
+          in: query
+          description: Status
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ENTERED
+                - READY
+                - ACCEPTED
+        - name: uuidParam
+          in: query
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+        - name: from
+          in: query
+          description: Page Number
+          required: false
+          style: form
+          explode: true
+          schema:
+            minimum: 0
+            type: integer
+            format: int32
+            default: 0
+        - name: approvalTypeIds
+          in: query
+          description: List of identifiers
+          required: true
+          style: form
+          explode: true
+          schema:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of identifiers
+            items:
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+        - name: headerParams
+          in: header
+          description: List of headers
+          required: false
+          style: form
+          explode: true
+          schema:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of headers
+            items:
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+      responses:
+        "200":
+          description: OK
+  /string-typed-number-formatted-properties:
+    get:
+      responses:
+        200:
+          description: Success!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string-typed-number-formatted-value:
+                    type: string
+                    format: number
+                  number-typed-value:
+                    type: number
 components:
   schemas:
+    Additions:
+      title: Additions
+      type: object
+      additionalProperties:
+        type: string
+      description: Additional properties
     TransactionsPatchRequestBody:
       required:
-      - id
+        - id
       type: object
       properties:
         id:
@@ -88,22 +242,55 @@ components:
       required:
         - currencyCode
         - referenceNumber
+        - requiredTags
       type: object
       discriminator:
         propertyName: paymentRequestType
       properties:
         referenceNumber:
           type: string
+          minLength: 6
           description: Reference number
         currencyCode:
           type: string
+          pattern: '^[A-Z]{3}$'
           description: Currency of the payment request
+        requestLine:
+          $ref: '#/components/schemas/PaymentRequestLine'
     MultiLinePaymentRequest:
       required:
+        - name
+        - amountNumberAsString
+        - amountNumber
         - lines
         - uniqueLines
+        - arrangementIds
       type: object
       properties:
+        name:
+          type: string
+          description: Request name
+          minLength: 3
+          maxLength: 251
+        amountNumberAsString:
+          description: The amount string in number format
+          type: string
+          format: number
+          minimum: -999.99999
+          maximum: 999.99999
+        amountNumberAsStringOptional:
+          description: The amount string in number format
+          type: string
+          format: number
+          minimum: -999.99999
+          maximum: 999.99999
+        amountNumber:
+          description: The amount string
+          type: number
+          minimum: -999.99999
+          maximum: 999.99999
+        additions:
+          $ref: '#/components/schemas/Additions'
         lines:
           type: array
           description: Payment request details
@@ -120,17 +307,122 @@ components:
           description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
+        optionalNullableLines:
+          type: array
+          nullable: true
+          description: Payment request optional details
+          items:
+            $ref: '#/components/schemas/PaymentRequestLine'
         optionalUniqueLines:
           type: array
           uniqueItems: true
           description: Payment request optional details
           items:
             $ref: '#/components/schemas/PaymentRequestLine'
+        arrangementIds:
+          description: Internal arrangement ids
+          type: array
+          items:
+            type: string
+            minLength: 5
+            maxLength: 361
+        uniqueArrangementIds:
+          description: Unique internal arrangement ids
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+            maxLength: 224
+        uuidPatterns:
+          description: List of UUID patterns
+          type: array
+          items:
+            type: string
+            pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
+            description: UUID pattern
+        mapObjects:
+          minProperties: 0
+          maxProperties: 1
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/PaymentRequestLine'
+          description: "Transaction data map"
+        mapStrings:
+          minProperties: 0
+          maxProperties: 5
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 7
+            maxLength: 10
+          description: "Transaction data string map"
     PaymentRequestLine:
       required:
         - accountId
+        - additionalPropertiesMap
       type: object
       properties:
         accountId:
           type: string
+          pattern: "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[1-5][0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12}$"
           description: Unique identifier of the related Account
+        status:
+          description: Status
+          type: array
+          items:
+            type: string
+            enum:
+              - GOOD
+              - BAD
+              - UGLY
+        additionalPropertiesMap:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              one:
+                type: string
+              two:
+                type: number
+
+
+    ValidatedPojo:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 36
+    ValidatedPojos:
+      title: ValidatedPojos
+      properties:
+        validStrings:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 2
+          items:
+            type: string
+            minLength: 1
+        validPojos:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/ValidatedPojo'
+        mainPojo:
+          $ref: '#/components/schemas/ValidatedPojo'
+
+      required:
+        - mainPojo
+        - validPojos
+    CommonEnum:
+      type: string
+      enum:
+        - YES
+        - NO
+        - INVALID

@@ -1,1 +1,13 @@
-{{#useOptional}}{{#required}}{{{dataType}}}{{/required}}{{^required}}Optional<{{#useBeanValidation}}{{>beanValidationCore}}{{/useBeanValidation}}{{{dataType}}}>{{/required}}{{/useOptional}}{{^useOptional}}{{{dataType}}}{{/useOptional}}
+{{#toOneLine}}
+  {{#useOptional}}
+    {{#required}}
+      {{>collectionDataTypeParam}}
+    {{/required}}
+    {{^required}}
+      Optional<{{>collectionDataTypeParam}}>
+    {{/required}}
+  {{/useOptional}}
+  {{^useOptional}}
+    {{>collectionDataTypeParam}}
+  {{/useOptional}}
+{{/toOneLine}}

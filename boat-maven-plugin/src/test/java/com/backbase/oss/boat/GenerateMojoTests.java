@@ -2,6 +2,7 @@ package com.backbase.oss.boat;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -75,6 +76,16 @@ class GenerateMojoTests {
         mojo.execute();
 
         assertThat(mojo.generatorName, equalTo(BoatJavaCodeGen.NAME));
+        assertEquals(
+            "ApiClient.java,ApiKeyAuth.java,Authentication.java,BeanValidationException.java," +
+                "HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java," +
+                "RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java",
+            mojo.supportingFilesToGenerate
+        );
+        assertThat(
+            mojo.getGeneratorSpecificSupportingFiles(),
+            containsInAnyOrder("BigDecimalCustomSerializer.java")
+        );
     }
 
     @Test
@@ -84,6 +95,16 @@ class GenerateMojoTests {
         mojo.execute();
 
         assertThat(mojo.generatorName, equalTo(BoatSpringCodeGen.NAME));
+        assertEquals(
+            "ApiClient.java,ApiKeyAuth.java,Authentication.java,BeanValidationException.java," +
+                "HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java," +
+                "RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java",
+            mojo.supportingFilesToGenerate
+        );
+        assertThat(
+            mojo.getGeneratorSpecificSupportingFiles(),
+            containsInAnyOrder("BigDecimalCustomSerializer.java")
+        );
     }
 
     @Test
@@ -93,6 +114,12 @@ class GenerateMojoTests {
         mojo.execute();
 
         assertThat(mojo.generatorName, equalTo(BoatJavaCodeGen.NAME));
+        assertEquals(
+            "ApiClient.java,ApiKeyAuth.java,Authentication.java,BeanValidationException.java," +
+                "HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java," +
+                "RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java",
+            mojo.supportingFilesToGenerate
+        );
     }
 
     @Test

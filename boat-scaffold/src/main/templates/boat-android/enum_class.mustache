@@ -1,0 +1,40 @@
+{{#gson}}
+import com.google.gson.annotations.SerializedName
+{{/gson}}
+{{#moshi}}
+import com.squareup.moshi.Json
+{{/moshi}}
+
+/**
+ {{#description}}* {{{description}}}{{/description}}
+ * Values: {{#allowableValues}}{{#enumVars}}{{&name}}{{^-last}},{{/-last}}{{/enumVars}}{{/allowableValues}}
+ */
+enum class {{classname}}(val value: {{{dataType}}}) {
+{{#allowableValues}}{{#enumVars}}
+    {{#moshi}}
+    @Json(name = {{^isString}}"{{/isString}}{{{value}}}{{^isString}}"{{/isString}})
+    {{/moshi}}
+    {{#gson}}
+    @SerializedName(value = {{^isString}}"{{/isString}}{{{value}}}{{^isString}}"{{/isString}})
+    {{/gson}}
+    {{#isListContainer}}
+    {{#isList}}
+    {{&name}}(listOf({{{value}}})){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+    {{/isList}}
+    {{^isList}}
+    {{&name}}(arrayOf({{{value}}})){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+    {{/isList}}
+    {{/isListContainer}}
+    {{^isListContainer}}
+    {{&name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+    {{/isListContainer}}
+{{/enumVars}}{{/allowableValues}}
+
+    /**
+	 * This override toString avoids using the enum var name and uses the actual api value instead.
+	 * In cases the var name and value are different, the client would send incorrect enums to the server.
+	 */
+	override fun toString(): String {
+        return value{{^isString}}.toString(){{/isString}}
+    }
+}

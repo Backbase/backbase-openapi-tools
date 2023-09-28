@@ -1,5 +1,28 @@
 package com.backbase.oss.boat;
 
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
+
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
@@ -24,13 +47,16 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -51,29 +77,6 @@ import org.openapitools.codegen.config.GlobalSettings;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServerVariablesKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
-
 /**
  * Generates client/server code from an OpenAPI json/yaml definition.
  */
@@ -91,6 +94,15 @@ public class GenerateMojo extends InputMavenArtifactMojo {
         } else {
             return "";
         }
+    }
+
+    static String uniqueJoin(Collection<String> values) {
+        return values.stream()
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .distinct()
+            .sorted()
+            .collect(Collectors.joining(","));
     }
 
     public static final String INSTANTIATION_TYPES = "instantiation-types";
@@ -737,8 +749,17 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 GlobalSettings.clearProperty(CodegenConstants.MODELS);
             }
 
-            if (null != generateSupportingFiles && generateSupportingFiles) {
-                GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, trimCSV(supportingFilesToGenerate));
+            String generatorSupportingFilesToGenerate = Optional.ofNullable(getGeneratorSpecificSupportingFiles())
+                .map(GenerateMojo::uniqueJoin)
+                .orElse("");
+
+            if (generateSupportingFiles != null && generateSupportingFiles) {
+                String allToGenerate = Stream.of(trimCSV(supportingFilesToGenerate), generatorSupportingFilesToGenerate)
+                    .filter(StringUtils::isNotBlank)
+                    .collect(joining(","));
+                GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, allToGenerate);
+            } else if (StringUtils.isNotBlank(generatorSupportingFilesToGenerate)) {
+                GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, generatorSupportingFilesToGenerate);
             } else {
                 GlobalSettings.clearProperty(CodegenConstants.SUPPORTING_FILES);
             }
@@ -930,6 +951,10 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             throw new MojoExecutionException(
                 "Code generation failed. See above for the full exception.");
         }
+    }
+
+    protected Collection<String> getGeneratorSpecificSupportingFiles() {
+        return Collections.emptySet();
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.backbase.oss.boat;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -8,6 +10,12 @@ import org.apache.maven.plugin.MojoFailureException;
 
 @Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
+
+    private static final Collection<String> EMBEDDED_SUPPORTING_FILES = List.of(
+        "ApiClient.java", "BeanValidationException.java", "RFC3339DateFormat.java", "ServerConfiguration.java",
+        "ServerVariable.java", "StringUtil.java", "Authentication.java", "HttpBasicAuth.java", "HttpBearerAuth.java",
+        "ApiKeyAuth.java", "JavaTimeFormatter.java"
+    );
 
     public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive,
         boolean generateSupportingFiles) throws MojoExecutionException, MojoFailureException {
@@ -43,10 +51,9 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         log.debug("Using configOptions={}", this.configOptions);
 
         if (isEmbedded) {
-            this.supportingFilesToGenerate = "ApiClient.java,BeanValidationException.java,RFC3339DateFormat.java,"
-                + "ServerConfiguration.java,ServerVariable.java,StringUtil.java,Authentication.java,HttpBasicAuth.java,"
-                + "HttpBearerAuth.java,ApiKeyAuth.java,JavaTimeFormatter.java";
+            this.supportingFilesToGenerate = uniqueJoin(EMBEDDED_SUPPORTING_FILES);
         }
+
         super.execute();
     }
 

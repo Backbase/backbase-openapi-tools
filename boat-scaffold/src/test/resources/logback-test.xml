@@ -1,0 +1,17 @@
+<configuration>
+    <appender name="COLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%highlight([%level]) [%logger{10}] %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="COLOR"/>
+    </root>
+    <!-- Uncomment below logger to see more details about code generation -->
+    <!--
+    <logger name="com.samskivert" level="TRACE"/>
+    <logger name="org.openapitools" level="TRACE"/>
+    <logger name="io.swagger" level="DEBUG"/>
+    <logger name="io.github" level="DEBUG"/>
+    -->
+</configuration>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.17.12-SNAPSHOT</version>
+        <version>0.17.22-SNAPSHOT</version>
     </parent>
   
     <artifactId>boat-scaffold</artifactId>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-trail-resources</artifactId>
-            <version>0.17.12-SNAPSHOT</version>
+            <version>0.17.22-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,11 +152,27 @@
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>${maven.resolver.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core</artifactId>
-            <version>3.24.9</version>
+            <version>3.25.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>5.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -174,6 +190,9 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>**/*.jar</excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>report</id>

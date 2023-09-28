@@ -4,7 +4,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.17.12-SNAPSHOT</version>
+    <version>0.17.22-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools is a collection of tools to work with Open API</description>
@@ -40,11 +40,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -54,33 +54,55 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <sonar.organization>backbase-technology-prototyping</sonar.organization>
+        <sonar.organization>backbase</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <openapi-generator.version>6.6.0</openapi-generator.version>
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <jackson.version>2.15.2</jackson.version>
         <mockito.version>5.5.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
-        <swagger-core.version>2.2.15</swagger-core.version>
+        <swagger-core.version>2.2.16</swagger-core.version>
         <swagger-parser.version>2.1.6</swagger-parser.version>
-        <snakeyaml.version>2.1</snakeyaml.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
     </properties>
 
-    <modules>
-        <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
-        <module>boat-trail-resources</module>
-        <module>boat-engine</module>
-        <module>boat-scaffold</module>
-        <module>boat-quay</module>
-        <module>boat-maven-plugin</module>
-        <!-- Code Coverage Project -->
-        <module>tests</module>
-    </modules>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
+                <module>boat-trail-resources</module>
+                <module>boat-engine</module>
+                <module>boat-scaffold</module>
+                <module>boat-quay</module>
+                <module>boat-maven-plugin</module>
+                <!-- Code Coverage Project -->
+                <module>tests</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>sonatype-deploy</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <!-- Project holding all OpenAPI specs for testing. Also includes reusable test harnesses -->
+                <module>boat-trail-resources</module>
+                <module>boat-engine</module>
+                <module>boat-scaffold</module>
+                <module>boat-quay</module>
+                <module>boat-maven-plugin</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -88,14 +110,14 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.28</version>
+                <version>1.18.30</version>
             </dependency>
 
 
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.7</version>
+                <version>2.0.9</version>
             </dependency>
 
             <dependency>
@@ -181,7 +203,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-ext</artifactId>
-                <version>2.0.7</version>
+                <version>2.0.9</version>
             </dependency>
 
             <dependency>
@@ -361,7 +383,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.9.1.2184</version>
+                    <version>3.10.0.2594</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -398,7 +420,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -419,7 +441,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                     <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
                 </configuration>
