@@ -19,6 +19,7 @@
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
             src/main/java/com/backbase/oss/codegen/*.java
+            src/main/java/org/openapitools/codegen/languages/*.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
