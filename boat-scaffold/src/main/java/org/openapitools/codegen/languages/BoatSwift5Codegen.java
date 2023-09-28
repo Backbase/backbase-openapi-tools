@@ -12,6 +12,7 @@ import org.openapitools.codegen.utils.ModelUtils;
 
 import java.util.*;
 
+
 public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenConfig {
     private static final String LIBRARY_DBS = "dbsDataProvider";
 
@@ -81,7 +82,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         if (parents == null || parents.isEmpty()) {
             return;
         }
-
         for (String parent : parents) {
             CodegenModel parentModel = ModelUtils.getModelByName(parent, objs);
             fixInheritance(model, parentModel);

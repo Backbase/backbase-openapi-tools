@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.*;
 
+import com.backbase.oss.boat.quay.model.BoatViolation;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import org.checkerframework.checker.units.qual.A;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.BoatSwift5Codegen;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.model.ModelMap;
@@ -56,11 +58,31 @@ public class BoatSwift5CodegenTests {
         final CodegenModel parent = new CodegenModel();
         parent.setImports(new HashSet<>(Arrays.asList("bike", "car")));
 
+        final CodegenModel parentModel = new CodegenModel();
+        parent.setImports(new HashSet<>(Arrays.asList("vehicle", "movie")));
+        parentModel.setName("parentModel");
+
+        final List<CodegenProperty> codegenProperties = new ArrayList<>();
+        final CodegenProperty codegenProperty1 = new CodegenProperty();
+        codegenProperty1.name = "Geeks";
+        codegenProperty1.title = "Geeks-title";
+
+        codegenProperties.add(codegenProperty1);
+
+        final Set<String> child = new HashSet<>();
+
+        parent.allOf = child;
+        parent.setAllVars(codegenProperties);
+        parent.parentModel = parentModel;
+        parent.setIsModel(true);
+
         parent.setClassname("parent");
         models.put("parent", createCodegenModelWrapper(parent));
+        models.put("parentModel", createCodegenModelWrapper(parentModel));
 
         assertEquals(codegen.postProcessAllModels(models), models);
     }
+
     static ModelsMap createCodegenModelWrapper(CodegenModel cm) {
         ModelsMap objs = new ModelsMap();
         List<ModelMap> modelMaps = new ArrayList<>();
