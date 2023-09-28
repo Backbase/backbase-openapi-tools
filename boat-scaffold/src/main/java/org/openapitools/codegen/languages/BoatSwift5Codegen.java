@@ -77,6 +77,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     }
 
     // Fix for inheritance bug
+    // BEGIN-NOSCAN
     private void addParentProperties(CodegenModel model, Map<String, ModelsMap> objs) {
         Set<String> parents = model.allOf;
         if (parents == null || parents.isEmpty()) {
@@ -108,5 +109,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         }
         codegenModel.removeAllDuplicatedProperty();
     }
+    // END-NOSCAN
 }
 
