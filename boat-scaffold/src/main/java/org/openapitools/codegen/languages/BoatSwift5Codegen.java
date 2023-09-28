@@ -94,12 +94,14 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             }
         }
     }
+    // END-NOSCAN
 
     /*
      Fix for inheritance bug
      There is no inheritance for Swift structs, so we're adding all parent vars
      recursively to the models allVars list while making sure we don't have duplicates.
     */
+    // BEGIN-NOSCAN
     private void fixInheritance(CodegenModel codegenModel, CodegenModel parentModel) {
         if (parentModel != null) {
             if (!parentModel.allVars.isEmpty()) {
@@ -110,5 +112,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         codegenModel.removeAllDuplicatedProperty();
     }
     // END-NOSCAN
+
 }
 
