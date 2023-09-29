@@ -71,7 +71,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         while (it.hasNext()) {
             Map.Entry<String, ModelsMap> entry = (Map.Entry)it.next();
             CodegenModel model = ModelUtils.getModelByName(entry.getKey(), postProcessedModels);
-            System.out.println("Starting Key: " + entry.getKey());
             addParentProperties(model, postProcessedModels);
         }
         return postProcessedModels;
