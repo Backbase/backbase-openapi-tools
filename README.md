@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.22
+* boat-maven-plugin
+  * Issue 211: Fix typo in changelogRenderer parameter in DiffMojo.java (#652) @talbot
 ## 0.17.21
 * boat-spring, boat-java
   * Issue 649: missing BigDecimalCustomSerializer.java (#650) @walaniam
