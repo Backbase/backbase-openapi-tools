@@ -191,7 +191,10 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
-                    <excludes>**/*.jar</excludes>
+                    <excludes>
+                        <exclude>**/*.jar</exclude>
+                        <exclude>org.openapitools.codegen.languages.*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

@@ -283,6 +283,7 @@
                 <configuration>
                     <skip>${skipTests}</skip>
                     <includes>com.backbase.oss.*</includes>
+                    <excludes>org.openapitools.codegen.languages.*</excludes>
                 </configuration>
                 <executions>
                     <execution>
