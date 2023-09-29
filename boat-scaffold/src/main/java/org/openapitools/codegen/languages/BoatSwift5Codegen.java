@@ -71,13 +71,13 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         while (it.hasNext()) {
             Map.Entry<String, ModelsMap> entry = (Map.Entry)it.next();
             CodegenModel model = ModelUtils.getModelByName(entry.getKey(), postProcessedModels);
+            System.out.println("Starting Key: " + entry.getKey());
             addParentProperties(model, postProcessedModels);
         }
         return postProcessedModels;
     }
 
     // Fix for inheritance bug
-    // BEGIN-NOSCAN
     private void addParentProperties(CodegenModel model, Map<String, ModelsMap> objs) {
         Set<String> parents = model.allOf;
         if (parents == null || parents.isEmpty()) {
@@ -94,14 +94,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             }
         }
     }
-    // END-NOSCAN
 
     /*
      Fix for inheritance bug
      There is no inheritance for Swift structs, so we're adding all parent vars
      recursively to the models allVars list while making sure we don't have duplicates.
     */
-    // BEGIN-NOSCAN
     private void fixInheritance(CodegenModel codegenModel, CodegenModel parentModel) {
         if (parentModel != null) {
             if (!parentModel.allVars.isEmpty()) {
@@ -111,7 +109,5 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         }
         codegenModel.removeAllDuplicatedProperty();
     }
-    // END-NOSCAN
-
 }
 
