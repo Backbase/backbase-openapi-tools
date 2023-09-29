@@ -193,7 +193,6 @@
                 <configuration>
                     <excludes>
                         <exclude>**/*.jar</exclude>
-                        <exclude>org.openapitools.codegen.languages.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
