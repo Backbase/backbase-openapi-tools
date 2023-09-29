@@ -15,8 +15,7 @@
 
     <properties>
         <sonar.coverage.exclusions>
-            src/main/java/com/backbase/oss/boat/ExporterOptions.java,
-            src/main/java/org/openapitools/codegen/languages/BoatSwift5Codegen.java
+            src/main/java/com/backbase/oss/boat/ExporterOptions.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
