@@ -18,7 +18,8 @@
         <maven.api.version>3.9.4</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
-            src/main/java/com/backbase/oss/codegen/*.java
+            src/main/java/com/backbase/oss/codegen/*.java,
+            src/main/java/org/openapitools/codegen/languages/BoatSwift5Codegen.java
         </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
