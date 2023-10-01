@@ -4,6 +4,12 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.StringSchema;
 
 import org.junit.jupiter.api.Test;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
+
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -167,4 +173,43 @@ public class BoatSwift5CodegenTests {
         assertEquals(podAuthors, openAPIDevs);
     }
 
+    @Test
+    public  void testPostProcessAllModels() {
+        final CodegenModel parent = new CodegenModel();
+        Map<String, ModelsMap> models = new HashMap<>();
+
+        final CodegenModel parentModel = new CodegenModel();
+        parentModel.setName("ActionParent");
+        parentModel.classname = "ActionParent";
+
+        final List<CodegenProperty> codegenProperties = new ArrayList<>();
+
+        final CodegenModel actionRecipeItemParentModel = new CodegenModel();
+        actionRecipeItemParentModel.setName("ActionRecipeItemParent");
+
+        final Set<String> child = new HashSet<>();
+        child.add("ActionRecipeItemParent");
+
+        parent.allOf = child;
+        parent.setAllVars(codegenProperties);
+        parent.parentModel = parentModel;
+        parent.setIsModel(true);
+        parent.modelJson = "{'required': ['true'], 'type': 'object', 'properties': {'type':{'maxLength':64, 'minLength':1, type: 'string'}}}";
+
+
+        models.put("ActionParent", createCodegenModelWrapper(parent));
+        models.put("ActionRecipeItemParent", createCodegenModelWrapper(actionRecipeItemParentModel));
+
+        assertEquals(boatSwift5CodeGen.postProcessAllModels(models), models);
+    }
+
+    static ModelsMap createCodegenModelWrapper(CodegenModel cm) {
+        ModelsMap objs = new ModelsMap();
+        List<ModelMap> modelMaps = new ArrayList<>();
+        ModelMap modelMap = new ModelMap();
+        modelMap.setModel(cm);
+        modelMaps.add(modelMap);
+        objs.setModels(modelMaps);
+        return objs;
+    }
 }
