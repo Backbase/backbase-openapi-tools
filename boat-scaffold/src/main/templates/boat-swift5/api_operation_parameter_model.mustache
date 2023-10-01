@@ -24,7 +24,7 @@
 {{/allParams}}
 
 {{#hasParams}}
-    internal init({{#allParams}}{{paramName}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+    internal init({{#allParams}}{{paramName}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{^-last}}, {{/-last}}{{/allParams}}) {
         {{#allParams}}
         self.{{paramName}} = {{paramName}}
         {{/allParams}}
@@ -70,13 +70,13 @@
         }
 
         public static func ==(lhs: Builder, rhs: Builder) -> Bool {
-        	return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isListContainer}}{{^required}}?{{/required}}.description{{/isListContainer}} == rhs.{{paramName}}{{#isListContainer}}{{^required}}?{{/required}}.description{{/isListContainer}}{{/isFreeFormObject}}{{^-last}} &&
+        	return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}{{#isMap}}lhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isMap}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
         	{{/-last}}{{/allParams}}
     	}
     }
 {{/hasParams}}
 
     public static func ==(lhs: Self, rhs: Self) -> Bool {
-        return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}{{#isMapContainer}}lhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMapContainer}}{{^isMapContainer}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isMapContainer}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isListContainer}}{{^required}}?{{/required}}.description{{/isListContainer}} == rhs.{{paramName}}{{#isListContainer}}{{^required}}?{{/required}}.description{{/isListContainer}}{{/isFreeFormObject}}{{^-last}} &&
+        return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}{{#isMap}}lhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) } == rhs.{{paramName}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}.mapValues { AnyCodable($0) }{{/isMap}}{{^isMap}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isMap}}{{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
         {{/-last}}{{/allParams}}
     }

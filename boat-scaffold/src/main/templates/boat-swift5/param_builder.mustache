@@ -1,1 +1,1 @@
-{{name}}: {{#isEnum}}{{#isListContainer}}[{{classname}}.{{enumName}}]{{/isListContainer}}{{^isListContainer}}{{classname}}.{{{datatypeWithEnum}}}{{/isListContainer}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}
+{{name}}: {{#isEnum}}{{#isArray}}[{{classname}}.{{enumName}}]{{/isArray}}{{^isArray}}{{classname}}.{{{datatypeWithEnum}}}{{/isArray}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}
