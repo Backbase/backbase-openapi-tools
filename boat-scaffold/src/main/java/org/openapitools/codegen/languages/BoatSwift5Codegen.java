@@ -1,5 +1,6 @@
 package org.openapitools.codegen.languages;
 
+import com.backbase.oss.boat.Utils;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.CodegenConfig;
@@ -9,12 +10,16 @@ import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenConfig {
     private static final String LIBRARY_DBS = "dbsDataProvider";
+
+    Map<String, ModelsMap> modelsForPrinting = new HashMap<>();
 
     /**
      * Constructor for the BoatSwift5Codegen codegen module.
@@ -65,6 +70,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     // Fix for inheritance bug
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        this.modelsForPrinting = objs;
         Map<String, ModelsMap> postProcessedModels = super.postProcessAllModels(objs);
         Iterator it = postProcessedModels.entrySet().iterator();
 
@@ -108,5 +114,15 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         }
         codegenModel.removeAllDuplicatedProperty();
     }
+
+    @Override
+    public void postProcess() {
+        System.out.println("################################################################################");
+        System.out.println("# Thanks for using BOAT Swift OpenAPI Generator.                                          #");
+        System.out.println("# Post Process Model." + modelsForPrinting);
+        System.out.println("################################################################################");
+    }
+
+//    post
 }
 
