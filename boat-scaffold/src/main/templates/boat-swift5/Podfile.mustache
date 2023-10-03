@@ -1,0 +1,35 @@
+source 'https://cdn.cocoapods.org'
+
+platform :ios, '11.0'
+
+plugin 'cocoapods-art', sources: %w[
+  bbartifacts3
+  bbartifacts-retail3
+]
+
+use_frameworks!
+install! 'cocoapods', deterministic_uuids: false
+
+# ignore all warnings from all pods
+inhibit_all_warnings!
+
+def normal_pods
+  pod 'Backbase', '>= 6.11'{{#useRxSwift}}
+  pod 'RxSwift', '~> 5.0.0'{{/useRxSwift}}{{#useAlamofire}}
+  pod 'Alamofire', '~> 4.9.1'{{/useAlamofire}}{{#usePromiseKit}}
+  pod 'PromiseKit', '~> 6.12.0'{{/usePromiseKit}}
+end
+
+target 'Common' do
+  use_frameworks!
+
+  normal_pods
+end
+
+target '{{projectName}}' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for {{projectName}}
+  normal_pods
+end

@@ -1,0 +1,1 @@
+"{{baseName}}":{{#isFreeFormObject}}({{paramName}} as{{^required}}?{{/required}} String){{^required}}?{{/required}}.encodeToJSON(){{/isFreeFormObject}}{{^isFreeFormObject}}{{paramName}}{{^required}}?{{/required}}.{{#isDateTime}}encodeToJSONDateTime{{/isDateTime}}{{^isDateTime}}encodeToJSON{{/isDateTime}}(){{/isFreeFormObject}}

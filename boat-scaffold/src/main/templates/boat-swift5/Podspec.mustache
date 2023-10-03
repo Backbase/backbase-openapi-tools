@@ -1,0 +1,35 @@
+Pod::Spec.new do |s|
+  s.name = '{{projectName}}'
+  s.version = '{{podVersion}}'{{#projectDescription}}
+  s.summary = '{{projectDescription}}'{{/projectDescription}}{{#podDescription}}
+  s.description = '{{podDescription}}'{{/podDescription}}
+  s.license = '{{#podLicense}}{{& podLicense}}{{/podLicense}}'{{^podLicense}}'Proprietary'{{/podLicense}}
+  s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/OpenAPITools/openapi-generator{{/podHomepage}}'{{#podAuthors}}
+  s.author = '{{podAuthors}}'{{/podAuthors}}
+
+  s.platform = :ios
+  s.ios.deployment_target = '14.0'
+  {{#podDocumentationURL}}
+  s.documentation_url = '{{podDocumentationURL}}'
+  {{/podDocumentationURL}}
+
+  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.source = { :git => "https://github.com/Backbase/backbase-openapi-tools", :tag => "{{{podVersion}}}" }
+  s.source_files = '{{projectName}}/Classes/**/*.swift'
+
+  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.vendored_frameworks = '{{projectName}}.xcframework'
+
+  # ――― Dependencies ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.dependency 'Backbase', '>= 9.0'
+  s.dependency 'ClientCommonGen2', '~> 1.0'
+  {{#usePromiseKit}}
+  s.dependency 'PromiseKit/CorePromise', '~> 6.12.0'
+  {{/usePromiseKit}}
+  {{#useRxSwift}}
+  s.dependency 'RxSwift', '~> 5.0.0'
+  {{/useRxSwift}}
+  {{#useAlamofire}}
+  s.dependency 'Alamofire', '~> 4.9.1'
+  {{/useAlamofire}}
+end

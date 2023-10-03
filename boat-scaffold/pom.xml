@@ -191,7 +191,9 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
-                    <excludes>**/*.jar</excludes>
+                    <excludes>
+                        <exclude>**/*.jar</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
