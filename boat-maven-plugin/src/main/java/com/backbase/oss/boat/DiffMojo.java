@@ -40,7 +40,7 @@ public class DiffMojo extends AbstractMojo {
     @Parameter(name = "writeChangelog", defaultValue = "false")
     private boolean writeChangelog;
 
-    @Parameter(name = "changeLogRenderer", defaultValue = "markdown")
+    @Parameter(name = "changelogRenderer", defaultValue = "markdown")
     private String changelogRenderer;
 
     @Parameter(name = "changelogOutput", defaultValue = "${project.build.directory}/changelog")
