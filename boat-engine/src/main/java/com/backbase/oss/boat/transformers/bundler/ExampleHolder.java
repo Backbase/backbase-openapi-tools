@@ -183,6 +183,8 @@ public abstract class ExampleHolder<T> {
             return new ArrayNodeExampleHolder(name, (ArrayNode) o);
         } else if (o instanceof String) {
             return new StringExampleHolder(name, o.toString());
+        } else if (o instanceof byte[]) {
+            return new StringExampleHolder(name, new String((byte[]) o));
         } else {
             throw new TransformerException(String.format(
                     "Unknown type backing example %s (%s) '%s'", name, o.getClass().getName(), o));
