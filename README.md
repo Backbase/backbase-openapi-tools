@@ -16,6 +16,11 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.23
+* *Boat Engine*
+  * Added support for byte array examples
+* *Boat Scaffold*
+  * Removed tag import in order to allow BOAT objects to have the name 'tag'
 ## 0.17.22
 * boat-maven-plugin
   * Issue 211: Fix typo in changelogRenderer parameter in DiffMojo.java (#652) @talbot
