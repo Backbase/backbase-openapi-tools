@@ -1,7 +1,6 @@
 package com.backbase.oss.codegen.java;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -11,10 +10,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
-import org.openapitools.codegen.languages.SpringCodegen;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.function.Function;
 import java.util.List;
 import java.util.Map;
 
@@ -140,15 +139,22 @@ class BoatJavaCodeGenTests {
 
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
 
-        File apiFile = files.stream()
-                .filter(file -> file.getName().equals("PaymentsApiClient.java"))
-                .findFirst()
-                .get();
+        Function<String, File> getFileByName = (String fileName) -> files.stream()
+            .filter(file -> file.getName().equals(fileName))
+            .findFirst()
+            .get();
+
+        File apiFile = getFileByName.apply("PaymentsApiClient.java");
         TypeDeclaration apiType = StaticJavaParser.parse(apiFile)
                 .findFirst(TypeDeclaration.class).get();
+        assertThat(apiType.getAnnotationByName("Component").isPresent(), is(generate));
+
+        File apiClientFile = getFileByName.apply("ApiClient.java");
+        TypeDeclaration apiClientType = StaticJavaParser.parse(apiClientFile)
+            .findFirst(TypeDeclaration.class).get();
+        assertThat(apiClientType.getAnnotationByName("Component").isPresent(), is(generate));
 
         assertThat(gen.createApiComponent, is(generate));
         assertThat(gen.getLibrary(), is("resttemplate"));
-        assertThat(apiType.getAnnotationByName("Component").isPresent(), is(generate));
     }
 }

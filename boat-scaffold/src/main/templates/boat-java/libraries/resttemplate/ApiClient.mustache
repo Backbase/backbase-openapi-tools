@@ -29,7 +29,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 {{/withXml}}
+{{#createApiComponent}}
 import org.springframework.stereotype.Component;
+{{/createApiComponent}}
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -84,7 +86,9 @@ import {{invokerPackage}}.auth.OAuth;
 {{/hasOAuthMethods}}
 
 {{>generatedAnnotation}}
+{{#createApiComponent}}
 @Component("{{invokerPackage}}.ApiClient")
+{{/createApiComponent}}
 public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
     public enum CollectionFormat {
         CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);
