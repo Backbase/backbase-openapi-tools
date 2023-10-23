@@ -58,17 +58,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         this.supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", this.sourceFolder, "AnyCodable.swift"));
     }
 
-//    @Override
-//    protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel,
-//                                                       Schema schema) {
-//
-//        final Schema additionalProperties = ModelUtils.getAdditionalProperties(openAPI, schema);
-//
-//        if (additionalProperties != null) {
-//            codegenModel.additionalPropertiesType = getSchemaType(additionalProperties);
-//        }
-//    }
-
     // Fix issues with generating arrays with Set.
     @Override
     public String getTypeDeclaration(Schema p) {
@@ -79,17 +68,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         }
         return super.getTypeDeclaration(p);
     }
-
-//    public String toInstantiationType(Schema p) {
-//        if (ModelUtils.isMapSchema(p)) {
-//            return getSchemaType(ModelUtils.getAdditionalProperties(openAPI, p));
-//        } else if (ModelUtils.isArraySchema(p)) {
-//            ArraySchema ap = (ArraySchema) p;
-//            String inner = getSchemaType(ap.getItems());
-//            return "[" + inner + "]";
-//        }
-//        return null;
-//    }
 
     @Override
     public CodegenModel fromModel(String name, Schema model) {
