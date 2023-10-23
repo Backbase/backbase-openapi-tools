@@ -1,8 +1,13 @@
 package org.openapitools.codegen.languages;
 
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.*;
 
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
@@ -28,14 +33,9 @@ public class BoatSwift5CodegenTests {
 
     @Test
     public void testProcessOptsSetDBSDataProvider() {
-        
         boatSwift5CodeGen.setLibrary("dbsDataProvider");
-
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
-
-//        assertThat(boatSwift5CodeGen.additionalProperties(), hasEntry("useDBSDataProvider", true));
-
     }
     @Test
     public void testGetTypeDeclaration() {
@@ -131,18 +131,14 @@ public class BoatSwift5CodegenTests {
 
     @Test
     public void prefixTest() {
-
         boatSwift5CodeGen.setModelNamePrefix("API");
-
         final String result = boatSwift5CodeGen.toModelName("MyType");
         assertEquals(result, "APIMyType");
     }
 
     @Test
     public void suffixTest() {
-
         boatSwift5CodeGen.setModelNameSuffix("API");
-
         final String result = boatSwift5CodeGen.toModelName("MyType");
         assertEquals(result, "MyTypeAPI");
     }
@@ -150,10 +146,8 @@ public class BoatSwift5CodegenTests {
     @Test
     public void testDefaultPodAuthors() throws Exception {
         // Given
-
         // When
         boatSwift5CodeGen.processOpts();
-
         // Then
         final String podAuthors = (String) boatSwift5CodeGen.additionalProperties().get(Swift5ClientCodegen.POD_AUTHORS);
         assertEquals(podAuthors, Swift5ClientCodegen.DEFAULT_POD_AUTHORS);
@@ -171,6 +165,26 @@ public class BoatSwift5CodegenTests {
         // Then
         final String podAuthors = (String) boatSwift5CodeGen.additionalProperties().get(Swift5ClientCodegen.POD_AUTHORS);
         assertEquals(podAuthors, openAPIDevs);
+    }
+
+    @Test
+    public void testFromModel() {
+        final Schema schema = new Schema()
+                .description("a sample model")
+                .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
+                .addProperty("name", new StringSchema())
+                .addProperty("createdAt", new DateTimeSchema())
+                .addProperty("binary", new BinarySchema())
+                .addProperty("byte", new ByteArraySchema())
+                .addProperty("uuid", new UUIDSchema())
+                .addProperty("dateOfBirth", new DateSchema())
+                .addRequiredItem("id")
+                .addRequiredItem("name")
+                .discriminator(new Discriminator().propertyName("test"));
+
+        OpenAPI openAPI = createOpenAPIWithOneSchema("sample", schema);
+        final CodegenModel cm = boatSwift5CodeGen.fromModel("sample", schema);
+
     }
 
     @Test
@@ -211,5 +225,28 @@ public class BoatSwift5CodegenTests {
         modelMaps.add(modelMap);
         objs.setModels(modelMaps);
         return objs;
+    }
+
+    static OpenAPI createOpenAPIWithOneSchema(String name, Schema schema) {
+        OpenAPI openAPI = createOpenAPI();
+        openAPI.setComponents(new Components());
+        openAPI.getComponents().addSchemas(name, schema);
+        return openAPI;
+    }
+    static OpenAPI createOpenAPI() {
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.setComponents(new Components());
+        openAPI.setPaths(new Paths());
+
+        final Info info = new Info();
+        info.setDescription("API under test");
+        info.setVersion("1.0.7");
+        info.setTitle("My title");
+        openAPI.setInfo(info);
+
+        final Server server = new Server();
+        server.setUrl("https://localhost:9999/root");
+        openAPI.setServers(Collections.singletonList(server));
+        return openAPI;
     }
 }
