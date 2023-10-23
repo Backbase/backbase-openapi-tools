@@ -169,21 +169,46 @@ public class BoatSwift5CodegenTests {
 
     @Test
     public void testFromModel() {
+        final ByteArraySchema byteArraySchema = new ByteArraySchema();
+//        byteArraySchema.se
+//        byteArray.addf
+        CodegenProperty codegenProperty = new CodegenProperty();
+        codegenProperty.isMap = true;
+        codegenProperty.isFreeFormObject = true;
+
+        final CodegenModel parent = new CodegenModel();
+        parent.setName("parent");
+        parent.classname = "parent";
+        parent.parentSchema = "sample";
+
+
+        List<CodegenProperty> codegenProperties = new ArrayList<>();
+        codegenProperties.add(codegenProperty);
+
+        parent.setAllVars(codegenProperties);
+
+
+
         final Schema schema = new Schema()
                 .description("a sample model")
                 .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
                 .addProperty("name", new StringSchema())
                 .addProperty("createdAt", new DateTimeSchema())
                 .addProperty("binary", new BinarySchema())
-                .addProperty("byte", new ByteArraySchema())
+                .addProperty("byte", byteArraySchema)
                 .addProperty("uuid", new UUIDSchema())
                 .addProperty("dateOfBirth", new DateSchema())
                 .addRequiredItem("id")
                 .addRequiredItem("name")
+                .name("sample")
                 .discriminator(new Discriminator().propertyName("test"));
 
-        OpenAPI openAPI = createOpenAPIWithOneSchema("sample", schema);
+        parent.setTypeProperties(schema);
+
         final CodegenModel cm = boatSwift5CodeGen.fromModel("sample", schema);
+        assertEquals(schema.getName(), cm.name);
+        assertTrue(cm.hasRequired);
+
 
     }
 
