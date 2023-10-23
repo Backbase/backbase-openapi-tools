@@ -1073,7 +1073,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
      * config.additionalProperties (configuration/configOptions) to proper booleans.
      * This enables mustache files to handle the properties better.
      *
-     * @param config CodeGen configms
+     * @param config CodeGen config
      */
     private void adjustAdditionalProperties(final CodegenConfig config) {
         Map<String, Object> configAdditionalProperties = config.additionalProperties();
