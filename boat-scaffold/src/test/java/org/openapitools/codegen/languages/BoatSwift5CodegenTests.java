@@ -183,6 +183,9 @@ public class BoatSwift5CodegenTests {
 
         final ArraySchema nestedArraySchema = new ArraySchema().items(new ObjectSchema());
 
+        final MapSchema mapSchema = new MapSchema();
+        mapSchema.additionalProperties(objectSchema);
+
         final Schema schema = new Schema()
                 .description("a sample model")
                 .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
@@ -194,6 +197,7 @@ public class BoatSwift5CodegenTests {
                 .addProperty("dateOfBirth", new DateSchema())
                 .addProperty("content", objectSchema)
                 .addProperty("nested", nestedArraySchema)
+                .addProperty("map", mapSchema)
                 .addRequiredItem("id")
                 .addRequiredItem("name")
                 .name("sample")
@@ -206,7 +210,7 @@ public class BoatSwift5CodegenTests {
         assertEquals(cm.name, "sample");
         assertEquals(cm.classname, "Sample");
         assertEquals(cm.description, "a sample model");
-        assertEquals(cm.vars.size(), 9);
+        assertEquals(cm.vars.size(), 10);
         assertEquals(cm.getDiscriminatorName(),"test");
 
         final CodegenProperty property1 = cm.vars.get(0);

@@ -103,7 +103,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     */
     private void fixFreeFormObject(List<CodegenProperty> codegenProperties) {
         for (CodegenProperty codegenProperty : codegenProperties) {
-            System.out.println("Received: " + codegenProperty);
             if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
                 codegenProperty.isFreeFormObject = false;
             }
