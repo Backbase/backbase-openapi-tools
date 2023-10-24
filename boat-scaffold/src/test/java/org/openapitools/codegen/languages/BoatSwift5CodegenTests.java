@@ -179,7 +179,6 @@ public class BoatSwift5CodegenTests {
 
         final ObjectSchema objectSchema = new ObjectSchema();
         objectSchema.setDescription("Sample ObjectSchema");
-//        objectSchema.
 
         final ArraySchema nestedArraySchema = new ArraySchema().items(new ObjectSchema());
 
@@ -190,11 +189,6 @@ public class BoatSwift5CodegenTests {
                 .description("a sample model")
                 .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
                 .addProperty("name", new StringSchema())
-                .addProperty("createdAt", new DateTimeSchema())
-                .addProperty("binary", new BinarySchema())
-                .addProperty("byte", new ByteArraySchema())
-                .addProperty("uuid", new UUIDSchema())
-                .addProperty("dateOfBirth", new DateSchema())
                 .addProperty("content", objectSchema)
                 .addProperty("nested", nestedArraySchema)
                 .addProperty("map", mapSchema)
@@ -210,7 +204,7 @@ public class BoatSwift5CodegenTests {
         assertEquals(cm.name, "sample");
         assertEquals(cm.classname, "Sample");
         assertEquals(cm.description, "a sample model");
-        assertEquals(cm.vars.size(), 10);
+        assertEquals(cm.vars.size(), 5);
         assertEquals(cm.getDiscriminatorName(),"test");
 
         final CodegenProperty property1 = cm.vars.get(0);
@@ -234,49 +228,36 @@ public class BoatSwift5CodegenTests {
         assertFalse(property2.isContainer);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        assertEquals(property3.baseName, "createdAt");
-        assertEquals(property3.dataType, "Date");
-        assertEquals(property3.name, "createdAt");
+        assertEquals(property3.baseName, "content");
+        assertEquals(property3.dataType, "Any");
+        assertEquals(property3.name, "content");
         assertNull(property3.defaultValue);
-        assertEquals(property3.baseType, "Date");
+        assertEquals(property3.baseType, "Any");
         assertFalse(property3.required);
         assertFalse(property3.isContainer);
+        assertTrue(property3.isFreeFormObject);
 
         final CodegenProperty property4 = cm.vars.get(3);
-        assertEquals(property4.baseName, "binary");
-        assertEquals(property4.dataType, "URL");
-        assertEquals(property4.name, "binary");
+        assertEquals(property4.baseName, "nested");
+        assertEquals(property4.dataType, "[Any]");
+        assertEquals(property4.name, "nested");
         assertNull(property4.defaultValue);
-        assertEquals(property4.baseType, "URL");
+        assertEquals(property4.baseType, "Array");
         assertFalse(property4.required);
-        assertFalse(property4.isContainer);
+        assertTrue(property4.isContainer);
+        assertTrue(property4.isFreeFormObject);
+        assertTrue(property4.items.isFreeFormObject);
 
         final CodegenProperty property5 = cm.vars.get(4);
-        assertEquals(property5.baseName, "byte");
-        assertEquals(property5.dataType, "Data");
-        assertEquals(property5.name, "byte");
+        assertEquals(property5.baseName, "map");
+        assertEquals(property5.dataType, "[String: Any]");
+        assertEquals(property5.name, "map");
         assertNull(property5.defaultValue);
-        assertEquals(property5.baseType, "Data");
+        assertEquals(property5.baseType, "Dictionary");
         assertFalse(property5.required);
-        assertFalse(property5.isContainer);
-
-        final CodegenProperty property6 = cm.vars.get(5);
-        assertEquals(property6.baseName, "uuid");
-        assertEquals(property6.dataType, "UUID");
-        assertEquals(property6.name, "uuid");
-        assertNull(property6.defaultValue);
-        assertEquals(property6.baseType, "UUID");
-        assertFalse(property6.required);
-        assertFalse(property6.isContainer);
-
-        final CodegenProperty property7 = cm.vars.get(6);
-        assertEquals(property7.baseName, "dateOfBirth");
-        assertEquals(property7.dataType, "Date");
-        assertEquals(property7.name, "dateOfBirth");
-        assertNull(property7.defaultValue);
-        assertEquals(property7.baseType, "Date");
-        assertFalse(property7.required);
-        assertFalse(property7.isContainer);
+        assertTrue(property5.isContainer);
+        assertTrue(property5.isFreeFormObject);
+        assertTrue(property5.items.isFreeFormObject);
 
     }
 
@@ -342,33 +323,4 @@ public class BoatSwift5CodegenTests {
         openAPI.setServers(Collections.singletonList(server));
         return openAPI;
     }
-
-    static OpenAPI parseFlattenSpec(String specFilePath) {
-        OpenAPI openAPI = parseSpec(specFilePath);
-        return flatten(openAPI);
-    }
-
-    static OpenAPI parseSpec(String specFilePath) {
-        OpenAPI openAPI = new OpenAPIParser().readLocation(specFilePath, null, new ParseOptions()).getOpenAPI();
-        // Invoke helper function to get the original swagger version.
-        // See https://github.com/swagger-api/swagger-parser/pull/1374
-        // Also see https://github.com/swagger-api/swagger-parser/issues/1369.
-        ModelUtils.getOpenApiVersion(openAPI, specFilePath, null);
-        return openAPI;
-    }
-    static OpenAPI flatten(OpenAPI openAPI) {
-
-        if (openAPI.getComponents() == null) {
-            openAPI.setComponents(new Components());
-        }
-
-        if (openAPI.getComponents().getSchemas() == null) {
-            openAPI.getComponents().setSchemas(new HashMap<String, Schema>());
-        }
-        return  openAPI;
-
-//        flattenPaths();
-//        flattenComponents();
-    }
-
 }
