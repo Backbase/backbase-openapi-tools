@@ -771,30 +771,30 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             GlobalSettings.setProperty(CodegenConstants.WITH_XML, withXml.toString());
 
             if (configOptions != null) {
-                // Retained for backwards-compataibility with configOptions -> instantiation-types
+                // Retained for backwards-compatibility with configOptions -> instantiation-types
                 if (instantiationTypes == null && configOptions.containsKey(INSTANTIATION_TYPES)) {
                     applyInstantiationTypesKvp(configOptions.get(INSTANTIATION_TYPES).toString(),
                         configurator);
                 }
 
-                // Retained for backwards-compataibility with configOptions -> import-mappings
+                // Retained for backwards-compatibility with configOptions -> import-mappings
                 if (importMappings == null && configOptions.containsKey(IMPORT_MAPPINGS)) {
                     applyImportMappingsKvp(configOptions.get(IMPORT_MAPPINGS).toString(),
                         configurator);
                 }
 
-                // Retained for backwards-compataibility with configOptions -> type-mappings
+                // Retained for backwards-compatibility with configOptions -> type-mappings
                 if (typeMappings == null && configOptions.containsKey(TYPE_MAPPINGS)) {
                     applyTypeMappingsKvp(configOptions.get(TYPE_MAPPINGS).toString(), configurator);
                 }
 
-                // Retained for backwards-compataibility with configOptions -> language-specific-primitives
+                // Retained for backwards-compatibility with configOptions -> language-specific-primitives
                 if (languageSpecificPrimitives == null && configOptions.containsKey(LANGUAGE_SPECIFIC_PRIMITIVES)) {
                     applyLanguageSpecificPrimitivesCsv(configOptions
                         .get(LANGUAGE_SPECIFIC_PRIMITIVES).toString(), configurator);
                 }
 
-                // Retained for backwards-compataibility with configOptions -> additional-properties
+                // Retained for backwards-compatibility with configOptions -> additional-properties
                 if (additionalProperties == null && configOptions.containsKey(ADDITIONAL_PROPERTIES)) {
                     applyAdditionalPropertiesKvp(configOptions.get(ADDITIONAL_PROPERTIES).toString(),
                         configurator);
@@ -804,7 +804,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                     applyServerVariablesKvp(configOptions.get(SERVER_VARIABLES).toString(), configurator);
                 }
 
-                // Retained for backwards-compataibility with configOptions -> reserved-words-mappings
+                // Retained for backwards-compatibility with configOptions -> reserved-words-mappings
                 if (reservedWordsMappings == null && configOptions.containsKey(RESERVED_WORDS_MAPPINGS)) {
                     applyReservedWordsMappingsKvp(configOptions.get(RESERVED_WORDS_MAPPINGS)
                         .toString(), configurator);
@@ -960,8 +960,8 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     /**
      * Calculate openapi specification file hash. If specification is hosted on remote resource it is downloaded first
      *
-     * @param inputSpecFile - Openapi specification input file to calculate it's hash.
-     *                      Does not taken into account if input spec is hosted on remote resource
+     * @param inputSpecFile - Openapi specification input file to calculate its hash.
+     *                      Does not take into account if input spec is hosted on remote resource
      * @return openapi specification file hash
      * @throws IOException When cannot read the file
      */
@@ -1019,8 +1019,8 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     /**
      * Get specification hash file.
      *
-     * @param inputSpecFile - Openapi specification input file  to calculate it's hash.
-     *                      Does not taken into account if input spec is hosted on remote resource
+     * @param inputSpecFile - Openapi specification input file  to calculate its hash.
+     *                      Does not take into account if input spec is hosted on remote resource
      * @return a file with previously calculated hash
      */
     private File getHashFile(File inputSpecFile) {
@@ -1073,7 +1073,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
      * config.additionalProperties (configuration/configOptions) to proper booleans.
      * This enables mustache files to handle the properties better.
      *
-     * @param config GodeGen config
+     * @param config CodeGen config
      */
     private void adjustAdditionalProperties(final CodegenConfig config) {
         Map<String, Object> configAdditionalProperties = config.additionalProperties();

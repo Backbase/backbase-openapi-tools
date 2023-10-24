@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -31,6 +32,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
         // Set the default template directory
         embeddedTemplateDir = templateDir = getName();
+
+        // Type mappings //
+        this.typeMapping.remove("object");
+        this.typeMapping.remove("AnyType");
+        this.typeMapping.put("object", "Any");
+        this.typeMapping.put("AnyType", "Any");
     }
 
     @Override
@@ -60,6 +67,53 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             return "[" + getTypeDeclaration(inner) + "]";
         }
         return super.getTypeDeclaration(p);
+    }
+
+    @Override
+    public CodegenModel fromModel(String name, Schema model) {
+        Map<String, Schema> allDefinitions = ModelUtils.getSchemas(this.openAPI);
+        CodegenModel codegenModel = super.fromModel(name, model);
+        if (codegenModel.description != null) {
+            codegenModel.imports.add("ApiModel");
+        }
+
+        fixAllFreeFormObject(codegenModel);
+
+        return codegenModel;
+    }
+
+    /*
+    This is added as a compatibility requirement for API specs containing free form objects
+    missing `additionalProperties` property
+     */
+    private void fixAllFreeFormObject(CodegenModel codegenModel) {
+        this.fixFreeFormObject(codegenModel.vars);
+        this.fixFreeFormObject(codegenModel.optionalVars);
+        this.fixFreeFormObject(codegenModel.requiredVars);
+        this.fixFreeFormObject(codegenModel.parentVars);
+        this.fixFreeFormObject(codegenModel.allVars);
+        this.fixFreeFormObject(codegenModel.readOnlyVars);
+        this.fixFreeFormObject(codegenModel.readWriteVars);
+    }
+
+    /*
+     If a property has both isFreeFormObject and isMapContainer true make isFreeFormObject false
+     This way when we have a free form object in the spec that has a typed value it will be
+     treated as a Dictionary
+    */
+    private void fixFreeFormObject(List<CodegenProperty> codegenProperties) {
+        for (CodegenProperty codegenProperty : codegenProperties) {
+            if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
+                codegenProperty.isFreeFormObject = false;
+            }
+
+            if (codegenProperty.isArray && codegenProperty.items.isFreeFormObject) {
+                codegenProperty.isFreeFormObject = true;
+                if (codegenProperty.additionalProperties == null) {
+                    codegenProperty.isMap = false;
+                }
+            }
+        }
     }
 
     // Fix for inheritance bug
@@ -113,7 +167,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     @Override
     public void postProcess() {
         System.out.println("################################################################################");
-        System.out.println("# Thanks for using BOAT Swift OpenAPI Generator.                                          #");
+        System.out.println("# Thanks for using BOAT Swift 5 OpenAPI Generator.                                          #");
         System.out.println("################################################################################");
     }
 
