@@ -185,6 +185,10 @@ public class BoatSwift5CodegenTests {
         final MapSchema mapSchema = new MapSchema();
         mapSchema.additionalProperties(objectSchema);
 
+        final MapSchema mapSchema1 = new MapSchema();
+        mapSchema1.setDescription("Sample ObjectSchema");
+        mapSchema1.additionalProperties(new StringSchema());
+
         final Schema schema = new Schema()
                 .description("a sample model")
                 .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
@@ -192,6 +196,7 @@ public class BoatSwift5CodegenTests {
                 .addProperty("content", objectSchema)
                 .addProperty("nested", nestedArraySchema)
                 .addProperty("map", mapSchema)
+                .addProperty("secondMap", mapSchema1)
                 .addRequiredItem("id")
                 .addRequiredItem("name")
                 .name("sample")
@@ -204,7 +209,7 @@ public class BoatSwift5CodegenTests {
         assertEquals(cm.name, "sample");
         assertEquals(cm.classname, "Sample");
         assertEquals(cm.description, "a sample model");
-        assertEquals(cm.vars.size(), 5);
+        assertEquals(cm.vars.size(), 6);
         assertEquals(cm.getDiscriminatorName(),"test");
 
         final CodegenProperty property1 = cm.vars.get(0);
@@ -257,7 +262,20 @@ public class BoatSwift5CodegenTests {
         assertFalse(property5.required);
         assertTrue(property5.isContainer);
         assertTrue(property5.isFreeFormObject);
+        assertTrue(property5.isMap);
         assertTrue(property5.items.isFreeFormObject);
+
+        final CodegenProperty property6 = cm.vars.get(5);
+        assertEquals(property6.baseName, "secondMap");
+        assertEquals(property6.dataType, "[String: String]");
+        assertEquals(property6.name, "secondMap");
+        assertNull(property6.defaultValue);
+        assertEquals(property6.baseType, "Dictionary");
+        assertFalse(property6.required);
+        assertTrue(property6.isContainer);
+        assertTrue(property6.isMap);
+        assertFalse(property6.isFreeFormObject);
+        assertFalse(property6.items.isFreeFormObject);
 
     }
 
