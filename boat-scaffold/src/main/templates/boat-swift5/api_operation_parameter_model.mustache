@@ -1,33 +1,33 @@
 {{#allParams}}
-    {{#isEnum}}
-        {{> modelInlineEnumDeclaration}}
-    {{/isEnum}}
+{{#isEnum}}
+    {{> modelInlineEnumDeclaration}}
+{{/isEnum}}
 {{/allParams}}
 {{#allParams}}
-    {{#isEnum}}
-        {{#description}}/** {{description}} */
-        {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} let {{paramName}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}
-    {{/isEnum}}
-    {{^isEnum}}
-        {{#description}}/** {{description}} */
-        {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} let {{paramName}}: {{{dataType}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}
-        {{#objcCompatible}}
-            {{#vendorExtensions.x-swift-optional-scalar}}
-                {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{paramName}}Num: NSNumber? {
-                get {
-                return {{paramName}}.map({ return NSNumber(value: $0) })
-                }
-                }
-            {{/vendorExtensions.x-swift-optional-scalar}}
-        {{/objcCompatible}}
-    {{/isEnum}}
+{{#isEnum}}
+    {{#description}}/** {{description}} */
+    {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} let {{paramName}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}
+{{/isEnum}}
+{{^isEnum}}
+    {{#description}}/** {{description}} */
+    {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} let {{paramName}}: {{{dataType}}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{/required}}
+    {{#objcCompatible}}
+    {{#vendorExtensions.x-swift-optional-scalar}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{paramName}}Num: NSNumber? {
+        get {
+            return {{paramName}}.map({ return NSNumber(value: $0) })
+        }
+    }
+    {{/vendorExtensions.x-swift-optional-scalar}}
+    {{/objcCompatible}}
+{{/isEnum}}
 {{/allParams}}
 
 {{#hasParams}}
     internal init({{#allParams}}{{paramName}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{^-last}}, {{/-last}}{{/allParams}}) {
-    {{#allParams}}
+        {{#allParams}}
         self.{{paramName}} = {{paramName}}
-    {{/allParams}}
+        {{/allParams}}
     }
 {{/hasParams}}
 {{#hasParams}}
@@ -36,47 +36,47 @@
     {{#allParams}}
         {{#description}}/** {{description}} */
         {{/description}}{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} {{#required}}let{{/required}}{{^required}}private(set) var{{/required}} {{> api_param_builder}}{{#required}}{{#isNullable}}?{{/isNullable}}{{/required}}{{^required}}?{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/required}}
-        {{^isEnum}}
-            {{#objcCompatible}}
-                {{#vendorExtensions.x-swift-optional-scalar}}
-                    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{paramName}}Num: NSNumber? {
-                    get {
-                    return {{paramName}}.map({ return NSNumber(value: $0) })
-                    }
-                    }
-                {{/vendorExtensions.x-swift-optional-scalar}}
-            {{/objcCompatible}}
-        {{/isEnum}}
+    {{^isEnum}}
+        {{#objcCompatible}}
+        {{#vendorExtensions.x-swift-optional-scalar}}
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var {{paramName}}Num: NSNumber? {
+            get {
+                return {{paramName}}.map({ return NSNumber(value: $0) })
+            }
+        }
+        {{/vendorExtensions.x-swift-optional-scalar}}
+        {{/objcCompatible}}
+    {{/isEnum}}
     {{/allParams}}
 
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init({{#requiredParams}}{{^-first}}, {{/-first}}{{> api_param_builder}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/requiredParams}}) {
-    {{#requiredParams}}
-        self.{{paramName}} = {{paramName}}
-    {{/requiredParams}}
-    }
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init({{#requiredParams}}{{^-first}}, {{/-first}}{{> api_param_builder}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/requiredParams}}) {
+            {{#requiredParams}}
+            self.{{paramName}} = {{paramName}}
+            {{/requiredParams}}
+        }
 
     {{#optionalParams}}
         /// Setter method for {{paramName}} property.
         {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func set({{> api_param_builder}}?) -> Self {
-        self.{{paramName}} = {{paramName}}
-        return self
+            self.{{paramName}} = {{paramName}}
+            return self
         }
     {{/optionalParams}}
 
-    /// Builder initializer method for {{operationIdCamelCase}}RequestParams DTO.
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func build() -> {{operationIdCamelCase}}RequestParams {
-    return {{operationIdCamelCase}}RequestParams({{#allParams}}{{paramName}}: {{paramName}}{{^-last}},
-    {{/-last}}{{/allParams}})
-    }
+        /// Builder initializer method for {{operationIdCamelCase}}RequestParams DTO.
+        {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func build() -> {{operationIdCamelCase}}RequestParams {
+            return {{operationIdCamelCase}}RequestParams({{#allParams}}{{paramName}}: {{paramName}}{{^-last}}, 
+            		{{/-last}}{{/allParams}})
+        }
 
-    public static func ==(lhs: Builder, rhs: Builder) -> Bool {
-    return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
-    {{/-last}}{{/allParams}}
-    }
+        public static func ==(lhs: Builder, rhs: Builder) -> Bool {
+        	return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
+        	{{/-last}}{{/allParams}}
+    	}
     }
 {{/hasParams}}
 
 public static func ==(lhs: Self, rhs: Self) -> Bool {
-return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
-{{/-last}}{{/allParams}}
+    return {{^hasParams}}true{{/hasParams}}{{#allParams}}{{#isFreeFormObject}}AnyCodable(lhs.{{paramName}}) == AnyCodable(rhs.{{paramName}}){{/isFreeFormObject}}{{^isFreeFormObject}}lhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}} == rhs.{{paramName}}{{#isArray}}{{^required}}?{{/required}}.description{{/isArray}}{{/isFreeFormObject}}{{^-last}} &&
+    {{/-last}}{{/allParams}}
 }
