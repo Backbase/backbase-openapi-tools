@@ -8,8 +8,10 @@
  */
 {{#hasParams}}@DataApi {{/hasParams}}class {{{operationIdCamelCase}}} internal constructor(
   {{#allParams}}
+ {{#isModel}}
+ val {{{paramName}}}: {{modelPackage}}.{{{dataType}}}{{^required}}? = null{{/required}},{{/isModel}} {{^isModel}}
+ val {{{paramName}}}: {{{dataType}}}{{^required}}? = null{{/required}}, {{/isModel}}
 
-  val {{{paramName}}}: {{{dataType}}}{{^required}}? = null{{/required}},
 
   {{#isMultipart}}
   {{#isFormParam}}
@@ -35,7 +37,9 @@
 
   class Builder {
     {{#allParams}}
-    var {{{paramName}}}: {{{dataType}}}? = null
+    {{#isModel}}
+    var {{{paramName}}}: {{modelPackage}}.{{{dataType}}}? = null {{/isModel}} {{^isModel}}
+    var {{{paramName}}}: {{{dataType}}}? = null {{/isModel}}
     {{#isMultipart}}
     {{#isFormParam}}
     {{^isFile}}
