@@ -24,7 +24,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <feign-version>13.0</feign-version>
+        <feign-version>13.1</feign-version>
         <feign-form-version>3.8.0</feign-form-version>
         <jackson-threetenbp-version>2.15.2</jackson-threetenbp-version>
         <scribejava-version>8.3.3</scribejava-version>
