@@ -1,12 +1,7 @@
 package com.backbase.oss.boat;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -18,6 +13,8 @@ import org.openapitools.openapidiff.core.output.ConsoleRender;
 import org.openapitools.openapidiff.core.output.HtmlRender;
 import org.openapitools.openapidiff.core.output.MarkdownRender;
 import org.openapitools.openapidiff.core.output.Render;
+
+import java.io.*;
 
 /**
  * Calculates a Change log for APIs.
@@ -52,12 +49,12 @@ public class DiffMojo extends AbstractMojo {
 
         ConsoleRender consoleRender = new ConsoleRender();
         if (changedOpenApi.isIncompatible()) {
-            log.error("\n{}", consoleRender.render(changedOpenApi));
+            log.error("\n{}", renderChangedOpenApi(consoleRender, changedOpenApi));
             if (breakOnBreakingChanges) {
                 throw new MojoExecutionException("newFile: " + newFile + " contains breaking changes!");
             }
         } else {
-            log.info("\n{}", consoleRender.render(changedOpenApi));
+            log.info("\n{}", renderChangedOpenApi(consoleRender, changedOpenApi));
         }
 
         if (writeChangelog) {
@@ -73,13 +70,23 @@ public class DiffMojo extends AbstractMojo {
             } else {
                 throw new MojoExecutionException("Invalid changelogRender. Supported types are 'markdown' and 'html");
             }
-            try {
-                FileUtils.write(new File(changelogOutput, "changelog." + extension), render.render(changedOpenApi), StandardCharsets.UTF_8);
+            File output = new File(changelogOutput, "changelog." + extension);
+            try (FileOutputStream outputStream = new FileOutputStream(output)) {
+                render.render(changedOpenApi, new OutputStreamWriter(outputStream));
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to write output", e);
             }
         }
 
+    }
+
+    public static String renderChangedOpenApi(Render render, ChangedOpenApi changedOpenApi) {
+        try (OutputStream outputStream = new ByteArrayOutputStream()) {
+            render.render(changedOpenApi, new OutputStreamWriter(outputStream));
+            return outputStream.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setNewFile(File newFile) {
