@@ -17,6 +17,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -354,9 +355,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         writePropertyBack(USE_PROTECTED_FIELDS, this.useProtectedFields);
 
 
-        this.additionalProperties.put("indent4", new IndentedLambda(4, " "));
+        this.additionalProperties.put("indent4", new IndentedLambda(4, " ", true, true));
         this.additionalProperties.put("newLine4", new NewLineIndent(4, " "));
-        this.additionalProperties.put("indent8", new IndentedLambda(8, " "));
+        this.additionalProperties.put("indent8", new IndentedLambda(8, " ", true, true));
         this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
         this.additionalProperties.put("toOneLine", new FormatToOneLine());
         this.additionalProperties.put("trimAndIndent4", new TrimAndIndent(4, " "));
@@ -381,6 +382,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
      */
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        if (operation.getExtensions() == null) {
+            operation.setExtensions(new LinkedHashMap<>());
+        }
         final CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
         if (this.addServletRequest) {
             final CodegenParameter codegenParameter = new CodegenParameter() {
