@@ -1,10 +1,21 @@
 package com.backbase.oss.boat.diff;
 
+import com.backbase.oss.boat.DiffMojo;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.openapitools.openapidiff.core.compare.OpenApiDiff;
+import org.openapitools.openapidiff.core.compare.OpenApiDiffOptions;
+import org.openapitools.openapidiff.core.model.ChangedOpenApi;
+import org.openapitools.openapidiff.core.output.MarkdownRender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,14 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.openapitools.openapidiff.core.compare.OpenApiDiff;
-import org.openapitools.openapidiff.core.model.ChangedOpenApi;
-import org.openapitools.openapidiff.core.output.MarkdownRender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @UtilityClass
 public class BatchOpenApiDiff {
@@ -44,6 +47,7 @@ public class BatchOpenApiDiff {
             .sorted(BatchOpenApiDiff::sortVersions)
             .collect(Collectors.toList());
 
+        OpenApiDiffOptions diffOptions = OpenApiDiffOptions.builder().build();
         for (int i = 1; i < sortedSpecs.size(); i++) {
             Pair<Path,OpenAPI> oldVersionPair = sortedSpecs.get(i-1);
             Pair<Path,OpenAPI> newVersionPair = sortedSpecs.get(i);
@@ -53,7 +57,7 @@ public class BatchOpenApiDiff {
             Path newOpenAPIPath = newVersionPair.getKey();
 
             try {
-                ChangedOpenApi compare = OpenApiDiff.compare(oldOpenAPI, newOpenAPI);
+                ChangedOpenApi compare = OpenApiDiff.compare(oldOpenAPI, newOpenAPI, diffOptions);
                 List<ChangedOpenApi> changeLog = getChangeLog(oldOpenAPI);
                 changeLog.add(compare);
                 String changelogMarkdown = renderChangeLog(changeLog);
@@ -126,7 +130,7 @@ public class BatchOpenApiDiff {
                 if (diff.isIncompatible()) {
                     markDown.append("**Note:** API has incompatible changes!!\n");
                 }
-                String changes = BatchOpenApiDiff.markdownRender.render(diff);
+                String changes = DiffMojo.renderChangedOpenApi(markdownRender, diff);
                 markDown.append(changes);
             }
         });
