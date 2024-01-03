@@ -80,12 +80,13 @@ public class DiffMojo extends AbstractMojo {
 
     }
 
-    public static String renderChangedOpenApi(Render render, ChangedOpenApi changedOpenApi) {
+    public static String renderChangedOpenApi(
+            Render render, ChangedOpenApi changedOpenApi) throws MojoExecutionException {
         try (OutputStream outputStream = new ByteArrayOutputStream()) {
             render.render(changedOpenApi, new OutputStreamWriter(outputStream));
             return outputStream.toString();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MojoExecutionException(e);
         }
     }
 

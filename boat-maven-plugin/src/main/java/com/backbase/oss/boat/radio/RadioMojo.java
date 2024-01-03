@@ -9,12 +9,6 @@ import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import feign.auth.BasicAuthRequestInterceptor;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -27,6 +21,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -140,77 +140,66 @@ public class RadioMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        BasicAuthRequestInterceptor basicAuthRequestInterceptor = null;
-
-        ObjectMapper objectMapper = JsonMapper.builder()
-            .findAndAddModules()
-            .build();
-
-        if (StringUtils.isNotEmpty(boatBayUsername) && StringUtils.isNotEmpty(boatBayPassword)) {
-            getLog().info("Basic Authentication set for username " + boatBayUsername);
-            basicAuthRequestInterceptor = new BasicAuthRequestInterceptor(boatBayUsername, boatBayPassword);
-        } else {
-            getLog().info("No Authentication set");
-        }
-
-        List<UploadSpec> allSpecs = new ArrayList<>();
-
-        for (SpecConfig spec : specs) {
-            allSpecs.add(mapToUploadSpec(spec));
-        }
-
         ApiClient apiClient = new ApiClient().setBasePath(boatBayUrl);
-        if (basicAuthRequestInterceptor != null) {
-            apiClient.addAuthorization("Basic Auth", basicAuthRequestInterceptor);
-        }
-
+        applyAuth(apiClient);
         BoatMavenPluginApi api = apiClient.buildClient(BoatMavenPluginApi.class);
 
         UploadRequestBody uploadRequestBody = UploadRequestBody.builder()
-                .groupId(groupId).artifactId(artifactId).version(version).specs(allSpecs).build();
-
-        List<BoatLintReport> reports =null;
-        try {
-            reports = api.uploadSpec(portalKey, sourceKey, uploadRequestBody);
-        }catch (Exception e){
-            getLog().error("BoatBay error :: " + e.getMessage());
-            if(failOnBoatBayErrorResponse)
-                throw new MojoFailureException("BoatBay error", e);
+                .groupId(groupId).artifactId(artifactId).version(version).build();
+        for (SpecConfig spec : specs) {
+            uploadRequestBody.getSpecs().add(mapToUploadSpec(spec));
         }
 
-        // Process Result
-        if(reports!=null) {
-            try {
-                File outputFile = new File(getOutput(), "radioOutput.json");
-                objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
-                // Log summary of report
-                reports.forEach(report -> {
-                    getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
-                    getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
-                    getLog().info("Number of Violations:" + report.getViolations().size());
-                });
-                // Log link to reports
-                getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
+        try {
+            List<BoatLintReport> reports = api.uploadSpec(portalKey, sourceKey, uploadRequestBody);
+            writeReportFile(reports);
 
-                if (failOnBreakingChange) {
-                    boolean doesSpecsHaveBreakingChanges = reports.stream()
-                            .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
-                    if (doesSpecsHaveBreakingChanges)
-                        throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
-                }
+            if (failOnBreakingChange) {
+                boolean doesSpecsHaveBreakingChanges = reports.stream()
+                        .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
+                if (doesSpecsHaveBreakingChanges)
+                    throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
+            }
 
-                if (failOnLintViolation) {
-                    boolean doesSpecsHaveMustViolations = reports.stream()
-                            .anyMatch(report -> report.getViolations().stream()
-                                    .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
-                    if (doesSpecsHaveMustViolations)
-                        throw new MojoFailureException("Specs have Must Violations. Check full report.");
-                }
-            } catch (IOException e) {
-                throw new MojoFailureException("Failed to write output", e);
+            if (failOnLintViolation) {
+                boolean doesSpecsHaveMustViolations = reports.stream()
+                        .anyMatch(report -> report.getViolations().stream()
+                                .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
+                if (doesSpecsHaveMustViolations)
+                    throw new MojoFailureException("Specs have Must Violations. Check full report.");
+            }
+        } catch (Exception e){
+            getLog().error("BoatBay error :: " + e.getMessage());
+            if (failOnBoatBayErrorResponse) {
+                throw new MojoFailureException("BoatBay error", e);
             }
         }
+    }
 
+    private void writeReportFile(List<BoatLintReport> reports) throws IOException {
+        ObjectMapper objectMapper = JsonMapper.builder()
+                .findAndAddModules()
+                .build();
+        File outputFile = new File(getOutput(), "radioOutput.json");
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, reports);
+        // Log summary of report
+        reports.forEach(report -> {
+            getLog().info(format("Spec %s summary :", report.getSpec().getKey()));
+            getLog().info(format("Changes are %s ", report.getSpec().getChanges()));
+            getLog().info("Number of Violations:" + report.getViolations().size());
+        });
+        // Log link to reports
+        getLog().info("UPLOAD TO BOAT-BAY SUCCESSFUL, check the full report: " + outputFile.getCanonicalPath());
+    }
+
+    private void applyAuth(ApiClient apiClient) {
+        if (StringUtils.isNotEmpty(boatBayUsername) && StringUtils.isNotEmpty(boatBayPassword)) {
+            getLog().info("Basic Authentication set for username " + boatBayUsername);
+            apiClient.addAuthorization(
+                    "Basic Auth", new BasicAuthRequestInterceptor(boatBayUsername, boatBayPassword));
+        } else {
+            getLog().info("No Authentication set");
+        }
     }
 
     private UploadSpec mapToUploadSpec(SpecConfig spec) throws MojoExecutionException {

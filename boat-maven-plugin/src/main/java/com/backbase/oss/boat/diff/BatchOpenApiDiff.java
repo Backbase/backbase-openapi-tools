@@ -9,6 +9,7 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.openapitools.openapidiff.core.compare.OpenApiDiff;
 import org.openapitools.openapidiff.core.compare.OpenApiDiffOptions;
 import org.openapitools.openapidiff.core.model.ChangedOpenApi;
@@ -114,26 +115,31 @@ public class BatchOpenApiDiff {
         Files.write(openApiFilePath, SerializerUtils.toYamlString(diffedApi).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
     }
 
-    private static String renderChangeLog(List<ChangedOpenApi> changeLog) {
+    private static String renderChangeLog(List<ChangedOpenApi> changeLog) throws MojoExecutionException{
         StringBuilder markDown = new StringBuilder();
         markDown.append("# Changelog\n");
-        changeLog.forEach(diff -> {
-            markDown.append("## ")
+        for (ChangedOpenApi changedOpenApi : changeLog) {
+            markDown.append(generateDiffReport(changedOpenApi));
+        }
+        return markDown.toString();
+    }
+
+    private static String generateDiffReport(ChangedOpenApi diff) throws MojoExecutionException {
+        StringBuilder markDown = new StringBuilder();
+        markDown.append("## ")
                 .append(diff.getOldSpecOpenApi().getInfo().getVersion())
                 .append(" - ")
                 .append(diff.getNewSpecOpenApi().getInfo().getVersion())
                 .append("\n");
 
-            if (!diff.isDifferent()) {
-                markDown.append("No Changes\n");
-            } else {
-                if (diff.isIncompatible()) {
-                    markDown.append("**Note:** API has incompatible changes!!\n");
-                }
-                String changes = DiffMojo.renderChangedOpenApi(markdownRender, diff);
-                markDown.append(changes);
+        if (!diff.isDifferent()) {
+            markDown.append("No Changes\n");
+        } else {
+            if (diff.isIncompatible()) {
+                markDown.append("**Note:** API has incompatible changes!!\n");
             }
-        });
+            markDown.append(DiffMojo.renderChangedOpenApi(markdownRender, diff));
+        }
         return markDown.toString();
     }
 
