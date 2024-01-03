@@ -1,12 +1,13 @@
 package com.backbase.oss.boat;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 @Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
@@ -16,25 +17,27 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         "ServerVariable.java", "StringUtil.java", "Authentication.java", "HttpBasicAuth.java", "HttpBearerAuth.java",
         "ApiKeyAuth.java", "JavaTimeFormatter.java"
     );
+    private static final String FALSE = "false";
+    private static final String TRUE = "true";
 
     public void execute(String generatorName, String library, boolean isEmbedded, boolean reactive,
         boolean generateSupportingFiles) throws MojoExecutionException, MojoFailureException {
 
         Map<String, String> options = new HashMap<>();
         options.put("library", library);
-        options.put("java8", "true");
+        options.put("java8", TRUE);
         options.put("dateLibrary", "java8");
         options.put("reactive", Boolean.toString(reactive));
-        options.put("performBeanValidation", "true");
-        options.put("skipDefaultInterface", "true");
-        options.put("interfaceOnly", "true");
-        options.put("useTags", "true");
-        options.put("useBeanValidation", "true");
-        options.put("useClassLevelBeanValidation", "false");
-        options.put("useOptional", "false");
-        options.put("useJakartaEe", "true");
-        options.put("useSpringBoot3", "true");
-        options.put("containerDefaultToNull", "false");
+        options.put("performBeanValidation", TRUE);
+        options.put("skipDefaultInterface", TRUE);
+        options.put("interfaceOnly", TRUE);
+        options.put("useTags", TRUE);
+        options.put("useBeanValidation", TRUE);
+        options.put("useClassLevelBeanValidation", FALSE);
+        options.put("useOptional", FALSE);
+        options.put("useJakartaEe", TRUE);
+        options.put("useSpringBoot3", TRUE);
+        options.put("containerDefaultToNull", FALSE);
 
         this.generatorName = generatorName;
         this.generateSupportingFiles = generateSupportingFiles;
