@@ -2,12 +2,6 @@ package com.backbase.oss.boat.radio;
 
 import com.backbase.oss.boat.bay.client.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.auth.BasicAuthRequestInterceptor;
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.Dispatcher;
@@ -20,8 +14,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.backbase.oss.boat.bay.client.model.Changes.BREAKING;
+import static com.backbase.oss.boat.bay.client.model.Changes.COMPATIBLE;
+import static com.backbase.oss.boat.bay.client.model.Severity.HINT;
+import static com.backbase.oss.boat.bay.client.model.Severity.MUST;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 class RadioMojoTests {
@@ -51,7 +53,6 @@ class RadioMojoTests {
         final String fileNameRequest = "one-client-*-v1.yaml";
         final String fileNameResolved = "one-client-api-v1.yaml";
 
-        final BigDecimal reportId = BigDecimal.valueOf(10);
         final String reportGrade = "A";
 
         SpecConfig specConfig = new SpecConfig();
@@ -87,7 +88,8 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
+                            List<BoatLintReport> result = buildSampleBoatLintReports(
+                                    specKey, reportGrade, COMPATIBLE, HINT,"test_all_valid_inputs");
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -108,7 +110,7 @@ class RadioMojoTests {
         List<BoatLintReport> result = Arrays.asList(objectMapper.readValue(output, BoatLintReport[].class));
 
         assertEquals(1, result.size());
-        assertEquals(reportId, result.get(0).getId());
+        assertEquals(BigDecimal.TEN, result.get(0).getId());
         assertEquals(reportGrade, result.get(0).getGrade());
 
     }
@@ -126,7 +128,6 @@ class RadioMojoTests {
         final String fileNameRequest = "one-client-*-v2.yaml";
         final String fileNameResolved = "one-client-api-v2.yaml";
 
-        final BigDecimal reportId = BigDecimal.valueOf(20);
         final String reportGrade = "B";
 
         SpecConfig specConfig = new SpecConfig();
@@ -162,7 +163,8 @@ class RadioMojoTests {
                                 uploadSpec.getOpenApi().length() > 0
                         ) {
                             log.info(uploadSpec.getOpenApi());
-                            List<BoatLintReport> result = getSampleBoatLintReports(expectedDefaultKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
+                            List<BoatLintReport> result = buildSampleBoatLintReports(
+                                    expectedDefaultKey, reportGrade, COMPATIBLE, HINT, "test_empty_specKeyAndName");
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         } else {
                             return new MockResponse().setResponseCode(400);
@@ -183,7 +185,7 @@ class RadioMojoTests {
         List<BoatLintReport> result = Arrays.asList(objectMapper.readValue(output, BoatLintReport[].class));
 
         assertEquals(1, result.size());
-        assertEquals(reportId, result.get(0).getId());
+        assertEquals(BigDecimal.TEN, result.get(0).getId());
         assertEquals(reportGrade, result.get(0).getGrade());
 
     }
@@ -225,7 +227,7 @@ class RadioMojoTests {
 
         mockBackEnd.setDispatcher(dispatcher);
 
-        assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        assertThrows(MojoExecutionException.class, mojo::execute);
 
     }
 
@@ -266,7 +268,7 @@ class RadioMojoTests {
 
         mockBackEnd.setDispatcher(dispatcher);
 
-        assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        assertThrows(MojoExecutionException.class, mojo::execute);
 
     }
 
@@ -307,7 +309,7 @@ class RadioMojoTests {
 
         mockBackEnd.setDispatcher(dispatcher);
 
-        assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        assertThrows(MojoExecutionException.class, mojo::execute);
 
     }
 
@@ -339,7 +341,6 @@ class RadioMojoTests {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
-
                         return new MockResponse().setResponseCode(200);
                 }
                 return new MockResponse().setResponseCode(404);
@@ -348,7 +349,7 @@ class RadioMojoTests {
 
         mockBackEnd.setDispatcher(dispatcher);
 
-        Exception exception = assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        Exception exception = assertThrows(MojoExecutionException.class, mojo::execute);
 
         assertTrue(exception.getMessage().startsWith("Invalid parent spec folder"));
 
@@ -367,7 +368,6 @@ class RadioMojoTests {
         final String validName = "one-client-api-v1.yaml";
         final String username = "admin";
         final String password = "admin";
-        final BigDecimal reportId = BigDecimal.valueOf(10);
         final String reportGrade = "A";
 
         SpecConfig specConfig = new SpecConfig();
@@ -392,7 +392,8 @@ class RadioMojoTests {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
 
                         if(request.getHeader("Authorization")!=null && request.getHeader("Authorization").length()>0){
-                            List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.HINT);
+                            List<BoatLintReport> result = buildSampleBoatLintReports(
+                                    specKey, reportGrade, COMPATIBLE, HINT, "test_auth");
                             return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                         }
                         return new MockResponse().setResponseCode(401);
@@ -421,7 +422,6 @@ class RadioMojoTests {
         final String artifactId = "pet-store-bom";
         final String specKey = "spec-key";
         final String version = "2021.09";
-        final BigDecimal reportId = BigDecimal.valueOf(10);
         final String reportGrade = "A";
         final String validName = "one-client-api-v1.yaml";
 
@@ -443,7 +443,8 @@ class RadioMojoTests {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
-                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.BREAKING,Severity.HINT);
+                        List<BoatLintReport> result = buildSampleBoatLintReports(
+                                specKey, reportGrade, BREAKING, HINT, "test_build_fail_on_breaking_changes");
                         return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                 }
                 return new MockResponse().setResponseCode(404);
@@ -460,7 +461,7 @@ class RadioMojoTests {
 
         // Build will fail if failOnBreakingChange is true
         mojo.setFailOnBreakingChange(true);
-        Exception exception = assertThrows(MojoFailureException.class, () -> mojo.execute());
+        Exception exception = assertThrows(MojoFailureException.class, mojo::execute);
         assertTrue(exception.getMessage().startsWith("Specs have Breaking Changes"));
 
     }
@@ -475,7 +476,6 @@ class RadioMojoTests {
         final String artifactId = "pet-store-bom";
         final String specKey = "spec-key";
         final String version = "2021.09";
-        final BigDecimal reportId = BigDecimal.valueOf(10);
         final String reportGrade = "A";
         final String validName = "one-client-api-v1.yaml";
 
@@ -497,7 +497,8 @@ class RadioMojoTests {
             public MockResponse dispatch(RecordedRequest request) {
                 switch (request.getPath()) {
                     case "/api/boat/portals/" + portalKey + "/boat-maven-plugin/" + sourceKey + "/upload":
-                        List<BoatLintReport> result = getSampleBoatLintReports(specKey, reportId, reportGrade,Changes.COMPATIBLE,Severity.MUST);
+                        List<BoatLintReport> result = buildSampleBoatLintReports(
+                                specKey, reportGrade, COMPATIBLE, MUST, "test_build_fail_on_must_violation");
                         return new MockResponse().setResponseCode(200).setBody(objectMapper.writeValueAsString(result));
                 }
                 return new MockResponse().setResponseCode(404);
@@ -514,7 +515,7 @@ class RadioMojoTests {
 
         // Build will fail if failOnLintViolation is true
         mojo.setFailOnLintViolation(true);
-        Exception exception = assertThrows(MojoFailureException.class, () -> mojo.execute());
+        Exception exception = assertThrows(MojoFailureException.class, mojo::execute);
         assertTrue(exception.getMessage().startsWith("Specs have Must Violations"));
 
     }
@@ -527,10 +528,7 @@ class RadioMojoTests {
         final String sourceKey = "pet-store-bom";
         final String groupId = "com.backbase.boat.samples";
         final String artifactId = "pet-store-bom";
-        final String specKey = "spec-key";
         final String version = "2021.09";
-        final BigDecimal reportId = BigDecimal.valueOf(10);
-        final String reportGrade = "A";
         final String validName = "one-client-api-v1.yaml";
 
         SpecConfig specConfig = new SpecConfig();
@@ -562,17 +560,17 @@ class RadioMojoTests {
         mockBackEnd.setDispatcher(dispatcher);
 
 
-        // Build will fail, when failOnBoatBayErrorResponse is true (Defualt)
-        Exception exception = assertThrows(MojoFailureException.class, () -> mojo.execute());
+        // Build will fail, when failOnBoatBayErrorResponse is true (Default)
+        Exception exception = assertThrows(MojoFailureException.class, mojo::execute);
         assertTrue(exception.getMessage().startsWith("BoatBay error"));
 
         // Build will not fail if failOnBoatBayErrorResponse is false
         mojo.setFailOnBoatBayErrorResponse(false);
         //No Exception is thrown
-        assertDoesNotThrow(() -> mojo.execute());
+        assertDoesNotThrow(mojo::execute);
         File output = new File(mojo.getRadioOutput(), "radioOutput.json");
         //But No output file present
-        assertTrue(!output.exists());
+        assertFalse(output.exists());
 
     }
 
@@ -581,17 +579,19 @@ class RadioMojoTests {
         return (new File("src/test/resources").getAbsolutePath() + glob);
     }
 
+
     @NotNull
-    private List<BoatLintReport> getSampleBoatLintReports(String expectedDefaultKey, BigDecimal reportId, String reportGrade,
-                                                          Changes typeOfChange, Severity sampleSeverityInResponse) {
+    private List<BoatLintReport> buildSampleBoatLintReports(String expectedDefaultKey,  String reportGrade,
+                                                            Changes typeOfChange, Severity sampleSeverityInResponse,
+                                                            String description) {
         BoatLintReport boatLintReport = new BoatLintReport();
-        boatLintReport.setId(reportId);
+        boatLintReport.setId(BigDecimal.TEN);
         boatLintReport.setGrade(reportGrade);
-        boatLintReport.violations(List.of(BoatViolation.builder().severity(sampleSeverityInResponse).build()));
-        boatLintReport.setSpec(BoatSpec.builder().key(expectedDefaultKey).changes(typeOfChange).build());
-        List<BoatLintReport> result = new ArrayList<>();
-        result.add(boatLintReport);
-        return result;
+        boatLintReport.violations(
+                List.of(BoatViolation.builder().severity(sampleSeverityInResponse).build()));
+        boatLintReport.setSpec(
+                BoatSpec.builder().key(expectedDefaultKey).description(description).changes(typeOfChange).build());
+        return List.of(boatLintReport);
     }
 
 }
