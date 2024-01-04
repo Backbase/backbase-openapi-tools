@@ -6,6 +6,7 @@ import com.backbase.oss.boat.bay.client.api.BoatMavenPluginApi;
 import com.backbase.oss.boat.bay.client.model.*;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import feign.auth.BasicAuthRequestInterceptor;
@@ -25,6 +26,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -145,7 +147,7 @@ public class RadioMojo extends AbstractMojo {
         BoatMavenPluginApi api = apiClient.buildClient(BoatMavenPluginApi.class);
 
         UploadRequestBody uploadRequestBody = UploadRequestBody.builder()
-                .groupId(groupId).artifactId(artifactId).version(version).build();
+                .groupId(groupId).artifactId(artifactId).version(version).specs(new ArrayList<>()).build();
         for (SpecConfig spec : specs) {
             uploadRequestBody.getSpecs().add(mapToUploadSpec(spec));
         }
@@ -156,19 +158,23 @@ public class RadioMojo extends AbstractMojo {
 
             if (failOnBreakingChange) {
                 boolean doesSpecsHaveBreakingChanges = reports.stream()
-                        .anyMatch(report -> report.getSpec().getChanges().equals(Changes.BREAKING));
-                if (doesSpecsHaveBreakingChanges)
+                        .anyMatch(report -> report.getSpec().getChanges() == Changes.BREAKING);
+                if (doesSpecsHaveBreakingChanges) {
                     throw new MojoFailureException("Specs have Breaking Changes. Check full report.");
+                }
             }
 
             if (failOnLintViolation) {
                 boolean doesSpecsHaveMustViolations = reports.stream()
                         .anyMatch(report -> report.getViolations().stream()
-                                .anyMatch(violation -> violation.getSeverity().equals(Severity.MUST)));
-                if (doesSpecsHaveMustViolations)
+                                .anyMatch(violation -> violation.getSeverity() == Severity.MUST));
+                if (doesSpecsHaveMustViolations) {
                     throw new MojoFailureException("Specs have Must Violations. Check full report.");
+                }
             }
-        } catch (Exception e){
+        } catch (IOException e) {
+            throw new MojoExecutionException(e);
+        } catch (RuntimeException e){
             getLog().error("BoatBay error :: " + e.getMessage());
             if (failOnBoatBayErrorResponse) {
                 throw new MojoFailureException("BoatBay error", e);
