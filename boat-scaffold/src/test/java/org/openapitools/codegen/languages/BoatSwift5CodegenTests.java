@@ -55,6 +55,32 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
+    public void testSetDependenciesAsToPodfileUpperCase() {
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "PODFILE");
+        boatSwift5CodeGen.processOpts();
+
+        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
+        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+    }
+    @Test
+    public void testSetDependenciesAsToPodfileLowerCase() {
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podfile");
+        boatSwift5CodeGen.processOpts();
+
+        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
+        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+    }
+
+    @Test
+    public void testSetDependenciesAsToPodfileCamelCase() {
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podFile");
+        boatSwift5CodeGen.processOpts();
+
+        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
+        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+    }
+
+    @Test
     public void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
         boatSwift5CodeGen.processOpts();
         final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
