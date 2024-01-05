@@ -13,6 +13,9 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.InlineModelResolver;
@@ -45,35 +48,10 @@ public class BoatSwift5CodegenTests {
         boatSwift5CodeGen.postProcess();
     }
 
-    @Test
-    void testSetDependenciesAsToPodfile() {
-        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
-        boatSwift5CodeGen.processOpts();
-
-        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
-    }
-
-    @Test
-    void testSetDependenciesAsToPodfileUpperCase() {
-        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "PODFILE");
-        boatSwift5CodeGen.processOpts();
-
-        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
-    }
-    @Test
-    void testSetDependenciesAsToPodfileLowerCase() {
-        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podfile");
-        boatSwift5CodeGen.processOpts();
-
-        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
-    }
-
-    @Test
-    void testSetDependenciesAsToPodfileCamelCase() {
-        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podFile");
+    @ParameterizedTest
+    @ValueSource(strings = {BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, "PODFILE", "podFile", "podfile", "podfilE"})
+    void testSetDependenciesDoesNotConsiderCase(String arg) {
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, arg);
         boatSwift5CodeGen.processOpts();
 
         final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
