@@ -30,129 +30,129 @@ public class BoatSwift5CodegenTests {
     BoatSwift5Codegen boatSwift5CodeGen = new BoatSwift5Codegen();
 
     @Test
-    public void testGeneratorName() {
+    void testGeneratorName() {
         assertEquals(boatSwift5CodeGen.getName(), "boat-swift5");
     }
     @Test
-    public void testGetHelpMessage() {
+    void testGetHelpMessage() {
         assertEquals(boatSwift5CodeGen.getHelp(), "Generates a BOAT Swift 5.x client library.");
     }
 
     @Test
-    public void testProcessOptsSetDBSDataProvider() {
+    void testProcessOptsSetDBSDataProvider() {
         boatSwift5CodeGen.setLibrary("dbsDataProvider");
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
     }
 
     @Test
-    public void testSetDependenciesAsToPodfile() {
+    void testSetDependenciesAsToPodfile() {
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
         boatSwift5CodeGen.processOpts();
 
         final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
     }
 
     @Test
-    public void testSetDependenciesAsToPodfileUpperCase() {
+    void testSetDependenciesAsToPodfileUpperCase() {
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "PODFILE");
         boatSwift5CodeGen.processOpts();
 
         final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
     }
     @Test
-    public void testSetDependenciesAsToPodfileLowerCase() {
+    void testSetDependenciesAsToPodfileLowerCase() {
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podfile");
         boatSwift5CodeGen.processOpts();
 
         final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
     }
 
     @Test
-    public void testSetDependenciesAsToPodfileCamelCase() {
+    void testSetDependenciesAsToPodfileCamelCase() {
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, "podFile");
         boatSwift5CodeGen.processOpts();
 
         final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+        assertEquals(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, dependenciesAs[0]);
     }
 
     @Test
-    public void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
+    void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
         boatSwift5CodeGen.processOpts();
         final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(0, dependenciesAs.length);
+        assertEquals(dependenciesAs.length, 0);
     }
 
     @Test
-    public void testGetTypeDeclaration() {
+    void testGetTypeDeclaration() {
 
         final ArraySchema childSchema = new ArraySchema().items(new StringSchema());
 
         assertEquals(boatSwift5CodeGen.getTypeDeclaration(childSchema),"[String]");
     }
     @Test
-    public void testCapitalizedReservedWord() throws Exception {
+    void testCapitalizedReservedWord() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("AS", null), "_as");
     }
 
     @Test
-    public void testReservedWord() throws Exception {
+    void testReservedWord() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("Public", null), "_public");
     }
 
     @Test
-    public void shouldNotBreakNonReservedWord() throws Exception {
+    void shouldNotBreakNonReservedWord() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("Error", null), "error");
     }
 
     @Test
-    public void shouldNotBreakCorrectName() throws Exception {
+    void shouldNotBreakCorrectName() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("EntryName", null), "entryName");
     }
 
     @Test
-    public void testSingleWordAllCaps() throws Exception {
+    void testSingleWordAllCaps() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("VALUE", null), "value");
     }
 
     @Test
-    public void testSingleWordLowercase() throws Exception {
+    void testSingleWordLowercase() throws Exception {
        assertEquals(boatSwift5CodeGen.toEnumVarName("value", null), "value");
     }
 
     @Test
-    public void testCapitalsWithUnderscore() throws Exception {
+    void testCapitalsWithUnderscore() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY_NAME", null), "entryName");
     }
 
     @Test
-    public void testCapitalsWithDash() throws Exception {
+    void testCapitalsWithDash() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY-NAME", null), "entryName");
     }
 
     @Test
-    public void testCapitalsWithSpace() throws Exception {
+    void testCapitalsWithSpace() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("ENTRY NAME", null), "entryName");
     }
 
     @Test
-    public void testLowercaseWithUnderscore() throws Exception {
+    void testLowercaseWithUnderscore() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("entry_name", null), "entryName");
     }
 
     @Test
-    public void testStartingWithNumber() throws Exception {
+    void testStartingWithNumber() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("123EntryName", null), "_123entryName");
         assertEquals(boatSwift5CodeGen.toEnumVarName("123Entry_name", null), "_123entryName");
         assertEquals(boatSwift5CodeGen.toEnumVarName("123EntryName123", null), "_123entryName123");
     }
 
     @Test
-    public void testSpecialCharacters() throws Exception {
+    void testSpecialCharacters() throws Exception {
         assertEquals(boatSwift5CodeGen.toEnumVarName("1:1", null), "_1Colon1");
         assertEquals(boatSwift5CodeGen.toEnumVarName("1:One", null), "_1ColonOne");
         assertEquals(boatSwift5CodeGen.toEnumVarName("Apple&Swift", null), "appleAmpersandSwift");
@@ -162,7 +162,7 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public void prefixExceptionTest() {
+    void prefixExceptionTest() {
 
         boatSwift5CodeGen.setModelNamePrefix("API");
 
@@ -171,7 +171,7 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public void suffixExceptionTest() {
+    void suffixExceptionTest() {
 
         boatSwift5CodeGen.setModelNameSuffix("API");
 
@@ -180,21 +180,21 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public void prefixTest() {
+    void prefixTest() {
         boatSwift5CodeGen.setModelNamePrefix("API");
         final String result = boatSwift5CodeGen.toModelName("MyType");
         assertEquals(result, "APIMyType");
     }
 
     @Test
-    public void suffixTest() {
+    void suffixTest() {
         boatSwift5CodeGen.setModelNameSuffix("API");
         final String result = boatSwift5CodeGen.toModelName("MyType");
         assertEquals(result, "MyTypeAPI");
     }
 
     @Test
-    public void testDefaultPodAuthors() throws Exception {
+    void testDefaultPodAuthors() throws Exception {
         // Given
         // When
         boatSwift5CodeGen.processOpts();
@@ -204,7 +204,7 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public void testPodAuthors() throws Exception {
+    void testPodAuthors() throws Exception {
         // Given
         final String openAPIDevs = "OpenAPI Devs";
         boatSwift5CodeGen.additionalProperties().put(Swift5ClientCodegen.POD_AUTHORS, openAPIDevs);
@@ -218,7 +218,7 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public void testFromModel() {
+    void testFromModel() {
 
         final ObjectSchema objectSchema = new ObjectSchema();
         objectSchema.setDescription("Sample ObjectSchema");
@@ -323,7 +323,7 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    public  void testPostProcessAllModels() {
+    void testPostProcessAllModels() {
         final CodegenModel parent = new CodegenModel();
         Map<String, ModelsMap> models = new HashMap<>();
 

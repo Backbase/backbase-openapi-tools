@@ -76,7 +76,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         if (ArrayUtils.contains(dependenciesAs, DEPENDENCY_MANAGEMENT_PODFILE)) {
             supportingFiles.add(new SupportingFile("Podfile.mustache",
                     "",
-                    "Podfile"));
+                    DEPENDENCY_MANAGEMENT_PODFILE));
         }
     }
 
