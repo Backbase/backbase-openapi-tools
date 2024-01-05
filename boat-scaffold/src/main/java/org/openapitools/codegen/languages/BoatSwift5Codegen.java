@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -67,7 +68,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         if (additionalProperties.containsKey(DEPENDENCY_MANAGEMENT)) {
             Object dependenciesAsObject = additionalProperties.get(DEPENDENCY_MANAGEMENT);
             if (dependenciesAsObject instanceof String) {
-                setDependenciesAs(((String) dependenciesAsObject).split(","));
+                setDependenciesAs((WordUtils.capitalizeFully((String) dependenciesAsObject).split(",")));
             }
         }
 
