@@ -44,6 +44,23 @@ public class BoatSwift5CodegenTests {
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
     }
+
+    @Test
+    public void testSetDependenciesAsToPodfile() {
+        boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+        boatSwift5CodeGen.processOpts();
+
+        final String[]  dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
+        assertEquals(dependenciesAs[0], BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE);
+    }
+
+    @Test
+    public void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
+        boatSwift5CodeGen.processOpts();
+        final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
+        assertEquals(0, dependenciesAs.length);
+    }
+
     @Test
     public void testGetTypeDeclaration() {
 
