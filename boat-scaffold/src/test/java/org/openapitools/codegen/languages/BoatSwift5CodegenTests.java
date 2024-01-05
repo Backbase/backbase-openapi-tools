@@ -196,42 +196,20 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    void testFromModel() {
+    void testFromModelCodegenModel() {
 
-        final ObjectSchema objectSchema = new ObjectSchema();
-        objectSchema.setDescription("Sample ObjectSchema");
-
-        final ArraySchema nestedArraySchema = new ArraySchema().items(new ObjectSchema());
-
-        final MapSchema mapSchema = new MapSchema();
-        mapSchema.additionalProperties(objectSchema);
-
-        final MapSchema mapSchema1 = new MapSchema();
-        mapSchema1.setDescription("Sample ObjectSchema");
-        mapSchema1.additionalProperties(new StringSchema());
-
-        final Schema schema = new Schema()
-                .description("a sample model")
-                .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
-                .addProperty("name", new StringSchema())
-                .addProperty("content", objectSchema)
-                .addProperty("nested", nestedArraySchema)
-                .addProperty("map", mapSchema)
-                .addProperty("secondMap", mapSchema1)
-                .addRequiredItem("id")
-                .addRequiredItem("name")
-                .name("sample")
-                .discriminator(new Discriminator().propertyName("test"));
-
-        OpenAPI openAPI = createOpenAPIWithOneSchema("sample", schema);
-        boatSwift5CodeGen.setOpenAPI(openAPI);
-        final CodegenModel cm = boatSwift5CodeGen.fromModel("sample", schema);
+        final CodegenModel cm = prepareForModelTests();
 
         assertEquals(cm.name, "sample");
         assertEquals(cm.classname, "Sample");
         assertEquals(cm.description, "a sample model");
         assertEquals(cm.vars.size(), 6);
-        assertEquals(cm.getDiscriminatorName(),"test");
+        assertEquals(cm.getDiscriminatorName(), "test");
+    }
+
+    @Test
+    void testFromModelProperty1() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property1 = cm.vars.get(0);
         assertEquals(property1.baseName, "id");
@@ -242,6 +220,10 @@ public class BoatSwift5CodegenTests {
         assertTrue(property1.required);
         assertTrue(property1.isPrimitiveType);
         assertFalse(property1.isContainer);
+    }
+    @Test
+    void testFromModelProperty2() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property2 = cm.vars.get(1);
         assertEquals(property2.baseName, "name");
@@ -252,6 +234,10 @@ public class BoatSwift5CodegenTests {
         assertTrue(property2.required);
         assertTrue(property2.isPrimitiveType);
         assertFalse(property2.isContainer);
+    }
+    @Test
+    void testFromModelProperty3() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property3 = cm.vars.get(2);
         assertEquals(property3.baseName, "content");
@@ -262,6 +248,10 @@ public class BoatSwift5CodegenTests {
         assertFalse(property3.required);
         assertFalse(property3.isContainer);
         assertTrue(property3.isFreeFormObject);
+    }
+    @Test
+    void testFromModelProperty4() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property4 = cm.vars.get(3);
         assertEquals(property4.baseName, "nested");
@@ -273,6 +263,10 @@ public class BoatSwift5CodegenTests {
         assertTrue(property4.isContainer);
         assertTrue(property4.isFreeFormObject);
         assertTrue(property4.items.isFreeFormObject);
+    }
+    @Test
+    void testFromModelProperty5() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property5 = cm.vars.get(4);
         assertEquals(property5.baseName, "map");
@@ -285,6 +279,11 @@ public class BoatSwift5CodegenTests {
         assertTrue(property5.isFreeFormObject);
         assertTrue(property5.isMap);
         assertTrue(property5.items.isFreeFormObject);
+
+    }
+    @Test
+    void testFromModelProperty6() {
+        final CodegenModel cm = prepareForModelTests();
 
         final CodegenProperty property6 = cm.vars.get(5);
         assertEquals(property6.baseName, "secondMap");
@@ -328,6 +327,38 @@ public class BoatSwift5CodegenTests {
         models.put("ActionRecipeItemParent", createCodegenModelWrapper(actionRecipeItemParentModel));
 
         assertEquals(boatSwift5CodeGen.postProcessAllModels(models), models);
+    }
+
+    private CodegenModel prepareForModelTests() {
+
+        final ObjectSchema objectSchema = new ObjectSchema();
+        objectSchema.setDescription("Sample ObjectSchema");
+
+        final ArraySchema nestedArraySchema = new ArraySchema().items(new ObjectSchema());
+
+        final MapSchema mapSchema = new MapSchema();
+        mapSchema.additionalProperties(objectSchema);
+
+        final MapSchema mapSchema1 = new MapSchema();
+        mapSchema1.setDescription("Sample ObjectSchema");
+        mapSchema1.additionalProperties(new StringSchema());
+
+        final Schema schema = new Schema()
+                .description("a sample model")
+                .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
+                .addProperty("name", new StringSchema())
+                .addProperty("content", objectSchema)
+                .addProperty("nested", nestedArraySchema)
+                .addProperty("map", mapSchema)
+                .addProperty("secondMap", mapSchema1)
+                .addRequiredItem("id")
+                .addRequiredItem("name")
+                .name("sample")
+                .discriminator(new Discriminator().propertyName("test"));
+
+        OpenAPI openAPI = createOpenAPIWithOneSchema("sample", schema);
+        boatSwift5CodeGen.setOpenAPI(openAPI);
+        return boatSwift5CodeGen.fromModel("sample", schema);
     }
 
     static ModelsMap createCodegenModelWrapper(CodegenModel cm) {
