@@ -62,7 +62,7 @@ public class BoatSwift5CodegenTests {
     void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
         boatSwift5CodeGen.processOpts();
         final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
-        assertEquals(dependenciesAs.length, 0);
+        assertEquals(0,dependenciesAs.length);
     }
 
     @Test
