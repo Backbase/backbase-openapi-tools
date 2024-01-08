@@ -2,10 +2,10 @@ package org.openapitools.codegen.languages;
 
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
-import org.openapitools.codegen.CodegenConfig;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.SupportingFile;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
+import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelsMap;
@@ -13,9 +13,13 @@ import org.openapitools.codegen.utils.ModelUtils;
 
 import java.util.*;
 
-
 public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenConfig {
-    private static final String LIBRARY_DBS = "dbsDataProvider";
+    public static final String LIBRARY_DBS = "dbsDataProvider";
+    public static final String DEPENDENCY_MANAGEMENT = "dependenciesAs";
+    public static final String DEPENDENCY_MANAGEMENT_PODFILE = "Podfile";
+    protected static final String DEPENDENCY_MANAGEMENT_CARTFILE = "Cartfile";
+    protected static final String[] DEPENDENCY_MANAGEMENT_OPTIONS = {DEPENDENCY_MANAGEMENT_CARTFILE, DEPENDENCY_MANAGEMENT_PODFILE};
+    protected String[] dependenciesAs = new String[0];
 
     /**
      * Constructor for the BoatSwift5Codegen codegen module.
@@ -38,6 +42,11 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         this.typeMapping.remove("AnyType");
         this.typeMapping.put("object", "Any");
         this.typeMapping.put("AnyType", "Any");
+
+        cliOptions.add(new CliOption(DEPENDENCY_MANAGEMENT,
+                "Available dependency managers "
+                        + StringUtils.join(DEPENDENCY_MANAGEMENT_OPTIONS, ", ")
+                        + " are available."));
     }
 
     @Override
@@ -55,7 +64,20 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         super.processOpts();
         additionalProperties.put("useDBSDataProvider", getLibrary().equals(LIBRARY_DBS));
         supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", sourceFolder, "AnyCodable.swift"));
-        this.supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", this.sourceFolder, "AnyCodable.swift"));
+
+        if (additionalProperties.containsKey(DEPENDENCY_MANAGEMENT)) {
+            Object dependenciesAsObject = additionalProperties.get(DEPENDENCY_MANAGEMENT);
+            if (dependenciesAsObject instanceof String) {
+                setDependenciesAs((WordUtils.capitalizeFully((String) dependenciesAsObject).split(",")));
+            }
+        }
+
+        additionalProperties.put(DEPENDENCY_MANAGEMENT, dependenciesAs);
+        if (ArrayUtils.contains(dependenciesAs, DEPENDENCY_MANAGEMENT_PODFILE)) {
+            supportingFiles.add(new SupportingFile("Podfile.mustache",
+                    "",
+                    DEPENDENCY_MANAGEMENT_PODFILE));
+        }
     }
 
     // Fix issues with generating arrays with Set.
@@ -71,7 +93,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
     @Override
     public CodegenModel fromModel(String name, Schema model) {
-        Map<String, Schema> allDefinitions = ModelUtils.getSchemas(this.openAPI);
         CodegenModel codegenModel = super.fromModel(name, model);
         if (codegenModel.description != null) {
             codegenModel.imports.add("ApiModel");
@@ -81,6 +102,11 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
         return codegenModel;
     }
+
+    public void setDependenciesAs(String[] dependenciesAs) {
+        this.dependenciesAs = dependenciesAs;
+    }
+
 
     /*
     This is added as a compatibility requirement for API specs containing free form objects
