@@ -14,7 +14,7 @@ import org.openapitools.codegen.utils.ModelUtils;
 import java.util.*;
 
 public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenConfig {
-    private static final String LIBRARY_DBS = "dbsDataProvider";
+    public static final String LIBRARY_DBS = "dbsDataProvider";
     public static final String DEPENDENCY_MANAGEMENT = "dependenciesAs";
     public static final String DEPENDENCY_MANAGEMENT_PODFILE = "Podfile";
     protected static final String DEPENDENCY_MANAGEMENT_CARTFILE = "Cartfile";
