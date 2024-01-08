@@ -1,6 +1,5 @@
 package org.openapitools.codegen.languages;
 
-import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -9,21 +8,16 @@ import io.swagger.v3.oas.models.media.*;
 
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.parser.core.models.ParseOptions;
 
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.InlineModelResolver;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
-import org.openapitools.codegen.utils.ModelUtils;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +40,7 @@ public class BoatSwift5CodegenTests {
         boatSwift5CodeGen.setLibrary(BoatSwift5Codegen.LIBRARY_DBS);
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
-        assertEquals(boatSwift5CodeGen.getLibrary(), BoatSwift5Codegen.LIBRARY_DBS);
+        assertEquals(BoatSwift5Codegen.LIBRARY_DBS, boatSwift5CodeGen.getLibrary());
     }
 
     @ParameterizedTest
