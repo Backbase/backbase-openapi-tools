@@ -43,9 +43,10 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testProcessOptsSetDBSDataProvider() {
-        boatSwift5CodeGen.setLibrary("dbsDataProvider");
+        boatSwift5CodeGen.setLibrary(BoatSwift5Codegen.LIBRARY_DBS);
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
+        assertEquals(boatSwift5CodeGen.getLibrary(), BoatSwift5Codegen.LIBRARY_DBS);
     }
 
     @ParameterizedTest
