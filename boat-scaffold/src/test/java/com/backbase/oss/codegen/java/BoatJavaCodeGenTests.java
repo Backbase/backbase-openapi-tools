@@ -1,6 +1,8 @@
 package com.backbase.oss.codegen.java;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -156,5 +158,47 @@ class BoatJavaCodeGenTests {
 
         assertThat(gen.createApiComponent, is(generate));
         assertThat(gen.getLibrary(), is("resttemplate"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldHonourBeanValidationOption(boolean useBeanValidation) throws InterruptedException, FileNotFoundException {
+
+        var input = new File("src/test/resources/boat-spring/openapi.yaml");
+        var output = TEST_OUTPUT + "/shouldHonourBeanValidationOption/" + String.valueOf(useBeanValidation);
+
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setOutputDir(output);
+        gen.setInputSpec(input.getAbsolutePath());
+        gen.setApiPackage("com.backbase.test.api");
+        gen.setModelPackage("com.backbase.test.api.model");
+        gen.setInvokerPackage("com.backbase.test.api.invoker");
+        gen.setApiNameSuffix("ApiClient");
+
+        final Map<String, Object> options = gen.additionalProperties();
+        options.put("library", "resttemplate");
+        options.put("useBeanValidation", String.valueOf(useBeanValidation));
+
+        var openApiInput = new OpenAPIParser()
+                .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+                .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(gen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        Function<String, File> getFileByName = (String fileName) -> files.stream()
+                .filter(file -> file.getName().equals(fileName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("File name found:" + fileName));
+
+        File apiFile = getFileByName.apply("ValidatedPojosApiClient.java");
+        CompilationUnit compilationUnit = StaticJavaParser.parse(apiFile);
+        MethodDeclaration getPojosMethod = compilationUnit
+                .findFirst(MethodDeclaration.class, m -> "getPojos".equals(m.getNameAsString())).get();
+        assertThat("Expect Valid annotation.", getPojosMethod.getParameter(0).getType().toString().contains("@Valid"), is(useBeanValidation));
+        assertThat("Expect jakarta Valid import", compilationUnit.getImports().stream().anyMatch(
+                id -> id.getNameAsString().equals("jakarta.validation.Valid")), is(useBeanValidation));
     }
 }
