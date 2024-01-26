@@ -28,7 +28,7 @@
         <feign-form-version>3.8.0</feign-form-version>
         <jackson-threetenbp-version>2.15.2</jackson-threetenbp-version>
         <scribejava-version>8.3.3</scribejava-version>
-        <swagger-annotations-version>1.6.12</swagger-annotations-version>
+        <swagger-annotations-version>1.6.13</swagger-annotations-version>
     </properties>
 
     <dependencyManagement>
