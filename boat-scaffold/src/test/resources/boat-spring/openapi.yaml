@@ -357,6 +357,12 @@ components:
             minLength: 7
             maxLength: 10
           description: "Transaction data string map"
+        emailAddress:
+          type: string
+          description: Sender Email
+          format: email
+          maxLength: 250
+          example: xyz@gmail.com
     PaymentRequestLine:
       required:
         - accountId
