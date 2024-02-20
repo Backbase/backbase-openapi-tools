@@ -812,7 +812,7 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
         }
     }
 
-    private class ApiClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+    private static class ApiClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
         private final Log log = LogFactory.getLog(ApiClientHttpRequestInterceptor.class);
 
         @Override
