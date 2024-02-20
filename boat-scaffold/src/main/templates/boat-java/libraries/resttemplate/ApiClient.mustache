@@ -14,7 +14,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -650,7 +649,7 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
                     }
                 }
             } catch (UnsupportedEncodingException e) {
-
+                throw new RuntimeException(e);
             }
         });
         return queryBuilder.toString();
@@ -678,8 +677,7 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
     public <T> ResponseEntity<T> invokeAPI(String path, HttpMethod method, Map<String, Object> pathParams, MultiValueMap<String, String> queryParams, Object body, HttpHeaders headerParams, MultiValueMap<String, String> cookieParams, MultiValueMap<String, Object> formParams, List<MediaType> accept, MediaType contentType, String[] authNames, ParameterizedTypeReference<T> returnType) throws RestClientException {
         updateParamsForAuth(authNames, queryParams, headerParams, cookieParams);
 
-        Map<String,Object> uriParams = new HashMap<>();
-        uriParams.putAll(pathParams);
+        Map<String,Object> uriParams = new HashMap<>(pathParams);
 
         String finalUri = path;
 
@@ -813,7 +811,7 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
         }
     }
 
-    private class ApiClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+    private static class ApiClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
         private final Log log = LogFactory.getLog(ApiClientHttpRequestInterceptor.class);
 
         @Override
@@ -824,7 +822,7 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
             return response;
         }
 
-        private void logRequest(HttpRequest request, byte[] body) throws UnsupportedEncodingException {
+        private void logRequest(HttpRequest request, byte[] body) {
             log.info("URI: " + request.getURI());
             log.info("HTTP Method: " + request.getMethod());
             log.info("HTTP Headers: " + headersToString(request.getHeaders()));
@@ -832,14 +830,14 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
         }
 
         private void logResponse(ClientHttpResponse response) throws IOException {
-            log.info("HTTP Status Code: " + response.getRawStatusCode());
+            log.info("HTTP Status Code: " + response.getStatusCode().value());
             log.info("Status Text: " + response.getStatusText());
             log.info("HTTP Headers: " + headersToString(response.getHeaders()));
             log.info("Response Body: " + bodyToString(response.getBody()));
         }
 
         private String headersToString(HttpHeaders headers) {
-            if(headers == null || headers.isEmpty()) {
+            if (headers == null || headers.isEmpty()) {
                 return "";
             }
             StringBuilder builder = new StringBuilder();

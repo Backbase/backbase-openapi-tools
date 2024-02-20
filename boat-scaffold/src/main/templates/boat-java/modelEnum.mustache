@@ -33,7 +33,7 @@ import com.google.gson.stream.JsonWriter;
   {{{name}}}({{{value}}}){{^-last}},
   {{/-last}}{{#-last}};{{/-last}}{{/enumVars}}{{/allowableValues}}
 
-  private {{{dataType}}} value;
+  private final {{{dataType}}} value;
 
   {{{datatypeWithEnum}}}{{^datatypeWithEnum}}{{{classname}}}{{/datatypeWithEnum}}({{{dataType}}} value) {
     this.value = value;
