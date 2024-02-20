@@ -15,6 +15,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.29
+* Fixed Spring deprecations
 ## 0.17.24
 * boat-spring
   * Fix [Inconsistent @Component for RestTemplate](https://github.com/Backbase/backbase-openapi-tools/issues/661)
