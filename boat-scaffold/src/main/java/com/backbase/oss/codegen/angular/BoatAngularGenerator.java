@@ -298,7 +298,12 @@ public class BoatAngularGenerator extends AbstractTypeScriptClientCodegen {
             final String rxjsVersion = "rxjsVersion";
             final String zonejsVersion = "zonejsVersion";
 
-            if (angularVersion.atLeast("16.0.0")) {
+            if (angularVersion.atLeast("17.0.0")) {
+                additionalProperties.put(tsVersion, "5.3.3");
+                additionalProperties.put(ngPackagrVersion, "17.1.2");
+                additionalProperties.put(rxjsVersion, "7.8.1");
+                additionalProperties.put(zonejsVersion, "0.14.4");
+            } else if (angularVersion.atLeast("16.0.0")) {
                 additionalProperties.put(tsVersion, "5.1.6");
                 additionalProperties.put(ngPackagrVersion, "16.1.0");
                 additionalProperties.put(rxjsVersion, "7.8.1");
