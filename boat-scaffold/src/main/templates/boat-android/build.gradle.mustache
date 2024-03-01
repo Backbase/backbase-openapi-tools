@@ -1,7 +1,4 @@
 buildscript {
-    ext.retailGroup = 'com.backbase.android.retail'
-    ext.appGroup = "${retailGroup}.app"
-
     ext.rootGroup = 'com.backbase.android.clients'
     ext.projectVersions = [
             minSdk: 23,
@@ -94,44 +91,17 @@ buildscript {
 allprojects { project ->
     repositories {
         google()
-        // These variables must be set up on your machine's global gradle.properties:
-        maven {
-            url = 'https://artifacts.backbase.com/android3'
-            credentials {
-                username = mvnUser
-                password = mvnPass
-            }
-        }
-        maven {
-            url = 'https://artifacts.backbase.com/android-retail3'
-            credentials {
-                username = mvnUser
-                password = mvnPass
-            }
-        }
-        maven {
-            url = 'https://artifacts.backbase.com/android-wealth3'
-            credentials {
-                username = mvnUser
-                password = mvnPass
-            }
-        }
-        maven {
-            url = 'https://artifacts.backbase.com/android-flow-development'
-            credentials {
-                username = mvnUser
-                password = mvnPass
-            }
-        }
-        maven {
-            url = 'https://artifacts.backbase.com/android-identity'
-            credentials {
-                username = mvnUser
-                password = mvnPass
-            }
-        }
         mavenCentral()
         jcenter()
+        // These variables must be set up on your machine's global gradle.properties:
+        maven {
+            name = "backbaseRepo"
+            url = uri("https://repo.backbase.com/repo")
+            credentials {
+                username = backbaseRepoUsername
+                password = backbaseRepoPassword
+            }
+        }
     }
 
     //noinspection UnnecessaryQualifiedReference
@@ -157,7 +127,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'org.jetbrains.dokka'
 
-group rootGroup
+group '{{packageName}}'
 ext.artifactName = '{{{artifactId}}}'
 version = '{{artifactVersion}}'
 
