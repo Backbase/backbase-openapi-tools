@@ -15,6 +15,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.30
+* Angular 17
 ## 0.17.29
 * Fixed Spring deprecations
 ## 0.17.24
