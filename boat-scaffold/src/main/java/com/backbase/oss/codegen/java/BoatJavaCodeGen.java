@@ -1,10 +1,8 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
-import java.io.File;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
@@ -12,6 +10,10 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
+
+import java.io.File;
+
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 
 public class BoatJavaCodeGen extends JavaClientCodegen {
 
@@ -140,4 +142,26 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             .map(CodegenValueType::getValue)
             .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
     }
+
+    @Override
+    public String getTypeDeclaration(Schema p) {
+        String s = super.getTypeDeclaration(p);
+        if (useBeanValidation && isArrayTypeOfEnum(p)) {
+            s = s.replace("<", "<@Valid ");
+        }
+        return s;
+    }
+
+    private boolean isArrayTypeOfEnum(Schema s) {
+        Schema<?> target = ModelUtils.isGenerateAliasAsModel() ? s : unaliasSchema(s);
+        if (!ModelUtils.isArraySchema(target)) {
+            return false;
+        }
+        Schema items = getSchemaItems((ArraySchema) target);
+        if (items.get$ref() != null) {
+            items = openAPI.getComponents().getSchemas().get(ModelUtils.getSimpleRef(items.get$ref()));
+        }
+        return items.getEnum() != null;
+    }
+
 }
