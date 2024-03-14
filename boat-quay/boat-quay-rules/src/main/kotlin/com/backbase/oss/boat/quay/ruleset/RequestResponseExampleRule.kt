@@ -9,10 +9,10 @@ import org.zalando.zally.rule.api.*
 import java.util.*
 
 @Rule(
-        ruleSet = BoatRuleSet::class,
-        id = "B014",
-        severity = Severity.SHOULD,
-        title = "The response example should contain all properties"
+    ruleSet = BoatRuleSet::class,
+    id = "B014",
+    severity = Severity.HINT,
+    title = "The response example should contain all properties"
 )
 class RequestResponseExampleRule {
 
@@ -23,19 +23,22 @@ class RequestResponseExampleRule {
      * @return list of identified violations
      */
 
-    @Check(severity = Severity.SHOULD)
+    @Check(severity = Severity.HINT)
     fun checkResponseExampleFulfill(context: Context): List<Violation> =
-            context.validateOperations { (method, operation) ->
-                operation?.responses.orEmpty()
-                        .map { (status, response) ->
-                            response.content.orEmpty()
-                                    .filterNot { (_, content) ->
-                                        hasDefinedAllParams(content)
-                                    }.map { (type, content) ->
-                                        context.violation("Not define example for ${method.name}:$status of $type", content)
-                                    }
-                        }.flatten()
-            }
+        context.validateOperations { (method, operation) ->
+            operation?.responses.orEmpty()
+                .map { (status, response) ->
+                    response.content.orEmpty()
+                        .filterNot { (_, content) ->
+                            hasDefinedAllParams(content)
+                        }.map { (type, content) ->
+                            context.violation(
+                                "Not define example for ${operation?.operationId}:${method.name}:$status of $type",
+                                content
+                            )
+                        }
+                }.flatten()
+        }
 
     private val objectMapper = ObjectMapper()
 
@@ -76,8 +79,10 @@ class RequestResponseExampleRule {
         }
     }
 
-    private fun arrayTypeCheck(prop: Map.Entry<String, Schema<Any>>, fieldValue: JsonNode) = fieldValue.all { e -> hasExample(prop.key, prop.value, e) }
+    private fun arrayTypeCheck(prop: Map.Entry<String, Schema<Any>>, fieldValue: JsonNode) =
+        fieldValue.all { e -> hasExample(prop.key, prop.value, e) }
 
-    private fun objectTypeCheck(prop: Map.Entry<String, Schema<Any>>, fieldValue: JsonNode) = hasExample(prop.key, prop.value, fieldValue)
+    private fun objectTypeCheck(prop: Map.Entry<String, Schema<Any>>, fieldValue: JsonNode) =
+        hasExample(prop.key, prop.value, fieldValue)
 
 }

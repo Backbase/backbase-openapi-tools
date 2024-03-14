@@ -12,7 +12,7 @@ import org.zalando.zally.rule.api.*
 @Rule(
         ruleSet = BoatRuleSet::class,
         id = "B010",
-        severity = Severity.HINT,
+        severity = Severity.MUST,
         title = "Pluralize Resource Names"
 )
 class PluralizeResourceNamesRule(rulesConfig: Config) {
@@ -29,7 +29,7 @@ class PluralizeResourceNamesRule(rulesConfig: Config) {
                     .map { it.toRegex() }
                     .toTypedArray())
 
-    @Check(severity = Severity.HINT)
+    @Check(severity = Severity.MUST)
     fun validate(context: Context): List<Violation> {
         return context.validatePaths { (path, _) ->
             pathSegments(sanitizedPath(path, whitelist))
