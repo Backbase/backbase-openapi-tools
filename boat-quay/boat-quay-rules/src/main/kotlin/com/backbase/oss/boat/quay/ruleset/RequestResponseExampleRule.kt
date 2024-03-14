@@ -32,7 +32,7 @@ class RequestResponseExampleRule {
                                     .filterNot { (_, content) ->
                                         hasDefinedAllParams(content)
                                     }.map { (type, content) ->
-                                        context.violation("Fulfill the response example for ${method.name}:$status for $type to include all properties ", content)
+                                        context.violation("Not define example for ${method.name}:$status of $type", content)
                                     }
                         }.flatten()
             }
@@ -43,7 +43,7 @@ class RequestResponseExampleRule {
         val properties = content.schema?.properties ?: return true
         var examples = content.examples.orEmpty()
         if (examples.isEmpty() && content.example != null) {
-            examples = mapOf("example" to content.example as Example)
+            examples = mapOf("example" to Example().value(content.example))
         }
         return examples.any { (_, exampleObject) ->
             val value = exampleObject?.value
@@ -60,21 +60,19 @@ class RequestResponseExampleRule {
         if (Objects.isNull(fieldValue)) {
             return false
         }
-        return when (property?.type) {
-            "array" -> fieldValue.isArray
-                    && property.items?.properties?.all { prop -> arrayTypeCheck(prop, fieldValue) } ?: false
-
-            "object" -> {
-                if (fieldValue.isObject) {
-                    if (property.additionalProperties != null) {
-                        return !fieldValue.isEmpty
-                    }
-                    return property.properties?.all { prop -> objectTypeCheck(prop, fieldValue) } ?: false
-                }
-                return false
+        return when {
+            "array" == property?.type && fieldValue.isArray -> {
+                property.items?.properties?.all { prop -> arrayTypeCheck(prop, fieldValue) } ?: false
             }
 
-            else -> fieldValue.toString().isNotBlank()
+            "object" == property?.type && fieldValue.isObject -> {
+                if (property.additionalProperties != null) {
+                    return !fieldValue.isEmpty
+                }
+                return property.properties?.all { prop -> objectTypeCheck(prop, fieldValue) } ?: false
+            }
+
+            else -> !(fieldValue.isArray || fieldValue.isObject) && fieldValue.toString().isNotBlank()
         }
     }
 

@@ -16,7 +16,7 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 ## 0.17.32
-* add new link rule `B014` - to validate if examples contain all defined properties in schema
+* add new lint rule `B014` - to validate if examples contain all defined properties in schema
   * ISSUE: #776
 * 
 ## 0.17.30
