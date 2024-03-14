@@ -41,7 +41,123 @@ class RequestResponseExampleRuleTest {
                         schema:
                           type: string
                       responses:
-                        
+                        "200":
+                          description: Portfolios by instrument information
+                          content:
+                            application/json:
+                              schema:
+                                  required:
+                                    - portfolios
+                                  type: object
+                                  properties:
+                                    portfolios:
+                                      type: array
+                                      description: Details of a portfolio.
+                                      items:
+                                        required:
+                                        - name
+                                        - portfolioId
+                                        type: object
+                                        properties:
+                                            name:
+                                              type: string
+                                              description: Portfolio's name.
+                                            alias:
+                                              type: string
+                                              description: Portfolio's alias.
+                                            portfolioId:
+                                              type: string
+                                              description: Portfolio's internal id.
+                                            availableBalance:
+                                              required:
+                                              - amount
+                                              - currency
+                                              type: object
+                                              properties:
+                                                amount:
+                                                  type: number
+                                                  description: The amount in the specified currency
+                                                currency:
+                                                  pattern: "^[A-Z]{3}${'$'}"
+                                                  type: string
+                                                  description: The alpha-3 code (complying with ISO 4217) of the currency
+                                                    that qualifies the amount
+                                            availableForTradingQty:
+                                              type: number
+                                              description: The number of shares available to sell (holdings - standing
+                                                orders).
+                                            iban:
+                                              type: string
+                                              description: "Account ID or an IBAN associated with a portfolio, where applicable."
+                                              deprecated: true
+                                            arrangementDisplay:
+                                                type: object
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                    description: The name that can be assigned by the bank to label an arrangement
+                                                  displayName:
+                                                    type: string
+                                                    description: "Represents an arrangement by it's correct naming identifier.\
+                                                      \ It could be account alias or user alias depending on the journey selected\
+                                                      \ by the financial institution. If none of those is set, the arrangement\
+                                                      \ name will be used."
+                                                  bankAlias:
+                                                    type: string
+                                                    description: The name that can be assigned by the customer to label the
+                                                      arrangement
+                                                  iban:
+                                                    type: string
+                                                    description: "The International Bank Account Number. If specified, it must\
+                                                      \ be a valid IBAN, otherwise an invalid value error could be raised."
+                                                  bban:
+                                                    type: string
+                                                    description: BBAN is the country-specific bank account number. It is short
+                                                      for Basic Bank Account Number. Account numbers usually match the BBAN.
+                                                  number:
+                                                    type: string
+                                                    description: First 6 and/or last 4 digits of a Payment card. All other digits
+                                                      will/to be masked. Be aware that using card number differently is potential
+                                                      PCI risk.
+                                                  bic:
+                                                    type: string
+                                                    description: Bank Identifier Code - international bank code that identifies
+                                                      particular banks worldwide
+                                                description: Arrangement information from Arrangement Manger
+                                            canSell:
+                                              type: boolean
+                                              description: Showing that the instrument can be sold from the selected portfolio.
+                              examples:
+                                example1:
+                                  value:
+                                      portfolios:
+                                        - name: Trading portfolio
+                                          alias: My portfolio to trade
+                                          portfolioId: 68bbeace-274e-11ec-9621-0242ac130002
+                                          availableBalance:
+                                            amount: 5068.3
+                                            currency: USD
+                                          availableForTradingQty: null
+                                          iban: NL79RABO5373380466
+                                          arrangementDisplay:
+                                            name: Trading portfolio one
+                                            displayName: First portfolio account
+                                            bankAlias: Portfolio account
+                                            iban: ••••••••••••••••••0466
+                                            bban: ••••••••••0466
+                                            number: •••••ffix
+                                            bic: BICExample1
+                                          canSell: true
+                                          accounts:
+                                          - id: 55bbeace-274e-22ec-5487-0242ac130004
+                                          - id: 44bbeace-274e-22ec-5487-0242ac130005
+                                example2:
+                                  value:
+                                      portfolios:
+                                        - name: Trading portfolio
+                                          alias: My portfolio to trade
+                                          portfolioId: 68bbeace-274e-11ec-9621-0242ac130002
+                                          
                         "400":
                           description: BadRequest
                           content:
