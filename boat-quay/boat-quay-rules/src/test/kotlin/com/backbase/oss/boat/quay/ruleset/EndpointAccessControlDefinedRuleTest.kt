@@ -203,4 +203,26 @@ class EndpointAccessControlDefinedRuleTest {
                 .isNotEmpty
     }
 
+    @Test
+    fun `Endpoint with multiple ACs`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    - resource: Users
+                      function: Manage Users
+                      privilege: view
+                    """.trimIndent()
+        )
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isEmpty()
+    }
+
 }

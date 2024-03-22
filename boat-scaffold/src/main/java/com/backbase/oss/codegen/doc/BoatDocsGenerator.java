@@ -1,10 +1,14 @@
 package com.backbase.oss.codegen.doc;
 
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
 import java.util.HashMap;
+import org.openapitools.codegen.CodegenOperation;
 
 @Slf4j
 public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGenerator {
@@ -25,6 +29,14 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
         typeAliases = new HashMap<>();
     }
 
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        boolean isMultipleAccessControlPermission = codegenOperation.vendorExtensions.containsKey("x-BbAccessControls");
+        codegenOperation.vendorExtensions.put("hasMultipleAccessControlPermissions", isMultipleAccessControlPermission);
+
+        return codegenOperation;
+    }
 
     @Override
     public String getName() {

@@ -1,0 +1,290 @@
+openapi: 3.0.1
+info:
+  title: Wallet Test Client API
+  description: No description available
+  version: v1
+servers:
+  - url: /serviceName/client-api/v1
+    description: The server
+tags:
+  - name: wallet test client api
+paths:
+  /wallet/paymentcards:
+    summary: Payment Cards
+    description: No description available
+    get:
+      tags:
+        - wallet
+      summary: Returns available payment card details for user, optionally filtered
+        by nameOnCard.
+      description: Returns available payment card details for user, optionally filtered
+        by nameOnCard
+      operationId: getPaymentcards
+      parameters:
+        - name: nameOnCard
+          in: query
+          description: Filter by the cardholder's name (case-insensitive), can be the
+            first one or more characters of one of the words/names
+          required: false
+          schema:
+            type: string
+          examples:
+            example:
+              summary: example
+              value: Smi
+        - name: dateTimeOnly
+          in: query
+          description: Creation date in datetime-only format
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            example:
+              summary: example
+              value: 2017-10-04T14:54:36
+        - name: dateTime
+          in: query
+          description: Creation date in Zoned RFC3339 Date-time format
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            example:
+              summary: example
+              value: 2017-10-04T14:54:36Z
+        - name: dateTime2616
+          in: query
+          description: Zoned RFC2616 Date-time param example
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            example:
+              summary: example
+              value: Wed, 4 Jul 2001 12:08:56 PDT
+        - name: date
+          in: query
+          description: Date-only param example
+          required: false
+          schema:
+            type: string
+            format: date
+          examples:
+            example:
+              summary: example
+              value: 2017-10-04
+        - name: time
+          in: query
+          description: time-only param example
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            example:
+              summary: example
+              value: 14:54:36
+        - name: orderBy
+          in: query
+          description: |
+            Order by field: nameOnCard
+          required: false
+          schema:
+            type: string
+          examples:
+            example:
+              summary: example
+        - name: direction
+          in: query
+          description: Direction
+          required: false
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
+            default: DESC
+          examples:
+            example:
+              summary: example
+      responses:
+        "200":
+          description: No description available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCards'
+              examples:
+                example:
+                  value: |-
+                    [ {
+                      "id" : "a5b0fe7d-c4dd-40a7-bd80-dfc7869327e1",
+                      "pan" : "5434111122223333",
+                      "cvc" : "123",
+                      "startDate" : "0116",
+                      "expiryDate" : "1219",
+                      "nameOnCard" : "Mr Timmy Tester",
+                      "creationDate" : "2011-05-30T12:13:14+03:00",
+                      "balance" : {
+                        "amount" : "2001",
+                        "currencyCode" : "EUR"
+                      },
+                      "apr" : 12.75
+                    }, {
+                      "id" : "d593c212-70ad-41a6-a547-d5d9232414cb",
+                      "pan" : "5434111122224444",
+                      "cvc" : "101",
+                      "startDate" : "0216",
+                      "expiryDate" : "0120",
+                      "nameOnCard" : "Mr Timmothy Tester",
+                      "creationDate" : "2011-05-30T12:13:14+03:00",
+                      "balance" : {
+                        "amount" : "4.4399999999999995",
+                        "currencyCode" : "GBP"
+                      },
+                      "apr" : 12.75
+                    }, {
+                      "id" : "9635966b-28e9-4479-8121-bb7bc9beeb62",
+                      "pan" : "5434121212121212",
+                      "cvc" : "121",
+                      "startDate" : "0115",
+                      "expiryDate" : "1218",
+                      "nameOnCard" : "Mr Timmy Tester",
+                      "creationDate" : "2011-05-30T12:13:14+03:00",
+                      "balance" : {
+                        "amount" : "1981",
+                        "currencyCode" : "EUR"
+                      },
+                      "apr" : 12.75
+                    } ]
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Bad Request",
+                      "errors" : [ {
+                        "message" : "Value Exceeded. Must be between {min} and {max}.",
+                        "key" : "common.api.shoesize",
+                        "context" : {
+                          "max" : "50",
+                          "min" : "1"
+                        }
+                      } ]
+                    }
+        "406":
+          description: NotAcceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Could not find acceptable representation",
+                      "supportedMediaTypes" : [ "application/json" ]
+                    }
+        "500":
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Description of error"
+                    }
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Access to requested resource denied.",
+                      "errors" : [ {
+                        "message" : "Resource access denied due to an insufficient user quota of {quota}.",
+                        "key" : "common.api.quota",
+                        "context" : {
+                          "quota" : "someQuota"
+                        }
+                      } ]
+                    }
+        "415":
+          description: UnsupportedMediaType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedMediaTypeError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Unsupported media type.",
+                      "errors" : [ {
+                        "message" : "The request entity has a media type {mediaType} which the resource does not support.",
+                        "key" : "common.api.mediaType",
+                        "context" : {
+                          "mediaType" : "application/javascript"
+                        }
+                      } ]
+                    }
+        "404":
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Resource not found.",
+                      "errors" : [ {
+                        "message" : "Unable to find the resource requested resource: {resource}.",
+                        "key" : "common.api.resource",
+                        "context" : {
+                          "resource" : "aResource"
+                        }
+                      } ]
+                    }
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedAltError'
+              examples:
+                example:
+                  value: |-
+                    {
+                      "message" : "Access to requested resource denied.",
+                      "errors" : [ {
+                        "message" : "Resource access denied due to invalid credentials.",
+                        "key" : "common.api.token",
+                        "context" : {
+                          "accessToken" : "expired"
+                        }
+                      } ]
+                    }
+      x-BbAccessControls:
+        - resource: WALLET
+          function: MANAGE_PAYMENT_CARDS
+          privilege: READ_PAYMENT_CARD
+        - resource: CARDS
+          function: MANAGE
+          privilege: READ_CARD

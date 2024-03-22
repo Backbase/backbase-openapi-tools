@@ -119,10 +119,19 @@ h2 {
   margin-bottom: 32px;
 }
 
-div.secured-by {
+div.in-row {
+  display: inline-block;
+}
+
+div.secured-by.secured-by-multiple {
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
+}
+
+div.secured-by-multiple {
+  margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 div.secured-by > h2 {
@@ -136,7 +145,13 @@ div.secured-by > h2:only-child {
   display: none !important;
 }
 
-div.secured-by > pre {
+div.secured-by-multiple > pre:nth-child(1) {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding-top: 8px;
+}
+
+div.secured-by,div.secured-by-multiple > pre {
   margin: 0;
   border: none;
   border-radius: 0;
@@ -150,7 +165,7 @@ div.secured-by > pre:nth-child(2) {
   padding-top: 8px;
 }
 
-div.secured-by > pre:last-child {
+div.secured-by,div.secured-by-multiple > pre:last-child {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   padding-bottom: 8px;
