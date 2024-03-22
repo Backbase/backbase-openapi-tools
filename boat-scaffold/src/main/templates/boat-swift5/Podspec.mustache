@@ -8,14 +8,14 @@ Pod::Spec.new do |s|
   s.author = '{{podAuthors}}'{{/podAuthors}}
 
   s.platform = :ios
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   {{#podDocumentationURL}}
   s.documentation_url = '{{podDocumentationURL}}'
   {{/podDocumentationURL}}
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source = { :git => "https://github.com/Backbase/backbase-openapi-tools", :tag => "{{{podVersion}}}" }
-  s.source_files = '{{projectName}}/Classes/**/*.swift'
+  s.source = { :git => 'https://github.com/backbase-rnd/backbase-generated-clients-ios/ios-clients/{{projectName}}'}
+  s.source_files = 'sources/**/*.swift'
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.vendored_frameworks = '{{projectName}}.xcframework'

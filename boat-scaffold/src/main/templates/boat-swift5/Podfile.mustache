@@ -1,6 +1,6 @@
 source 'https://cdn.cocoapods.org'
 
-platform :ios, '11.0'
+platform :ios, '15.0'
 
 plugin 'cocoapods-art', sources: %w[
   bbartifacts3
@@ -14,7 +14,7 @@ install! 'cocoapods', deterministic_uuids: false
 inhibit_all_warnings!
 
 def normal_pods
-  pod 'Backbase', '>= 6.11'{{#useRxSwift}}
+  pod 'Backbase', '>= 9'{{#useRxSwift}}
   pod 'RxSwift', '~> 5.0.0'{{/useRxSwift}}{{#useAlamofire}}
   pod 'Alamofire', '~> 4.9.1'{{/useAlamofire}}{{#usePromiseKit}}
   pod 'PromiseKit', '~> 6.12.0'{{/usePromiseKit}}
