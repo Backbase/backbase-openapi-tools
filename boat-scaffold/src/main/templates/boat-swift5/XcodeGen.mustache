@@ -5,7 +5,7 @@ targets:
   {{projectName}}:
     type: framework
     platform: iOS
-    deploymentTarget: "14.0"
+    deploymentTarget: "15.0"
     sources: [{{projectName}}]
     info:
       path: ./Info.plist
@@ -13,6 +13,3 @@ targets:
     scheme:
       testTargets:
         - {{projectName}}IntegrationTests
-    postBuildScripts:
-      - path: ../../fix_swiftinterface.sh
-        name: Fix swiftinterface
