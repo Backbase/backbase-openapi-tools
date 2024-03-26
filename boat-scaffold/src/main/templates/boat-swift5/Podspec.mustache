@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary = '{{projectDescription}}'{{/projectDescription}}{{#podDescription}}
   s.description = '{{podDescription}}'{{/podDescription}}
   s.license = '{{#podLicense}}{{& podLicense}}{{/podLicense}}'{{^podLicense}}'Proprietary'{{/podLicense}}
-  s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/OpenAPITools/openapi-generator{{/podHomepage}}'{{#podAuthors}}
+  s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/Backbase/backbase-openapi-tools{{/podHomepage}}'{{#podAuthors}}
   s.author = '{{podAuthors}}'{{/podAuthors}}
 
   s.platform = :ios
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source = { :git => 'https://github.com/backbase-rnd/backbase-generated-clients-ios/ios-clients/{{projectName}}'}
-  s.source_files = 'sources/**/*.swift'
+  s.source_files = '{{projectName}}/Classes/**/*.swift'
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.vendored_frameworks = '{{projectName}}.xcframework'

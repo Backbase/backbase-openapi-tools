@@ -10,6 +10,3 @@ targets:
     info:
       path: ./Info.plist
       version: {{#podVersion}}{{podVersion}}{{/podVersion}}{{^podVersion}}{{#apiInfo}}{{version}}{{/apiInfo}}{{^apiInfo}}}0.0.1{{/apiInfo}}{{/podVersion}}
-    scheme:
-      testTargets:
-        - {{projectName}}IntegrationTests
