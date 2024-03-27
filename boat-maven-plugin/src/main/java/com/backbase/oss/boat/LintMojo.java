@@ -11,6 +11,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.zalando.zally.rule.api.Severity;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Mojo(name = "lint", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
@@ -55,7 +56,10 @@ public class LintMojo extends AbstractLintMojo {
             if (!report.hasViolations()) {
                 log.info("OpenAPI: {}, is valid! No warnings!", report.getFilePath());
             } else {
-                isFailed = true;
+                if (report.getViolations().stream().anyMatch(v -> v.getRule().getSeverity() == Severity.MUST
+                    || v.getRule().getSeverity() == Severity.SHOULD)) {
+                    isFailed = true;
+                }
                 log.warn("OpenAPI: {} has Linting issues: ", report.getFilePath());
                 report.getViolations().forEach(result -> log.warn("{}", result.displayString()));
             }
@@ -65,7 +69,8 @@ public class LintMojo extends AbstractLintMojo {
             }
         }
         if (isFailed && failOnWarning) {
-            throw new MojoFailureException("Linting " + inputSpec + " failed. Please correct the found issues and try again");
+            throw new MojoFailureException(
+                "Linting " + inputSpec + " failed. Please correct the found issues and try again");
         }
 
     }
@@ -94,4 +99,5 @@ public class LintMojo extends AbstractLintMojo {
     public void setWriteLintReport(boolean writeLintReport) {
         this.writeLintReport = writeLintReport;
     }
+
 }
