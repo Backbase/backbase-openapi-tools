@@ -1,10 +1,7 @@
 package com.backbase.oss.boat.quay.ruleset
 
-import com.fasterxml.jackson.core.JsonPointer
 import com.typesafe.config.Config
 import org.zalando.zally.rule.api.*
-import java.nio.file.FileVisitOption
-import java.util.Optional
 
 @Rule(
         ruleSet = BoatRuleSet::class,
@@ -30,6 +27,7 @@ class EndpointAccessControlDefinedRule(config: Config) {
                                 context.violation("Access Control not defined: ${it.operationId}", it))
                     } else {
                         val acExplicitlyDisabled: Boolean = "false" == it.extensions["x-BbAccessControl"].toString()
+                        val acEnabledSet: Boolean = notEmpty(it.extensions["x-BbAccessControl"])
                         val isMultipleAcs: Boolean = notEmpty(it.extensions["x-BbAccessControls"])
                         val acResourceSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-resource"])
                         val acFunctionSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-function"])
@@ -55,22 +53,18 @@ class EndpointAccessControlDefinedRule(config: Config) {
                                 }
                             }
 
-                        } else if (!acExplicitlyDisabled && (acResourceSet || acFunctionSet || acPrivilegeSet)) {
+                        } else if (acExplicitlyDisabled && (acResourceSet || acFunctionSet || acPrivilegeSet || isMultipleAcs)) {
                             violations.add(
                                     context.violation("AC both disabled and defined: ${it.operationId}", it))
 
-                        } else if (acResourceSet || !acFunctionSet || !acPrivilegeSet) {
+                        } else if (!acEnabledSet && (!acResourceSet || !acFunctionSet || !acPrivilegeSet)) {
                             violations.add(
                                     context.violation("AC info not complete: ${it.extensions}", it))
                         }
                     }
                 }
+
         return violations
     }
-
-    /*class Permission {
-        val resource;
-        val
-    }*/
 }
 

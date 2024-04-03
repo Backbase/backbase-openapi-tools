@@ -216,6 +216,9 @@ class EndpointAccessControlDefinedRuleTest {
                     - resource: Users
                       function: Manage Users
                       privilege: view
+                    - resource: Payment
+                      function: Manage Payments
+                      privilege: view
                     """.trimIndent()
         )
         val violations = rule.validate(context)
@@ -223,6 +226,117 @@ class EndpointAccessControlDefinedRuleTest {
         ZallyAssertions
                 .assertThat(violations)
                 .isEmpty()
+    }
+
+    @Test
+    fun `Endpoint with multiple ACs but no permissions defined`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    """.trimIndent()
+        )
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
+    @Test
+    fun `Endpoint with multiple ACs but missing parameter in permission`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    - resource: Users
+                      function: Manage Users
+                    """.trimIndent()
+        )
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
+    @Test
+    fun `Endpoint with multiple ACs but missing parameter in second permission`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    - resource: Users
+                      function: Manage Users
+                      privilege: view
+                    - resource: Payment
+                      privilege: view
+                    """.trimIndent()
+        )
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
+    @Test
+    fun `Endpoint with multiple ACs but too many parameters in permission`() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    - resource: Users
+                      function: Manage Users
+                      privilege: view
+                      something: else
+                    """.trimIndent()
+        )
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
+    }
+
+    @Test
+    fun `Endpoint has multiple ACs defined and explicitly set false `() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+                """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControl: false
+                  x-BbAccessControls:
+                    - resource: Users
+                      function: Manage Users
+                      privilege: view
+            """.trimIndent()
+        )
+
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+                .assertThat(violations)
+                .isNotEmpty
     }
 
 }
