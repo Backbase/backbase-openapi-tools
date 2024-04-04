@@ -71,11 +71,9 @@ class BoatDocsTest {
     @Test
     void testGenerateDocs_MultiplePermissions() throws IOException {
         generateDocs(getFile("/openapi-with-examples/openapi-with-multiple-permissions.yaml"));
-
-        File output = new File("target/docs/");
-        String[] actualDirectorySorted = output.list();
         File index = new File("target/docs/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
+        assertTrue(generated.startsWith("<!DOCTYPE html>"));
     }
 
     @Test
