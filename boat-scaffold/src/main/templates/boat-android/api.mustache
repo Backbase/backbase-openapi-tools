@@ -5,11 +5,8 @@ package {{apiPackage}}
 {{/imports}}
 import java.net.URI
 import com.backbase.android.dbs.DBSClient
-import com.backbase.android.common.utils.dbs.MutableParams
-import com.backbase.android.common.utils.dbs.Params
 import com.backbase.android.dbs.DBSDataProvider
-import com.backbase.android.common.utils.dbs.DBSDataImpl
-import com.backbase.android.common.utils.dbs.CustomNetworkDBSProvider
+import com.backbase.android.dbs.dataproviders.NetworkDBSDataProvider
 import com.backbase.android.Backbase
 import com.backbase.android.utils.net.MultiPartWrapper
 import com.backbase.android.utils.net.PartContent
@@ -45,9 +42,9 @@ class {{classname}}(
     val moshi: Moshi,
     val parser: ResponseBodyParser,
     var serverUri: URI,
-    var provider: DBSDataProvider = CustomNetworkDBSProvider(context),
+    var provider: DBSDataProvider = NetworkDBSDataProvider(context),
     var backbase: Backbase = requireNotNull(Backbase.getInstance()) { "The Backbase instance must not be null!" }
-) : DBSClient, DBSDataImpl(backbase) {
+) : DBSClient {
 
     override fun setBaseURI(baseUri: URI) {
         this.serverUri = baseUri
