@@ -213,12 +213,14 @@ class EndpointAccessControlDefinedRuleTest {
               /client-api/foo:
                 get:
                   x-BbAccessControls:
-                    - resource: Users
-                      function: Manage Users
-                      privilege: view
-                    - resource: Payment
-                      function: Manage Payments
-                      privilege: view
+                    description: This endpoint requires the following permissions
+                    permissions:
+                        - resource: Users
+                          function: Manage Users
+                          privilege: view
+                        - resource: Payment
+                          function: Manage Payments
+                          privilege: view
                     """.trimIndent()
         )
         val violations = rule.validate(context)
@@ -257,8 +259,10 @@ class EndpointAccessControlDefinedRuleTest {
               /client-api/foo:
                 get:
                   x-BbAccessControls:
-                    - resource: Users
-                      function: Manage Users
+                    description: This endpoint requires the following permissions
+                    permissions: 
+                        - resource: Users
+                          function: Manage Users
                     """.trimIndent()
         )
         val violations = rule.validate(context)
@@ -278,11 +282,13 @@ class EndpointAccessControlDefinedRuleTest {
               /client-api/foo:
                 get:
                   x-BbAccessControls:
-                    - resource: Users
-                      function: Manage Users
-                      privilege: view
-                    - resource: Payment
-                      privilege: view
+                    description: This endpoint requires the following permissions
+                    permissions: 
+                        - resource: Users
+                          function: Manage Users
+                          privilege: view
+                        - resource: Payment
+                          privilege: view
                     """.trimIndent()
         )
         val violations = rule.validate(context)
@@ -302,10 +308,12 @@ class EndpointAccessControlDefinedRuleTest {
               /client-api/foo:
                 get:
                   x-BbAccessControls:
-                    - resource: Users
-                      function: Manage Users
-                      privilege: view
-                      something: else
+                    description: This endpoint requires the following permissions
+                    permissions:
+                        - resource: Users
+                          function: Manage Users
+                          privilege: view
+                          something: else
                     """.trimIndent()
         )
         val violations = rule.validate(context)
@@ -326,9 +334,11 @@ class EndpointAccessControlDefinedRuleTest {
                 get:
                   x-BbAccessControl: false
                   x-BbAccessControls:
-                    - resource: Users
-                      function: Manage Users
-                      privilege: view
+                    description: This endpoint requires the following permissions
+                    permissions:   
+                        - resource: Users
+                          function: Manage Users
+                          privilege: view
             """.trimIndent()
         )
 
@@ -337,6 +347,30 @@ class EndpointAccessControlDefinedRuleTest {
         ZallyAssertions
                 .assertThat(violations)
                 .isNotEmpty
+    }
+
+    @Test
+    fun `Endpoint has multiple ACs defined but no description `() {
+        @Language("YAML")
+        val context = DefaultContextFactory().getOpenApiContext(
+            """
+            openapi: 3.0.3
+            paths: 
+              /client-api/foo:
+                get:
+                  x-BbAccessControls:
+                    permissions:   
+                        - resource: Users
+                          function: Manage Users
+                          privilege: view
+            """.trimIndent()
+        )
+
+        val violations = rule.validate(context)
+
+        ZallyAssertions
+            .assertThat(violations)
+            .isNotEmpty
     }
 
 }

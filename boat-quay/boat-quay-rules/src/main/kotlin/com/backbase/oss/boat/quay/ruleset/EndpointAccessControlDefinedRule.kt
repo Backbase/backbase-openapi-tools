@@ -34,7 +34,16 @@ class EndpointAccessControlDefinedRule(config: Config) {
                         val acPrivilegeSet: Boolean = notEmpty(it.extensions["x-BbAccessControl-privilege"])
 
                         if (!acExplicitlyDisabled && isMultipleAcs) {
-                            val entries: List<*> = it.extensions["x-BbAccessControls"] as List<*>;
+
+                            val multiAccessControls = it.extensions["x-BbAccessControls"] as Map<*, *>;
+
+                            val description = multiAccessControls["description"];
+
+                            if (!notEmpty(description)) {
+                                violations.add(context.violation("No description defined for x-BbAccessControls", it))
+                            }
+
+                            val entries: List<*> = multiAccessControls["permissions"] as List<*>;
                             val numberOfEntries = entries.size;
 
                             if (numberOfEntries == 0) {

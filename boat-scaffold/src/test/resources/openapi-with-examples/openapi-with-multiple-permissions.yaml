@@ -282,9 +282,11 @@ paths:
                       } ]
                     }
       x-BbAccessControls:
-        - resource: WALLET
-          function: MANAGE_PAYMENT_CARDS
-          privilege: READ_PAYMENT_CARD
-        - resource: CARDS
-          function: MANAGE
-          privilege: READ_CARD
+        description: (a) and (b) are required permissions.
+        permissions:
+          - resource: WALLET
+            function: MANAGE_PAYMENT_CARDS
+            privilege: READ_PAYMENT_CARD
+          - resource: CARDS
+            function: MANAGE
+            privilege: READ_CARD

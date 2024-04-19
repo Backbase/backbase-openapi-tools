@@ -55,13 +55,17 @@
                     <table>
                       <tr>
                     {{#x-BbAccessControls}}
-                      <td>
-                        <div class="secured-by-multiple">
-                          {{#resource}}<pre><b>Resource:</b> {{.}}</pre>{{/resource}}
-                          {{#function}}<pre><b>Function:</b> {{.}}</pre>{{/function}}
-                          {{#privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/privilege}}
-                        </div>
-                      </td>
+                      {{#description}}<pre><b>Description:</b> {{.}}</pre>{{/description}}
+                      {{#permissions}}
+                          <td>
+                            <div class="secured-by-multiple">
+                              {{#letter}}<pre><b>({{.}})</b></pre>{{/letter}}
+                              {{#resource}}<pre><b>Resource:</b> {{.}}</pre>{{/resource}}
+                              {{#function}}<pre><b>Function:</b> {{.}}</pre>{{/function}}
+                              {{#privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/privilege}}
+                            </div>
+                          </td>
+                      {{/permissions}}
                     {{/x-BbAccessControls}}
                       </tr>
                     </table>

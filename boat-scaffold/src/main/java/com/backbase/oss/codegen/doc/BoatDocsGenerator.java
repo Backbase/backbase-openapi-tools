@@ -3,6 +3,7 @@ package com.backbase.oss.codegen.doc;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -34,6 +35,21 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
         boolean isMultipleAccessControlPermission = codegenOperation.vendorExtensions.containsKey("x-BbAccessControls");
         codegenOperation.vendorExtensions.put("hasMultipleAccessControlPermissions", isMultipleAccessControlPermission);
+        if (isMultipleAccessControlPermission) {
+            try {
+                Map<String, Object> accessControlInfo = (Map<String, Object>)codegenOperation.vendorExtensions.get("x-BbAccessControls");
+
+                if (accessControlInfo.containsKey("permissions")) {
+                    List<Map<String, Object>> permissions = (List<Map<String, Object>>) accessControlInfo.get("permissions");
+
+                    for (int p = 0; p < permissions.size(); p++) {
+                        permissions.get(p).put("letter", (char)('a' + p));
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Unable to add index to access control BOAT docs", e);
+            }
+        }
 
         return codegenOperation;
     }
