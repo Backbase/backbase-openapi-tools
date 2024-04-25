@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoatSwift5CodegenTests {
     BoatSwift5Codegen boatSwift5CodeGen = new BoatSwift5Codegen();
 
+
     @Test
     void testGeneratorName() {
         assertEquals(boatSwift5CodeGen.getName(), "boat-swift5");
@@ -37,6 +38,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testProcessOptsSetDBSDataProvider() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.setLibrary(BoatSwift5Codegen.LIBRARY_DBS);
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
@@ -46,6 +48,7 @@ public class BoatSwift5CodegenTests {
     @ParameterizedTest
     @ValueSource(strings = {BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, "PODFILE", "podFile", "podfile", "podfilE"})
     void testSetDependenciesDoesNotConsiderCase(String arg) {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, arg);
         boatSwift5CodeGen.processOpts();
 
@@ -55,6 +58,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.processOpts();
         final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
         assertEquals(0,dependenciesAs.length);
@@ -168,6 +172,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testDefaultPodAuthors() throws Exception {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         // Given
         // When
         boatSwift5CodeGen.processOpts();
@@ -178,6 +183,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testPodAuthors() throws Exception {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         // Given
         final String openAPIDevs = "OpenAPI Devs";
         boatSwift5CodeGen.additionalProperties().put(Swift5ClientCodegen.POD_AUTHORS, openAPIDevs);
