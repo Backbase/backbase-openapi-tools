@@ -47,8 +47,6 @@ class BoatDocsTest {
         File output = new File("target/docs/");
         String[] actualDirectorySorted = output.list();
         Arrays.sort(actualDirectorySorted);
-        String[] expectedDirectory = {".openapi-generator", ".openapi-generator-ignore", "index.html"};
-//        assertArrayEquals(expectedDirectory, actualDirectorySorted);
         File index = new File("target/docs/index.html");
         String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
         assertTrue(generated.startsWith("<!DOCTYPE html>"));
