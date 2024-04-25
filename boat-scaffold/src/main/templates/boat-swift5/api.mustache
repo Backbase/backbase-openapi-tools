@@ -12,7 +12,7 @@ import PromiseKit{{/usePromiseKit}}{{#useRxSwift}}
 import RxSwift{{/useRxSwift}}{{#useCombine}}
 import Combine{{/useCombine}}
 {{#swiftUseApiNamespace}}
-extension {{#hasStrippedProjectName}}{{strippedProjectName}}Client{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API{{/hasStrippedProjectName}} {
+extension {{moduleName}}Client {
 {{/swiftUseApiNamespace}}
 
 /// {{classname}} protocol defines a blueprint of methods, properties, and other requirements for {{classname}} functionality. 
@@ -114,7 +114,7 @@ extension {{#hasStrippedProjectName}}{{strippedProjectName}}Client{{/hasStripped
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>
      */
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}} {{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{#hasStrippedProjectName}}{{strippedProjectName}}Client.apiResponseQueue{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.apiResponseQueue{{/hasStrippedProjectName}}) -> Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}} {{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue) -> Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
         let deferred = Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>.pending()
         {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
             switch result {
@@ -142,7 +142,7 @@ extension {{#hasStrippedProjectName}}{{strippedProjectName}}Client{{/hasStripped
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>
      */
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{#hasStrippedProjectName}}{{strippedProjectName}}Client.apiResponseQueue{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.apiResponseQueue{{/hasStrippedProjectName}}) -> Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue) -> Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
         return Observable.create { observer -> Disposable in
             {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
                 switch result {
@@ -173,7 +173,7 @@ extension {{#hasStrippedProjectName}}{{strippedProjectName}}Client{{/hasStripped
      - returns: AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{#hasStrippedProjectName}}{{strippedProjectName}}Client.apiResponseQueue{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.apiResponseQueue{{/hasStrippedProjectName}}) -> AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error> {    
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue) -> AnyPublisher<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error> {    
         return Future<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>.init { promisse in
             {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
                 switch result {
@@ -201,7 +201,7 @@ extension {{#hasStrippedProjectName}}{{strippedProjectName}}Client{{/hasStripped
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the result
      */
-    open func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{#hasStrippedProjectName}}{{strippedProjectName}}Client.apiResponseQueue{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.apiResponseQueue{{/hasStrippedProjectName}}, completion: @escaping ((_ result: Result<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>) -> Void)) {    
+    open func {{operationId}}({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}{{#hasParams}}, {{/hasParams}}apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue, completion: @escaping ((_ result: Result<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}, Error>) -> Void)) {    
         {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}).execute(apiResponseQueue) { result -> Void in
             switch result {
             {{#returnType}}

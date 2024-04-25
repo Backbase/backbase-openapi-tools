@@ -25,7 +25,7 @@ class URLSessionRequestBuilderFactory: RequestBuilderFactory {
     }
 }
 
-{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} typealias {{#hasStrippedProjectName}}{{strippedProjectName}}ClientChallengeHandler{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}APIChallengeHandler{{/hasStrippedProjectName}} = ((URLSession, URLSessionTask, URLAuthenticationChallenge) -> (URLSession.AuthChallengeDisposition, URLCredential?))
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} typealias {{moduleName}}ClientChallengeHandler = ((URLSession, URLSessionTask, URLAuthenticationChallenge) -> (URLSession.AuthChallengeDisposition, URLCredential?))
 
 // Store the URLSession's delegate to retain its reference
 private let sessionDelegate = SessionDelegate()
@@ -34,7 +34,7 @@ private let sessionDelegate = SessionDelegate()
 private let defaultURLSession = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
 
 // Store current taskDidReceiveChallenge for every URLSessionTask
-private var challengeHandlerStore = SynchronizedDictionary<Int, {{#hasStrippedProjectName}}{{strippedProjectName}}ClientChallengeHandler{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}APIChallengeHandler{{/hasStrippedProjectName}}>()
+private var challengeHandlerStore = SynchronizedDictionary<Int, {{moduleName}}ClientChallengeHandler>()
 
 // Store current URLCredential for every URLSessionTask
 private var credentialStore = SynchronizedDictionary<Int, URLCredential>()
@@ -44,7 +44,7 @@ private var credentialStore = SynchronizedDictionary<Int, URLCredential>()
     /**
      May be assigned if you want to control the authentication challenges.
      */
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var taskDidReceiveChallenge: {{#hasStrippedProjectName}}{{strippedProjectName}}ClientChallengeHandler?{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}APIChallengeHandler?{{/hasStrippedProjectName}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var taskDidReceiveChallenge: {{moduleName}}ClientChallengeHandler?
 
     /**
      May be assigned if you want to do any of those things:
@@ -102,7 +102,7 @@ private var credentialStore = SynchronizedDictionary<Int, URLCredential>()
     }
 
     @discardableResult
-    override {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func execute(_ apiResponseQueue: DispatchQueue = {{#hasStrippedProjectName}}{{strippedProjectName}}Client.apiResponseQueue{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.apiResponseQueue{{/hasStrippedProjectName}}, _ completion: @escaping (_ result: Swift.Result<Response<T>, ErrorResponse>) -> Void) -> RequestTask {
+    override {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func execute(_ apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue, _ completion: @escaping (_ result: Swift.Result<Response<T>, ErrorResponse>) -> Void) -> RequestTask {
         let urlSession = createURLSession()
 
         guard let xMethod = HTTPMethod(rawValue: method) else {
@@ -197,7 +197,7 @@ private var credentialStore = SynchronizedDictionary<Int, URLCredential>()
 
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func buildHeaders() -> [String: String] {
         var httpHeaders: [String: String] = [:]
-        for (key, value) in {{#hasStrippedProjectName}}{{strippedProjectName}}Client.customHeaders{{/hasStrippedProjectName}}{{^hasStrippedProjectName}}{{projectName}}API.customHeaders{{/hasStrippedProjectName}}
+        for (key, value) in {{moduleName}}Client.customHeaders
             httpHeaders[key] = value
         }
         for (key, value) in headers {
