@@ -331,17 +331,26 @@ public class BoatSwift5CodegenTests {
     }
 
     @Test
-    void testSanitizeThrowsWhenProjectNameIsInvalid() {
+    void test_processOptsThrowsWhenProjectNameIsInvalid() {
         boatSwift5CodeGen.additionalProperties().put("projectName","SomethingClient");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> boatSwift5CodeGen.sanitize((String) boatSwift5CodeGen.additionalProperties().get("projectName")));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> boatSwift5CodeGen.processOpts());
         assertEquals("SomethingClient is not valid. projectName should end with `API or `Api`", exception.getMessage());
     }
 
     @Test
-    void testSanitizeReturnsStrippedModuleNameIsAProjectNameEndingWithAPIIsProvided() {
+    void test_processOptsSetsStrippedModuleNameIsAProjectNameEndingWithAPIIsProvided() {
         boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         String expectedModuleName = "Something";
-        assertEquals(boatSwift5CodeGen.sanitize((String) boatSwift5CodeGen.additionalProperties().get("projectName")), expectedModuleName);
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), expectedModuleName);
+    }
+
+    @Test
+    void test_processOptsSetsOriginalProjectNameAsModuleNameIfNameDoesNotEndWithAPIOrClient() {
+        String expectedModuleName = "Something";
+        boatSwift5CodeGen.additionalProperties().put("projectName",expectedModuleName);
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), expectedModuleName);
     }
 
     private CodegenModel prepareForModelTests() {
