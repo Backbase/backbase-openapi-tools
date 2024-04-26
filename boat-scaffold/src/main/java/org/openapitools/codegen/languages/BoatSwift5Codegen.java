@@ -205,7 +205,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         if (Pattern.matches("\\w.*(API|Api)$", projectName)) {
             projName = Pattern.compile("(API|Api)$").matcher(projectName).replaceAll("");
         } else if (Pattern.matches("\\w.*(CLIENT|client|Client)$", projectName)) {
-            throw new RuntimeException(projectName + " is not valid. projectName should end with `API or `Api`");
+            throw new IllegalArgumentException(projectName + " is not valid. projectName should end with `API or `Api`");
         } else {
             projName = projectName;
         }
