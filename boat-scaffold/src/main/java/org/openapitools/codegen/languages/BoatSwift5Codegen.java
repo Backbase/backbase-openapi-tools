@@ -200,12 +200,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     Check if it's ending with API, if yes, strip the API / Api and set moduleName to the stripped string
     Check if it's ending with Client, if yes, stop, fail the whole generation.
      */
-    private String sanitize(String projectName) {
+    String sanitize(String projectName) {
         String projName = "";
         if (Pattern.matches("\\w.*(API|Api)$", projectName)) {
             projName = Pattern.compile("(API|Api)$").matcher(projectName).replaceAll("");
         } else if (Pattern.matches("\\w.*(CLIENT|client|Client)$", projectName)) {
-            throw new RuntimeException(projectName + " is not valid. projectName should end with `API or `Api` ");
+            throw new RuntimeException(projectName + " is not valid. projectName should end with `API or `Api`");
         } else {
             projName = projectName;
         }

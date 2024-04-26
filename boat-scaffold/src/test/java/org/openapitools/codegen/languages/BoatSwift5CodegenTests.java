@@ -330,6 +330,20 @@ public class BoatSwift5CodegenTests {
         assertEquals(boatSwift5CodeGen.postProcessAllModels(models), models);
     }
 
+    @Test
+    void testSanitizeThrowsWhenProjectNameIsInvalid() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingClient");
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> boatSwift5CodeGen.sanitize((String) boatSwift5CodeGen.additionalProperties().get("projectName")));
+        assertEquals("SomethingClient is not valid. projectName should end with `API or `Api`", exception.getMessage());
+    }
+
+    @Test
+    void testSanitizeReturnsStrippedModuleNameIsAProjectNameEndingWithAPIIsProvided() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
+        String expectedModuleName = "Something";
+        assertEquals(boatSwift5CodeGen.sanitize((String) boatSwift5CodeGen.additionalProperties().get("projectName")), expectedModuleName);
+    }
+
     private CodegenModel prepareForModelTests() {
 
         final ObjectSchema objectSchema = new ObjectSchema();
