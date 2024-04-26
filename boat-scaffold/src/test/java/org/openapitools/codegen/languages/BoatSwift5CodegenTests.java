@@ -333,7 +333,7 @@ public class BoatSwift5CodegenTests {
     @Test
     void test_processOptsThrowsWhenProjectNameIsInvalid() {
         boatSwift5CodeGen.additionalProperties().put("projectName","SomethingClient");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> boatSwift5CodeGen.processOpts());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> boatSwift5CodeGen.processOpts());
         assertEquals("SomethingClient is not valid. projectName should end with `API or `Api`", exception.getMessage());
     }
 
