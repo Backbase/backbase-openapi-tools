@@ -353,6 +353,19 @@ public class BoatSwift5CodegenTests {
         assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), expectedModuleName);
     }
 
+    /*
+    Test that when a moduleName is provided sanitize is not called
+     */
+    @Test
+    void test_processOptsDoesNotSetModuleNameIfAlreadySet() {
+        String projectName = "CustomerAPI";
+        String moduleName = "CustomerAPIModified";
+        boatSwift5CodeGen.additionalProperties().put("projectName",projectName);
+        boatSwift5CodeGen.additionalProperties().put("moduleName",moduleName);
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), moduleName);
+    }
+
     private CodegenModel prepareForModelTests() {
 
         final ObjectSchema objectSchema = new ObjectSchema();
