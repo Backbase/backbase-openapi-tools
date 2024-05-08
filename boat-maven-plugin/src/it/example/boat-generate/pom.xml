@@ -6,13 +6,13 @@
 
     <parent>
         <groupId>com.backbase.oss.boat.example</groupId>
-        <artifactId>example</artifactId>
+        <artifactId>boat-generate</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>boat-generate</artifactId>
+    <artifactId>java-clients</artifactId>
 
-    <name>BOAT :: Generate Examples</name>
+    <name>BOAT :: Generate :: Java Clients</name>
 
     <description>
         Example projects showing how BOAT can help you generate code
@@ -21,10 +21,20 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>angular</module>
-        <module>java-clients</module>
-        <module>java-server</module>
+        <module>java</module>
+        <module>rest-template-embedded</module>
+        <module>webclient-embedded</module>
     </modules>
 
-</project>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+    </dependencies>
+</project>
