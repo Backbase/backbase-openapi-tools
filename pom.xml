@@ -4,7 +4,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.17.34-SNAPSHOT</version>
+    <version>0.17.35-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools is a collection of tools to work with Open API</description>
@@ -62,7 +62,7 @@
 
         <lombok.version>1.18.32</lombok.version>
         <jackson.version>2.17.1</jackson.version>
-        <mockito.version>5.11.0</mockito.version>
+        <mockito.version>5.12.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.2.21</swagger-core.version>
@@ -190,7 +190,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-xml</artifactId>
-                <version>3.0.0</version>
+                <version>4.0.3</version>
             </dependency>
 
             <dependency>
