@@ -30,7 +30,7 @@ class LintMojoTests {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void testsFailOnWarningWithReport(boolean report) throws MojoFailureException, MojoExecutionException {
+    void testsFailOnWarningWithReport(boolean report) {
         LintMojo lintMojo = new LintMojo();
         lintMojo.setIgnoreRules(new String[]{"219", "105", "M008", "M009", "M010", "M011", "H001", "H002",
             "S005", "S006", "S007"});
