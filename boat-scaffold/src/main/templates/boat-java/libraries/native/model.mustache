@@ -43,9 +43,16 @@ import android.os.Parcelable;
 import android.os.Parcel;
 {{/parcelableModel}}
 {{#useBeanValidation}}
+{{^useJakartaEe}}
 import javax.validation.constraints.*;
 import javax.validation.Valid;
+{{/useJakartaEe}}
+{{#useJakartaEe}}
+import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
+{{/useJakartaEe}}
 {{/useBeanValidation}}
+
 {{#performBeanValidation}}
 import org.hibernate.validator.constraints.*;
 {{/performBeanValidation}}
