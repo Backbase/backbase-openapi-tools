@@ -148,7 +148,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     {{^vendorExtensions.x-is-jackson-optional-nullable}}
     {{^required}}
     if (this.{{name}} == null) {
-      this.{{name}} = {{{defaultValue}}};
+       this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
     }
     {{/required}}
     this.{{name}}.add({{name}}Item);
@@ -173,7 +173,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     {{^vendorExtensions.x-is-jackson-optional-nullable}}
     {{^required}}
     if (this.{{name}} == null) {
-      this.{{name}} = {{{defaultValue}}};
+       this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
     }
     {{/required}}
     this.{{name}}.put(key, {{name}}Item);
@@ -206,14 +206,29 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
 {{/deprecated}}
 {{#required}}
 {{#isNullable}}
+{{^useJakartaEe}}
   @javax.annotation.Nullable
+{{/useJakartaEe}}
+{{#useJakartaEe}}
+  @jakarta.annotation.Nullable
+{{/useJakartaEe}}
 {{/isNullable}}
 {{^isNullable}}
+{{^useJakartaEe}}
   @javax.annotation.Nonnull
+{{/useJakartaEe}}
+{{#useJakartaEe}}
+  @jakarta.annotation.Nonnull
+{{/useJakartaEe}}
 {{/isNullable}}
 {{/required}}
 {{^required}}
+{{^useJakartaEe}}
   @javax.annotation.Nullable
+{{/useJakartaEe}}
+{{#useJakartaEe}}
+  @jakarta.annotation.Nullable
+{{/useJakartaEe}}
 {{/required}}
 {{#useBeanValidation}}
 {{>beanValidation}}

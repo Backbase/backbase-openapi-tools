@@ -18,7 +18,8 @@ BOAT is still under development and subject to change.
 ## 0.17.34
 * add new lint rule `B014` - to validate if examples contain all defined properties in schema
   * ISSUE: #776
-* 
+* Improve generated client Class Name
+* Fix Jakarta native client generation options
 ## 0.17.30
 * Angular 17
 ## 0.17.29
