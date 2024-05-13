@@ -29,6 +29,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+                            <ignoreRules>B014</ignoreRules>
                         </configuration>
                     </execution>
                 </executions>
