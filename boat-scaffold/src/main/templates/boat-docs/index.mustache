@@ -48,14 +48,38 @@
                           {{#description}}<p>{{description}}</p>{{/description}}
                     <p class="marked">{{notes}}</p>
                       <br/>
-                      {{#vendorExtensions}}
-                          <div class="secured-by">
-                              <h2>Secured by Backbase Access Control</h2>
-                              {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
-                              {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
-                              {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
-                          </div>
-                      {{/vendorExtensions}}
+                {{#vendorExtensions}}
+                  {{#hasMultipleAccessControlPermissions}}
+                  <div class="secured-by">
+                    <h2>Secured by Backbase Access Control</h2>
+                    <table>
+                      <tr>
+                    {{#x-BbAccessControls}}
+                      {{#description}}<pre><b>Description:</b> {{.}}</pre>{{/description}}
+                      {{#permissions}}
+                          <td>
+                            <div class="secured-by-multiple">
+                              {{#letter}}<pre><b>({{.}})</b></pre>{{/letter}}
+                              {{#resource}}<pre><b>Resource:</b> {{.}}</pre>{{/resource}}
+                              {{#function}}<pre><b>Function:</b> {{.}}</pre>{{/function}}
+                              {{#privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/privilege}}
+                            </div>
+                          </td>
+                      {{/permissions}}
+                    {{/x-BbAccessControls}}
+                      </tr>
+                    </table>
+                  </div>
+                  {{/hasMultipleAccessControlPermissions}}
+                  {{^hasMultipleAccessControlPermissions}}
+                    <div class="secured-by">
+                      <h2>Secured by Backbase Access Control</h2>
+                      {{#x-BbAccessControl-resource}}<pre><b>Resource:</b> {{.}}</pre>{{/x-BbAccessControl-resource}}
+                      {{#x-BbAccessControl-function}}<pre><b>Function:</b> {{.}}</pre>{{/x-BbAccessControl-function}}
+                      {{#x-BbAccessControl-privilege}}<pre><b>Privilege:</b> {{.}}</pre>{{/x-BbAccessControl-privilege}}
+                    </div>
+                  {{/hasMultipleAccessControlPermissions}}
+                {{/vendorExtensions}}
                       <pre class="prettyprint language-html prettyprinted"><code><span class="pln"><span  class="http-method" data-type="{{httpMethod}}">{{httpMethod}}</span>{{path}}</span></code></pre>
 
                       {{#hasAuthMethods}}
