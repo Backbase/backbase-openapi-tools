@@ -100,8 +100,8 @@ class RequestResponseExampleRule {
 
                     else -> value as JsonNode
                 }
-            val noExampleProps = properties!!.map { (name, _) ->
-                hasExample(name, properties[name], jsonObject)
+            val noExampleProps = properties!!.map { (propName, _) ->
+                hasExample(propName, properties[propName], jsonObject)
             }.flatten()
             Pair(name, noExampleProps)
         }

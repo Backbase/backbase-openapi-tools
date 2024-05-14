@@ -56,12 +56,19 @@ class RequestResponseExampleRuleTest {
                                       format: number
                                       minimum: -999.99999
                                       maximum: 999.99999
+                                    additions:
+                                      type: object
+                                      additionalProperties:
+                                        type: string  
                             examples:
                                 example1:
                                   value:
                                       name: Trading payment
                                       amountNumberAsString: 101.01
                                       amountNumberAsStringOptional: 100.00
+                                      additions:
+                                        test1: value1
+                                        test2: value2
                       responses:
                         "204":
                           description: OK
@@ -270,7 +277,7 @@ class RequestResponseExampleRuleTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = [EXAMPLE_TYPE_MISS_MATCH, EXAMPLE_INCORRECT_OBJECT])
+    @ValueSource(strings = [EXAMPLE_TYPE_MISS_MATCH, EXAMPLE_INCORRECT_OBJECT, EXAMPLE_REQUEST_BODY_INCORRECT_OBJECT])
     fun `incorrect example check`(value: String) {
         val violations = cut.checkResponseExampleFulfill(DefaultContextFactory()
                 .getOpenApiContext(value.trimIndent()))
@@ -322,6 +329,57 @@ class RequestResponseExampleRuleTest {
                             value:
                               name: aaa
                               alias: [a,d]
+            """
+
+        @Language("YAML")
+        const val EXAMPLE_REQUEST_BODY_INCORRECT_OBJECT: String = """
+            openapi: 3.0.3
+            info:
+              title: Thing API
+              version: 1.0.0
+            paths:
+              /users:
+                put:
+                  requestBody:
+                    content:
+                      application/json:
+                        schema:
+                          type: array
+                          items:
+                            required:
+                              - name
+                            type: object
+                            properties:
+                                name:
+                                  type: string
+                                  description: Request name
+                                  minLength: 3
+                                  maxLength: 251
+                                amountNumberAsString:
+                                  description: The amount string in number format
+                                  type: string
+                                  format: number
+                                  minimum: -999.99999
+                                  maximum: 999.99999
+                                amountNumberAsStringOptional:
+                                  description: The amount string in number format
+                                  type: string
+                                  format: number
+                                  minimum: -999.99999
+                                  maximum: 999.99999
+                                additions:
+                                  type: object
+                                  additionalProperties:
+                                    type: string   
+                        examples:
+                            example1:
+                              value:
+                                  amountNumberAsStringOptional: 100.00 
+                                  additions: 
+                                    dd: vv
+                  responses:
+                        "204":
+                          description: OK
             """
 
         @Language("YAML")
