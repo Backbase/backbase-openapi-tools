@@ -15,9 +15,14 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+
 ## 0.17.34
 * Improve generated client Class Name
 * Fix Jakarta native client generation options
+## 0.17.33
+BOAT now supports multiple access control permissions within the tag `x-BbAccessControls` in the OpenAPI spec. 
+It contains two parameters `description` which describes the relationship between the permissions and `permissions` 
+which is an array of permissions with tags `resource`, `function` and `privilege`. 
 ## 0.17.30
 * Angular 17
 ## 0.17.29
