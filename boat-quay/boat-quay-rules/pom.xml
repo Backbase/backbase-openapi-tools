@@ -66,6 +66,12 @@
             <groupId>org.zalando</groupId>
             <artifactId>zally-core</artifactId>
             <version>${zally.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-stdlib-jdk8</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.zalando</groupId>

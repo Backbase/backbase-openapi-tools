@@ -94,4 +94,5 @@ public class LintMojo extends AbstractLintMojo {
     public void setWriteLintReport(boolean writeLintReport) {
         this.writeLintReport = writeLintReport;
     }
+
 }
