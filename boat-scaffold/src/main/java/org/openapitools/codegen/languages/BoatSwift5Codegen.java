@@ -12,6 +12,7 @@ import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenConfig {
     public static final String LIBRARY_DBS = "dbsDataProvider";
@@ -19,6 +20,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     public static final String DEPENDENCY_MANAGEMENT_PODFILE = "Podfile";
     protected static final String DEPENDENCY_MANAGEMENT_CARTFILE = "Cartfile";
     protected static final String[] DEPENDENCY_MANAGEMENT_OPTIONS = {DEPENDENCY_MANAGEMENT_CARTFILE, DEPENDENCY_MANAGEMENT_PODFILE};
+    protected static final String MODULE_NAME = "moduleName";
     protected String[] dependenciesAs = new String[0];
 
     /**
@@ -77,6 +79,9 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             supportingFiles.add(new SupportingFile("Podfile.mustache",
                     "",
                     DEPENDENCY_MANAGEMENT_PODFILE));
+        }
+        if (!additionalProperties.containsKey(MODULE_NAME)) {
+            additionalProperties.put(MODULE_NAME, sanitize((String) additionalProperties.get(PROJECT_NAME)));
         }
     }
 
@@ -190,10 +195,27 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         codegenModel.removeAllDuplicatedProperty();
     }
 
+    /*
+    Get the projectName,
+    Check if it's ending with API, if yes, strip the API / Api and set moduleName to the stripped string
+    Check if it's ending with Client, if yes, stop, fail the whole generation.
+     */
+    private String sanitize(String projectName) {
+        String projName = "";
+        if (Pattern.matches("\\w.*(API|Api)$", projectName)) {
+            projName = Pattern.compile("(API|Api)$").matcher(projectName).replaceAll("");
+        } else if (Pattern.matches("\\w.*(CLIENT|client|Client)$", projectName)) {
+            throw new IllegalArgumentException(projectName + " is not valid. projectName should end with `API or `Api`");
+        } else {
+            projName = projectName;
+        }
+        return projName;
+    }
+
     @Override
     public void postProcess() {
         System.out.println("################################################################################");
-        System.out.println("# Thanks for using BOAT Swift 5 OpenAPI Generator.                                          #");
+        System.out.println("#            Thanks for using BOAT Swift 5 OpenAPI Generator.                   #");
         System.out.println("################################################################################");
     }
 

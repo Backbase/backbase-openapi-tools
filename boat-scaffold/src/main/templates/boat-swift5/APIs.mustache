@@ -8,7 +8,7 @@ import Foundation
 import Backbase
 import ClientCommonGen2
 
-{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} class {{projectName}}API: NSObject, DBSClient {
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} class {{moduleName}}Client: NSObject, DBSClient {
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var dataProvider: DBSDataProvider?
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var baseURL: URL{{#useAlamofire}}
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory(){{/useAlamofire}}{{#useURLSession}}
@@ -41,7 +41,7 @@ import ClientCommonGen2
         self.isBody = isBody
         self.headers = headers
 
-        addHeaders({{projectName}}API.customHeaders)
+        addHeaders({{moduleName}}Client.customHeaders)
         addHeaders(Backbase.authClient().tokens())
     }
 
@@ -51,7 +51,7 @@ import ClientCommonGen2
         }
     }
 
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func execute(_ apiResponseQueue: DispatchQueue = {{projectName}}API.apiResponseQueue, _ completion: @escaping (_ result: Result<Response<T>, Error>) -> Void) { }
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func execute(_ apiResponseQueue: DispatchQueue = {{moduleName}}Client.apiResponseQueue, _ completion: @escaping (_ result: Result<Response<T>, Error>) -> Void) { }
 
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func addHeader(name: String, value: String) -> Self {
         if !value.isEmpty {

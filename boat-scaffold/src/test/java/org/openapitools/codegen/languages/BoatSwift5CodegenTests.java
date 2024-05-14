@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoatSwift5CodegenTests {
     BoatSwift5Codegen boatSwift5CodeGen = new BoatSwift5Codegen();
 
+
     @Test
     void testGeneratorName() {
         assertEquals(boatSwift5CodeGen.getName(), "boat-swift5");
@@ -37,6 +38,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testProcessOptsSetDBSDataProvider() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.setLibrary(BoatSwift5Codegen.LIBRARY_DBS);
         boatSwift5CodeGen.processOpts();
         boatSwift5CodeGen.postProcess();
@@ -46,6 +48,7 @@ public class BoatSwift5CodegenTests {
     @ParameterizedTest
     @ValueSource(strings = {BoatSwift5Codegen.DEPENDENCY_MANAGEMENT_PODFILE, "PODFILE", "podFile", "podfile", "podfilE"})
     void testSetDependenciesDoesNotConsiderCase(String arg) {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.additionalProperties().put(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT, arg);
         boatSwift5CodeGen.processOpts();
 
@@ -55,6 +58,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testWhenDependenciesAsIsNotSetShouldBeEmpty() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         boatSwift5CodeGen.processOpts();
         final String[] dependenciesAs = (String[]) boatSwift5CodeGen.additionalProperties().get(BoatSwift5Codegen.DEPENDENCY_MANAGEMENT);
         assertEquals(0,dependenciesAs.length);
@@ -168,6 +172,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testDefaultPodAuthors() throws Exception {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         // Given
         // When
         boatSwift5CodeGen.processOpts();
@@ -178,6 +183,7 @@ public class BoatSwift5CodegenTests {
 
     @Test
     void testPodAuthors() throws Exception {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
         // Given
         final String openAPIDevs = "OpenAPI Devs";
         boatSwift5CodeGen.additionalProperties().put(Swift5ClientCodegen.POD_AUTHORS, openAPIDevs);
@@ -322,6 +328,42 @@ public class BoatSwift5CodegenTests {
         models.put("ActionRecipeItemParent", createCodegenModelWrapper(actionRecipeItemParentModel));
 
         assertEquals(boatSwift5CodeGen.postProcessAllModels(models), models);
+    }
+
+    @Test
+    void test_processOptsThrowsWhenProjectNameIsInvalid() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingClient");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> boatSwift5CodeGen.processOpts());
+        assertEquals("SomethingClient is not valid. projectName should end with `API or `Api`", exception.getMessage());
+    }
+
+    @Test
+    void test_processOptsSetsStrippedModuleNameIsAProjectNameEndingWithAPIIsProvided() {
+        boatSwift5CodeGen.additionalProperties().put("projectName","SomethingAPI");
+        String expectedModuleName = "Something";
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), expectedModuleName);
+    }
+
+    @Test
+    void test_processOptsSetsOriginalProjectNameAsModuleNameIfNameDoesNotEndWithAPIOrClient() {
+        String expectedModuleName = "Something";
+        boatSwift5CodeGen.additionalProperties().put("projectName",expectedModuleName);
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), expectedModuleName);
+    }
+
+    /*
+    Test that when a moduleName is provided sanitize is not called
+     */
+    @Test
+    void test_processOptsDoesNotSetModuleNameIfAlreadySet() {
+        String projectName = "CustomerAPI";
+        String moduleName = "CustomerAPIModified";
+        boatSwift5CodeGen.additionalProperties().put("projectName",projectName);
+        boatSwift5CodeGen.additionalProperties().put("moduleName",moduleName);
+        boatSwift5CodeGen.processOpts();
+        assertEquals(boatSwift5CodeGen.additionalProperties().get("moduleName"), moduleName);
     }
 
     private CodegenModel prepareForModelTests() {

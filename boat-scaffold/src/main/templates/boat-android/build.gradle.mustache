@@ -43,7 +43,6 @@ buildscript {
             appCompat: "androidx.appcompat:appcompat:$versions.appCompat",
             backbaseIdentitySdk: 'com.backbase.android.identity:identitysdk:1.3.0',
             backbaseSdk: "com.backbase.android.sdk:backbase:$versions.backbaseSdk",
-            commonUtils: "com.backbase.android.common:common-utils:$versions.wc3",
             coreKtx: "androidx.core:core-ktx:$versions.coreKtx",
             desugarJdkLibs: 'com.android.tools:desugar_jdk_libs:1.0.9',
             gson: "com.google.code.gson:gson:$versions.gson",
@@ -166,7 +165,6 @@ dependencies {
   implementation deps.moshi
   implementation deps.moshiAdapters
   implementation deps.backbaseSdk
-  implementation deps.commonUtils
   implementation deps.clientsCommon
   coreLibraryDesugaring deps.desugarJdkLibs
 }
