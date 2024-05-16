@@ -9,7 +9,7 @@ It currently consists of
 
 * Create Diff Report between 2 OpenAPI versions of the same spec (Based on https://github.com/quen2404/openapi-diff)
 * Decompose Transformer to remove Composed Schemas from OpenAPI specs to aid in code generators
-* Case Transformer to see how your API looks like when going from camelCase to snake_case  (transforms examples too)
+* Case Transformer to view how your API looks like when going from Camel Case to Snake Case  (transforms examples too)
 * [Code Generator](boat-maven-plugin/README.md) based on [openapi-generator.tech](https://openapi-generator.tech/) with optimized templates and fixes.
 * Lint mojo based on Zalando Zally and Backbase API
 
