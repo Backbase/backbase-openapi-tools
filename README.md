@@ -15,6 +15,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.36
+* Lint rule `B014` doesn't throw a null exception when parsing a string array property in a schema.  
 ## 0.17.35
 * ISSUE: #776 add new lint rule `B014` - to validate if examples contain all defined properties in the schema
 * BOAT now supports multiple access control permissions within the tag `x-BbAccessControls` in the OpenAPI spec. 
