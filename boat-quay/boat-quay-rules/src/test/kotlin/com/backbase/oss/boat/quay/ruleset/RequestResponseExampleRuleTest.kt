@@ -298,6 +298,18 @@ class RequestResponseExampleRuleTest {
                 .isEmpty()
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [EXAMPLE_STRING_ARRAY])
+    fun `Array of Strings`(value: String) {
+
+        val violations = cut.checkResponseExampleFulfill(DefaultContextFactory()
+            .getOpenApiContext(value.trimIndent()))
+
+        ZallyAssertions
+            .assertThat(violations)
+            .isEmpty()
+    }
+
     companion object {
 
         @Language("YAML")
@@ -480,6 +492,38 @@ class RequestResponseExampleRuleTest {
                                         incorrectObject:
                                           a: 1
                 """
-    }
+        @Language("YAML")
+        const val EXAMPLE_STRING_ARRAY: String = """
+            openapi: 3.0.3
+            info:
+              title: Thing API
+              version: 1.0.0
+            paths:
+              /foo:
+                get:
+                  description: Lorem Ipsum
+                  operationId: foo
+                  responses:
+                    200:
+                      description: Lorem Ipsum
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties: 
+                              names:
+                                type: array
+                                items:
+                                  type: string
+                          examples:
+                            example1:
+                              value:
+                                names: 
+                                  - aaa
+                                  - bbb
+                                  - ccc 
+                                  
+                """
 
+    }
 }

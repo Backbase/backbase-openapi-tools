@@ -124,7 +124,14 @@ class RequestResponseExampleRule {
         val fieldValue = jsonObject.findValue(propertyName) ?: return listOf(missedProperty(parentName, propertyName))
         return when {
             "array" == property?.type && fieldValue.isArray -> {
-                property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }!!.flatten()
+                when {
+                    property.items.type == "object" -> {
+                        property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }!!.flatten()
+                    }
+                    else -> {
+                        emptyList()
+                    }
+                }
             }
 
             "object" == property?.type && fieldValue.isObject -> {
