@@ -17,7 +17,7 @@ import android.content.Context
 import com.squareup.moshi.Types
 import com.squareup.moshi.Moshi
 
-import dev.drewhamilton.extracare.DataApi
+import dev.drewhamilton.poko.Poko
 
 import com.backbase.android.clients.common.Call
 import com.backbase.android.clients.common.MultipartCall
@@ -72,14 +72,7 @@ class {{classname}}(
         {{^isMultipart}}
         val bodyType = {{#bodyParam}}{{>api_parameter_model_type}}{{/bodyParam}} {{^hasBodyParam}}{{#hasFormParams}}Types.newParameterizedType(Map::class.java, String::class.java, String::class.java){{/hasFormParams}}{{/hasBodyParam}}{{^hasBodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{/hasBodyParam}}
         val serializedBody: kotlin.String? = {{#bodyParam}}moshi.adapter<{{{dataType}}}>(bodyType).toJson(params.{{{paramName}}}){{/bodyParam}}{{^hasBodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{#hasFormParams}}moshi.adapter<Map<String, String>>(bodyType).toJson(mapOf({{#formParams}}"{{{baseName}}}" to params.{{{paramName}}}?.toString(){{#hasMore}}, {{/hasMore}}{{/formParams}})){{/hasFormParams}}{{/hasBodyParam}}
-        val headers: MutableMap<String,String> = mutableMapOf<String,String>()
-        {{#hasConsumes}}{{#consumes.0}}headers["Content-Type"] = "{{mediaType}}"{{/consumes.0}}{{/hasConsumes}}
-        {{#hasHeaderParams}}
-        {{#headerParams}}
-        headers["{{{baseName}}}"] = {{#isContainer}}params.{{{paramName}}}.joinToString(separator = collectionDelimiter("{{collectionFormat}}")){{/isContainer}}{{^isContainer}}params.{{paramName}}.toString(){{/isContainer}}
-        {{/headerParams}}
-        {{/hasHeaderParams}}
-
+        val headers: Map<String, String?> = mapOf({{#hasConsumes}}{{#consumes.0}}"Content-Type" to "{{mediaType}}"{{/consumes.0}}, {{/hasConsumes}}{{#hasHeaderParams}}{{#headerParams}}"{{{baseName}}}" to {{#isContainer}}params.{{{paramName}}}.joinToString(separator = collectionDelimiter("{{collectionFormat}}")){{/isContainer}}{{^isContainer}}params.{{paramName}}?.toString(),{{/isContainer}}{{#hasMore}}, {{/hasMore}}{{/headerParams}}{{/hasHeaderParams}})
         {{/isMultipart}}
         val queryParams = mutableMapOf<String, List<String>>()
         val path = "{{{path}}}"{{#pathParams}}.replace("{" + "{{{paramName}}}" + "}", params.{{{paramName}}}.toString()){{/pathParams}}

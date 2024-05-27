@@ -6,7 +6,7 @@
  * @param {{paramName}}ContentType the mime type of [{{paramName}}]. Optional. Defaults to text/plain for primitives and application/json for everything else.
  {{/isFormParam}}{{/isMultipart}}{{/isFile}}{{/allParams}}
  */
-{{#hasParams}}@DataApi {{/hasParams}}class {{{operationIdCamelCase}}} internal constructor(
+{{#hasParams}}@Poko {{/hasParams}}class {{{operationIdCamelCase}}} internal constructor(
   {{#allParams}}
  {{#isModel}}
  val {{{paramName}}}: {{modelPackage}}.{{{dataType}}}{{^required}}? = null{{/required}},{{/isModel}} {{^isModel}}

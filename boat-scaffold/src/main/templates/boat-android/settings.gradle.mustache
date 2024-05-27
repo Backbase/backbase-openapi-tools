@@ -1,2 +1,28 @@
-{{#multiplatform}}enableFeaturePreview('GRADLE_METADATA'){{/multiplatform}}
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { setUrl("https://jitpack.io") }
+        maven {
+            name = "backbaseRepo"
+            url = uri("https://repo.backbase.com/repo")
+            credentials(PasswordCredentials.class)
+        }
+        gradlePluginPortal()
+    }
+
+    versionCatalogs {
+        create("foundationLibs") { from("com.backbase.android.platform:catalog-foundation:2024.06.01") }
+        create("thirdPartiesLibs") { from("com.backbase.android.platform:catalog-third-parties:2024.06.01") }
+        create("midTierLibs") { from("com.backbase.android.platform:catalog-mid-tier:2024.06.01") }
+    }
+}
 rootProject.name = '{{artifactId}}'
