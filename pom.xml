@@ -394,6 +394,12 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco-maven-plugin.version}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>**/*.jar</exclude>
+                            <exclude>org/gradle/wrapper/**</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
