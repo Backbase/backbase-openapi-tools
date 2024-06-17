@@ -15,7 +15,7 @@
     <description>Open API Converter</description>
 
     <properties>
-        <maven.api.version>3.9.7</maven.api.version>
+        <maven.api.version>3.9.8</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
             src/main/java/com/backbase/oss/codegen/*.java
