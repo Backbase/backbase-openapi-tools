@@ -33,14 +33,12 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
-      - name: Build and Publish SNAPSHOT
+      - name: Build and Test
         run: |
           mvn \
             --no-transfer-progress \
             --batch-mode \
-            -DskipTests=true \
-            -Psonatype-deploy \
-            deploy
+            -DskipTests=false            
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
