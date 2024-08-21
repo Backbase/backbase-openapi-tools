@@ -6,6 +6,7 @@ plugins {
     alias(thirdPartiesLibs.plugins.kotlinx.compatibility.validator)
     alias(thirdPartiesLibs.plugins.poko)
     alias(thirdPartiesLibs.plugins.kotlin.parcelize)
+    alias(thirdPartiesLibs.plugins.ksp)
 }
 group '{{packageName}}'
 version = '{{artifactVersion}}'
@@ -16,14 +17,16 @@ android {
         minSdk = 26
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 dependencies {
     implementation(foundationLibs.msdk)
     implementation(midTierLibs.clients.common)
+    implementation(thirdPartiesLibs.moshi.kotlin.core)
+    ksp(thirdPartiesLibs.moshi.kotlin.codegen)
 }
