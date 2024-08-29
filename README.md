@@ -15,6 +15,10 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.46
+* boat-scaffold
+  * Enhanced ISO8601 Date Formatting with Fractional Seconds Support for Swift template.
+    * The `OpenISO8601DateFormatter` template now supports parsing and formatting ISO8601 dates with none, one, or multiple fractional seconds in Swift 5. This enhancement provides greater flexibility and precision when working with date and time values, accommodating various use cases that require different levels of fractional second accuracy.
 ## 0.17.36
 * Lint rule `B014` doesn't throw a null exception when parsing a string array property in a schema.  
 ## 0.17.35
