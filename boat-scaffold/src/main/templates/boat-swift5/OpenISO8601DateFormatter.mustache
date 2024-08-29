@@ -18,6 +18,15 @@ import Foundation
         return formatter
     }()
 
+    // Primary formatter with fractional seconds
+    private static let sharedDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return formatter
+    }()
+
     private func setup() {
         calendar = Calendar(identifier: .iso8601)
         locale = Locale(identifier: "en_US_POSIX")
@@ -39,6 +48,33 @@ import Foundation
         if let result = super.date(from: string) {
             return result
         }
-        return OpenISO8601DateFormatter.withoutSeconds.date(from: string)
+        if let result = OpenISO8601DateFormatter.withoutSeconds.date(from: string) {
+            return result
+        }
+        return OpenISO8601DateFormatter.parseDate(from: string)
+    }
+
+    private static func parseDate(from dateString: String) -> Date? {
+        // Base date format
+        let baseFormat = "yyyy-MM-dd'T'HH:mm:ss"
+
+        // Create an instance of DateFormatter for parsing
+        let dateFormatter = OpenISO8601DateFormatter.sharedDateFormatter
+
+        // Check for fractional seconds by locating the dot
+        guard let dotIndex = dateString.firstIndex(of: ".") else {
+            // No fractional seconds, use base format
+            dateFormatter.dateFormat = baseFormat
+            return dateFormatter.date(from: dateString)
+        }
+
+        // Extract fractional part length
+        let fractionLength = dateString[dateString.index(after: dotIndex)...].count
+
+        // Construct the date format with fractional seconds
+        let fractionalFormat = String(repeating: "S", count: fractionLength)
+        dateFormatter.dateFormat = "\(baseFormat).\(fractionalFormat)"
+
+        return dateFormatter.date(from: dateString)
     }
 }
