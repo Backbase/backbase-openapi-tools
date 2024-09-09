@@ -47,7 +47,7 @@
                             <reservedWordsMappings>delete=delete,function=function,new=new</reservedWordsMappings>
                             <additionalProperties>npmName=${codegen.npmPackage.name},npmVersion=${codegen.npmPackage.version},withMocks=${codegen.generateMocks},buildDist=${codegen.buildDist},serviceSuffix=${codegen.serviceSuffix},apiModulePrefix=${codegen.apiModulePrefix}</additionalProperties>
                             <configOptions>
-                                <ngVersion>13.0.0</ngVersion>
+                                <ngVersion>16.2.6</ngVersion>
                             </configOptions>
                         </configuration>
                     </execution>
