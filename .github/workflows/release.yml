@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
       - name: Build and Analyze
         env:
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
           server-id: 'central'
           server-username: SONATYPE_USERNAME
@@ -97,7 +97,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
       - name: Configure Git user
         run: |
