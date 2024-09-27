@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
       - name: Build & Test
         run: mvn -B test
@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
       - name: Build and Analyze
         env:
