@@ -103,7 +103,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             codegenModel.imports.add("ApiModel");
         }
 
-        fixAllFreeFormObject(codegenModel);
+        //fixAllFreeFormObject(codegenModel);
 
         return codegenModel;
     }

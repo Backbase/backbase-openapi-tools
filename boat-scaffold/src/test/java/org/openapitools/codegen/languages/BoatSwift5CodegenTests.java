@@ -1,5 +1,9 @@
 package org.openapitools.codegen.languages;
 
+import com.backbase.oss.boat.loader.OpenAPILoader;
+import com.backbase.oss.boat.loader.OpenAPILoaderException;
+import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
+import com.backbase.oss.codegen.angular.BoatAngularGenerator;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -13,13 +17,18 @@ import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 
+import java.io.File;
+import java.net.URL;
 import java.util.*;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -429,5 +438,37 @@ public class BoatSwift5CodegenTests {
         server.setUrl("https://localhost:9999/root");
         openAPI.setServers(Collections.singletonList(server));
         return openAPI;
+    }
+
+    @Test
+    public void testRecursion() throws OpenAPILoaderException {
+
+        String specName = "EAPI";
+
+        generate("/oas-examples/" + specName + ".yaml", "testTarget/swift/" + specName);
+    }
+
+    private void generate(String specName, String output) throws OpenAPILoaderException {
+        File spec = getFile(specName);
+
+        OpenAPI openAPI = OpenAPILoader.load(spec);
+
+        BoatSwift5Codegen generator = new BoatSwift5Codegen();
+        generator.setUseClasses(true);
+        generator.setSkipOverwrite(false);
+        generator.setOutputDir(output);
+        generator.setProjectName("EAPI");
+
+        ClientOptInput input = new ClientOptInput();
+        input.config(generator);
+        input.openAPI(openAPI);
+
+        new DefaultGenerator().opts(input).generate();
+    }
+
+    protected File getFile(String name) {
+        URL resource = getClass().getResource(name);
+        assert resource != null;
+        return new File(resource.getFile());
     }
 }
