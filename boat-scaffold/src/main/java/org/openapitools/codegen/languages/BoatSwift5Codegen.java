@@ -112,7 +112,6 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         this.dependenciesAs = dependenciesAs;
     }
 
-
     /*
     This is added as a compatibility requirement for API specs containing free form objects
     missing `additionalProperties` property
@@ -134,9 +133,9 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     */
     private void fixFreeFormObject(List<CodegenProperty> codegenProperties) {
         for (CodegenProperty codegenProperty : codegenProperties) {
-            if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
-                codegenProperty.isFreeFormObject = false;
-            }
+            //if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
+            //    codegenProperty.isFreeFormObject = false;
+            //}
 
             if (codegenProperty.isArray && codegenProperty.items.isFreeFormObject) {
                 codegenProperty.isFreeFormObject = true;
