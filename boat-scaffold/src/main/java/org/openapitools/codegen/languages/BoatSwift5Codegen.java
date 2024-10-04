@@ -103,7 +103,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             codegenModel.imports.add("ApiModel");
         }
 
-        //fixAllFreeFormObject(codegenModel);
+        fixAllFreeFormObject(codegenModel);
 
         return codegenModel;
     }
@@ -134,9 +134,9 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     */
     private void fixFreeFormObject(List<CodegenProperty> codegenProperties) {
         for (CodegenProperty codegenProperty : codegenProperties) {
-            if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
-                codegenProperty.isFreeFormObject = false;
-            }
+            // if (codegenProperty.isFreeFormObject && codegenProperty.isMap && !codegenProperty.items.isFreeFormObject) {
+            //     codegenProperty.isFreeFormObject = false;
+            // }
 
             if (codegenProperty.isArray && codegenProperty.items.isFreeFormObject) {
                 codegenProperty.isFreeFormObject = true;
