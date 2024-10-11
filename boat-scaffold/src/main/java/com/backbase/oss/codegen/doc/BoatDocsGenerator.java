@@ -20,7 +20,7 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
         super();
         embeddedTemplateDir = templateDir = NAME;
         cliOptions.add(new CliOption(CodegenConstants.GENERATE_ALIAS_AS_MODEL, CodegenConstants.GENERATE_ALIAS_AS_MODEL));
-        additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, false);
+        additionalProperties.put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, true);
         additionalProperties.put("appName", "OpenAPI Sample");
         additionalProperties.put("appDescription", "A sample OpenAPI server");
         additionalProperties.put("infoUrl", "https://backbase.github.io/backbase-openapi-tools/");
