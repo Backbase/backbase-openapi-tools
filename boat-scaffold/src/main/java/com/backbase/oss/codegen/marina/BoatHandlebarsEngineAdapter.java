@@ -8,16 +8,23 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Jackson2Helper;
 import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.context.FieldValueResolver;
+import com.github.jknack.handlebars.context.FieldValueResolver.FieldWrapper;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import com.github.jknack.handlebars.helper.StringHelpers;
 import com.github.jknack.handlebars.io.AbstractTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Modifier;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.api.TemplatingExecutor;
 import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
@@ -35,11 +42,34 @@ public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
             }
         };
 
+        var MY_FIELD_VALUE_RESOLVER = new FieldValueResolver() {
+            @Override
+            protected Set<FieldWrapper> members(
+                Class<?> clazz) {
+                var members = super.members(clazz);
+                return members.stream()
+                    .filter(fw -> isValidField(fw))
+                    .collect(Collectors.toSet());
+            }
+
+            boolean isValidField(
+                FieldWrapper fw) {
+                if (fw instanceof AccessibleObject) {
+                    if (isUseSetAccessible(fw)) {
+                        return true;
+                    }
+                    return false;
+                }
+                return true;
+            }
+        };
         Context context = Context
                 .newBuilder(bundle)
                 .resolver(
                         MapValueResolver.INSTANCE,
-                        JavaBeanValueResolver.INSTANCE)
+                        JavaBeanValueResolver.INSTANCE,
+                        MethodValueResolver.INSTANCE,
+                        MY_FIELD_VALUE_RESOLVER)
                 .build();
 
         Handlebars handlebars = new Handlebars(loader);
@@ -58,4 +88,5 @@ public class BoatHandlebarsEngineAdapter extends HandlebarsEngineAdapter {
         Template tmpl = handlebars.compile(templateFile);
         return tmpl.apply(context);
     }
+
 }
