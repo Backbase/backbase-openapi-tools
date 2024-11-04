@@ -54,7 +54,7 @@
                             <goal>generate-spring-boot-embedded</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore-expanded.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/refs/heads/main/tests/v3.0/pass/petstore-expanded.yaml</inputSpec>
                             <modelPackage>com.backbase.oss.boat.example.petstore.model</modelPackage>
                             <apiPackage>com.backbase.oss.boat.example.petstore.api</apiPackage>
                         </configuration>
