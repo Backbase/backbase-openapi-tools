@@ -28,7 +28,7 @@
                             <goal>doc</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/api-with-examples.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/OAI/OpenAPI-Specification/refs/heads/main/tests/v3.0/pass/api-with-examples.yaml</inputSpec>
                         </configuration>
                     </execution>
                 </executions>
