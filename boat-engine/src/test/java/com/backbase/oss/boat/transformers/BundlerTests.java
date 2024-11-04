@@ -87,7 +87,7 @@ class BundlerTests {
     @Test
     void testBundleHttp() throws OpenAPILoaderException, IOException {
 
-        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml";
+        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/refs/heads/main/tests/v3.0/pass/petstore.yaml";
         OpenAPI openAPI = OpenAPILoader.load(url);
         OpenAPI openAPIUnproccessed = openAPI;
 
