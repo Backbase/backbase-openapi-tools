@@ -125,6 +125,12 @@
         </dependency>
 
         <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
@@ -352,9 +358,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-generator.version}</version>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <version>0.17.50</version>
                 <executions>
                     <execution>
                         <goals>
@@ -374,6 +380,7 @@
                                 <library>feign</library>
                                 <dateLibrary>java8</dateLibrary>
                                 <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder </additionalModelTypeAnnotations>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
                         </configuration>
                     </execution>
