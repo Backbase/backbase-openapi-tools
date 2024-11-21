@@ -104,31 +104,30 @@ class RequestResponseExampleRule {
         content: MediaType,
         components: Components?
     ): Map<String, Example?> {
-        var examples = content.examples.orEmpty()
-        if (examples.isEmpty()) {
-            val example = Example()
-            if (content.example != null) {
-                val exampleJsonNode = content.example as JsonNode
-                if (exampleJsonNode.has("value") && !exampleJsonNode.get("value").isNull) {
-                    example.value(exampleJsonNode.get("value"))
+        return content.examples.orEmpty()
+            .ifEmpty {
+                val example = Example()
+                if (content.example != null) {
+                    val jsonNode = content.example as JsonNode
+                    jsonNode.update("value") { value -> example.value(value) }
+                    jsonNode.update("\$ref") { ref -> example.`$ref`(ref.toString()) }
                 }
-                if (exampleJsonNode.has("\$ref") && !exampleJsonNode.get("\$ref").isNull) {
-                    example.`$ref`(exampleJsonNode.get("\$ref").toString())
+                mapOf("example" to example)
+            }.mapValues { example ->
+                if (StringUtils.isNotBlank(example.value.`$ref`)) {
+                    components?.examples?.get(
+                        StringUtils.substringAfterLast(example.value.`$ref`, "/").removeSuffix("\"")
+                    )
+                } else {
+                    example.value
                 }
             }
-            examples = mapOf("example" to example)
+    }
 
+    private fun JsonNode.update(key: String, onFound: (JsonNode) -> Unit) {
+        if (has(key) && !get(key).isNull && get(key) is JsonNode) {
+            onFound(get(key))
         }
-        val examples2 = examples.mapValues { example ->
-            if (StringUtils.isNotBlank(example.value.`$ref`)) {
-                components?.examples?.get(
-                    StringUtils.substringAfterLast(example.value.`$ref`, "/").removeSuffix("\"")
-                )
-            } else {
-                example.value
-            }
-        }
-        return examples2
     }
 
     private fun jsonObject(exampleObject: Example?): JsonNode {
