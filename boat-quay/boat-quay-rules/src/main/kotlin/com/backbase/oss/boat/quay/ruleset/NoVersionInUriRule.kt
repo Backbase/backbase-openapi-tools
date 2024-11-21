@@ -1,6 +1,5 @@
 package com.backbase.oss.boat.quay.ruleset
 
-import com.backbase.oss.boat.quay.ruleset.util.UnifiedApiUtil
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import org.zalando.zally.rule.api.*
@@ -9,7 +8,7 @@ import org.zalando.zally.rule.api.*
     ruleSet = BoatRuleSet::class,
     id = "B009U",
     severity = Severity.MUST,
-    title = "Check no prefix for paths should contain version for Unified Backbase API specs"
+    title = "Check no prefix for paths should contain version (the rule intended for Unified Backbase API specs)"
 )
 class NoVersionInUriRule {
 
@@ -18,11 +17,8 @@ class NoVersionInUriRule {
 
     @Check(severity = Severity.MUST)
     fun validate(context: Context): List<Violation> =
-        if (!UnifiedApiUtil.isUnifiedBackbaseApi(context.api.info))
-            emptyList()
-        else
-            ( violatingPaths(context.api))
-                .map { context.violation(description, it) }
+        (violatingPaths(context.api))
+            .map { context.violation(description, it) }
 
 
     private fun violatingPaths(api: OpenAPI): Collection<PathItem> =

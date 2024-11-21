@@ -19,7 +19,6 @@ class NoPrefixPathRuleTest {
             info:
               title: Thing API
               version: 1.0.0
-              x-api-type: Unified Backbase API
             paths: 
               /foo:
                 get:
@@ -62,7 +61,6 @@ class NoPrefixPathRuleTest {
             info:
               title: Thing API
               version: 1.0.0
-              x-api-type: Unified Backbase API
             paths: 
               /client-api/foo:
                 get:

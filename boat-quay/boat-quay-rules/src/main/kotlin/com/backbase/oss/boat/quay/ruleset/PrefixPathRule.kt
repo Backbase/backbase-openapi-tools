@@ -1,9 +1,7 @@
 package com.backbase.oss.boat.quay.ruleset
 
-import com.backbase.oss.boat.quay.ruleset.util.UnifiedApiUtil
 import com.typesafe.config.Config
 import org.zalando.zally.rule.api.*
-import kotlin.collections.emptyList
 
 @Rule(
         ruleSet = BoatRuleSet::class,
@@ -20,23 +18,18 @@ class PrefixPathRule(config: Config) {
     @Check(Severity.MUST)
     fun validate(context: Context): List<Violation>  =
 
-        if (UnifiedApiUtil.isUnifiedBackbaseApi(context.api.info))
-            emptyList()
-        else
-            context.api.paths.orEmpty()
+        context.api.paths.orEmpty()
                 .map {
                     val extractParts = it.key.split("/")
-                    val prefix = if (extractParts.size > 1) extractParts[1] else ""
+                    val prefix = if(extractParts.size  > 1) extractParts[1] else ""
                     Pair(prefix, it.value)
                 }
                 .filter {
                     !validPathPrefixes.contains(it.first)
                 }
                 .map {
-                    context.violation(
-                        "Incorrect path prefix: ${it.first}. Correct values are $validPathPrefixes",
-                        it.second
-                    )
+                    context.violation("Incorrect path prefix: ${it.first}. Correct values are $validPathPrefixes", it.second)
                 }
+
 
 }

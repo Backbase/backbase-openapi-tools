@@ -18,7 +18,6 @@ class NoVersionInUriRuleTest {
             info:
               title: Thing API
               version: 1.0.0
-              x-api-type: Unified Backbase API
             paths: 
               /api/foo:
                 get:
@@ -61,7 +60,6 @@ class NoVersionInUriRuleTest {
             info:
               title: Thing API
               version: 1.0.0
-              x-api-type: Unified Backbase API
             paths: 
               /api/foo/v1true:
                 get:
