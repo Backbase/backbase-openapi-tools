@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.52
+* Lint rule `B014` fix reference link to component examples
 ## 0.17.46
 * boat-scaffold
   * Enhanced ISO8601 Date Formatting with Fractional Seconds Support for Swift template.

@@ -3,11 +3,13 @@ package com.backbase.oss.boat.quay.ruleset
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.media.MediaType
 import io.swagger.v3.oas.models.media.Schema
+import org.apache.commons.lang3.StringUtils
 import org.zalando.zally.rule.api.*
 
 @Rule(
@@ -19,8 +21,8 @@ import org.zalando.zally.rule.api.*
 class RequestResponseExampleRule {
 
     /**
-     * Validate if the example contain at least one response example with all defined properties in a schema
-     * It will help to validate full response. Not just the required fields.
+     * Validate if the response/request contains at least one example with all defined properties in a schema
+     * It will help to validate full response/request. Not just the required fields.
      * Check only 2xx responses.
      * @param context the context to validate
      * @return list of identified violations
@@ -42,7 +44,7 @@ class RequestResponseExampleRule {
             (method == PathItem.HttpMethod.POST || method == PathItem.HttpMethod.PUT) -> {
                 operation?.requestBody?.content.orEmpty()
                     .map { (type, content) ->
-                        findMissPropsInExample(content).map { missProps ->
+                        findMissPropsInExample(content, context.api.components).map { missProps ->
                             context.violation(
                                 "Not defined value(s) (`${missProps.second}`) of example(`${missProps.first}`) for request body of ${operation?.operationId}:${method.name} of $type",
                                 content
@@ -67,7 +69,7 @@ class RequestResponseExampleRule {
         .map { (status, response) ->
             response.content.orEmpty()
                 .map { (type, content) ->
-                    findMissPropsInExample(content).map { missProps ->
+                    findMissPropsInExample(content, context.api.components).map { missProps ->
                         context.violation(
                             "Not defined value(s) (`${missProps.second}`) of example(`${missProps.first}`) for ${operation?.operationId}:${method.name}:$status of $type",
                             content
@@ -80,34 +82,62 @@ class RequestResponseExampleRule {
 
     private val objectMapper = ObjectMapper()
 
-    private fun findMissPropsInExample(content: MediaType): List<Pair<String, List<String>>> {
+    private fun findMissPropsInExample(content: MediaType, components: Components?): List<Pair<String, List<String>>> {
         val properties = when {
             content.schema?.properties != null -> content.schema?.properties
             content.schema?.items?.properties != null -> content.schema?.items?.properties
             else -> return emptyList()
         }
-        var examples = content.examples.orEmpty()
-        if (examples.isEmpty()) {
-            examples = mapOf("example" to Example().value(content.example))
-        }
-        val missedExampleProps = examples.map { (name, exampleObject) ->
-            val jsonObject =
-                when (val value = exampleObject?.value) {
-                    null -> JsonNodeFactory.instance.objectNode()
-                    is String -> objectMapper.valueToTree(
-                        value
-                    )
-
-                    else -> value as JsonNode
-                }
+        val missedExampleProps = prepareExamples(content, components).map { (name, exampleObject) ->
             val noExampleProps = properties!!.map { (propName, _) ->
-                hasExample(propName, properties[propName], jsonObject)
+                hasExample(propName, properties[propName], jsonObject(exampleObject))
             }.flatten()
             Pair(name, noExampleProps)
         }
         return when {
             missedExampleProps.any { ep -> ep.second.isEmpty() } -> emptyList()
             else -> listOf(missedExampleProps.first())
+        }
+    }
+
+    private fun prepareExamples(
+        content: MediaType,
+        components: Components?
+    ): Map<String, Example?> {
+        return content.examples.orEmpty()
+            .ifEmpty {
+                val example = Example()
+                if (content.example != null) {
+                    val jsonNode = content.example as JsonNode
+                    jsonNode.update("value") { value -> example.value(value) }
+                    jsonNode.update("\$ref") { ref -> example.`$ref`(ref.toString()) }
+                }
+                mapOf("example" to example)
+            }.mapValues { example ->
+                if (StringUtils.isNotBlank(example.value.`$ref`)) {
+                    components?.examples?.get(
+                        StringUtils.substringAfterLast(example.value.`$ref`, "/").removeSuffix("\"")
+                    )
+                } else {
+                    example.value
+                }
+            }
+    }
+
+    private fun JsonNode.update(key: String, onFound: (JsonNode) -> Unit) {
+        if (has(key) && !get(key).isNull && get(key) is JsonNode) {
+            onFound(get(key))
+        }
+    }
+
+    private fun jsonObject(exampleObject: Example?): JsonNode {
+        return when (val value = exampleObject?.value) {
+            null -> JsonNodeFactory.instance.objectNode()
+            is String -> objectMapper.valueToTree(
+                value
+            )
+
+            else -> value as JsonNode
         }
     }
 
@@ -126,8 +156,10 @@ class RequestResponseExampleRule {
             "array" == property?.type && fieldValue.isArray -> {
                 when {
                     property.items.type == "object" -> {
-                        property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }!!.flatten()
+                        property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }!!
+                            .flatten()
                     }
+
                     else -> {
                         emptyList()
                     }
