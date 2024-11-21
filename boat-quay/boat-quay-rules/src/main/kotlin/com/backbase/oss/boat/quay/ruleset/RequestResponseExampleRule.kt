@@ -21,8 +21,8 @@ import org.zalando.zally.rule.api.*
 class RequestResponseExampleRule {
 
     /**
-     * Validate if the example contain at least one response example with all defined properties in a schema
-     * It will help to validate full response. Not just the required fields.
+     * Validate if the response/request contains at least one example with all defined properties in a schema
+     * It will help to validate full response/request. Not just the required fields.
      * Check only 2xx responses.
      * @param context the context to validate
      * @return list of identified violations
