@@ -9,7 +9,7 @@ import kotlin.collections.orEmpty
     ruleSet = BoatRuleSet::class,
     id = "B007U",
     severity = Severity.MUST,
-    title = "Check no prefix for paths (the rule intended for Unified Backbase API specs)"
+    title = "Unified Backbase API specs do NOT expect any prefix in paths"
 )
 class NoPrefixPathRule(config: Config) {
 

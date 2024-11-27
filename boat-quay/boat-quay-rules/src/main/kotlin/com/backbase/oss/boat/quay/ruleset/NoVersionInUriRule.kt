@@ -8,7 +8,7 @@ import org.zalando.zally.rule.api.*
     ruleSet = BoatRuleSet::class,
     id = "B009U",
     severity = Severity.MUST,
-    title = "Check no prefix for paths should contain version (the rule intended for Unified Backbase API specs)"
+    title = "Unified Backbase API specs do NOT expect a version prefix in paths"
 )
 class NoVersionInUriRule {
 

@@ -14,6 +14,11 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.52
+* Added 2 Lint rules `B007U` and `B009U` for Unified Backbase API specs:
+  * `B007U` checks whether paths do not contain `client-api`, `service-api` and `integration-api` prefixes. Any prefix is not allowed for Unified Backbase API.
+  * `B009U` checks whether paths do not contain any version number. Any version number is not allowed for Unified Backbase API.
+* These rules are ignored by default, but if you redefine the list of ignored rules in your project, then you need to add these two rules to your list.
 ## 0.17.46
 * boat-scaffold
   * Enhanced ISO8601 Date Formatting with Fractional Seconds Support for Swift template.
