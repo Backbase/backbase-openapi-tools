@@ -18,8 +18,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     public static final String LIBRARY_DBS = "dbsDataProvider";
     public static final String DEPENDENCY_MANAGEMENT = "dependenciesAs";
     public static final String DEPENDENCY_MANAGEMENT_PODFILE = "Podfile";
-    protected static final String DEPENDENCY_MANAGEMENT_CARTFILE = "Cartfile";
-    protected static final String[] DEPENDENCY_MANAGEMENT_OPTIONS = {DEPENDENCY_MANAGEMENT_CARTFILE, DEPENDENCY_MANAGEMENT_PODFILE};
+    protected static final String[] DEPENDENCY_MANAGEMENT_OPTIONS = {DEPENDENCY_MANAGEMENT_PODFILE};
     protected static final String MODULE_NAME = "moduleName";
     protected String[] dependenciesAs = new String[0];
 
@@ -83,6 +82,13 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         if (!additionalProperties.containsKey(MODULE_NAME)) {
             additionalProperties.put(MODULE_NAME, sanitize((String) additionalProperties.get(PROJECT_NAME)));
         }
+        // Remove support for SwiftPM
+        if (this.getLibrary().equals(LIBRARY_DBS)) {
+            this.supportingFiles.remove(new SupportingFile("Cartfile.mustache", "", "Cartfile"));
+            this.supportingFiles.remove(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
+            this.supportingFiles.remove(new SupportingFile("Package.swift.mustache", "", "Package.swift"));
+        }
+
     }
 
     // Fix issues with generating arrays with Set.
