@@ -49,7 +49,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
         <lombok.version>1.18.36</lombok.version>
-        <jackson.version>2.18.1</jackson.version>
+        <jackson.version>2.18.2</jackson.version>
         <mockito.version>5.14.2</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
