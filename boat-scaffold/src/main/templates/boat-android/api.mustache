@@ -111,12 +111,15 @@ class {{classname}}(
         }
         {{/isFile}}
         {{/formParams}}
-
-        {{#isListContainer}}
-        return MultipartCall<{{{returnType}}}>(request, multiPartWrapper, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java))
-        {{/isListContainer}}
+        {{#isListContainer}}return MultipartCall<{{{returnType}}}>(request, multiPartWrapper, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java)){{/isListContainer}}
         {{^isListContainer}}
+        {{#isArray}}return MultipartCall<{{{returnType}}}>(request, multiPartWrapper, parser, Types.newParameterizedType(List::class.java, {{{returnBaseType}}}::class.java)){{/isArray}}
+        {{^isArray}}
+        {{#uniqueItems}} return MultipartCall<{{{returnType}}}>(request, multiPartWrapper, parser, Types.newParameterizedType(Set::class.java, {{{returnBaseType}}}::class.java)){{/uniqueItems}}
+        {{^uniqueItems}}
         return MultipartCall<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}>(request, multiPartWrapper, parser, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Unit{{/returnType}}::class.java)
+        {{/uniqueItems}}
+        {{/isArray}}
         {{/isListContainer}}
         {{/isMultipart}}
     }
