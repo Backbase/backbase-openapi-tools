@@ -1,7 +1,7 @@
 {{#queryParams}}
 
         if (params.{{{paramName}}} != null) {
-            queryParams["{{{paramName}}}"] =
+            queryParams["{{{baseName}}}"] =
         {{#isContainer}}
             {{#isExplode}}
                 //explode=true
