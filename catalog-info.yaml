@@ -9,6 +9,7 @@ metadata:
   annotations:
     jira/maint-component: API Toolkit
     jira/maint-subcomponent: BOAT
+    jira/project-key: DAS
     slack/conversation-id: CMU9PLZ5Z
   links:
     - url: https://community.backbase.com/documentation/ServiceSDK/latest/generate_clients_from_openapi
