@@ -188,8 +188,49 @@ paths:
                     format: number
                   number-typed-value:
                     type: number
+
+  /use-pojo-as-query-param:
+    get:
+      tags:
+        - pojosInQuery
+      operationId: getWithPojosInQuery
+      parameters:
+        - name: simpleParam
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: pojoParam
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            $ref: "#/components/schemas/MyPojo"
+      responses:
+        "200":
+          description: OK
+
 components:
   schemas:
+    MyPojo:
+      required:
+        - field1
+        - field2
+      type: object
+      properties:
+        field1:
+          maxLength: 32
+          minLength: 1
+          pattern: ^\S.*$
+          type: string
+        field2:
+          maxLength: 50
+          minLength: 1
+          pattern: ^\S.*$
+          type: string
     Additions:
       title: Additions
       type: object
