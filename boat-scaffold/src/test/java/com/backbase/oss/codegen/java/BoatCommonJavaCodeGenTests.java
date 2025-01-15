@@ -83,6 +83,7 @@ class BoatCommonJavaCodeGenTests {
 
         assertThat(lines)
             .contains("public ResponseEntity<Void> getWithPojosInQueryWithHttpInfo(String simpleParam, MyPojo pojoParam) throws RestClientException {")
+            .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"simpleParam\", simpleParam));")
             .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"field1\", pojoParam.getField1()));")
             .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"field2\", pojoParam.getField2()));");
     }
