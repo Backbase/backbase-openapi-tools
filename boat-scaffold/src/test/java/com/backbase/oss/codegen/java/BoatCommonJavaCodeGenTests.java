@@ -154,7 +154,7 @@ class BoatCommonJavaCodeGenTests {
             .findAll(FieldDeclaration.class)
             .stream()
             .flatMap(field -> field.getChildNodes().stream())
-            .filter(node -> node instanceof VariableDeclarator)
+            .filter(VariableDeclarator.class::isInstance)
             .map(VariableDeclarator.class::cast)
             .filter(declarator -> declarator.getName().getIdentifier().equals(fieldName))
             .findFirst()
