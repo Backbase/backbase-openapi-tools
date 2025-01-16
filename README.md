@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.54 and later
+Starting from 0.17.54 the release notes are available at https://github.com/Backbase/backbase-openapi-tools/releases
 ## 0.17.53
 * Added 2 Lint rules `B007U` and `B009U` for Unified Backbase API specs:
   * `B007U` checks whether paths do not contain `client-api`, `service-api` and `integration-api` prefixes. Any prefix is not allowed for Unified Backbase API.
