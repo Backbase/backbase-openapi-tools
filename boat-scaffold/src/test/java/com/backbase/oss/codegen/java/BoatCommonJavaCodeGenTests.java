@@ -1,5 +1,6 @@
 package com.backbase.oss.codegen.java;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,10 +20,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openapitools.codegen.ClientOptInput;
@@ -47,6 +50,42 @@ class BoatCommonJavaCodeGenTests {
         generateAndAssert(javaCodeGenWithLib(RESTTEMPLATE), containerDefaultToNull);
         generateAndAssert(javaCodeGenWithLib(APACHE), containerDefaultToNull);
         generateAndAssert(springCodeGen(), containerDefaultToNull);
+    }
+
+    @Test
+    void shouldExplodePojoQueryParam() throws IOException {
+
+        BoatJavaCodeGen codegen = javaCodeGenWithLib(RESTTEMPLATE);
+
+        var input = new File("src/test/resources/boat-spring/openapi.yaml");
+        var outputDir = TEST_OUTPUT + "/shouldExplodePojoQueryParam";
+
+        codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setOutputDir(outputDir);
+
+        OpenAPI openApiInput = new OpenAPIParser()
+            .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+            .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File pojosInQueryApi = files.stream()
+            .filter(it -> it.getName().equals("PojosInQueryApi.java"))
+            .findFirst()
+            .orElseThrow();
+
+        List<String> lines = Files.readAllLines(pojosInQueryApi.toPath()).stream()
+            .map(String::trim)
+            .collect(Collectors.toList());
+
+        assertThat(lines)
+            .contains("public ResponseEntity<Void> getWithPojosInQueryWithHttpInfo(String simpleParam, MyPojo pojoParam) throws RestClientException {")
+            .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"simpleParam\", simpleParam));")
+            .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"field1\", pojoParam.getField1()));")
+            .contains("localVarQueryParams.putAll(apiClient.parameterToMultiValueMap(null, \"field2\", pojoParam.getField2()));");
     }
 
     private static BoatJavaCodeGen javaCodeGenWithLib(String library) {
@@ -115,7 +154,7 @@ class BoatCommonJavaCodeGenTests {
             .findAll(FieldDeclaration.class)
             .stream()
             .flatMap(field -> field.getChildNodes().stream())
-            .filter(node -> node instanceof VariableDeclarator)
+            .filter(VariableDeclarator.class::isInstance)
             .map(VariableDeclarator.class::cast)
             .filter(declarator -> declarator.getName().getIdentifier().equals(fieldName))
             .findFirst()
