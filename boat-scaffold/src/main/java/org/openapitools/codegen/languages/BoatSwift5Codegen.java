@@ -143,6 +143,15 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
                     codegenProperty.isMap = false;
                 }
             }
+
+            if ( codegenProperty.isMap && codegenProperty.additionalProperties != null ) {
+
+                if (codegenProperty.getAdditionalProperties().isContainer) {
+                    codegenProperty.isFreeFormObject = true;
+                    codegenProperty.dataType = "[String: Any]";
+                    codegenProperty.datatypeWithEnum = "[String: Any]";
+                }
+            }
         }
     }
 
