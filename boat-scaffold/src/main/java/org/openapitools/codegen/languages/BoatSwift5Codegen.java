@@ -146,10 +146,14 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
 
             if ( codegenProperty.isMap && codegenProperty.additionalProperties != null ) {
 
-                if (codegenProperty.getAdditionalProperties().isContainer) {
+                if (codegenProperty.getAdditionalProperties().isContainer && !codegenProperty.getAdditionalProperties().isArray) {
+                    System.out.println("********************** START *********************");
+                    System.out.println("CodegenProperty" + codegenProperty.toString());
+                    System.out.println("Additional Properties" + codegenProperty.getAdditionalProperties().toString());
+                    System.out.println("*********************** END **********************");
                     codegenProperty.isFreeFormObject = true;
-                    codegenProperty.dataType = "[String: Any]";
-                    codegenProperty.datatypeWithEnum = "[String: Any]";
+                    codegenProperty.setDataType("[String: Any]");
+                    codegenProperty.setDatatypeWithEnum("[String: Any]");
                 }
             }
         }
