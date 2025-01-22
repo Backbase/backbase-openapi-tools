@@ -21,6 +21,8 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
     protected static final String DEPENDENCY_MANAGEMENT_CARTFILE = "Cartfile";
     protected static final String[] DEPENDENCY_MANAGEMENT_OPTIONS = {DEPENDENCY_MANAGEMENT_CARTFILE, DEPENDENCY_MANAGEMENT_PODFILE};
     protected static final String MODULE_NAME = "moduleName";
+    protected static final String NESTED_STRING_ANY_DICTIONARY = "[String: [String: Any]]";
+    protected static final String STRING_ANY_DICTIONARY = "[String: Any]";
     protected String[] dependenciesAs = new String[0];
 
     /**
@@ -145,15 +147,12 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
             }
 
             if ( codegenProperty.isMap && codegenProperty.additionalProperties != null ) {
-
                 if (codegenProperty.getAdditionalProperties().isContainer && !codegenProperty.getAdditionalProperties().isArray) {
-                    System.out.println("********************** START *********************");
-                    System.out.println("CodegenProperty" + codegenProperty.toString());
-                    System.out.println("Additional Properties" + codegenProperty.getAdditionalProperties().toString());
-                    System.out.println("*********************** END **********************");
-                    codegenProperty.isFreeFormObject = true;
-                    codegenProperty.setDataType("[String: Any]");
-                    codegenProperty.setDatatypeWithEnum("[String: Any]");
+                    if (codegenProperty.getDataType().equals(NESTED_STRING_ANY_DICTIONARY)){
+                        codegenProperty.isFreeFormObject = true;
+                        codegenProperty.setDataType(STRING_ANY_DICTIONARY);
+                        codegenProperty.setDatatypeWithEnum(STRING_ANY_DICTIONARY);
+                    }
                 }
             }
         }
