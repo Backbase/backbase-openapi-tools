@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.55
+* Enhanced `boat-swift5` generator to cater for nested freeformObjects. This issue was identified in `ContentServicesApi`
 ## 0.17.54 and later
 Starting from 0.17.54 the release notes are available at https://github.com/Backbase/backbase-openapi-tools/releases
 ## 0.17.53
