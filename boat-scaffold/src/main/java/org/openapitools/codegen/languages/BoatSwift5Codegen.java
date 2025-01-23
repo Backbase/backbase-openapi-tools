@@ -146,7 +146,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
                 }
             }
 
-            if ( hasNestedStringAnyDictionary(codegenProperty)) {
+            if (hasNestedStringAnyDictionary(codegenProperty)) {
                 codegenProperty.isFreeFormObject = true;
                 codegenProperty.setDataType(STRING_ANY_DICTIONARY);
                 codegenProperty.setDatatypeWithEnum(STRING_ANY_DICTIONARY);
