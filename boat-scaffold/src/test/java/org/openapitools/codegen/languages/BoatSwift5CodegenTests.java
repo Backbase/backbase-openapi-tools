@@ -204,7 +204,7 @@ public class BoatSwift5CodegenTests {
         assertEquals(cm.name, "sample");
         assertEquals(cm.classname, "Sample");
         assertEquals(cm.description, "a sample model");
-        assertEquals(cm.vars.size(), 6);
+        assertEquals(cm.vars.size(), 7);
         assertEquals(cm.getDiscriminatorName(), "test");
     }
 
@@ -380,6 +380,12 @@ public class BoatSwift5CodegenTests {
         mapSchema1.setDescription("Sample ObjectSchema");
         mapSchema1.additionalProperties(new StringSchema());
 
+        final ObjectSchema oneLevelNestedObjectSchema = new ObjectSchema();
+        final ObjectSchema nestedObjectSchema = new ObjectSchema();
+        nestedObjectSchema.additionalProperties(oneLevelNestedObjectSchema);
+        final ObjectSchema objectSchema1 = new ObjectSchema();
+        objectSchema1.additionalProperties(nestedObjectSchema);
+
         final Schema schema = new Schema()
                 .description("a sample model")
                 .addProperty("id", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
@@ -388,6 +394,7 @@ public class BoatSwift5CodegenTests {
                 .addProperty("nested", nestedArraySchema)
                 .addProperty("map", mapSchema)
                 .addProperty("secondMap", mapSchema1)
+                .addProperty("link", objectSchema1)
                 .addRequiredItem("id")
                 .addRequiredItem("name")
                 .name("sample")
