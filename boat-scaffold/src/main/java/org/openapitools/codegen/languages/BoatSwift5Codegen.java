@@ -146,12 +146,10 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
                 }
             }
 
-            if ( hasNestedAdditionalProperties(codegenProperty)) {
-                if (codegenProperty.getDataType().equals(NESTED_STRING_ANY_DICTIONARY)) {
-                    codegenProperty.isFreeFormObject = true;
-                    codegenProperty.setDataType(STRING_ANY_DICTIONARY);
-                    codegenProperty.setDatatypeWithEnum(STRING_ANY_DICTIONARY);
-                }
+            if ( hasNestedStringAnyDictionaryDataTypeFromNestedAdditionalProperties(codegenProperty)) {
+                codegenProperty.isFreeFormObject = true;
+                codegenProperty.setDataType(STRING_ANY_DICTIONARY);
+                codegenProperty.setDatatypeWithEnum(STRING_ANY_DICTIONARY);
             }
         }
     }
@@ -229,6 +227,10 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
                 && codegenProperty.additionalProperties != null
                 && codegenProperty.getAdditionalProperties().isContainer
                 && !codegenProperty.getAdditionalProperties().isArray;
+    }
+
+    private boolean hasNestedStringAnyDictionaryDataTypeFromNestedAdditionalProperties(CodegenProperty codegenProperty) {
+        return hasNestedAdditionalProperties(codegenProperty) && codegenProperty.getDataType().equals(NESTED_STRING_ANY_DICTIONARY);
     }
 
     @Override
