@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.56
+* Added new `flattenOutput` parameter into `bundle` execution to generate the bundled APIs directly into `output` directory, even though the respective `input` files are located within a subdirectory in the `input`.
 ## 0.17.55
 * Enhanced `boat-swift5` generator to cater for nested freeformObjects. This issue was identified in `ContentServicesApi`
 ## 0.17.54 and later
