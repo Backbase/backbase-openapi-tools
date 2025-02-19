@@ -202,6 +202,36 @@ Bundles a spec by resolving external references.
 Configuration can point to a single in- and output file, or to in- and output directories. When directories are
 specified, all files specified by the `includes` parameter are bundled.
 
+Available parameters:
+
+    input (Default: ${project.basedir}/src/main/resources)
+        Required: true
+        Path to a directory or a file to indicate the input Open API files to bundle.
+
+    includes (Default: **/openapi.yaml, **/*api*.yaml)
+        Required: false
+        List of file patterns to include to bundle.
+
+    output (Default: ${project.build.directory}/openapi)
+        Required: true
+        Output directory for the bundled OpenAPI specs.
+
+    flattenOutput (Default: false)
+        Required: false
+        Flatten the output directory structure, i.e. the bundle API specs are directly put into the output folder, even if the respective `input` files are located within a subdirectory in the `input`.
+
+    version
+        Required: false
+        Optional parameter, to override the bundled spec version.
+
+    versionFileName (Default: false)
+        Required: false
+        Optional parameter to include the version in the bundled spec file name.
+        
+    removeExtensions (Default: "")
+        Required: false
+        Optional parameter to remove extensions from the bundled spec.
+
 Examples in `json` files are parsed to objects.
 
     <configuration>

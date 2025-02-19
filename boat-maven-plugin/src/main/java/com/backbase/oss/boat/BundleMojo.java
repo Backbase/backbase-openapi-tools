@@ -4,7 +4,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
@@ -12,6 +11,8 @@ import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.SetVersion;
 import com.backbase.oss.boat.transformers.ExtensionFilter;
+
+import com.google.common.annotations.VisibleForTesting;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +21,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.models.info.Info;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +53,9 @@ public class BundleMojo extends AbstractMojo {
 
     @Parameter(name = "output", required = true, defaultValue = "${project.build.directory}/openapi")
     private File output;
+
+    @Parameter(name = "flattenOutput", required = false)
+    private boolean flattenOutput = false;
 
     @Parameter(name = "version", required = false)
     private String version;
@@ -82,17 +88,20 @@ public class BundleMojo extends AbstractMojo {
         final File[] inputFiles;
         final File[] outputFiles;
         if (input.isDirectory()) {
-
             DirectoryScanner directoryScanner = new DirectoryScanner();
             directoryScanner.setBasedir(input);
             directoryScanner.setIncludes(includes);
             directoryScanner.scan();
+
             String[] includedFiles = directoryScanner.getIncludedFiles();
-            inputFiles = stream(includedFiles).map(f -> new File(input, f)).collect(Collectors.toList()).toArray(File[]::new);
+            inputFiles = stream(includedFiles)
+                .map(file -> new File(input, file))
+                .collect(Collectors.toList())
+                .toArray(File[]::new);
             outputFiles = stream(includedFiles)
+                .map(this::normalizeOutputFileName)
                 .map(file -> new File(output, file))
                 .toArray(File[]::new);
-
             log.info("Found " + inputFiles.length + " specs to bundle.");
         } else {
             inputFiles = new File[] {input};
@@ -102,7 +111,6 @@ public class BundleMojo extends AbstractMojo {
         for (int i = 0; i < inputFiles.length; i++) {
             bundleOpenAPI(inputFiles[i], outputFiles[i]);
         }
-
     }
 
     private void bundleOpenAPI(File inputFile, File outputFile) throws MojoExecutionException {
@@ -130,8 +138,8 @@ public class BundleMojo extends AbstractMojo {
             if (versionFileName) {
                 String versionedFileName = versionFileName(outputFile.getAbsolutePath(), openAPI);
                 outputFile = Paths.get(versionedFileName).toFile();
-
             }
+
             Files.write(outputFile.toPath(), SerializerUtils.toYamlString(openAPI).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
             log.info("Bundled: {} into: {}", inputFile, outputFile);
         } catch (OpenAPILoaderException | IOException e) {
@@ -139,12 +147,12 @@ public class BundleMojo extends AbstractMojo {
         }
     }
 
-
+    @VisibleForTesting
     String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
-        String openApiVersion = openAPI.getInfo() != null ? openAPI.getInfo().getVersion() : null;
-        if (openApiVersion == null) {
-            throw new MojoExecutionException("Configured to use version in filename, but no version set.");
-        }
+        String openApiVersion = Optional.ofNullable(openAPI.getInfo())
+            .map(Info::getVersion)
+            .orElseThrow(() -> new MojoExecutionException("Configured to use version in filename, but no version set."));
+
         if (!openApiVersion.matches("^\\d\\..*")) {
             throw new MojoExecutionException(
                 "Version should be semver (or at least have a recognisable major version), but found '" + openApiVersion
@@ -159,4 +167,8 @@ public class BundleMojo extends AbstractMojo {
         return originalFileName.replaceAll("^(.*api-v)([0-9]+)(\\.yaml$)", "$1" + openApiVersion + "$3");
     }
 
+    @VisibleForTesting
+    String normalizeOutputFileName(String outputFileName) {
+        return flattenOutput ? new File(outputFileName).getName() : outputFileName;
+    }
 }

@@ -13,6 +13,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,18 +51,59 @@ class BundleMojoTest {
     @Test
     @SneakyThrows
     void testBundleFolder() {
+        var outputFolder = "target/test-bundle-folder";
+
         BundleMojo mojo = new BundleMojo();
 
-        mojo.setInput(new File(getClass().getResource("/bundler/folder/one-client-api-v1.yaml").getFile())
-            .getParentFile());
-        mojo.setOutput(new File("target/test-bundle-folder"));
+        mojo.setInput(new File(getClass().getResource("/bundler/folder").getFile()));
+        mojo.setOutput(new File(outputFolder));
         mojo.setIncludes(new String[]{"*-api-v*.yaml"});
         mojo.setVersionFileName(true);
         mojo.execute();
 
-        assertTrue(new File("target/test-bundle-folder/one-client-api-v1.3.5.yaml").exists());
-        assertTrue(new File("target/test-bundle-folder/one-client-api-v2.0.0.yaml").exists());
-        assertTrue(new File("target/test-bundle-folder/another-client-api-v1.7.9.yaml").exists());
+        assertTrue(new File(outputFolder, "one-client-api-v1.3.5.yaml").exists());
+        assertTrue(new File(outputFolder, "one-client-api-v2.0.0.yaml").exists());
+        assertTrue(new File(outputFolder, "another-client-api-v1.7.9.yaml").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void testBundleFolder_whenNotToBeFlattened_inSubDirStructure() {
+        var outputFolder = "target/test-bundle-folder-with-subdir";
+
+        BundleMojo mojo = new BundleMojo();
+
+        mojo.setInput(new File(getClass().getResource("/bundler").getFile()));
+        mojo.setOutput(new File(outputFolder));
+        mojo.setIncludes(new String[]{"**/*api-v*.yaml"}); // Includes sub-directories by '**/'
+        mojo.setVersionFileName(true);
+        mojo.setFlattenOutput(false);
+
+        mojo.execute();
+
+        assertTrue(new File(outputFolder, "/folder/one-client-api-v1.3.5.yaml").exists());
+        assertTrue(new File(outputFolder, "/folder/one-client-api-v2.0.0.yaml").exists());
+        assertTrue(new File(outputFolder, "/folder/another-client-api-v1.7.9.yaml").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void testBundleFolder_whenToBeFlattened_inSubDirStructure() {
+        var outputFolder = "target/test-bundle-folder-flattened";
+
+        BundleMojo mojo = new BundleMojo();
+
+        mojo.setInput(new File(getClass().getResource("/bundler").getFile()));
+        mojo.setOutput(new File(outputFolder));
+        mojo.setIncludes(new String[]{"**/*api-v*.yaml"}); // Includes sub-directories by '**/'
+        mojo.setVersionFileName(true);
+        mojo.setFlattenOutput(true);
+
+        mojo.execute();
+
+        assertTrue(new File(outputFolder, "one-client-api-v1.3.5.yaml").exists());
+        assertTrue(new File(outputFolder, "one-client-api-v2.0.0.yaml").exists());
+        assertTrue(new File(outputFolder, "another-client-api-v1.7.9.yaml").exists());
     }
 
     @Test
@@ -123,6 +166,42 @@ class BundleMojoTest {
 
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "outputFile.yaml", "/client-api/v1/outputFile.yaml"})
+    void testOutputFileName_DefaultBehaviour(String outputFileName) {
+        BundleMojo mojo = new BundleMojo();
+
+        var actual = mojo.normalizeOutputFileName(outputFileName);
+
+        assertEquals(outputFileName, actual);
+    }
+
+    @Test
+    void testOutputFileName_WhenToBeFlattened_SimpleStructure() {
+        BundleMojo mojo = new BundleMojo();
+        mojo.setFlattenOutput(true);
+
+        var fileName = "outputFile.yaml";
+
+        var expected = fileName;
+        var actual = mojo.normalizeOutputFileName(fileName);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testOutputFileName_WhenToBeFlattened_NestedStructure() {
+        BundleMojo mojo = new BundleMojo();
+        mojo.setFlattenOutput(true);
+
+        var fileName = "/client-api/v1/outputFile.yaml";
+
+        var expected = "outputFile.yaml";
+        var actual = mojo.normalizeOutputFileName(fileName);
+
+        assertEquals(expected, actual);
+    }
+
     private void assertThrowsMojoExecutionExceptionWithMessage(Executable executable, String message) {
         MojoExecutionException thrown = assertThrows(MojoExecutionException.class, executable);
         assertTrue(thrown.getMessage().startsWith(message), "Expected message '" + message + "' but got '"
@@ -140,6 +219,4 @@ class BundleMojoTest {
         assert resource != null;
         return new File(resource.getFile());
     }
-
-
 }
