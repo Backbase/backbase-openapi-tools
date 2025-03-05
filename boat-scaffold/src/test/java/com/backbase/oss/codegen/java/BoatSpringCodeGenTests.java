@@ -22,6 +22,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -215,6 +216,15 @@ class BoatSpringCodeGenTests {
         assertHasCollectionParamWithType(getPaymentsMethod, "approvalTypeIds", "List", "String");
         assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
         assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
+
+        MethodDeclaration createPaymentsMethod = StaticJavaParser.parse(paymentsApiFile)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "createPayments".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        AnnotationExpr sizeAnnotation = createPaymentsMethod.getParameterByName("multiLinePaymentRequest").orElseThrow()
+            .getAnnotationByName("Size").orElseThrow();
+        assertEquals("@Size(min = 1, max = 55)", sizeAnnotation.toString());
 
         File paymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
             .findFirst()
