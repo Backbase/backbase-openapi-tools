@@ -259,6 +259,7 @@ class BoatSpringCodeGenTests {
         assertFieldValueAssignment(
                 multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
         assertFieldAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "name", "Pattern", "@Pattern(regexp = \"^[^\\\\r\\\\n]{1,64}$\")");
         assertFieldValueAssignment(
                 multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
 
@@ -448,6 +449,15 @@ class BoatSpringCodeGenTests {
         FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
         assertThat("Expect annotation to be present on field: " + annotationName + " " + fieldName,
                 fieldDeclaration.getAnnotationByName(annotationName).isPresent(), is(true));
+    }
+
+    private static void assertFieldAnnotation(
+        CompilationUnit unit, String fieldName, String annotationName, String value) throws FileNotFoundException {
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+        AnnotationExpr annotation = fieldDeclaration.getAnnotationByName(annotationName)
+            .orElseThrow(() -> new AssertionError(
+                "Expect annotation to be present on field: " + annotationName + " " + fieldName));
+        assertThat(annotation.toString(), equalTo(value));
     }
 
     private static void assertFieldValueAssignment(
