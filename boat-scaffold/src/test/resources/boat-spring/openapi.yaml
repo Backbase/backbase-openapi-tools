@@ -100,6 +100,8 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 55
+              minItems: 1
               items:
                 $ref: '#/components/schemas/MultiLinePaymentRequest'
       responses:
@@ -313,6 +315,7 @@ components:
           description: Request name
           minLength: 3
           maxLength: 251
+          pattern: "^[^\\r\\n]{1,64}$"
         amountNumberAsString:
           description: The amount string in number format
           type: string

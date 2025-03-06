@@ -22,6 +22,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -216,6 +217,15 @@ class BoatSpringCodeGenTests {
         assertHasCollectionParamWithType(getPaymentsMethod, "status", "List", "String");
         assertHasCollectionParamWithType(getPaymentsMethod, "headerParams", "List", "String");
 
+        MethodDeclaration createPaymentsMethod = StaticJavaParser.parse(paymentsApiFile)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "createPayments".equals(it.getName().toString()))
+            .findFirst().orElseThrow();
+        AnnotationExpr sizeAnnotation = createPaymentsMethod.getParameterByName("multiLinePaymentRequest").orElseThrow()
+            .getAnnotationByName("Size").orElseThrow();
+        assertEquals("@Size(min = 1, max = 55)", sizeAnnotation.toString());
+
         File paymentRequestLine = files.stream().filter(file -> file.getName().equals("PaymentRequestLine.java"))
             .findFirst()
             .get();
@@ -249,6 +259,7 @@ class BoatSpringCodeGenTests {
         assertFieldValueAssignment(
                 multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
         assertFieldAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
+        assertFieldAnnotation(multiLinePaymentRequestUnit, "name", "Pattern", "@Pattern(regexp = \"^[^\\\\r\\\\n]{1,64}$\")");
         assertFieldValueAssignment(
                 multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
 
@@ -438,6 +449,15 @@ class BoatSpringCodeGenTests {
         FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
         assertThat("Expect annotation to be present on field: " + annotationName + " " + fieldName,
                 fieldDeclaration.getAnnotationByName(annotationName).isPresent(), is(true));
+    }
+
+    private static void assertFieldAnnotation(
+        CompilationUnit unit, String fieldName, String annotationName, String value) throws FileNotFoundException {
+        FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
+        AnnotationExpr annotation = fieldDeclaration.getAnnotationByName(annotationName)
+            .orElseThrow(() -> new AssertionError(
+                "Expect annotation to be present on field: " + annotationName + " " + fieldName));
+        assertThat(annotation.toString(), equalTo(value));
     }
 
     private static void assertFieldValueAssignment(

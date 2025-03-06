@@ -124,7 +124,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
                 return;
             }
             String formatted = text
-                .replace("\\n", SINGLE_SPACE)
                 .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
                 .replaceAll("\\< ", "<")
                 .replaceAll(" >", ">")
