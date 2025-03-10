@@ -10,7 +10,7 @@ install! 'cocoapods', deterministic_uuids: false
 inhibit_all_warnings!
 
 def normal_pods
-  pod 'Backbase', '>= 9'{{#useRxSwift}}
+  pod 'BackbaseSDK', '1.0.0-rc.2'{{#useRxSwift}}
   pod 'RxSwift', '>= 5.0.0'{{/useRxSwift}}{{#useAlamofire}}
   pod 'Alamofire', '>= 4.9.1'{{/useAlamofire}}{{#usePromiseKit}}
   pod 'PromiseKit', '>= 6.12.0'{{/usePromiseKit}}
