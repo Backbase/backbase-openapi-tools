@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = '{{projectName}}'
   s.version = '{{podVersion}}'{{#projectDescription}}
-  s.summary = '{{projectDescription}}'{{/projectDescription}}{{#podDescription}}
+  s.summary = '{{projectDescription}}. API Spec Version: {{appVersion}}'{{/projectDescription}}{{#podDescription}}
   s.description = '{{podDescription}}'{{/podDescription}}
   s.license = '{{#podLicense}}{{& podLicense}}{{/podLicense}}'{{^podLicense}}'Proprietary'{{/podLicense}}
   s.homepage = '{{podHomepage}}{{^podHomepage}}https://github.com/Backbase/backbase-openapi-tools{{/podHomepage}}'{{#podAuthors}}
