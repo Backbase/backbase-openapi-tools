@@ -8,7 +8,12 @@
 // https://openapi-generator.tech
 
 import Foundation
+{{#useMsdkSwift}}
+import BackbaseSDK
+{{/useMsdkSwift}}
+{{^useMsdkSwift}}
 import ClientCommonGen2
+{{/useMsdkSwift}}
 
 public extension {{classname}} {
 {{#operation}}

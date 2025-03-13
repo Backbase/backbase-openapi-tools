@@ -6,8 +6,14 @@
 //
 
 import Foundation
+{{#useMsdkSwift}}
+import BackbaseSDK
+{{/useMsdkSwift}}
+{{^useMsdkSwift}}
 import Backbase
-import ClientCommonGen2{{#usePromiseKit}}
+import ClientCommonGen2
+{{/useMsdkSwift}}
+{{#usePromiseKit}}
 import PromiseKit{{/usePromiseKit}}{{#useRxSwift}}
 import RxSwift{{/useRxSwift}}{{#useCombine}}
 import Combine{{/useCombine}}
@@ -77,7 +83,12 @@ extension {{moduleName}}Client {
 {{#description}}
 /** {{description}} */{{/description}}
 {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} class {{classname}}: NSObject, DBSClient, {{classname}}Protocol {
+    {{#useMsdkSwift}}
+    public var dataProvider: BackbaseSDK.DBSDataProvider?
+    {{/useMsdkSwift}}
+    {{^useMsdkSwift}}
     public var dataProvider: DBSDataProvider?
+    {{/useMsdkSwift}}
     public var baseURL: URL
 
     public override init() {
@@ -284,12 +295,23 @@ extension {{moduleName}}Client {
         ]
         let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders){{/-last}}{{/headerParams}}
         guard let url = urlComponents?.url else { throw CallError.invalidUrl }
+        {{#useMsdkSwift}}
+        let request = try BackbaseSDK.RequestBuilder.createURLRequest(requestUrl: url, 
+                                                                            method: "{{httpMethod}}",
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            bodyParameters: parameters,
+                                                                            bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
+                                                                            headers: headerParameters{{/-first}}{{/headerParams}})
+        {{/useMsdkSwift}}
+        {{^useMsdkSwift}}
         let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
                                                                             method: "{{httpMethod}}",
                                                                             queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
                                                                             bodyParameters: parameters,
                                                                             bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
                                                                             headers: headerParameters{{/-first}}{{/headerParams}})
+        {{/useMsdkSwift}}
+
         return Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}>(dataProvider: dataProvider, request: request)
     }
     {{/hasParams}}
@@ -356,12 +378,24 @@ extension {{moduleName}}Client {
         ]
         let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders){{/-last}}{{/headerParams}}
         guard let url = urlComponents?.url else { throw CallError.invalidUrl }
+
+        {{#useMsdkSwift}}
+        let request = try BackbaseSDK.RequestBuilder.createURLRequest(requestUrl: url, 
+                                                                            method: "{{httpMethod}}",
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            bodyParameters: parameters,
+                                                                            bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
+                                                                            headers: headerParameters{{/-first}}{{/headerParams}})
+        {{/useMsdkSwift}}
+        {{^useMsdkSwift}}
         let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
                                                                             method: "{{httpMethod}}",
                                                                             queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
                                                                             bodyParameters: parameters,
                                                                             bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
                                                                             headers: headerParameters{{/-first}}{{/headerParams}})
+        {{/useMsdkSwift}}
+
         return Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}>(dataProvider: dataProvider, request: request)
     }
 {{/operation}}

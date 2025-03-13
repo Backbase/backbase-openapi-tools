@@ -5,8 +5,14 @@
 //
 
 import Foundation
+{{#useMsdkSwift}}
+import BackbaseSDK
+{{/useMsdkSwift}}
+{{^useMsdkSwift}}
 import Backbase
 import ClientCommonGen2
+{{/useMsdkSwift}}
+
 
 {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} class {{moduleName}}Client: NSObject, DBSClient {
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var dataProvider: DBSDataProvider?
@@ -42,7 +48,12 @@ import ClientCommonGen2
         self.headers = headers
 
         addHeaders({{moduleName}}Client.customHeaders)
+        {{#useMsdkSwift}}
+        addHeaders(Backbase.authClient()?.tokens() ?? [:])
+        {{/useMsdkSwift}}
+        {{^useMsdkSwift}}
         addHeaders(Backbase.authClient().tokens())
+        {{/useMsdkSwift}}
     }
 
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} func addHeaders(_ aHeaders:[String:String]) {
