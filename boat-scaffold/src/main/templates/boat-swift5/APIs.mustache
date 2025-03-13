@@ -10,8 +10,9 @@ import BackbaseSDK
 {{/useMsdkSwift}}
 {{^useMsdkSwift}}
 import Backbase
-{{/useMsdkSwift}}
 import ClientCommonGen2
+{{/useMsdkSwift}}
+
 
 {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} class {{moduleName}}Client: NSObject, DBSClient {
     {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} var dataProvider: DBSDataProvider?

@@ -26,8 +26,8 @@ Pod::Spec.new do |s|
   {{/useMsdkSwift}}
   {{^useMsdkSwift}}
   s.dependency 'Backbase', '>= 9.0'
-  {{/useMsdkSwift}}
   s.dependency 'ClientCommonGen2', '>= 1.0'
+  {{/useMsdkSwift}}
   {{#usePromiseKit}}
   s.dependency 'PromiseKit/CorePromise', '>= 6.12.0'
   {{/usePromiseKit}}

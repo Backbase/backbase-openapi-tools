@@ -6,7 +6,12 @@
 //
 
 import Foundation
+{{#useMsdkSwift}}
+import BackbaseSDK
+{{/useMsdkSwift}}
+{{^useMsdkSwift}}
 import ClientCommonGen2
+{{/useMsdkSwift}}
 
 {{#description}}
 /** {{description}} */{{/description}}
