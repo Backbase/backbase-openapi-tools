@@ -392,6 +392,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
             codegenParameter.paramName = "httpServletRequest";
             codegenOperation.allParams.add(codegenParameter);
         }
+        if (codegenOperation.returnType != null) {
+            codegenOperation.returnType = codegenOperation.returnType.replace("@Valid", "");
+        }
         return codegenOperation;
     }
 

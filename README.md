@@ -14,6 +14,13 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.59
+* Fix bug where java-spring generator puts `@Valid` annoation on return type of Api methods, cause service to blame
+  client for invalid generated response with a 400 status.
+## 0.17.58
+
+## 0.17.57
+
 ## 0.17.56
 * Added new `flattenOutput` parameter into `bundle` execution to generate the bundled APIs directly into `output` directory, even though the respective `input` files are located within a subdirectory in the `input`.
 ## 0.17.55

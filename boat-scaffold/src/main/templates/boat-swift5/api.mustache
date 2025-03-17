@@ -24,35 +24,6 @@ extension {{moduleName}}Client {
 /// {{classname}} protocol defines a blueprint of methods, properties, and other requirements for {{classname}} functionality. 
 {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} protocol {{classname}}Protocol {
 {{#operation}}
-
-    {{#hasParams}}
-    /**
-     {{#summary}}
-     {{{summary}}}
-     {{/summary}}
-     - {{httpMethod}} {{{path}}}{{#notes}}
-     - {{{notes}}}{{/notes}}{{#subresourceOperation}}
-     - subresourceOperation: {{subresourceOperation}}{{/subresourceOperation}}{{#defaultResponse}}
-     - defaultResponse: {{defaultResponse}}{{/defaultResponse}}
-     {{#authMethods}}
-     - {{#isBasic}}BASIC{{/isBasic}}{{#isOAuth}}OAuth{{/isOAuth}}{{#isApiKey}}API Key{{/isApiKey}}:
-       - type: {{type}}{{#keyParamName}} {{keyParamName}} {{#isKeyInQuery}}(QUERY){{/isKeyInQuery}}{{#isKeyInHeaer}}(HEADER){{/isKeyInHeaer}}{{/keyParamName}}
-       - name: {{name}}
-       {{/authMethods}}
-     {{#hasResponseHeaders}}
-     - responseHeaders: [{{#responseHeaders}}{{{baseName}}}({{{dataType}}}){{^-last}}, {{/-last}}{{/responseHeaders}}]
-     {{/hasResponseHeaders}}
-     {{#externalDocs}}
-     - externalDocs: {{externalDocs}}
-     {{/externalDocs}}
-     {{#allParams}}
-     - parameter {{paramName}}: ({{#isFormParam}}form{{/isFormParam}}{{#isQueryParam}}query{{/isQueryParam}}{{#isPathParam}}path{{/isPathParam}}{{#isHeaderParam}}header{{/isHeaderParam}}{{#isBodyParam}}body{{/isBodyParam}}) {{description}} {{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
-     {{/allParams}}
-     - returns: Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}> {{description}}
-     */
-    @available(*, deprecated, message: "This method is deprecated in favor of the alternative method with {{classname}}.{{operationIdCamelCase}}RequestParams class.")
-    func {{operationId}}Call({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{classname}}.{{{datatypeWithEnum}}}_{{operationId}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}?{{/required}}{{^-last}}, {{/-last}}{{/allParams}}) throws -> Call<{{#returnType}}{{#isResponseFile}}Data{{/isResponseFile}}{{^isResponseFile}}{{{returnType}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}NoResponse{{/returnType}}>
-    {{/hasParams}}
     
     /**
      {{#summary}}
@@ -229,6 +200,7 @@ extension {{moduleName}}Client {
         }
     }
 {{/useResult}}
+
     {{#hasParams}}
     /**
      {{#summary}}
