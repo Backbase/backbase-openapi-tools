@@ -21,8 +21,13 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = '{{projectName}}.xcframework'
 
   # ――― Dependencies ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  {{#useMsdkSwift}}
+  s.dependency 'BackbaseSDK'
+  {{/useMsdkSwift}}
+  {{^useMsdkSwift}}
   s.dependency 'Backbase', '>= 9.0'
   s.dependency 'ClientCommonGen2', '>= 1.0'
+  {{/useMsdkSwift}}
   {{#usePromiseKit}}
   s.dependency 'PromiseKit/CorePromise', '>= 6.12.0'
   {{/usePromiseKit}}
