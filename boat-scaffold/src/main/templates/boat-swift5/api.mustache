@@ -227,8 +227,8 @@ extension {{moduleName}}Client {
         guard let dataProvider = dataProvider else { throw CallError.missingDataProvider }
         {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{#-first}}var{{/-first}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
         let {{paramName}}PathItem = "\({{#isEnum}}params.{{{paramName}}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}.rawValue{{/isContainer}}{{/isEnum}}{{^isEnum}}APIHelper.mapValueToPathItem(params.{{{paramName}}}){{/isEnum}})"
-        path = path.replacingOccurrences(of: "{{=<% %>=}}{<%baseName%>}<%={{ }}=%>", with: {{{paramName}}}PathItem, options: .literal, range: nil){{/pathParams}}
-        {{#pathParams}}{{#-first}}path = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""{{/-first}}{{/pathParams}}
+        let encoded{{paramName}}PathItem = {{paramName}}PathItem.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        path = path.replacingOccurrences(of: "{{=<% %>=}}{<%baseName%>}<%={{ }}=%>", with: encoded{{paramName}}PathItem, options: .literal, range: nil){{/pathParams}}
         {{#bodyParam}}
         let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: params.{{{paramName}}})
         {{/bodyParam}}
