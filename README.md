@@ -14,6 +14,9 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.60
+* Allow references to parent directory of the spec itself, to be able to refer to common examples in a common lib.
+* Fix tests... petshop example moved.
 ## 0.17.59
 * Fix bug where java-spring generator puts `@Valid` annoation on return type of Api methods, cause service to blame
   client for invalid generated response with a 400 status.
