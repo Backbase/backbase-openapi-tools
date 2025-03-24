@@ -119,6 +119,7 @@ public class ExamplesProcessor {
     }
 
     private void putComponentExample(String key, Example example) {
+        log.debug("Put Component Example: [{}], [{}]", key, example);
         getComponentExamplesFromOpenAPI().put(key, example);
     }
 
@@ -155,7 +156,6 @@ public class ExamplesProcessor {
             return;
         }
 
-        URI resolvedUri;
         Optional<String> fragment;
         if (refPath.contains("#") && !refPath.startsWith("#/components/examples")) {
             fragment = Optional.of(StringUtils.substringAfter(refPath, "#"));
@@ -164,11 +164,12 @@ public class ExamplesProcessor {
             fragment = Optional.empty();
         }
 
-        resolvedUri = resolveUri(relativePath, refPath);
+        URI resolvedUri = resolveUri(relativePath, refPath);
         try {
             String content = readContent(Paths.get(resolvedUri));
 
             if (fragment.isPresent()) {
+                log.debug("Read content from [{}], finding fragment [{}]", resolvedUri, fragment.get());
                 String exampleName = StringUtils.substringAfterLast(fragment.get(), "/");
                 // resolve fragment from json node
                 JsonNode jsonNode = yamlObjectMapper.readTree(content);
@@ -178,19 +179,22 @@ public class ExamplesProcessor {
                 processInLineExample(exampleHolder,relativePath,exampleNode, exampleName);
 
             } else {
+                log.debug("Read content from [{}], set content and dereference", resolvedUri);
                 exampleHolder.setContent(content);
                 dereferenceExample(exampleHolder);
             }
             if (derefenceExamples) {
+                log.debug("Read content from [{}], not setting content and dereference because...", resolvedUri);
                 dereferenceExample(exampleHolder);
             }
 
         } catch (IOException e) {
-            throw new TransformerException("Unable to fix inline examples", e);
+            throw new TransformerException("Unable to fix inline examples from " + resolvedUri, e);
         }
     }
 
     private void processInLineExample(ExampleHolder exampleHolder, String relativePath, JsonNode exampleNode, String exampleName) throws IOException {
+        log.debug("Process inline example [{}], [{}], [{}], [{}]", exampleHolder, relativePath, exampleNode, exampleName);
         if (exampleNode.has("$ref")) {
             String refPath = exampleNode.get("$ref").asText();
             exampleHolder.replaceRef(refPath);
@@ -227,17 +231,23 @@ public class ExamplesProcessor {
     }
 
     private URI resolveUri(String relativePath, String refPath) {
-        URI resolvedUri;
         if (relativePath == null) {
-            resolvedUri = rootUri.resolve(StringUtils.strip(refPath, "./"));
+            return rootUri.resolve(removeTrainingDotSlash(refPath));
         } else {
-            resolvedUri = rootUri.resolve(checkTrailingSlash(relativePath.replace("\\", "/")))
+            return rootUri.resolve(checkTrailingSlash(relativePath.replace("\\", "/")))
                 .resolve(refPath.replace("\\", "/"));
         }
-        return resolvedUri;
+    }
+
+    private String removeTrainingDotSlash(String path) {
+        if (StringUtils.startsWith(path,"./")) {
+            return StringUtils.substring(path, 2);
+        }
+        return path;
     }
 
     private void dereferenceExample(ExampleHolder exampleHolder) {
+        log.debug("dereferenceExample: '{}'", exampleHolder);
         String rootName = exampleHolder.getExampleName();
         int count = 0;
         while (existsButNotMatching(cache.get(makeCountedName(rootName, count)), exampleHolder)) {
