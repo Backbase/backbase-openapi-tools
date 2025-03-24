@@ -16,6 +16,11 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.parser.models.RefFormat;
+import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -26,12 +31,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
-import lombok.extern.slf4j.Slf4j;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +89,7 @@ class BundlerTests {
     @Test
     void testBundleHttp() throws OpenAPILoaderException, IOException {
 
-        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/refs/heads/main/tests/v3.0/pass/petstore.yaml";
+        String url = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/refs/heads/main/_archive_/schemas/v3.0/pass//petstore.yaml";
         OpenAPI openAPI = OpenAPILoader.load(url);
         OpenAPI openAPIUnproccessed = openAPI;
 
@@ -105,8 +107,9 @@ class BundlerTests {
         try {
             bundler.transform(openAPI, Collections.EMPTY_MAP);
             fail("Expected TransformerException");
-        }catch (TransformerException e){
-            assertEquals("Unable to fix inline examples",e.getMessage());
+        } catch (TransformerException e){
+            assertTrue(e.getMessage().startsWith("Unable to fix inline examples from file"));
+            assertTrue(e.getMessage().endsWith("notexist.json"));
         }
 
     }
