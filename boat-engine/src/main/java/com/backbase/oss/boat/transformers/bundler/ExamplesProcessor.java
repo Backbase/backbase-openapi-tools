@@ -239,7 +239,7 @@ public class ExamplesProcessor {
         }
     }
 
-    private String removeTrainingDotSlash(String path) {
+    private String removeLeadingDotSlash(String path) {
         if (StringUtils.startsWith(path,"./")) {
             return StringUtils.substring(path, 2);
         }
