@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.61
+* Added new `excludes` parameter into `bundle` execution to exclude certain files (default: `**/lib/**`) to avoid generating externally downloaded spec files.
 ## 0.17.60
 * Allow references to parent directory of the spec itself, to be able to refer to common examples in a common lib.
 * Fix tests... petshop example moved.

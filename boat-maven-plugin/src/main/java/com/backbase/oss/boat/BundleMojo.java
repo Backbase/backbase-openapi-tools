@@ -51,6 +51,9 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "includes", defaultValue = "**/openapi.yaml, **/*api*.yaml")
     protected String[] includes;
 
+    @Parameter(name = "excludes", defaultValue = "**/lib/**")
+    protected String[] excludes;
+
     @Parameter(name = "output", required = true, defaultValue = "${project.build.directory}/openapi")
     private File output;
 
@@ -91,6 +94,7 @@ public class BundleMojo extends AbstractMojo {
             DirectoryScanner directoryScanner = new DirectoryScanner();
             directoryScanner.setBasedir(input);
             directoryScanner.setIncludes(includes);
+            directoryScanner.setExcludes(excludes);
             directoryScanner.scan();
 
             String[] includedFiles = directoryScanner.getIncludedFiles();

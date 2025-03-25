@@ -212,6 +212,10 @@ Available parameters:
         Required: false
         List of file patterns to include to bundle.
 
+    excludes (Default: **/lib/**)
+        Required: false
+        List of file patterns to exclude to bundle.
+
     output (Default: ${project.build.directory}/openapi)
         Required: true
         Output directory for the bundled OpenAPI specs.
