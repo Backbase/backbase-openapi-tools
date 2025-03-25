@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -64,6 +65,28 @@ class BundleMojoTest {
         assertTrue(new File(outputFolder, "one-client-api-v1.3.5.yaml").exists());
         assertTrue(new File(outputFolder, "one-client-api-v2.0.0.yaml").exists());
         assertTrue(new File(outputFolder, "another-client-api-v1.7.9.yaml").exists());
+        assertFalse(new File(outputFolder, "test-client-api-v1.1.1.yaml").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void testBundleFolder_whenExcludesExists() {
+        var outputFolder = "target/test-bundle-bundler";
+
+        BundleMojo mojo = new BundleMojo();
+
+        mojo.setInput(new File(getClass().getResource("/bundler").getFile()));
+        mojo.setOutput(new File(outputFolder));
+        mojo.setIncludes(new String[]{"**/*-api-v*.yaml"});
+        mojo.setExcludes(new String[]{"**/folder/**"});
+        mojo.setVersionFileName(true);
+        mojo.setFlattenOutput(true);
+        mojo.execute();
+
+        assertFalse(new File(outputFolder, "one-client-api-v1.3.5.yaml").exists());
+        assertFalse(new File(outputFolder, "one-client-api-v2.0.0.yaml").exists());
+        assertFalse(new File(outputFolder, "another-client-api-v1.7.9.yaml").exists());
+        assertTrue(new File(outputFolder, "test-client-api-v1.1.1.yaml").exists());
     }
 
     @Test
