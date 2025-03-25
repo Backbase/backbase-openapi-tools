@@ -232,7 +232,7 @@ public class ExamplesProcessor {
 
     private URI resolveUri(String relativePath, String refPath) {
         if (relativePath == null) {
-            return rootUri.resolve(removeTrainingDotSlash(refPath));
+            return rootUri.resolve(removeLeadingDotSlash(refPath));
         } else {
             return rootUri.resolve(checkTrailingSlash(relativePath.replace("\\", "/")))
                 .resolve(refPath.replace("\\", "/"));
