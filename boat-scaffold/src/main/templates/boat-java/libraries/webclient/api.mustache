@@ -6,6 +6,11 @@ import {{invokerPackage}}.ApiClient;
 {{/imports}}
 {{^fullJavaUtil}}
 
+{{#useBeanValidation}}
+import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
+{{/useBeanValidation}}
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
