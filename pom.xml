@@ -56,7 +56,7 @@
         <swagger-core.version>2.2.29</swagger-core.version>
         <swagger-parser.version>2.1.6</swagger-parser.version>
         <snakeyaml.version>2.4</snakeyaml.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     </properties>
 
     <profiles>
