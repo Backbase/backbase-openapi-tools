@@ -414,7 +414,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (shouldSerializeBigDecimalAsString(property)) {
             property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)");
             model.imports.add("BigDecimalCustomSerializer");
-            model.imports.add("JsonSerialize");
         }
     }
 

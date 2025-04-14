@@ -157,7 +157,11 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         if (!ModelUtils.isArraySchema(target)) {
             return false;
         }
-        Schema items = getSchemaItems((ArraySchema) target);
+        Schema items = target.getItems();
+        if (items == null) {
+            // Will default to strings schema, which is not an enum
+            return false;
+        }
         if (items.get$ref() != null) {
             items = openAPI.getComponents().getSchemas().get(ModelUtils.getSimpleRef(items.get$ref()));
         }
