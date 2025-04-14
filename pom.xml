@@ -43,6 +43,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <sonar.organization>backbase</sonar.organization>
+        <sonar.projectKey>backbase-openapi-tools</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <openapi-generator.version>7.12.0</openapi-generator.version>
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
