@@ -13,7 +13,6 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInst
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvp;
@@ -74,6 +73,7 @@ import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.auth.AuthParser;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.utils.OptionUtils;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 
@@ -573,13 +573,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 java.nio.file.Files.copy(inputSpecFile.toPath(), copyTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // attempt to read from config file
-            CodegenConfigurator configurator = CodegenConfigurator.fromFile(configurationFile);
-
-            // if a config file wasn't specified or we were unable to read it
-            if (configurator == null) {
-                configurator = new CodegenConfigurator();
-            }
+            final CodegenConfigurator configurator = loadCodegenConfigurator();
 
             configurator.setVerbose(verbose);
 
@@ -857,7 +851,10 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             }
 
             if (openapiNormalizer != null && (configOptions == null || !configOptions.containsKey("openapi-normalizer"))) {
-                applyOpenAPINormalizerKvpList(openapiNormalizer, configurator);
+                for (String propString: openapiNormalizer) {
+                    OptionUtils.parseCommaSeparatedTuples(propString)
+                            .forEach(p -> {configurator.addOpenapiNormalizer(p.getLeft(), p.getRight());});
+                }
             }
 
             // Apply Schema Mappings
@@ -951,6 +948,16 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             throw new MojoExecutionException(
                 "Code generation failed. See above for the full exception.");
         }
+    }
+
+    /**
+     * Attempt to read from config file, return default otherwise.
+     *
+     * @return The CodegenConfigurator loaded from file or a default.
+     */
+    private CodegenConfigurator loadCodegenConfigurator() {
+        CodegenConfigurator configurator = CodegenConfigurator.fromFile(configurationFile);
+        return configurator != null ? configurator : new CodegenConfigurator();
     }
 
     protected Collection<String> getGeneratorSpecificSupportingFiles() {
