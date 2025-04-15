@@ -1,7 +1,6 @@
 package com.backbase.oss.codegen.java;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
-import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -158,10 +157,6 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
             return false;
         }
         Schema items = target.getItems();
-        if (items == null) {
-            // Will default to strings schema, which is not an enum
-            return false;
-        }
         if (items.get$ref() != null) {
             items = openAPI.getComponents().getSchemas().get(ModelUtils.getSimpleRef(items.get$ref()));
         }
