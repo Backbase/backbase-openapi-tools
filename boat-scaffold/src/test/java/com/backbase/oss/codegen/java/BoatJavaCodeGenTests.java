@@ -1,36 +1,34 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.CREATE_API_COMPONENT;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.REST_TEMPLATE_BEAN_NAME;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_DEFAULT_API_CLIENT;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_JACKSON_CONVERSION;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_PROTECTED_FIELDS;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_WITH_MODIFIERS;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.parser.core.models.ParseOptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.config.GlobalSettings;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.DefaultGenerator;
+import java.util.stream.Stream;
+
+import static com.backbase.oss.codegen.java.BoatJavaCodeGen.*;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoatJavaCodeGenTests {
 
@@ -207,5 +205,41 @@ class BoatJavaCodeGenTests {
         assertThat("Expect Valid annotation.", getPojosMethod.getParameter(0).getType().toString().contains("@Valid"), is(useBeanValidation));
         assertThat("Expect jakarta Valid import", compilationUnit.getImports().stream().anyMatch(
                 id -> id.getNameAsString().equals("jakarta.validation.Valid")), is(useBeanValidation));
+    }
+
+    @ParameterizedTest
+    @MethodSource("testTypeDeclarationValues")
+    public void testTypeDeclaration(boolean useBeanValidation, String schemaType,
+                                    String itemType, boolean itemEnum, String expected) {
+
+        // Setup
+        BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setUseBeanValidation(useBeanValidation);
+        GlobalSettings.setProperty("generateAliasAsModel", "true");
+
+        Schema schema = new Schema();
+        schema.type(schemaType);
+        if (itemType != null) {
+            Schema itemSchema = new Schema();
+            itemSchema.type(itemType);
+            if (itemEnum) {
+                itemSchema.setEnum(List.of("1", "2"));
+            }
+            schema.setItems(itemSchema);
+        }
+
+        String s = gen.getTypeDeclaration(schema);
+        assertEquals(expected, s);
+    }
+
+    static Stream<Arguments> testTypeDeclarationValues() {
+        return Stream.of(
+                Arguments.of(true, "string", null, false, "String"),
+                Arguments.of(false, "string", null, false, "String"),
+                Arguments.of(true, "array", "string", false, "List<String>"),
+                Arguments.of(true, "array", "string", true, "List<@Valid String>"),
+                Arguments.of(true, "array", "object", false, "List<Object>"),
+                Arguments.of(true, "array", null, false, "List<String>") // this case logs an ERROR
+        );
     }
 }
