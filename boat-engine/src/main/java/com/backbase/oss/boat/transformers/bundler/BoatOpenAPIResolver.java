@@ -9,6 +9,7 @@ import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.processors.ComponentsProcessor;
 import io.swagger.v3.parser.processors.OperationProcessor;
 import io.swagger.v3.parser.processors.PathsProcessor;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,14 +41,13 @@ public class BoatOpenAPIResolver {
     public OpenAPI resolve() {
         if (this.openApi == null) {
             return null;
-        } else {
-            examplesProcessor.processExamples(this.openApi);
-            processOpenAPI();
-            return this.openApi;
         }
+        processOpenAPI();
+        return this.openApi;
     }
 
     private void processOpenAPI() {
+        this.examplesProcessor.processExamples();
         this.pathProcessor.processPaths();
         this.componentsProcessor.processComponents();
         if (this.openApi.getPaths() == null) {

@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -120,7 +121,7 @@ class BundlerTests {
         String spec = System.getProperty("spec", inputUri);
         OpenAPI openAPI = OpenAPILoader.load(spec);
         OpenAPI openAPIUnproccessed = openAPI;
-        new ExamplesProcessor(openAPI,spec).processExamples(openAPI);
+        new ExamplesProcessor(openAPI,spec).processExamples();
         assertEquals(openAPIUnproccessed, openAPI);
     }
 
@@ -131,7 +132,7 @@ class BundlerTests {
         OpenAPI openAPI = OpenAPILoader.load(spec);
         ExamplesProcessor examplesProcessor = new ExamplesProcessor(openAPI,spec);
         try {
-            examplesProcessor.processExamples(openAPI);
+            examplesProcessor.processExamples();
             fail("Expected TransformerException");
         }catch (TransformerException e){
             assertEquals("Failed to process example content for ExampleHolder{name='example-in-components', ref=null}",e.getMessage());
@@ -166,15 +167,13 @@ class BundlerTests {
             openAPI.getComponents().getExamples().get("example-in-components-1").getSummary(),
             is("component-examples with example - should be left alone"));
 
-
         // actual input is not valid... when there is a ref no other properties should be set - still allow it.
         assertThat("Component example that duplicates a inline example, is left alone. But the summary is removed",
             openAPI.getComponents().getExamples().get("example-number-one").getSummary(), is("example-number-one"));
 
 
-        assertThat("Deep linked examples are dereferenced.",
-            singleExampleMap(openAPI, "/users", PathItem::getPost, "400", APPLICATION_JSON).get("$ref").toString(),
-            isComponentExample);
+        assertComponentExample(openAPI, "/users", PathItem::getPost, "400");
+
         assertThat("The deep linked example is in /components/examples",
             openAPI.getComponents().getExamples().get("lib-bad-request-validation-error"), notNullValue());
 
@@ -186,9 +185,7 @@ class BundlerTests {
             openAPI.getPaths().get("/users").getPut().getResponses().get("401").getContent().get(APPLICATION_JSON)
                 .getExamples().get("named-bad-example").get$ref(), isComponentExample);
 
-        assertThat("Relative path works",
-            openAPI.getPaths().get("/users").getPut().getResponses().get("403").getContent().get(APPLICATION_JSON)
-                .getExample(), notNullValue());
+        assertComponentExample(openAPI, "/users", PathItem::getPut, "403");
 
         Example exampleNoThree = openAPI.getPaths().get("/multi-users").getPost().getRequestBody().getContent()
             .get(APPLICATION_JSON).getExamples().get("example-number-three");
@@ -196,6 +193,27 @@ class BundlerTests {
             is("#/components/examples/example-number-three"));
         assertThat("value.$ref is cleaned up", exampleNoThree.getValue(), nullValue());
 
+    }
+
+    /**
+     * Asserts that the specified path/operation/responseCode points to a component/response that has a ref to an
+     * example and validates that this example exists in components/examples.
+     * @param openAPI the OpenAPI object
+     * @param path the path of the endpoint
+     * @param operationGetter the getter function to retrieve the operation from the path item
+     * @param responseCode the response code to check
+     */
+    private void assertComponentExample(OpenAPI openAPI, String path, Function<PathItem, Operation> operationGetter,
+                                        String responseCode) {
+        String responseRef = operationGetter.apply(openAPI.getPaths().get(path)).getResponses().get(responseCode).get$ref();
+        assertThat("Response is referenced", responseRef, notNullValue());
+        ApiResponse response = openAPI.getComponents().getResponses().get(substringAfterLast(responseRef, "/"));
+        assertThat("Response " + responseRef + " is inlined in components/response", response, notNullValue());
+        Object exampleRef = ((Map)response.getContent().get(APPLICATION_JSON).getExample()).get("$ref");
+        assertThat("The component has a ref to the actual example", exampleRef, notNullValue());
+        assertThat("400 response is inlined in components/response",
+                openAPI.getComponents().getExamples().containsKey(
+                        substringAfterLast(String.valueOf(exampleRef), "/")), is(true));
     }
 
     private ObjectNode singleExampleNode(OpenAPI openAPI, String path, Function<PathItem, Operation> operation,
@@ -214,9 +232,11 @@ class BundlerTests {
         ApiResponses responses = apply.getResponses();
         ApiResponse apiResponse = responses.get(response);
         Content content = apiResponse.getContent();
+        if (content == null) {
+            return Map.of();
+        }
         MediaType mediaType = content.get(contentType);
-        return mediaType
-            .getExample();
+        return mediaType.getExample();
     }
 
     // @Test - not really a test.

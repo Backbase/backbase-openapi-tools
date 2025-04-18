@@ -15,6 +15,9 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.parser.models.RefFormat;
 import io.swagger.v3.parser.util.RefUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -24,8 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 
 @Slf4j
@@ -53,7 +54,7 @@ public class ExamplesProcessor {
         }
     }
 
-    public void processExamples(OpenAPI openAPI) {
+    public void processExamples() {
 
         log.debug("Processing examples in Components");
         // dereference the /component/examples first...
