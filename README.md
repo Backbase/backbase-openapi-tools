@@ -14,6 +14,8 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.62
+* Fixed reactive generation of code to not include extra Flux<> to return parameter
 ## 0.17.61
 * Added new `excludes` parameter into `bundle` execution to exclude certain files (default: `**/lib/**`) to avoid generating externally downloaded spec files.
 ## 0.17.60
