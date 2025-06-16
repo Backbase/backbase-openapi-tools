@@ -68,7 +68,7 @@ public class BoatSwift5Codegen extends Swift5ClientCodegen implements CodegenCon
         super.processOpts();
         additionalProperties.put("useDBSDataProvider", getLibrary().equals(LIBRARY_DBS));
         supportingFiles.add(new SupportingFile("AnyCodable.swift.mustache", sourceFolder, "AnyCodable.swift"));
-        supportingFiles.add(new SupportingFile("URLEncoding+ExplodedParameters.swift.mustache", sourceFolder, "URLEncoding+ExplodedParameters.swift"));
+        supportingFiles.add(new SupportingFile("CommonClient+ExplodedParameters.swift.mustache", sourceFolder, "CommonClient+ExplodedParameters.swift"));
 
         if (additionalProperties.containsKey(DEPENDENCY_MANAGEMENT)) {
             Object dependenciesAsObject = additionalProperties.get(DEPENDENCY_MANAGEMENT);
