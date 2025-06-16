@@ -1,0 +1,97 @@
+//
+//  URLEncoding+ExplodedParameters.swift
+//  client-common-ios
+//
+//  Created by Mirko Tomic on 16. 6. 2025..
+//
+
+import Foundation
+
+/// ArrayParam wrapper for controlling OpenAPI array parameter encoding
+public struct ArrayParam {
+    public init(_ value: [Any?], exploded: Bool) {
+        self.value = value
+        self.explode = exploded
+    }
+
+    public let value: [Any?]
+    public let explode: Bool
+
+    /// Returns URLQueryItems based on explode setting
+    func queryItems(for key: String) -> [URLQueryItem] {
+        if explode {
+            return value.compactMap { $0 }.map { URLQueryItem(name: key, value: "\($0)") }
+        } else {
+            let joined = value.compactMap { $0 }.map { "\($0)" }.joined(separator: ",")
+            return [URLQueryItem(name: key, value: joined)]
+        }
+    }
+}
+
+public extension URLEncoding {
+    /// Creates a URL request by encoding parameters with exploded array support
+    /// and applying them onto an existing request url.
+    ///
+    /// This method supports the ArrayParam type for controlling exploded vs comma-separated arrays
+    /// according to OpenAPI specification.
+    ///
+    /// - parameter urlRequest: The request to have parameters applied.
+    /// - parameter parameters: The parameters to apply. Can include ArrayParam instances.
+    ///
+    /// - throws: An `Error` if the encoding process encounters an error.
+    ///
+    /// - returns: The encoded request.
+    static func encodeWithExplodedSupport(_ urlRequest: URLRequest, with parameters: [String: Any]?) throws -> URLRequest {
+        var urlRequest = urlRequest
+        guard let parameters = parameters else { return urlRequest }
+
+        guard let url = urlRequest.url else {
+            throw CallError.requestMissingUrl
+        }
+
+        if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false), !parameters.isEmpty {
+            urlComponents.queryItems = mapValuesToQueryItemsWithExplodedSupport(parameters)
+            urlRequest.url = urlComponents.url
+        }
+
+        return urlRequest
+    }
+
+    private static func mapValuesToQueryItemsWithExplodedSupport(_ source: [String: Any?]) -> [URLQueryItem]? {
+        let items = source.compactMap { key, value -> [URLQueryItem]? in
+            guard let value else {
+                return nil
+            }
+
+            switch value {
+            case let array as [Any?]:
+                return ArrayParam(array, exploded: true)
+                    .queryItems(for: key)
+
+            case let arrayParam as ArrayParam:
+                return arrayParam
+                    .queryItems(for: key)
+
+            default:
+                return [URLQueryItem(name: key, value: "\(value)")]
+            }
+        }.flatMap { $0 }
+
+        return items.isEmpty ? nil : items
+    }
+}
+
+// Helper extensions for easier ArrayParam creation
+public extension Array {
+    /// Creates an ArrayParam with exploded=true for OpenAPI query parameter encoding
+    /// Example: ["a", "b"].exploded -> ?param=a&param=b
+    var exploded: ArrayParam {
+        ArrayParam(self, exploded: true)
+    }
+
+    /// Creates an ArrayParam with exploded=false for OpenAPI query parameter encoding
+    /// Example: ["a", "b"].commaSeparated -> ?param=a,b
+    var commaSeparated: ArrayParam {
+        ArrayParam(self, exploded: false)
+    }
+}
