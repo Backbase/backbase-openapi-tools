@@ -22,7 +22,7 @@ extension {{moduleName}}Client {
 {{/swiftUseApiNamespace}}
 
 /// {{classname}} protocol defines a blueprint of methods, properties, and other requirements for {{classname}} functionality. 
-{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} protocol {{classname}}Protocol {
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} protocol {{classname}}Protocol {
 {{#operation}}
     
     /**
@@ -53,7 +53,7 @@ extension {{moduleName}}Client {
 
 {{#description}}
 /** {{description}} */{{/description}}
-{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} class {{classname}}: NSObject, DBSClient, {{classname}}Protocol {
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} class {{classname}}: NSObject, DBSClient, {{classname}}Protocol {
     {{#useMsdkSwift}}
     public var dataProvider: BackbaseSDK.DBSDataProvider?
     {{/useMsdkSwift}}
