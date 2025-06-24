@@ -137,6 +137,7 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
             defaultValue = "new HashMap<>()";
             isMap = true;
         }
+        this.nameInCamelCase = StringUtils.capitalize(this.nameInCamelCase);
     }
     @Override
     public String toString() {
