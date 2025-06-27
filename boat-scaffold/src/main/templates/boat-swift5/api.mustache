@@ -22,7 +22,7 @@ extension {{moduleName}}Client {
 {{/swiftUseApiNamespace}}
 
 /// {{classname}} protocol defines a blueprint of methods, properties, and other requirements for {{classname}} functionality. 
-{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}open{{/nonPublicApi}} protocol {{classname}}Protocol {
+{{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} protocol {{classname}}Protocol {
 {{#operation}}
     
     /**
