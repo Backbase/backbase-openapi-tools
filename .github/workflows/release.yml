@@ -13,7 +13,7 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
@@ -94,7 +94,7 @@ jobs:
       - name: Checkout Branch
         uses: actions/checkout@v4
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
