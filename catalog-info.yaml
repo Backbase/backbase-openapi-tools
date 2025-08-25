@@ -21,4 +21,4 @@ metadata:
 spec:
   type: internal
   lifecycle: production
-  owner: DE - API Sandbox
+  owner: DE - DevLight

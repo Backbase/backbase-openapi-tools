@@ -1,5 +1,6 @@
 ![Build](https://github.com/Backbase/backbase-openapi-tools/workflows/BOAT/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.backbase.oss%3Abackbase-openapi-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.backbase.oss%3Abackbase-openapi-tools)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Backbase/backbase-openapi-tools)
 # Backbase OpenApi Tools 
 
 The Backbase Open API Tools is a collection of tools created to work efficiently with OpenAPI
