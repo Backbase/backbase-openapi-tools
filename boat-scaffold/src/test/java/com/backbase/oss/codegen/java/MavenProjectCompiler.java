@@ -2,6 +2,7 @@ package com.backbase.oss.codegen.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -56,9 +57,13 @@ class MavenProjectCompiler {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, projectDir.getAbsolutePath());
             String[] args = generateMavenCliArgs();
             log.debug("mvn cli args: {}", Arrays.toString(args));
-            int compilationStatus = mavenCli.doMain(args, projectDir.getAbsolutePath(), System.out, System.out);
+            log.info("Building: {}", projectDir.getName());
+            PrintStream out = new PrintStream(new File(projectDir, "mvn.log"));
+            int compilationStatus = mavenCli.doMain(args, projectDir.getAbsolutePath(), out, out);
             log.debug("compilation status={}", compilationStatus);
             return compilationStatus;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             if (StringUtils.isBlank(initialDir)) {
                 System.clearProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
