@@ -278,7 +278,8 @@ class BoatSpringCodeGenTests {
         var compiler = new MavenProjectCompiler(BoatSpringCodeGenTests.class.getClassLoader());
         var projectDir = new File(output);
         int compilationStatus = compiler.compile(projectDir);
-        assertEquals(0, compilationStatus);
+        assertEquals(0, compilationStatus,
+                "Failed compilation. see " + projectDir.getAbsolutePath() + "/mvn.log for details");
 
         // verify
         ClassLoader projectClassLoader = compiler.getProjectClassLoader(projectDir);
