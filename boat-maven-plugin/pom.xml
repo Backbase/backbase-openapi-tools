@@ -235,6 +235,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Override OkHttp version to be compatible with MockWebServer 5.1.0 -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>5.1.0</version>
+        </dependency>
 
     </dependencies>
 
