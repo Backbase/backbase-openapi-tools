@@ -273,7 +273,7 @@ extension {{moduleName}}Client {
                                                                             headers: headerParameters{{/-first}}{{/headerParams}})
         {{/useMsdkSwift}}
         {{^useMsdkSwift}}
-        let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
+        let request = try ClientCommonGen2.RequestBuilder.createURLRequestWithExplodedSupport(requestUrl: url, 
                                                                             method: "{{httpMethod}}",
                                                                             queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
                                                                             bodyParameters: parameters,
