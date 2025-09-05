@@ -29,14 +29,6 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/me.andrz.jackson/jackson-json-reference-core -->
-        <dependency>
-            <groupId>me.andrz.jackson</groupId>
-            <artifactId>jackson-json-reference-core</artifactId>
-            <version>0.3.2</version>
-        </dependency>
-
-
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
