@@ -7,12 +7,14 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyAdditionalPropertiesKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyEnumNameMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyImportMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInstantiationTypesKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyNameMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
@@ -492,10 +494,23 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     private List<String> openapiNormalizer;
 
     /**
-     * A map of scheme and the new one
+     * A map of scheme and the new one.
      */
     @Parameter(name = "schemaMappings", property = "openapi.generator.maven.plugin.schemaMappings")
     private List<String> schemaMappings;
+
+    /**
+     * A map of property names and the new names.
+     */
+    @Parameter(name = "nameMappings", property = "openapi.generator.maven.plugin.nameMappings")
+    private List<String> nameMappings;
+
+    /**
+     * A map of enum names and the new names.
+     */
+    @Parameter(name = "enumNameMappings", property = "openapi.generator.maven.plugin.enumNameMappings")
+    private List<String> enumNameMappings;
+
 
     public void setBuildContext(BuildContext buildContext) {
         this.buildContext = buildContext;
@@ -863,6 +878,16 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             // Apply Schema Mappings
             if (schemaMappings != null && (configOptions == null || !configOptions.containsKey(SCHEMA_MAPPING))) {
                 applySchemaMappingsKvpList(schemaMappings, configurator);
+            }
+
+            // Apply Name Mappings
+            if (nameMappings != null && (configOptions == null || !configOptions.containsKey("name-mappings"))) {
+                applyNameMappingsKvpList(nameMappings, configurator);
+            }
+
+            // Apply Enum Name Mappings
+            if (enumNameMappings != null && (configOptions == null || !configOptions.containsKey("enum-name-mappings"))) {
+                applyEnumNameMappingsKvpList(enumNameMappings, configurator);
             }
 
             if (environmentVariables != null) {
