@@ -114,10 +114,19 @@ components:
           type: string
         tag:
           type: string
+        size:
+          $ref: '#/components/schemas/Size'
     Pets:
       type: array
       items:
         $ref: "#/components/schemas/Pet"
+    Size:
+      type: string
+      description: Size of the pet
+      enum:
+        - SMALL
+        - MEDIUM
+        - LARGE
     Error:
       type: object
       required:

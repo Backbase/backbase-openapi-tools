@@ -96,6 +96,60 @@ Same with `generate` but with opinionated defaults for Rest Template Client
         </additionalProperties>
     </configuration>
 
+### Property & Enum Name Mappings (new)
+
+Two new optional parameters are supported by the BOAT plugin (mirroring OpenAPI Generator capabilities) to rename generated members without post-processing:
+
+    nameMappings        A map of property names to their new names.
+    enumNameMappings    A map of enum (symbol) names to their new names.
+
+You can configure them directly as top-level plugin parameters OR via `configOptions` using the underlying generator keys `name-mappings` and `enum-name-mappings`.
+
+Supported input formats:
+1. Top-level list form (preferred for clarity):
+
+    <configuration>
+        ...
+        <nameMappings>
+            <nameMapping>old_property_name=NewPropertyName</nameMapping>
+            <nameMapping>id=identifier</nameMapping>
+        </nameMappings>
+        <enumNameMappings>
+            <enumNameMapping>old_enum_name=NewEnumName</enumNameMapping>
+            <enumNameMapping>Status=ApiStatus</enumNameMapping>
+        </enumNameMappings>
+    </configuration>
+
+2. Via system properties / CLI (helpful for experimentation):
+
+    mvn clean compile \
+      -Dopenapi.generator.maven.plugin.nameMappings=old_property_name=NewPropertyName,id=identifier \
+      -Dopenapi.generator.maven.plugin.enumNameMappings=old_enum_name=NewEnumName,Status=ApiStatus
+
+Rules & notes:
+- Key/value pairs use '='. Whitespace around keys/values is trimmed.
+- For multiple entries in system property form, separate by comma.
+- Duplicate keys: last one wins.
+- These mappings apply after any model / type renames from other mapping options.
+- `nameMappings` affects property (field) identifiers in generated models & parameter names (where supported by the underlying generator).
+- `enumNameMappings` affects enum constant identifiers (not their serialized wire values). To change wire values, adjust the OpenAPI schema itself.
+
+Example combining with other options:
+
+    <plugin>
+      <groupId>com.backbase.oss</groupId>
+      <artifactId>boat-maven-plugin</artifactId>
+      <configuration>
+        <nameMappings>
+          <nameMapping>created_at=createdAt</nameMapping>
+          <nameMapping>updated_at=updatedAt</nameMapping>
+        </nameMappings>
+        <enumNameMappings>
+          <enumNameMapping>status=ResourceStatus</enumNameMapping>
+        </enumNameMappings>
+      </configuration>
+    </plugin>
+
 ## boat:generate-webclient-embedded
 
 Same with `generate` but with opinionated defaults for Web Client

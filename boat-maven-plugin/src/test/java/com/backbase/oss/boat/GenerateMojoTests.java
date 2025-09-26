@@ -1,11 +1,14 @@
 package com.backbase.oss.boat;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -14,6 +17,7 @@ import com.backbase.oss.codegen.java.BoatSpringCodeGen;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -55,7 +59,13 @@ class GenerateMojoTests {
     void useJavaBoat() throws MojoExecutionException, MojoFailureException {
         GenerateMojo mojo = configure(new GenerateMojo(), "java");
 
+        mojo.setEnumNameMappings(singletonList("LARGE=SUPER-BIG"));
+        mojo.setNameMappings(singletonList("size=petSize"));
+
         mojo.execute();
+
+        assertGeneratedClientModels(mojo.output, "Pet.java", "petSize");
+        assertGeneratedClientModels(mojo.output, "Size.java", "SUPER-BIG");
 
         assertThat(mojo.generatorName, equalTo(BoatJavaCodeGen.NAME));
     }
@@ -187,4 +197,25 @@ class GenerateMojoTests {
         mojo.generatorName = generatorName;
         return mojo;
     }
+
+    private void assertGeneratedClientModels(File mojoOutput, String fileName, String... expectedProperties) {
+        File dir = mojoOutput.getAbsoluteFile()
+            .toPath()
+            .resolve("src/main/java/org/openapitools/client/model")
+            .toFile();
+        File target = new File(dir, fileName);
+        assertThat(target.exists(), is(true));
+        try {
+            String content = java.nio.file.Files.readString(
+                target.toPath(),
+                java.nio.charset.StandardCharsets.UTF_8
+            );
+            assertAll(Stream.of(expectedProperties).map(prop ->
+                () -> assertThat("Expected content not found: " + prop, content.contains(prop), is(true))
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
