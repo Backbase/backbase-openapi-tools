@@ -15,6 +15,11 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+
+## 0.17.63
+Add support params of openapi-generator `name-mappings` and `enum-name-mappings`.
+Check `Property & Enum Name Mappings (new)` in [boat-maven-plugin](boat-maven-plugin/README.md)
+
 ## 0.17.62
 * Fixed reactive generation of code to not include extra Flux<> to return parameter
 ## 0.17.61

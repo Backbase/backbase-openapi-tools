@@ -516,6 +516,14 @@ public class GenerateMojo extends InputMavenArtifactMojo {
         this.buildContext = buildContext;
     }
 
+    public void setNameMappings(List<String> nameMappings) {
+        this.nameMappings = nameMappings;
+    }
+
+    public void setEnumNameMappings(List<String> enumNameMappings) {
+        this.enumNameMappings = enumNameMappings;
+    }
+
     @Override
     @SuppressWarnings({"java:S3776", "java:S1874"})
     public void execute() throws MojoExecutionException, MojoFailureException {
