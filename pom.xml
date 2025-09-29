@@ -48,7 +48,7 @@
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
-        <lombok.version>1.18.40</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <jackson.version>2.20.0</jackson.version>
         <mockito.version>5.19.0</mockito.version>
 
@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.40</version>
+                <version>1.18.42</version>
             </dependency>
 
             <dependency>
