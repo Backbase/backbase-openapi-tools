@@ -209,6 +209,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
+        this.apiNamePrefix = "Webhook";
     }
 
     /*
@@ -300,7 +301,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public void processOpts() {
         super.processOpts();
 
-        // Whether it's using ApiUtil or not.
+        // Whether it's using ApiUtil or not
         // cases:
         // <supportingFilesToGenerate>ApiUtil.java present or not</supportingFilesToGenerate>
         // <generateSupportingFiles>true or false</generateSupportingFiles>
@@ -324,6 +325,33 @@ public class BoatSpringCodeGen extends SpringCodegen {
             serializerTemplate + ".java"
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
+
+        // Adding Webhook related models to supporting files
+        final var webhookResponseTemplate = "WebhookResponse";
+        this.supportingFiles.add(new SupportingFile(webhookResponseTemplate + ".mustache",
+                (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+            webhookResponseTemplate + ".java"));
+
+        final var servletContentTemplate = "ServletContent";
+        this.supportingFiles.add(new SupportingFile(servletContentTemplate + ".mustache",
+                (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+                servletContentTemplate + ".java"));
+
+        final var posthookRequestTemplate = "PosthookRequest";
+        this.supportingFiles.add(new SupportingFile(posthookRequestTemplate + ".mustache",
+                (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+                posthookRequestTemplate + ".java"));
+
+        final var prehookRequestTemplate = "PrehookRequest";
+        this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + ".mustache",
+                (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+                prehookRequestTemplate + ".java"));
+
+        this.importMapping.put(webhookResponseTemplate, modelPackage + "." + webhookResponseTemplate);
+        this.importMapping.put(servletContentTemplate, modelPackage + "." + servletContentTemplate);
+        this.importMapping.put(posthookRequestTemplate, modelPackage + "." + posthookRequestTemplate);
+        this.importMapping.put(prehookRequestTemplate, modelPackage + "." + prehookRequestTemplate);
+
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);

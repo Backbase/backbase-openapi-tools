@@ -171,7 +171,7 @@ class BoatSpringCodeGenTests {
 
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
 
-        File testApi = files.stream().filter(file -> file.getName().equals("ClientApi.java"))
+        File testApi = files.stream().filter(file -> file.getName().equals("WebhookClientApi.java"))
                 .findFirst()
                 .get();
         MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)

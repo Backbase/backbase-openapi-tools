@@ -1,0 +1,75 @@
+package {{modelPackage}};
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+
+public class WebhookResponse extends ServletContent {
+
+    private int httpStatusCode;
+
+    public WebhookResponse() {
+    }
+
+    public WebhookResponse(ServletContent content) {
+        super(content);
+    }
+
+    public WebhookResponse httpStatusCode(int httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+        return this;
+    }
+
+    public int getHttpStatusCode() {
+        return httpStatusCode;
+    }
+
+    public void setHttpStatusCode(int httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
+
+    public WebhookResponse body(String body) {
+        this.setBody(body);
+        return this;
+    }
+
+    public WebhookResponse headers(Map<String, List<String>> headers) {
+        this.setHeaders(headers);
+        return this;
+    }
+
+    public WebhookResponse parameters(Map<String, String[]> parameters) {
+        this.setParameters(parameters);
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WebhookResponse webhookResponse = (WebhookResponse) o;
+        return super.equals(o) && Objects.equals(this.httpStatusCode, webhookResponse.httpStatusCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Objects.hash(httpStatusCode);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class WebhookResponse {\n");
+        sb.append("    body: ").append(toIndentedString(getBody())).append("\n");
+        sb.append("    headers: ").append(toIndentedString(getHeaders())).append("\n");
+        sb.append("    parameters: ").append(toIndentedString(getParameters())).append("\n");
+        sb.append("    httpStatusCode: ").append(toIndentedString(this.httpStatusCode)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+}

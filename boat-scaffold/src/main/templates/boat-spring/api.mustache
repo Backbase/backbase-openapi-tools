@@ -94,7 +94,9 @@ import jakarta.annotation.Generated;
 {{^useJakartaEe}}
 import javax.annotation.Generated;
 {{/useJakartaEe}}
-
+import {{modelPackage}}.WebhookResponse;
+import {{modelPackage}}.PrehookRequest;
+import {{modelPackage}}.PosthookRequest;
 {{>generatedAnnotation}}
 {{#useBeanValidation}}
 {{#useClassLevelBeanValidation}}
@@ -119,7 +121,7 @@ import javax.annotation.Generated;
 @RequestMapping("${openapi.<%title%>.base-path:<%>defaultBasePath%>}")
 <%={{ }}=%>
 {{/useRequestMappingOnInterface}}
-public interface Webhooks{{classname}} {
+public interface {{classname}} {
 {{#jdk8-default-interface}}
     {{^isDelegate}}
         {{^reactive}}
@@ -245,8 +247,8 @@ public interface Webhooks{{classname}} {
         produces = { {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }{{/hasProduces}}{{#hasConsumes}},
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
-    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{>responseType}} prehook{{operationId}}(
-        {{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> prehook{{operationId}}(
+        @Valid @RequestBody PrehookRequest prehookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
         {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
         {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
         {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
@@ -265,8 +267,8 @@ public interface Webhooks{{classname}} {
         produces = { {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }{{/hasProduces}}{{#hasConsumes}},
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
-    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{>responseType}} posthook{{operationId}}(
-        {{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> posthook{{operationId}}(
+        @Valid @RequestBody PosthookRequest posthookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
         {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
         {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
         {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
