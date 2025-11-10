@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.67
+* Fixed duplicate enum generation in openapi-generator`enum-name-mappings`.
+
 ## 0.17.66
 * Add support params of openapi-generator `name-mappings` and `enum-name-mappings`.
 Check `Property & Enum Name Mappings (new)` in [boat-maven-plugin](boat-maven-plugin/README.md)
