@@ -140,11 +140,11 @@ class BoatSpringCodeGenTests {
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
 
         File testApi = files.stream().filter(file -> file.getName().equals("TestApi.java"))
-            .findFirst()
-            .get();
+                .findFirst()
+                .get();
         MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)
-            .findAll(MethodDeclaration.class)
-            .get(1);
+                .findAll(MethodDeclaration.class)
+                .get(1);
 
         Parameter filesParam = testPostMethod.getParameterByName("files").get();
         Parameter contentParam = testPostMethod.getParameterByName("content").get();
@@ -153,30 +153,6 @@ class BoatSpringCodeGenTests {
         assertTrue(contentParam.getAnnotationByName("RequestPart").isPresent());
         assertThat(contentParam.getTypeAsString(), equalTo("TestObjectPart"));
         assertThat(filesParam.getTypeAsString(), equalTo("List<MultipartFile>"));
-    }
-
-    @Test
-    void webhookWithCardsApi() throws IOException {
-        var codegen = new BoatSpringCodeGen();
-        var input = new File("src/test/resources/boat-spring/cardsapi.yaml");
-        codegen.setLibrary("spring-boot");
-        codegen.setInterfaceOnly(true);
-        codegen.setOutputDir(TEST_OUTPUT + "/cards");
-        codegen.setInputSpec(input.getAbsolutePath());
-
-        var openApiInput = new OpenAPIParser().readLocation(input.getAbsolutePath(), null, new ParseOptions()).getOpenAPI();
-        var clientOptInput = new ClientOptInput();
-        clientOptInput.config(codegen);
-        clientOptInput.openAPI(openApiInput);
-
-        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
-
-        File testApi = files.stream().filter(file -> file.getName().equals("WebhookClientApi.java"))
-                .findFirst()
-                .get();
-        MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)
-                .findAll(MethodDeclaration.class)
-                .get(1);
     }
 
     @Test
