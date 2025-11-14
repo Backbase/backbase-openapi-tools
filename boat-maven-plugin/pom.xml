@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.17.66-SNAPSHOT</version>
+        <version>0.17.67-SNAPSHOT</version>
     </parent>
     <artifactId>boat-maven-plugin</artifactId>
 
@@ -360,7 +360,7 @@
             <plugin>
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>0.17.50</version>
+                <version>0.17.67</version>
                 <executions>
                     <execution>
                         <goals>
@@ -382,6 +382,37 @@
                                 <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder </additionalModelTypeAnnotations>
                                 <useJakartaEe>true</useJakartaEe>
                             </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>fix-timezone-enum-duplicates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <replaceregexp match='ETC_GMT_(\d+2)\("Etc/GMT\+'
+                                               replace='ETC_GMT_PLUS_\1("Etc/GMT+'
+                                               flags="g"
+                                               byline="true">
+                                    <fileset dir="${project.build.directory}/generated-sources" includes="**/TimeZoneEnum.java"/>
+                                </replaceregexp>
+
+                                <replaceregexp match='ETC_GMT_(\d+)\("Etc/GMT-'
+                                               replace='ETC_GMT_MINUS_\1("Etc/GMT-'
+                                               flags="g"
+                                               byline="true">
+                                    <fileset dir="${project.build.directory}/generated-sources" includes="**/TimeZoneEnum.java"/>
+                                </replaceregexp>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
