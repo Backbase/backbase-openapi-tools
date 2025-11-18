@@ -8,8 +8,24 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every weekday
       interval: "daily"
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"                # include all GitHub Actions
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 20
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"                # include all Maven dependencies
+        update-types:
+          - "minor"
+          - "patch"
