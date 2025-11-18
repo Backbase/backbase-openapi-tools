@@ -1,5 +1,3 @@
- Set update schedule for GitHub Actions and split Maven updates so that
-# artifacts with group id starting with "org.openapitools" are grouped separately.
 
 version: 2
 updates:
