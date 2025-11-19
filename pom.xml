@@ -4,7 +4,7 @@
 
     <groupId>com.backbase.oss</groupId>
     <artifactId>backbase-openapi-tools</artifactId>
-    <version>0.17.68-SNAPSHOT</version>
+    <version>0.17.69-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <description>Backbase Open Api Tools is a collection of tools to work with Open API</description>
