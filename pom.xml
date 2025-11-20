@@ -44,7 +44,7 @@
 
         <sonar.organization>backbase</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <openapi-generator.version>7.4.0</openapi-generator.version>
+        <openapi-generator.version>7.17.0</openapi-generator.version>
         <aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
