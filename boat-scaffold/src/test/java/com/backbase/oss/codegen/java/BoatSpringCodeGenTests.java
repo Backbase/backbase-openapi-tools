@@ -140,11 +140,11 @@ class BoatSpringCodeGenTests {
         List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
 
         File testApi = files.stream().filter(file -> file.getName().equals("TestApi.java"))
-                .findFirst()
-                .get();
+            .findFirst()
+            .get();
         MethodDeclaration testPostMethod = StaticJavaParser.parse(testApi)
-                .findAll(MethodDeclaration.class)
-                .get(1);
+            .findAll(MethodDeclaration.class)
+            .get(1);
 
         Parameter filesParam = testPostMethod.getParameterByName("files").get();
         Parameter contentParam = testPostMethod.getParameterByName("content").get();

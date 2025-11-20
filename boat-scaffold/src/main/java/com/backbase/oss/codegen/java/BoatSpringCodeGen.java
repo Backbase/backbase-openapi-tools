@@ -1,12 +1,5 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
@@ -14,6 +7,16 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.*;
+import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.templating.mustache.IndentedLambda;
+import org.openapitools.codegen.utils.ModelUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -25,21 +28,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenParameter;
-import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.SupportingFile;
-import org.openapitools.codegen.config.GlobalSettings;
-import org.openapitools.codegen.languages.SpringCodegen;
-import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import org.openapitools.codegen.utils.ModelUtils;
+
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 @Slf4j
 public class BoatSpringCodeGen extends SpringCodegen {
@@ -87,24 +82,24 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
         private String[] splitLines(final String text) {
             return stream(text.split("\\r\\n|\\n"))
-                    .map(s -> s.replaceFirst(REGEX, ""))
-                    .toArray(String[]::new);
+                .map(s -> s.replaceFirst(REGEX, ""))
+                .toArray(String[]::new);
         }
 
         private int minIndent(String[] lines) {
             return stream(lines)
-                    .filter(StringUtils::isNotBlank)
-                    .map(s -> s.replaceFirst(REGEX, ""))
-                    .map(NewLineIndent::indentLevel)
-                    .min(Integer::compareTo)
-                    .orElse(0);
+                .filter(StringUtils::isNotBlank)
+                .map(s -> s.replaceFirst(REGEX, ""))
+                .map(NewLineIndent::indentLevel)
+                .min(Integer::compareTo)
+                .orElse(0);
         }
 
         static int indentLevel(String text) {
             return IntStream
-                    .range(0, text.replaceFirst(REGEX, text).length())
-                    .filter(n -> !Character.isWhitespace(text.charAt(n)))
-                    .findFirst().orElse(0);
+                .range(0, text.replaceFirst(REGEX, text).length())
+                .filter(n -> !Character.isWhitespace(text.charAt(n)))
+                .findFirst().orElse(0);
         }
     }
 
@@ -124,10 +119,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
                 return;
             }
             String formatted = text
-                    .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
-                    .replaceAll("\\< ", "<")
-                    .replaceAll(" >", ">")
-                    .trim();
+                .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
+                .replaceAll("\\< ", "<")
+                .replaceAll(" >", ">")
+                .trim();
 
             if (log.isTraceEnabled()) {
                 log.trace("Fragment [{}] reformatted into [{}]", text, formatted);
@@ -195,18 +190,18 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
         this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
-                "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
+            "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
-                "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
+            "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
-                "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
+            "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
                 this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
-                "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
+            "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
-                "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
+            "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
-                "Whether to use protected visibility for model fields"));
+            "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
     }
@@ -307,21 +302,21 @@ public class BoatSpringCodeGen extends SpringCodegen {
         final String supFiles = GlobalSettings.getProperty(CodegenConstants.SUPPORTING_FILES);
         // cleared by <generateSuportingFiles>false</generateSuportingFiles>
         final boolean useApiUtil = supFiles != null && (supFiles.isEmpty()
-                ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
-                : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
+            ? needApiUtil() // set to empty by <generateSuportingFiles>true</generateSuportingFiles>
+            : supFiles.contains("ApiUtil.java")); // set by <supportingFilesToGenerate/>
 
         if (!useApiUtil) {
             this.supportingFiles
-                    .removeIf(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
+                .removeIf(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
         }
 
         writePropertyBack("useApiUtil", useApiUtil);
 
         final var serializerTemplate = "BigDecimalCustomSerializer";
         this.supportingFiles.add(new SupportingFile(
-                serializerTemplate + ".mustache",
-                (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
-                serializerTemplate + ".java"
+            serializerTemplate + ".mustache",
+            (sourceFolder + File.separator + modelPackage).replace(".", java.io.File.separator),
+            serializerTemplate + ".java"
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
@@ -372,12 +367,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     private boolean needApiUtil() {
         return this.apiTemplateFiles.containsKey("api.mustache")
-                && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
+            && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
     }
 
     /**
-     This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
-     the service interface. There is a relevant httpServletParam.mustache file.
+         This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
+         the service interface. There is a relevant httpServletParam.mustache file.
      */
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
@@ -402,8 +397,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public String toDefaultValue(CodegenProperty cp, Schema schema) {
         final Schema referencedSchema = ModelUtils.getReferencedSchema(this.openAPI, schema);
         return getCollectionCodegenValue(cp, referencedSchema, containerDefaultToNull, instantiationTypes())
-                .map(CodegenValueType::getValue)
-                .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
+            .map(CodegenValueType::getValue)
+            .orElseGet(() -> super.toDefaultValue(cp, referencedSchema));
     }
 
     @Override
@@ -420,7 +415,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     private boolean shouldSerializeBigDecimalAsString(CodegenProperty property) {
         return (serializeBigDecimalAsString && ("decimal".equalsIgnoreCase(property.baseType) || "bigdecimal".equalsIgnoreCase(property.baseType)))
-                || (isApiStringFormattedAsNumber(property) && !isDataTypeString(property));
+            || (isApiStringFormattedAsNumber(property) && !isDataTypeString(property));
     }
 
     private boolean isApiStringFormattedAsNumber(CodegenProperty property) {
@@ -429,6 +424,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     private boolean isDataTypeString(CodegenProperty property) {
         return Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
-                .anyMatch("string"::equalsIgnoreCase);
+            .anyMatch("string"::equalsIgnoreCase);
     }
 }
