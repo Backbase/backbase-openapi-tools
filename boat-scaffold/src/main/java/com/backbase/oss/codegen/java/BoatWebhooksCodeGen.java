@@ -1,23 +1,26 @@
 package com.backbase.oss.codegen.java;
 
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.servers.Server;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 
 import java.io.File;
+import java.util.List;
 
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 @Slf4j
 public class BoatWebhooksCodeGen extends SpringCodegen {
     public static final String NAME = "boat-webhooks";
-   // public static final String NAME = "boat-spring";
 
     public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
@@ -200,4 +203,14 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         return this.apiTemplateFiles.containsKey("api.mustache")
                 && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
     }
+
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        final CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        // Remove the standard body parameter (if it exists) ---
+        // This prevents the generator's default logic from inserting its own request body.
+        codegenOperation.allParams.removeIf(p -> p.isBodyParam);
+        return codegenOperation;
+    }
+
 }

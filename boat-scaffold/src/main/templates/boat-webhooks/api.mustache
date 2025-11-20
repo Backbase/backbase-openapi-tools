@@ -181,7 +181,7 @@ public interface {{classname}} {
             {{#responses}}
             @ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = {
                 {{#produces}}
-                @Content(mediaType = "{{{mediaType}}}", schema = @Schema(implementation = {{{baseType}}}.class)){{^-last}},{{/-last}}
+                @Content(mediaType = "{{{mediaType}}}"){{^-last}},{{/-last}}
                 {{/produces}}
             }{{/baseType}}){{^-last}},{{/-last}}
             {{/responses}}
@@ -248,15 +248,125 @@ public interface {{classname}} {
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> prehook{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
-        @Valid @RequestBody PrehookRequest prehookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
-        {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
-        {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
-        {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
+       @Valid @RequestBody PrehookRequest prehookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+       {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
+       {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
+       {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
     ){{#unhandledException}} throws Exception{{/unhandledException}}{{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}} {
         {{#delegate-method}}
         return {{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}, pageable{{/vendorExtensions.x-spring-paginated}});
         {{/delegate-method}}
     }
+
+    {{/jdk8-default-interface}}
+
+
+
+
+{{/operation}}
+
+
+{{#operation}}
+
+    /**
+     * {{httpMethod}} {{{path}}}{{#summary}} : {{.}}{{/summary}}
+    {{#notes}}
+     * {{.}}
+    {{/notes}}
+     *
+    {{#allParams}}
+     * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{.}}{{/defaultValue}}){{/required}}
+    {{/allParams}}
+     * @return {{#responses}}{{message}} (status code {{code}}){{^-last}}
+     *         or {{/-last}}{{/responses}}
+    {{#isDeprecated}}
+     * @deprecated
+    {{/isDeprecated}}
+    {{#externalDocs}}
+     * {{description}}
+     * @see <a href="{{url}}">{{summary}} Documentation</a>
+    {{/externalDocs}}
+     */
+    {{#isDeprecated}}
+    @Deprecated
+    {{/isDeprecated}}
+    {{#virtualService}}
+    @ApiVirtual
+    {{/virtualService}}
+    {{#swagger2AnnotationLibrary}}
+    @Operation(
+        operationId = "{{{operationId}}}",
+        {{#summary}}
+        summary = "{{{.}}}",
+        {{/summary}}
+        {{#notes}}
+        description = "{{{.}}}",
+        {{/notes}}
+        {{#vendorExtensions.x-tags.size}}
+        tags = { {{#vendorExtensions.x-tags}}"{{tag}}"{{^-last}}, {{/-last}}{{/vendorExtensions.x-tags}} },
+        {{/vendorExtensions.x-tags.size}}
+        responses = {
+            {{#responses}}
+            @ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = {
+                {{#produces}}
+                @Content(mediaType = "{{{mediaType}}}"){{^-last}},{{/-last}}
+                {{/produces}}
+            }{{/baseType}}){{^-last}},{{/-last}}
+            {{/responses}}
+        }{{#hasAuthMethods}},
+        security = {
+            {{#authMethods}}
+            @SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes={ {{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}} }{{/isOAuth}}){{^-last}},{{/-last}}
+            {{/authMethods}}
+        }{{/hasAuthMethods}}
+    )
+    {{/swagger2AnnotationLibrary}}
+    {{#swagger1AnnotationLibrary}}
+    @ApiOperation(
+        {{#vendorExtensions.x-tags.size}}
+        tags = { {{#vendorExtensions.x-tags}}"{{tag}}"{{^-last}}, {{/-last}}{{/vendorExtensions.x-tags}} },
+        {{/vendorExtensions.x-tags.size}}
+        value = "{{{summary}}}",
+        nickname = "{{{operationId}}}",
+        notes = "{{{notes}}}"{{#returnBaseType}},
+        response = {{{.}}}.class{{/returnBaseType}}{{#returnContainer}},
+        responseContainer = "{{{.}}}"{{/returnContainer}}{{#hasAuthMethods}},
+        authorizations = {
+        {{#authMethods}}
+        {{#isOAuth}}
+            @Authorization(value = "{{name}}", scopes = {
+            {{#scopes}}
+                @AuthorizationScope(scope = "{{scope}}", description = "{{description}}"){{^-last}},{{/-last}}
+            {{/scopes}}
+            }){{^-last}},{{/-last}}
+        {{/isOAuth}}
+        {{^isOAuth}}
+            @Authorization(value = "{{name}}"){{^-last}},{{/-last}}
+        {{/isOAuth}}
+        {{/authMethods}} }{{/hasAuthMethods}}
+    )
+    @ApiResponses({
+        {{#responses}}
+        @ApiResponse(code = {{{code}}}, message = "{{{message}}}"{{#baseType}}, response = {{{.}}}.class{{/baseType}}{{#containerType}}, responseContainer = "{{{.}}}"{{/containerType}}){{^-last}},{{/-last}}
+        {{/responses}}
+    })
+    {{/swagger1AnnotationLibrary}}
+    {{#implicitHeadersParams.0}}
+    {{#swagger2AnnotationLibrary}}
+    @Parameters({
+        {{#implicitHeadersParams}}
+        {{>paramDoc}}{{^-last}},{{/-last}}
+        {{/implicitHeadersParams}}
+    })
+    {{/swagger2AnnotationLibrary}}
+    {{#swagger1AnnotationLibrary}}
+    @ApiImplicitParams({
+        {{#implicitHeadersParams}}
+        {{>implicitHeader}}{{^-last}},{{/-last}}
+        {{/implicitHeadersParams}}
+    })
+    {{/swagger1AnnotationLibrary}}
+    {{/implicitHeadersParams.0}}
 
 
     @RequestMapping(
@@ -268,26 +378,22 @@ public interface {{classname}} {
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> posthook{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
-        @Valid @RequestBody PosthookRequest posthookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
-        {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
+        @RequestBody PosthookRequest posthookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+        {{/-last}} {{/allParams}}{{#reactive}}{{#hasParams}},
         {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
         {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
     ){{#unhandledException}} throws Exception{{/unhandledException}}{{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}} {
         {{#isDelegate}}
-        return getDelegate().{{operationId}}Posthook({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}, pageable{{/vendorExtensions.x-spring-paginated}});
+        return {{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}, pageable{{/vendorExtensions.x-spring-paginated}});
         {{/isDelegate}}
-        {{^isDelegate}}
-        {{>methodBody}}
-        {{/isDelegate}}
-    }{{/jdk8-default-interface}}
-
-
-
+    }
 
     {{/jdk8-default-interface}}
 
 
 
+
 {{/operation}}
+
 }
 {{/operations}}

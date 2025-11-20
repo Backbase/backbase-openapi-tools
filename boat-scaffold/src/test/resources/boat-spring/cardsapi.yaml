@@ -6,6 +6,8 @@ info:
 paths:
   /client/v3/cards:
     post:
+      tags:
+        - card
       operationId: postCards
       requestBody:
         content:
@@ -16,6 +18,8 @@ paths:
         "201":
           $ref: '#/components/responses/CardIdResponse'
     get:
+      tags:
+        - card
       operationId: getCards
       responses:
         "200":
