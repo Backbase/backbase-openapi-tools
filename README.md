@@ -16,8 +16,12 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.68
+0.17.67 release publishing failed, 0.17.68 is the public release.
+
 ## 0.17.67
 Update swift5 template to add support for exploded GET parameters (Swift only).
+
 ## 0.17.66
 * Add support params of openapi-generator `name-mappings` and `enum-name-mappings`.
 Check `Property & Enum Name Mappings (new)` in [boat-maven-plugin](boat-maven-plugin/README.md)
