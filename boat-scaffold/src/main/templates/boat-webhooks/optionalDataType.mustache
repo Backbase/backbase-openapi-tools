@@ -1,0 +1,13 @@
+{{#toOneLine}}
+  {{#useOptional}}
+    {{#required}}
+      {{>collectionDataTypeParam}}
+    {{/required}}
+    {{^required}}
+      Optional<{{>collectionDataTypeParam}}>
+    {{/required}}
+  {{/useOptional}}
+  {{^useOptional}}
+    {{>collectionDataTypeParam}}
+  {{/useOptional}}
+{{/toOneLine}}
