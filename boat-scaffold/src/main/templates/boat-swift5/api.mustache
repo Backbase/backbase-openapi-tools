@@ -252,7 +252,7 @@ extension {{moduleName}}Client {
         let parameters: [String: Any]? = nil
             {{/hasFormParams}}
         {{/bodyParam}}{{#hasQueryParams}}
-        let queryParameters: [String: Any?] = [
+        let queryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
             {{#queryParams}}
             {{> _param}}{{^-last}}, {{/-last}}
             {{/queryParams}}
@@ -267,7 +267,7 @@ extension {{moduleName}}Client {
         {{#useMsdkSwift}}
         let request = try BackbaseSDK.RequestBuilder.createURLRequest(requestUrl: url, 
                                                                             method: "{{httpMethod}}",
-                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
                                                                             bodyParameters: parameters,
                                                                             bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
                                                                             headers: headerParameters{{/-first}}{{/headerParams}})
@@ -275,7 +275,7 @@ extension {{moduleName}}Client {
         {{^useMsdkSwift}}
         let request = try ClientCommonGen2.RequestBuilder.createURLRequest(requestUrl: url, 
                                                                             method: "{{httpMethod}}",
-                                                                            queryParameters: {{#hasQueryParams}}queryParameters.compactMapValues({ $0 }){{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+                                                                            queryParameters: {{#hasQueryParams}}queryParameters{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
                                                                             bodyParameters: parameters,
                                                                             bodyType: {{#hasBodyParam}}{{^isMultipart}}.json{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{#isMultipart}}.multipartForm{{/isMultipart}}{{/hasBodyParam}}{{^hasBodyParam}}{{^isMultipart}}.none{{/isMultipart}}{{/hasBodyParam}}{{#headerParams}}{{#-first}},
                                                                             headers: headerParameters{{/-first}}{{/headerParams}})
