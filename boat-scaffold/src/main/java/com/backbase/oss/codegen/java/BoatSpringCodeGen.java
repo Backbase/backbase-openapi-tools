@@ -1,5 +1,12 @@
 package com.backbase.oss.codegen.java;
 
+import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
+
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
@@ -7,16 +14,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.*;
-import org.openapitools.codegen.config.GlobalSettings;
-import org.openapitools.codegen.languages.SpringCodegen;
-import org.openapitools.codegen.templating.mustache.IndentedLambda;
-import org.openapitools.codegen.utils.ModelUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -28,13 +25,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.templating.mustache.IndentedLambda;
+import org.openapitools.codegen.utils.ModelUtils;
 
 @Slf4j
 public class BoatSpringCodeGen extends SpringCodegen {
@@ -195,7 +200,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
             "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
-                this.addBindingResult));
+            this.addBindingResult));
         this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
             "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
         this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
@@ -371,8 +376,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     }
 
     /**
-         This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
-         the service interface. There is a relevant httpServletParam.mustache file.
+        This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
+        the service interface. There is a relevant httpServletParam.mustache file.
      */
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
