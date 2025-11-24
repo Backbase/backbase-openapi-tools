@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.70
+Fix: Examples of responses defined in components/responses were not inlined by the ExamplesProcessor. 
+
 ## 0.17.69
 Update query parameter handling in Swift5 template (#1177)
 
