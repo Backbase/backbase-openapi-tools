@@ -65,9 +65,7 @@ public class ExamplesProcessor {
 
         if (openAPI.getComponents().getResponses() != null) {
             log.debug("Processing examples in component/responses");
-            openAPI.getComponents().getResponses().values().forEach(response -> {
-                processResponse(response);
-            });
+            openAPI.getComponents().getResponses().values().forEach(this::processResponse);
         }
 
 
