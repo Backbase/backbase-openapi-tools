@@ -164,6 +164,8 @@ paths:
                   $ref: '#/components/examples/example-in-components'
                 in-component-1:
                   $ref: '#/components/examples/example-in-components-1'
+        '400':
+          $ref: '#/components/responses/ResponseWithAFileReferenceToExample'
 components:
   schemas:
     UserPostRequest:
@@ -182,6 +184,16 @@ components:
       pattern: ^[0-9].*$
       minLength: 1
       maxLength: 30
+  responses:
+    ResponseWithAFileReferenceToExample:
+      description: A 400 response with a reference to an example file.
+      content:
+        application/json:
+          schema:
+            $ref: 'schemas/post-user-response.json'
+          example:
+            $ref: 'examples/user-post-response.json'
+
   examples:
     example-in-components:
       $ref: './examples/user-post-response.json'
