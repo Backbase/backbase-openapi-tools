@@ -84,6 +84,7 @@ class BundlerTests {
 
         new Bundler(input).transform(openAPI, Collections.emptyMap());
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
+        assertThat("Should not contain any json reference", Yaml.pretty(openAPI).indexOf(".json"), is(-1));
         assertEquals(openAPIUnproccessed, openAPI);
     }
 
