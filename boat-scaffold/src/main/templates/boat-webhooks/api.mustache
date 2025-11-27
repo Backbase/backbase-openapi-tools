@@ -248,7 +248,7 @@ public interface {{classname}} {
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> prehook{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
-       @Valid @RequestBody PrehookRequest prehookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+       @Valid @RequestBody PrehookRequest prehookRequest{{#allParams.0}}, {{/allParams.0}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
        {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
        {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
        {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
@@ -378,7 +378,7 @@ public interface {{classname}} {
         consumes = { {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }{{/hasConsumes}}{{/singleContentTypes}}
     )
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}ResponseEntity<WebhookResponse> posthook{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
-        @RequestBody PosthookRequest posthookRequest{{#allParams}}{{#hasParams}}, {{/hasParams}}{{/allParams}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
+        @RequestBody PosthookRequest posthookRequest{{#allParams.0}}, {{/allParams.0}}{{#allParams}}{{#toOneLine}}{{>queryParams}}{{/toOneLine}}{{>pathParams}}{{>headerParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
         {{/-last}} {{/allParams}}{{#reactive}}{{#hasParams}},
         {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
         {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}

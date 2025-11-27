@@ -22,6 +22,6 @@ public class GenerateSpringBootEmbeddedWebhookMojo extends AbstractGenerateMojo 
 
     @Override
     protected Collection<String> getGeneratorSpecificSupportingFiles() {
-        return Set.of("WebhookResponse.java", "ServletContent.java", "PosthookRequest.java", "PrehookRequest.java");
+        return Set.of("BigDecimalCustomSerializer.java", "WebhookResponse.java", "ServletContent.java", "PosthookRequest.java", "PrehookRequest.java");
     }
 }

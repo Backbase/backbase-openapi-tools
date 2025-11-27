@@ -34,7 +34,7 @@ public class BoatWebhooksCodeGenTests {
 
     @Test
     void processOptsUseProtectedFields() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        final BoatWebhooksCodeGen gen = new BoatWebhooksCodeGen();
         final Map<String, Object> options = gen.additionalProperties();
 
         options.put(USE_PROTECTED_FIELDS, "true");
