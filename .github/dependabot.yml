@@ -1,4 +1,3 @@
-# Set update schedule for GitHub Actions
 
 version: 2
 updates:
@@ -8,8 +7,36 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every weekday
       interval: "daily"
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"                # include all GitHub Actions
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 20
+    groups:
+      # Specific group for org.openapitools.* artifacts.
+      # For Maven, patterns are matched against "groupId:artifactId",
+      # so "org.openapitools:*" matches any artifact whose groupId starts with org.openapitools.
+      openapitools:
+        patterns:
+          - "org.openapitools:*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Catch-all group for all other Maven dependencies.
+      # Keep this after the specific group to ensure specific matches are picked first.
+      other-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

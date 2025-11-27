@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.backbase.oss</groupId>
         <artifactId>backbase-openapi-tools</artifactId>
-        <version>0.17.66-SNAPSHOT</version>
+        <version>0.17.69-SNAPSHOT</version>
     </parent>
   
     <artifactId>boat-scaffold</artifactId>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>com.backbase.oss</groupId>
             <artifactId>boat-trail-resources</artifactId>
-            <version>0.17.66-SNAPSHOT</version>
+            <version>0.17.69-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -165,13 +165,13 @@
         <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core</artifactId>
-            <version>3.27.0</version>
+            <version>3.27.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>9.0.1.Final</version>
+            <version>9.1.0.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
