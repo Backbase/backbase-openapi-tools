@@ -1,0 +1,89 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: test
+
+paths:
+  /client/v3/cards:
+    post:
+      tags:
+        - card
+      operationId: postCards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardItem'
+      responses:
+        "201":
+          $ref: '#/components/responses/CardIdResponse'
+    get:
+      tags:
+        - card
+      operationId: getCards
+      responses:
+        "200":
+          $ref: '#/components/responses/CardsResponse'
+
+  /client/v3/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/cardIdPathParam'
+    get:
+      tags:
+        - card
+      operationId: getCardById
+      responses:
+        "200":
+          $ref: '#/components/responses/CardItemResponse'
+
+components:
+
+  parameters:
+    cardIdPathParam:
+      name: cardId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The ID of the card
+
+  schemas:
+    CardItem:
+      type: object
+      required:
+        - cardId
+      properties:
+        cardId:
+          type: number
+        name:
+          type: string
+
+    CardId:
+      type: object
+      properties:
+        cardId:
+          type: number
+
+  responses:
+    CardIdResponse:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardId'
+
+    CardsResponse:
+      description: Fetch cards
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardItem'
+
+    CardItemResponse:
+      description:  Card by id
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardItem'
+
+
