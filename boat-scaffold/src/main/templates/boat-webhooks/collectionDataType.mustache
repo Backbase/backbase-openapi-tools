@@ -1,0 +1,23 @@
+{{#openApiNullable}}
+  {{#isNullable}}JsonNullable<{{/isNullable}}
+{{/openApiNullable}}
+{{! apply collection type e.g. Set, List }}
+{{{baseType}}}<
+{{#useBeanValidation}}
+  {{#items}}
+    {{#isPrimitiveType}}
+      {{>beanValidationCore}}
+    {{/isPrimitiveType}}
+    {{^isPrimitiveType}}
+      {{packageName}}@Valid
+    {{/isPrimitiveType}}
+  {{/items}}
+{{/useBeanValidation}}
+{{^useBeanValidation}}
+{{items.packageName}}
+{{/useBeanValidation}}
+{{! apply collection item type }}
+{{{items.simpleName}}}>
+{{#openApiNullable}}
+  {{#isNullable}}>{{/isNullable}}
+{{/openApiNullable}}

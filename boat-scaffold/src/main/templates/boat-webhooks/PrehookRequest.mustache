@@ -1,0 +1,70 @@
+package {{modelPackage}};
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Predefined request object for prehook endpoints.
+ */
+public class PrehookRequest extends ServletContent {
+
+    private Map<String, String> pathVariables;
+
+    public PrehookRequest body(String body) {
+        this.setBody(body);
+        return this;
+    }
+
+    public PrehookRequest headers(Map<String, List<String>> headers) {
+        this.setHeaders(headers);
+        return this;
+    }
+
+    public PrehookRequest parameters(Map<String, String[]> parameters) {
+        this.setParameters(parameters);
+        return this;
+    }
+
+    public PrehookRequest pathVariables(Map<String, String> pathVariables) {
+        this.pathVariables = pathVariables;
+        return this;
+    }
+
+    public Map<String, String> getPathVariables() {
+        return pathVariables;
+    }
+
+    public void setPathVariables(Map<String, String> pathVariables) {
+        this.pathVariables = pathVariables;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PrehookRequest prehookRequest = (PrehookRequest) o;
+        return super.equals(o) && Objects.equals(this.pathVariables, prehookRequest.pathVariables);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Objects.hash(pathVariables);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class PrehookRequest {\n");
+        sb.append("    body: ").append(toIndentedString(getBody())).append("\n");
+        sb.append("    headers: ").append(toIndentedString(getHeaders())).append("\n");
+        sb.append("    parameters: ").append(toIndentedString(getParameters())).append("\n");
+        sb.append("    pathVariables: ").append(toIndentedString(pathVariables)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+}

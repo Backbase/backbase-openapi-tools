@@ -60,6 +60,36 @@ Same with `generate` but with opinionated defaults for Spring
         </configOptions>
     </configuration>
 
+## boat:generate-spring-boot-embedded-webhooks
+
+Same with `generate-spring-boot-embedded` but with opinionated defaults for Webhooks
+It will generate webhook interfaces with prehook and posthook request mapping for each endpoint in the OpenAPI Specs.
+
+    <configuration>
+        <output>${project.build.directory}/generated-sources/openapi</output>
+        <generateSupportingFiles>true</generateSupportingFiles>
+        <generatorName>boat-webhooks</generatorName>
+        <strictSpec>true</strictSpec>
+        <generateApiTests>false</generateApiTests>
+        <generateModelTests>false</generateModelTests>
+        <inputSpec>${project.basedir}/../api/product-service-api/src/main/resources/openapi.yaml</inputSpec>
+        <configOptions>
+            <dateLibrary>java8</dateLibrary>
+            <interfaceOnly>true</interfaceOnly>
+            <skipDefaultInterface>true</skipDefaultInterface>
+            <useBeanValidation>true</useBeanValidation>
+            <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
+            <useTags>true</useTags>
+            <java8>true</java8>
+            <useOptional>false</useOptional>
+            <apiPackage>com.backbase.product.api.service.v2</apiPackage>
+            <modelPackage>com.backbase.product.api.service.v2.model</modelPackage>
+            <useJakartaEe>true</useJakartaEe>
+            <useSpringBoot3>true</useSpringBoot3>
+            <containerDefaultToNull>false</containerDefaultToNull>
+        </configOptions>
+    </configuration>
+
 ## boat:generate-rest-template-embedded
 
 Same with `generate` but with opinionated defaults for Rest Template Client
