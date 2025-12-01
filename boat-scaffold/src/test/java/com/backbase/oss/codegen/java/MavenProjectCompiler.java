@@ -53,12 +53,11 @@ class MavenProjectCompiler {
         log.debug("Compiling mvn project in: {}", projectDir);
         var mavenCli = new MavenCli(new ClassWorld("myRealm", contextClassLoader));
         final String initialDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
-        try {
+        try(PrintStream out = new PrintStream(new File(projectDir, "mvn.log"))) {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, projectDir.getAbsolutePath());
             String[] args = generateMavenCliArgs();
             log.debug("mvn cli args: {}", Arrays.toString(args));
             log.info("Building: {}", projectDir.getName());
-            PrintStream out = new PrintStream(new File(projectDir, "mvn.log"));
             int compilationStatus = mavenCli.doMain(args, projectDir.getAbsolutePath(), out, out);
             log.debug("compilation status={}", compilationStatus);
             return compilationStatus;

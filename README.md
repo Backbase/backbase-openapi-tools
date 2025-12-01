@@ -15,6 +15,24 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+
+## 0.17.70
+Fix: Examples of responses defined in components/responses were not inlined by the ExamplesProcessor. 
+
+## 0.17.69
+Update query parameter handling in Swift5 template (#1177)
+
+## 0.17.68
+0.17.67 release publishing failed, 0.17.68 is the public release.
+
+## 0.17.67
+Update swift5 template to add support for exploded GET parameters (Swift only).
+
+## 0.17.66
+* Add support params of openapi-generator `name-mappings` and `enum-name-mappings`.
+Check `Property & Enum Name Mappings (new)` in [boat-maven-plugin](boat-maven-plugin/README.md)
+* fixed release process
+
 ## 0.17.62
 * Fixed reactive generation of code to not include extra Flux<> to return parameter
 ## 0.17.61

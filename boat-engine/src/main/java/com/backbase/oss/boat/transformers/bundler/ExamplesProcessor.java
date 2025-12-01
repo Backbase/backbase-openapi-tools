@@ -13,6 +13,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.models.RefFormat;
 import io.swagger.v3.parser.util.RefUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +63,13 @@ public class ExamplesProcessor {
             .map(e -> ExampleHolder.of(e.getKey(), e.getValue(), true))
             .forEach(this::fixInlineExamples);
 
+        if (openAPI.getComponents().getResponses() != null) {
+            log.debug("Processing examples in component/responses");
+            openAPI.getComponents().getResponses().values().forEach(this::processResponse);
+        }
 
+
+        log.debug("Processing examples in Paths");
         openAPI.getPaths()
             .forEach((path, pathItem) -> {
                 log.debug("Processing examples in Path: {}", path);
@@ -74,23 +81,28 @@ public class ExamplesProcessor {
                             processMediaType(mediaType, null, false);
                         });
                     }
-                    operation.getResponses().forEach((responseCode, apiResponse) -> {
-                        log.debug("Processing Response Body Examples for Response Code: {}", responseCode);
-                        if (apiResponse.getContent() != null) {
-                            apiResponse.getContent().forEach((contentType, mediaType) -> {
-                                log.debug("Processing Response Body Examples for Content Type: {}", contentType);
-                                processMediaType(mediaType, null, false);
-                            });
-                        }
+                    operation.getResponses().forEach((responseCode, apiResponse) ->  {
+                        log.debug("Processing Response Body Examples for:  {}:{} {}", httpMethod, path, responseCode);
+                        processResponse(apiResponse);
                     });
                 });
             });
     }
 
-    public void processContent(Content content, String relativePath) {
+    public void processResponse(ApiResponse response) {
+        if (response.getContent() != null) {
+            response.getContent().forEach((contentType, mediaType) -> {
+                log.debug("Processing Response Body Examples for Content Type: {}", contentType);
+                processMediaType(mediaType, null, false);
+            });
+        } else {
+            log.warn("Content is null for: {}", response);
+        }
+    }
 
+    public void processContent(Content content, String relativePath) {
         content.forEach((s, mediaType) -> {
-            log.debug("Processing Consent for: {} with relative path: {}", s, relativePath);
+            log.debug("Processing Content for: {} with relative path: {}", s, relativePath);
             processMediaType(mediaType, relativePath, true);
         });
 
