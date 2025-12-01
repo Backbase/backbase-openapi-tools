@@ -1,7 +1,6 @@
 package com.backbase.oss.codegen.java;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
-import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -157,7 +156,7 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         if (!ModelUtils.isArraySchema(target)) {
             return false;
         }
-        Schema items = getSchemaItems((ArraySchema) target);
+        Schema items = target.getItems();
         if (items.get$ref() != null) {
             items = openAPI.getComponents().getSchemas().get(ModelUtils.getSimpleRef(items.get$ref()));
         }
