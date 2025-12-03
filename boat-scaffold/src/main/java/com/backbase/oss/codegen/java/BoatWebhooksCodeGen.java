@@ -45,6 +45,8 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
     public static final String USE_WITH_MODIFIERS = "useWithModifiers";
     public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
+    public static final String  MUSTACHE_EXTENSION =".mustache";
+    public static final String JAVA_EXTENSION =".java";
 
 
     static class NewLineIndent implements Mustache.Lambda {
@@ -119,8 +121,8 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
             }
             String formatted = text
                     .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
-                    .replaceAll("\\< ", "<")
-                    .replaceAll(" >", ">")
+                    .replace("\\< ", "<")
+                    .replace(" >", ">")
                     .trim();
 
             if (log.isTraceEnabled()) {
@@ -202,7 +204,7 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
                 "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
         this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
                 "Whether to use protected visibility for model fields"));
-        supportedLibraries.put("boat-webhooks", "Boat Webhooks codegen");
+        supportedLibraries.put(NAME, "Boat Webhooks codegen");
         this.apiNameSuffix = "Api";
         this.apiNamePrefix = "Webhook";
     }
@@ -248,32 +250,32 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
 
         final var serializerTemplate = "BigDecimalCustomSerializer";
         this.supportingFiles.add(new SupportingFile(
-                serializerTemplate + ".mustache",
+                serializerTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
-                serializerTemplate + ".java"
+                serializerTemplate + JAVA_EXTENSION
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
         // Adding Webhook related models to supporting files
         final var webhookResponseTemplate = "WebhookResponse";
-        this.supportingFiles.add(new SupportingFile(webhookResponseTemplate + ".mustache",
+        this.supportingFiles.add(new SupportingFile(webhookResponseTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
-                webhookResponseTemplate + ".java"));
+                webhookResponseTemplate + JAVA_EXTENSION));
 
         final var servletContentTemplate = "ServletContent";
-        this.supportingFiles.add(new SupportingFile(servletContentTemplate + ".mustache",
+        this.supportingFiles.add(new SupportingFile(servletContentTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
-                servletContentTemplate + ".java"));
+                servletContentTemplate + JAVA_EXTENSION));
 
         final var posthookRequestTemplate = "PosthookRequest";
-        this.supportingFiles.add(new SupportingFile(posthookRequestTemplate + ".mustache",
+        this.supportingFiles.add(new SupportingFile(posthookRequestTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
-                posthookRequestTemplate + ".java"));
+                posthookRequestTemplate + JAVA_EXTENSION));
 
         final var prehookRequestTemplate = "PrehookRequest";
-        this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + ".mustache",
+        this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
-                prehookRequestTemplate + ".java"));
+                prehookRequestTemplate + JAVA_EXTENSION));
         String modelPath = (sourceFolder + File.separator + modelPackage).replace(".", File.separator);
         log.info("Supporting file output path: {}", modelPath);
         this.importMapping.put(webhookResponseTemplate, modelPackage + "." + webhookResponseTemplate);
@@ -369,7 +371,7 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
             return dataType;
         }
         String result = dataType;
-        if (!contains(dataType, "@Valid")) {
+        if (!dataType.contains("@Valid")) {
             result = dataType.replace("<", "<@Valid ");
         }
         Matcher m = Pattern.compile("^(.+\\<)(@Valid) ([a-z\\.]+)([A-Z].*)(\\>)$").matcher(dataType);
@@ -409,9 +411,7 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         // This prevents the generator's default logic from inserting its own request body.
         codegenOperation.allParams.removeIf(p -> p.isBodyParam);
         if (this.addServletRequest) {
-            final CodegenParameter codegenParameter = new CodegenParameter() {
-                public boolean isHttpServletRequest = true;
-            };
+            final CodegenParameter codegenParameter = new CodegenParameter();
             codegenParameter.paramName = "httpServletRequest";
             codegenOperation.allParams.add(codegenParameter);
         }
