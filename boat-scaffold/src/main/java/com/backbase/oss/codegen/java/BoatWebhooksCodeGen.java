@@ -149,7 +149,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
                 serializerTemplate + JAVA_EXTENSION
         ));
-        this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
         // Adding Webhook related models to supporting files
         final var webhookResponseTemplate = "WebhookResponse";
@@ -171,16 +170,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
                 prehookRequestTemplate + JAVA_EXTENSION));
-        String modelPath = (sourceFolder + File.separator + modelPackage).replace(".", File.separator);
-        log.info("Supporting file output path: {}", modelPath);
-        this.importMapping.put(webhookResponseTemplate, modelPackage + "." + webhookResponseTemplate);
-        this.importMapping.put(servletContentTemplate, modelPackage + "." + servletContentTemplate);
-        this.importMapping.put(posthookRequestTemplate, modelPackage + "." + posthookRequestTemplate);
-        this.importMapping.put(prehookRequestTemplate, modelPackage + "." + prehookRequestTemplate);
-
-        log.info("supportingFiles size: {}", this.supportingFiles.size());
-
-        log.info("supportingFiles size: {}", this.supportingFiles);
 
         if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
             this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
@@ -269,7 +258,8 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         if (!dataType.contains("@Valid")) {
             result = dataType.replace("<", "<@Valid ");
         }
-        Matcher m = Pattern.compile("^(.+\\<)(@Valid) ([a-z\\.]+)([A-Z].*)(\\>)$").matcher(dataType);
+        // Use a safer regex to avoid catastrophic backtracking
+        Matcher m = Pattern.compile("^([^<]+<)(@Valid) ([a-z\\.]+)([A-Z].*)(>)$").matcher(dataType);
         if (m.matches()) {
             // Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>
             result = m.group(1) + m.group(3) + m.group(2) + " " + m.group(4) + m.group(5);
