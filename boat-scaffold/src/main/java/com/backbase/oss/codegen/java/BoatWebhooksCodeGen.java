@@ -95,13 +95,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
                     .min(Integer::compareTo)
                     .orElse(0);
         }
-
-        static int indentLevel(String text) {
-            return IntStream
-                    .range(0, text.replaceFirst(REGEX, text).length())
-                    .filter(n -> !Character.isWhitespace(text.charAt(n)))
-                    .findFirst().orElse(0);
-        }
     }
 
     /**

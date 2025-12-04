@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.DefaultGenerator;
@@ -20,13 +21,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.backbase.oss.codegen.java.BoatWebhooksCodeGen.USE_PROTECTED_FIELDS;
+import static com.backbase.oss.codegen.java.BoatWebhooksCodeGen.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,6 +47,11 @@ class BoatWebhooksCodeGenTests {
         final Map<String, Object> options = gen.additionalProperties();
 
         options.put(USE_PROTECTED_FIELDS, "true");
+        options.put(USE_CLASS_LEVEL_BEAN_VALIDATION, "true");
+        options.put(ADD_SERVLET_REQUEST, "true");
+        options.put(ADD_BINDING_RESULT, "true");
+        options.put(USE_LOMBOK_ANNOTATIONS, "true");
+        options.put(USE_WITH_MODIFIERS, "true");
 
         gen.processOpts();
 
@@ -112,7 +116,41 @@ class BoatWebhooksCodeGenTests {
         codegenProperty.baseName = "request"; // not a response
 
         String result = codegen.replaceBeanValidationCollectionType(
-                codegenProperty,"Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
-        assertEquals("Set<com.backbase.dbs.arrangement.commons.model.@Valid TranslationItemDto>", result);
+                codegenProperty,"Set<com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
+        assertEquals("Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>", result);
+    }
+
+    @Test
+    void testFromParameter() {
+        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
+        io.swagger.v3.oas.models.parameters.Parameter swaggerParam = new io.swagger.v3.oas.models.parameters.Parameter();
+        swaggerParam.setName("testParam");
+        Set<String> imports = new HashSet<>();
+
+        // Call the method under test
+        var result = codeGen.fromParameter(swaggerParam, imports);
+
+        // Assert result is not null and has expected properties
+        assertThat(result, notNullValue());
+        assertEquals("testParam", result.baseName);
+    }
+
+    @Test
+    void testPostProcessModelProperty_addsBigDecimalSerializerAnnotation() {
+        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
+        // Simulate the condition for shouldSerializeBigDecimalAsString to return true
+        CodegenProperty property = new CodegenProperty();
+        property.baseType = "BigDecimal";
+        property.openApiType = "string";
+        property.dataFormat = "number";
+        CodegenModel model = new CodegenModel();
+        model.imports = new HashSet<>();
+        property.vendorExtensions = new HashMap<>();
+
+        codeGen.setSerializeBigDecimalAsString(true);
+        codeGen.postProcessModelProperty(model, property);
+
+        assertThat(property.vendorExtensions, hasEntry("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)"));
+        assertThat(model.imports, hasItems("BigDecimalCustomSerializer", "JsonSerialize"));
     }
 }
