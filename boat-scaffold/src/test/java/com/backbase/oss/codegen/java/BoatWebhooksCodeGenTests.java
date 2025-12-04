@@ -10,11 +10,7 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -121,6 +117,40 @@ class BoatWebhooksCodeGenTests {
     }
 
     @Test
+    void replaceBeanValidationCollectionType_shouldCoverAllBranches() {
+        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
+        CodegenProperty property = new CodegenProperty();
+        property.isModel = true;
+        property.baseName = "request";
+        String baseType = "Set<com.example.Model>";
+
+        codegen.setUseBeanValidation(false);
+        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
+
+        codegen.setUseBeanValidation(true);
+        assertEquals("", codegen.replaceBeanValidationCollectionType(property, ""));
+
+        property.isModel = false;
+        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
+        property.isModel = true;
+
+        property.baseName = "response";
+        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
+        property.baseName = "request";
+
+        String noValidType = "Set<com.example.Model>";
+        String expectedValidType = "Set<@Valid com.example.Model>";
+        assertEquals(expectedValidType, codegen.replaceBeanValidationCollectionType(property, noValidType));
+
+        String regexType = "Set<@Valid com.example.Model>";
+        String expectedRegexResult = "Set<com.example.@Valid Model>";
+        assertEquals(expectedRegexResult, codegen.replaceBeanValidationCollectionType(property, regexType));
+
+        String unmatchedType = "List<@Valid Model>";
+        assertEquals(unmatchedType, codegen.replaceBeanValidationCollectionType(property, unmatchedType));
+    }
+
+    @Test
     void testFromParameter() {
         BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
         io.swagger.v3.oas.models.parameters.Parameter swaggerParam = new io.swagger.v3.oas.models.parameters.Parameter();
@@ -153,4 +183,47 @@ class BoatWebhooksCodeGenTests {
         assertThat(property.vendorExtensions, hasEntry("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)"));
         assertThat(model.imports, hasItems("BigDecimalCustomSerializer", "JsonSerialize"));
     }
+
+    @Test
+    void postProcessModelProperty_shouldNotAddAnnotationForNonBigDecimal() {
+        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
+        codegen.setSerializeBigDecimalAsString(true);
+
+        CodegenModel model = new CodegenModel();
+        CodegenProperty property = new CodegenProperty();
+        property.baseType = "String";
+        property.openApiType = "string";
+        property.dataFormat = "string";
+
+        codegen.postProcessModelProperty(model, property);
+
+        // Assert that no annotation is added
+        assertThat(property.vendorExtensions.containsKey("x-extra-annotation"), is(false));
+    }
+
+    @Test
+    void toApiName_shouldReturnDefaultNameForEmptyString() {
+        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
+        String result = codegen.toApiName("");
+        assertEquals("WebhookDefaultApi", result);
+    }
+
+    @Test
+    void processOpts_shouldRemoveApiUtilSupportingFileWhenNotUsed() {
+        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
+        // Add ApiUtil supporting file
+        codegen.supportingFiles().add(new SupportingFile("apiUtil.mustache", "dir", "ApiUtil.java"));
+        // Simulate configuration to NOT use ApiUtil
+        codegen.additionalProperties().put("generateSupportingFiles", false);
+        // Set up the global property to simulate the absence of ApiUtil
+        org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", "");
+        // Execute processOpts (which contains the selected lines)
+        codegen.processOpts();
+        // Assert that ApiUtil supporting file is removed
+        boolean apiUtilPresent = codegen.supportingFiles().stream()
+                .anyMatch(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
+        assertEquals(false, apiUtilPresent);
+    }
+
+
 }
