@@ -60,7 +60,7 @@ class BoatWebhooksCodeGenTests {
 
     @Test
     void newLineIndent() throws IOException {
-        final BoatWebhooksCodeGen.NewLineIndent indent = new BoatWebhooksCodeGen.NewLineIndent(2, "_");
+        final BoatSpringCodeGen.NewLineIndent indent = new BoatSpringCodeGen.NewLineIndent(2, "_");
         final StringWriter output = new StringWriter();
         final Template.Fragment frag = mock(Template.Fragment.class);
 

@@ -1,7 +1,5 @@
 package com.backbase.oss.codegen.java;
 
-import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -9,7 +7,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
@@ -17,21 +14,15 @@ import org.openapitools.codegen.templating.mustache.IndentedLambda;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
@@ -48,95 +39,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
     public static final String  MUSTACHE_EXTENSION =".mustache";
     public static final String JAVA_EXTENSION =".java";
 
-
-    static class NewLineIndent implements Mustache.Lambda {
-
-        private final String prefix;
-        private static final String REGEX = "\\s+$";
-
-        NewLineIndent(int level, String space) {
-            this.prefix = IntStream.range(0, level).mapToObj(n -> space).collect(joining());
-        }
-
-        @Override
-        public void execute(Template.Fragment frag, Writer out) throws IOException {
-            final String text = frag.execute();
-
-            if (text == null || text.isEmpty()) {
-                return;
-            }
-
-            final String[] lines = splitLines(text);
-            final int indent = minIndent(lines);
-
-            for (final String line : lines) {
-                out.write(this.prefix);
-                String processedLine = StringUtils.substring(line, indent);
-                out.write(postProcessLine(processedLine));
-                out.write(System.lineSeparator());
-            }
-        }
-
-        protected String postProcessLine(String line) {
-            return line;
-        }
-
-        private String[] splitLines(final String text) {
-            return stream(text.split("\\r\\n|\\n"))
-                    .map(s -> s.replaceFirst(REGEX, ""))
-                    .toArray(String[]::new);
-        }
-
-        private int minIndent(String[] lines) {
-            return stream(lines)
-                    .filter(StringUtils::isNotBlank)
-                    .map(s -> s.replaceFirst(REGEX, ""))
-                    .map(BoatSpringCodeGen.NewLineIndent::indentLevel)
-                    .min(Integer::compareTo)
-                    .orElse(0);
-        }
-    }
-
-    /**
-     * This lambda reformats multiline generated code into single line.
-     */
-    static class FormatToOneLine implements Mustache.Lambda {
-
-        private static final String SINGLE_SPACE = " ";
-
-        private static final String WHITESPACE_REGEX = "\\s+";
-
-        @Override
-        public void execute(Template.Fragment frag, Writer out) throws IOException {
-            String text = frag.execute();
-            if (text == null || text.isEmpty()) {
-                return;
-            }
-            String formatted = text
-                    .replaceAll(WHITESPACE_REGEX, SINGLE_SPACE)
-                    .replace("\\< ", "<")
-                    .replace(" >", ">")
-                    .trim();
-
-            if (log.isTraceEnabled()) {
-                log.trace("Fragment [{}] reformatted into [{}]", text, formatted);
-            }
-
-            out.write(formatted);
-        }
-    }
-
-    static class TrimAndIndent extends BoatSpringCodeGen.NewLineIndent {
-
-        TrimAndIndent(int level, String space) {
-            super(level, space);
-        }
-
-        @Override
-        protected String postProcessLine(String line) {
-            return line.trim();
-        }
-    }
 
     /**
      * Add @Validated to class-level Api interfaces. Defaults to false
@@ -309,11 +211,11 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         writePropertyBack(USE_PROTECTED_FIELDS, this.useProtectedFields);
 
         this.additionalProperties.put("indent4", new IndentedLambda(4, " ", true, true));
-        this.additionalProperties.put("newLine4", new NewLineIndent(4, " "));
+        this.additionalProperties.put("newLine4", new BoatSpringCodeGen.NewLineIndent(4, " "));
         this.additionalProperties.put("indent8", new IndentedLambda(8, " ", true, true));
-        this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
-        this.additionalProperties.put("toOneLine", new FormatToOneLine());
-        this.additionalProperties.put("trimAndIndent4", new TrimAndIndent(4, " "));
+        this.additionalProperties.put("newLine8", new BoatSpringCodeGen.NewLineIndent(8, " "));
+        this.additionalProperties.put("toOneLine", new BoatSpringCodeGen.FormatToOneLine());
+        this.additionalProperties.put("trimAndIndent4", new BoatSpringCodeGen.TrimAndIndent(4, " "));
     }
 
     private boolean needApiUtil() {
