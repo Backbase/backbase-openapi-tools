@@ -211,18 +211,23 @@ class BoatWebhooksCodeGenTests {
     @Test
     void processOpts_shouldRemoveApiUtilSupportingFileWhenNotUsed() {
         BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
-        // Add ApiUtil supporting file
-        codegen.supportingFiles().add(new SupportingFile("apiUtil.mustache", "dir", "ApiUtil.java"));
-        // Simulate configuration to NOT use ApiUtil
+        var outputDir = TEST_OUTPUT + "/supportingFilesTest";
+        codegen.supportingFiles().add(new SupportingFile("apiUtil.mustache", outputDir, "ApiUtil.java"));
         codegen.additionalProperties().put("generateSupportingFiles", false);
-        // Set up the global property to simulate the absence of ApiUtil
-        org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", "");
-        // Execute processOpts (which contains the selected lines)
-        codegen.processOpts();
-        // Assert that ApiUtil supporting file is removed
-        boolean apiUtilPresent = codegen.supportingFiles().stream()
-                .anyMatch(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
-        assertEquals(false, apiUtilPresent);
+        String originalSupportingFiles = org.openapitools.codegen.config.GlobalSettings.getProperty("supportingFiles");
+        try {
+            org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", "");
+            codegen.processOpts();
+            boolean apiUtilPresent = codegen.supportingFiles().stream()
+                    .anyMatch(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
+            assertEquals(false, apiUtilPresent);
+        } finally {
+            if (originalSupportingFiles != null) {
+                org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", originalSupportingFiles);
+            } else {
+                org.openapitools.codegen.config.GlobalSettings.clearProperty("supportingFiles");
+            }
+        }
     }
 
 
