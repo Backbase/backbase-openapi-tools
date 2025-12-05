@@ -7,7 +7,13 @@ import io.swagger.v3.oas.models.servers.Server;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.openapitools.codegen.*;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
@@ -170,34 +176,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
                 prehookRequestTemplate + JAVA_EXTENSION));
-
-        if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
-            this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
-        }
-        if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
-            this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);
-        }
-        if (this.additionalProperties.containsKey(ADD_BINDING_RESULT)) {
-            this.addBindingResult = convertPropertyToBoolean(ADD_BINDING_RESULT);
-        }
-        if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
-            this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
-        }
-        if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
-            this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
-        }
-        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
-            this.additionalProperties.put("modelFieldsVisibility", "protected");
-        } else {
-            this.additionalProperties.put("modelFieldsVisibility", "private");
-        }
-
-        writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
-        writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
-        writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
-        writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-        writePropertyBack(USE_PROTECTED_FIELDS, this.useProtectedFields);
 
         this.additionalProperties.put("indent4", new IndentedLambda(4, " ", true, true));
         this.additionalProperties.put("newLine4", new BoatSpringCodeGen.NewLineIndent(4, " "));
