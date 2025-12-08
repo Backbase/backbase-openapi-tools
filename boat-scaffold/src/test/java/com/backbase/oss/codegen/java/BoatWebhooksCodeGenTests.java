@@ -10,12 +10,13 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.CodegenModel;;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.CodegenParameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,7 @@ class BoatWebhooksCodeGenTests {
     }
 
     @Test
-    void addServletRequestTestFromOperation(){
+    void addServletRequestTestFromOperation() {
         final BoatWebhooksCodeGen gen = new BoatWebhooksCodeGen();
         gen.addServletRequest = true;
         CodegenOperation co = gen.fromOperation("/test", "POST", new Operation(), null);
@@ -103,7 +104,7 @@ class BoatWebhooksCodeGenTests {
         codegenProperty.baseName = "request"; // not a response
 
         String result = codegen.replaceBeanValidationCollectionType(
-                codegenProperty,"Set<com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
+                codegenProperty, "Set<com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
         assertEquals("Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>", result);
     }
 
@@ -184,7 +185,7 @@ class BoatWebhooksCodeGenTests {
         CodegenProperty property = new CodegenProperty();
         property.baseType = "String";
         property.openApiType = "string";
-        property.dataFormat = "string";
+        property.dataFormat = "number";
 
         codegen.postProcessModelProperty(model, property);
 
@@ -221,5 +222,18 @@ class BoatWebhooksCodeGenTests {
         }
     }
 
+    @Test
+    void postProcessParameter_setsBaseTypeForContainer() {
+        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
+        codeGen.setReactive(false);
+        CodegenParameter param = new CodegenParameter();
+        param.isContainer = true;
+        param.isMap = false;
+        param.dataType = "List<String>";
+        param.baseType = null;
 
+        codeGen.postProcessParameter(param);
+
+        assertEquals("List", param.baseType, "Base type should be extracted from dataType for containers");
+    }
 }
