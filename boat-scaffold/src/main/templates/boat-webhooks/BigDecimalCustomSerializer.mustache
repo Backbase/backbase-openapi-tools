@@ -1,0 +1,19 @@
+package {{modelPackage}};
+
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializerBase;
+import java.math.BigDecimal;
+
+public class BigDecimalCustomSerializer extends ToStringSerializerBase {
+
+    public BigDecimalCustomSerializer() {
+        super(BigDecimal.class);
+    }
+
+    @Override
+    public String valueToString(Object value) {
+        if (value instanceof BigDecimal) {
+            return ((BigDecimal) value).toPlainString();
+        }
+        return (value == null) ? null : value.toString();
+    }
+}
