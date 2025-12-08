@@ -126,27 +126,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         return camelize(this.apiNamePrefix + "_" + name + "_" + this.apiNameSuffix);
     }
 
-
-    /**
-     * Centralizes the handling of configuration booleans and updates additionalProperties accordingly.
-     */
-    private void handleConfigBooleans() {
-        this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
-        this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);
-        this.addBindingResult = convertPropertyToBoolean(ADD_BINDING_RESULT);
-        this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
-        this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
-        this.useProtectedFields = convertPropertyToBoolean(USE_PROTECTED_FIELDS);
-
-        this.additionalProperties.put(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
-        this.additionalProperties.put(ADD_SERVLET_REQUEST, this.addServletRequest);
-        this.additionalProperties.put(ADD_BINDING_RESULT, this.addBindingResult);
-        this.additionalProperties.put(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        this.additionalProperties.put(USE_WITH_MODIFIERS, this.useWithModifiers);
-        this.additionalProperties.put(USE_PROTECTED_FIELDS, this.useProtectedFields);
-        this.additionalProperties.put("modelFieldsVisibility", this.useProtectedFields ? "protected" : "private");
-    }
-
     @Override
     public void processOpts() {
         super.processOpts();
@@ -188,8 +167,6 @@ public class BoatWebhooksCodeGen extends SpringCodegen {
         this.supportingFiles.add(new SupportingFile(prehookRequestTemplate + MUSTACHE_EXTENSION,
                 (sourceFolder + File.separator + modelPackage).replace(".", File.separator),
                 prehookRequestTemplate + JAVA_EXTENSION));
-        // Centralized config boolean handling
-        handleConfigBooleans();
         this.additionalProperties.put("indent4", new IndentedLambda(4, " ", true, true));
         this.additionalProperties.put("newLine4", new BoatSpringCodeGen.NewLineIndent(4, " "));
         this.additionalProperties.put("indent8", new IndentedLambda(8, " ", true, true));
