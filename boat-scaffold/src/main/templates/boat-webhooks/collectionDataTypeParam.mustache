@@ -1,0 +1,22 @@
+{{#isArray}}
+  {{#useBeanValidation}}
+    {{#uniqueItems}}java.util.Set{{/uniqueItems}}
+    {{^uniqueItems}}java.util.List{{/uniqueItems}}<
+    {{#items}}
+      {{#isPrimitiveType}}
+        {{>beanValidationCore}} {{{dataType}}}>
+      {{/isPrimitiveType}}
+      {{^isPrimitiveType}}
+        {{packageName}}@Valid {{simpleName}}>
+      {{/isPrimitiveType}}
+    {{/items}}
+  {{/useBeanValidation}}
+  {{^useBeanValidation}}
+    {{#uniqueItems}}java.util.Set{{/uniqueItems}}
+    {{^uniqueItems}}java.util.List{{/uniqueItems}}
+    <{{{items.dataType}}}>
+  {{/useBeanValidation}}
+{{/isArray}}
+{{^isArray}}
+  {{{dataType}}}
+{{/isArray}}
