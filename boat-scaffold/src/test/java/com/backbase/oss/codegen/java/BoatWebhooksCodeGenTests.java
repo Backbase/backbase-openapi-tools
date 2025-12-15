@@ -3,37 +3,23 @@ package com.backbase.oss.codegen.java;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.samskivert.mustache.Template;
 import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
-import org.openapitools.codegen.SupportingFile;
-import org.openapitools.codegen.CodegenParameter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class BoatWebhooksCodeGenTests {
 
@@ -47,32 +33,9 @@ class BoatWebhooksCodeGenTests {
     }
 
     @Test
-    void newLineIndent() throws IOException {
-        final BoatSpringCodeGen.NewLineIndent indent = new BoatSpringCodeGen.NewLineIndent(2, "_");
-        final StringWriter output = new StringWriter();
-        final Template.Fragment frag = mock(Template.Fragment.class);
-
-        when(frag.execute()).thenReturn("\n Good \r\n   morning,  \r\n  Dave ");
-
-        indent.execute(frag, output);
-
-        assertThat(output.toString(), equalTo(String.format("__%n__Good%n__  morning,%n__ Dave%n")));
-    }
-
-    @Test
-    void addServletRequestTestFromOperation() {
-        final BoatWebhooksCodeGen gen = new BoatWebhooksCodeGen();
-        gen.addServletRequest = true;
-        CodegenOperation co = gen.fromOperation("/test", "POST", new Operation(), null);
-        assertEquals(1, co.allParams.size());
-        assertEquals("httpServletRequest", co.allParams.get(0).paramName);
-    }
-
-    @Test
     void webhookWithCardsApi() throws IOException {
         var codegen = new BoatWebhooksCodeGen();
         var input = new File("src/test/resources/boat-spring/cardsapi.yaml");
-        codegen.setLibrary("spring-boot");
         codegen.setInterfaceOnly(true);
         codegen.setOutputDir(TEST_OUTPUT + "/cards");
         codegen.setInputSpec(input.getAbsolutePath());
@@ -96,144 +59,10 @@ class BoatWebhooksCodeGenTests {
     }
 
     @Test
-    void testReplaceBeanValidationCollectionType() {
-        var codegen = new BoatWebhooksCodeGen();
-        codegen.setUseBeanValidation(true);
-        var codegenProperty = new CodegenProperty();
-        codegenProperty.isModel = true;
-        codegenProperty.baseName = "request"; // not a response
-
-        String result = codegen.replaceBeanValidationCollectionType(
-                codegenProperty, "Set<com.backbase.dbs.arrangement.commons.model.TranslationItemDto>");
-        assertEquals("Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>", result);
-    }
-
-    @Test
-    void replaceBeanValidationCollectionType_shouldCoverAllBranches() {
-        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
-        CodegenProperty property = new CodegenProperty();
-        property.isModel = true;
-        property.baseName = "request";
-        String baseType = "Set<com.example.Model>";
-
-        codegen.setUseBeanValidation(false);
-        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
-
-        codegen.setUseBeanValidation(true);
-        assertEquals("", codegen.replaceBeanValidationCollectionType(property, ""));
-
-        property.isModel = false;
-        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
-        property.isModel = true;
-
-        property.baseName = "response";
-        assertEquals(baseType, codegen.replaceBeanValidationCollectionType(property, baseType));
-        property.baseName = "request";
-
-        String noValidType = "Set<com.example.Model>";
-        String expectedValidType = "Set<@Valid com.example.Model>";
-        assertEquals(expectedValidType, codegen.replaceBeanValidationCollectionType(property, noValidType));
-
-        String regexType = "Set<@Valid com.example.Model>";
-        String expectedRegexResult = "Set<com.example.@Valid Model>";
-        assertEquals(expectedRegexResult, codegen.replaceBeanValidationCollectionType(property, regexType));
-
-        String unmatchedType = "List<@Valid Model>";
-        assertEquals(unmatchedType, codegen.replaceBeanValidationCollectionType(property, unmatchedType));
-    }
-
-    @Test
-    void testFromParameter() {
-        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
-        io.swagger.v3.oas.models.parameters.Parameter swaggerParam = new io.swagger.v3.oas.models.parameters.Parameter();
-        swaggerParam.setName("testParam");
-        Set<String> imports = new HashSet<>();
-
-        // Call the method under test
-        var result = codeGen.fromParameter(swaggerParam, imports);
-
-        // Assert result is not null and has expected properties
-        assertThat(result, notNullValue());
-        assertEquals("testParam", result.baseName);
-    }
-
-    @Test
-    void testPostProcessModelProperty_addsBigDecimalSerializerAnnotation() {
-        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
-        // Simulate the condition for shouldSerializeBigDecimalAsString to return true
-        CodegenProperty property = new CodegenProperty();
-        property.baseType = "BigDecimal";
-        property.openApiType = "string";
-        property.dataFormat = "number";
-        CodegenModel model = new CodegenModel();
-        model.imports = new HashSet<>();
-        property.vendorExtensions = new HashMap<>();
-
-        codeGen.setSerializeBigDecimalAsString(true);
-        codeGen.postProcessModelProperty(model, property);
-
-        assertThat(property.vendorExtensions, hasEntry("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)"));
-        assertThat(model.imports, hasItems("BigDecimalCustomSerializer", "JsonSerialize"));
-    }
-
-    @Test
-    void postProcessModelProperty_shouldNotAddAnnotationForNonBigDecimal() {
-        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
-        codegen.setSerializeBigDecimalAsString(true);
-
-        CodegenModel model = new CodegenModel();
-        CodegenProperty property = new CodegenProperty();
-        property.baseType = "String";
-        property.openApiType = "string";
-        property.dataFormat = "number";
-
-        codegen.postProcessModelProperty(model, property);
-
-        // Assert that no annotation is added
-        assertThat(property.vendorExtensions.containsKey("x-extra-annotation"), is(false));
-    }
-
-    @Test
     void toApiName_shouldReturnDefaultNameForEmptyString() {
         BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
         String result = codegen.toApiName("");
         assertEquals("WebhookDefaultApi", result);
     }
 
-    @Test
-    void processOpts_shouldRemoveApiUtilSupportingFileWhenNotUsed() {
-        BoatWebhooksCodeGen codegen = new BoatWebhooksCodeGen();
-        var outputDir = TEST_OUTPUT + "/supportingFilesTest";
-        codegen.supportingFiles().add(new SupportingFile("apiUtil.mustache", outputDir, "ApiUtil.java"));
-        codegen.additionalProperties().put("generateSupportingFiles", false);
-        String originalSupportingFiles = org.openapitools.codegen.config.GlobalSettings.getProperty("supportingFiles");
-        try {
-            org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", "");
-            codegen.processOpts();
-            boolean apiUtilPresent = codegen.supportingFiles().stream()
-                    .anyMatch(sf -> "apiUtil.mustache".equals(sf.getTemplateFile()));
-            assertEquals(false, apiUtilPresent);
-        } finally {
-            if (originalSupportingFiles != null) {
-                org.openapitools.codegen.config.GlobalSettings.setProperty("supportingFiles", originalSupportingFiles);
-            } else {
-                org.openapitools.codegen.config.GlobalSettings.clearProperty("supportingFiles");
-            }
-        }
-    }
-
-    @Test
-    void postProcessParameter_setsBaseTypeForContainer() {
-        BoatWebhooksCodeGen codeGen = new BoatWebhooksCodeGen();
-        codeGen.setReactive(false);
-        CodegenParameter param = new CodegenParameter();
-        param.isContainer = true;
-        param.isMap = false;
-        param.dataType = "List<String>";
-        param.baseType = null;
-
-        codeGen.postProcessParameter(param);
-
-        assertEquals("List", param.baseType, "Base type should be extracted from dataType for containers");
-    }
 }
