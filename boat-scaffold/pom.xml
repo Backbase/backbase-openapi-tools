@@ -22,7 +22,7 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
         <embedded.maven.version>3.9.11</embedded.maven.version>
-        <maven.resolver.version>1.9.24</maven.resolver.version>
+        <maven.resolver.version>1.9.25</maven.resolver.version>
         <maven.wagon.version>3.5.3</maven.wagon.version>
     </properties>
 
