@@ -25,11 +25,8 @@
 {{/allVars}}
 
 {{#hasVars}}
-    @available(*, deprecated, message: "This initializer is deprecated, use the initializer and the setters of {{classname}}.Builder class.")
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init({{#allVars}}{{name}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}? = nil{{/isNullable}}{{/required}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allVars}}) {
-        {{#allVars}}
-        self.{{name}} = {{name}}
-        {{/allVars}}
+    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init() {
+        // All properties initialized with their default values
     }
 {{/hasVars}}
 
@@ -70,8 +67,11 @@
 
         /// Builder initializer method for {{classname}} DTO.
         {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func build() -> {{classname}} {
-            return {{classname}}({{#allVars}}{{name}}: {{name}}{{^-last}}, 
-                    {{/-last}}{{/allVars}})
+            var result = {{classname}}()
+            {{#allVars}}
+            result.{{name}} = {{name}}
+            {{/allVars}}
+            return result
         }
 
         public static func ==(lhs: Builder, rhs: Builder) -> Bool {
