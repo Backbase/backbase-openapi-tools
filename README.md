@@ -15,6 +15,9 @@ It currently consists of
 
 # Release Notes
 BOAT is still under development and subject to change.
+## 0.17.74
+* Swift5: Removed deprecated initializer from model objects. The initializer is now internal and only accessible through the Builder pattern, preventing breaking code from deprecation warnings.
+
 ## 0.17.73
 Added code related to generate webhook endpoints with different goal
 To add prehook and posthook request mappings for all the requests in spec yaml using webhooks.
