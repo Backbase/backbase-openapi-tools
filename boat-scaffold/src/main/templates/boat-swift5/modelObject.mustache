@@ -25,7 +25,10 @@
 {{/allVars}}
 
 {{#hasVars}}
-    {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} init() {
+    internal init({{#allVars}}{{name}}: {{{datatypeWithEnum}}}{{#required}}{{#isNullable}}? = nil{{/isNullable}}{{/required}}{{^required}}? = nil{{/required}}{{^-last}}, {{/-last}}{{/allVars}}) {
+        {{#allVars}}
+        self.{{name}} = {{name}}
+        {{/allVars}}
     }
 {{/hasVars}}
 
@@ -66,11 +69,8 @@
 
         /// Builder initializer method for {{classname}} DTO.
         {{#nonPublicApi}}internal{{/nonPublicApi}}{{^nonPublicApi}}public{{/nonPublicApi}} func build() -> {{classname}} {
-            var result = {{classname}}()
-            {{#allVars}}
-            result.{{name}} = {{name}}
-            {{/allVars}}
-            return result
+            return {{classname}}({{#allVars}}{{name}}: {{name}}{{^-last}}, 
+                    {{/-last}}{{/allVars}})
         }
 
         public static func ==(lhs: Builder, rhs: Builder) -> Bool {
