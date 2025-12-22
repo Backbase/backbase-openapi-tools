@@ -54,7 +54,7 @@
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.2.41</swagger-core.version>
-        <swagger-parser.version>2.1.36</swagger-parser.version>
+        <swagger-parser.version>2.1.37</swagger-parser.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
     </properties>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.22</version>
+                <version>1.5.23</version>
             </dependency>
 
             <dependency>
