@@ -21,12 +21,15 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
-    - name: Setup Java 21
+    - name: Setup Java
       uses: actions/setup-java@v5
       with:
-        distribution: temurin
+        distribution: 'microsoft'
         java-version: '21'
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+        cache: 'maven'
+    - name: Build and Analyze
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: mvn -B verify -Dgpg.skip
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
