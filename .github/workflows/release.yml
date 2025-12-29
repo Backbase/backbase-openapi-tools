@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v6
+        uses: actions/checkout@v6
       - name: Setup Java
-        uses: actions/setup-java@8617b2cce998314393c155b2c6db4d2b722b15be # v5
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
@@ -30,10 +30,10 @@ jobs:
     needs: [ sonar ]
     steps:
       - name: Checkout project
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v6
+        uses: actions/checkout@v6
 
       - name: Setup Java
-        uses: actions/setup-java@8617b2cce998314393c155b2c6db4d2b722b15be # v5
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
@@ -91,10 +91,10 @@ jobs:
     needs: [ publish ]
     steps:
       - name: Checkout Branch
-        uses: actions/checkout@b4ffde65f46336ab11d5ea33ade984223922a344 # v4.1.1
+        uses: actions/checkout@v6
 
       - name: Setup Java
-        uses: actions/setup-java@8617b2cce998314393c155b2c6db4d2b722b15be # v5
+        uses: actions/setup-java@v5
         with:
           distribution: 'microsoft'
           java-version: '21'
@@ -121,7 +121,7 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@6d6857d36972954561a903c4f05b07ce2ea451b3 # v6
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore: bump version to ${{ steps.bump_version.outputs.new_version }}"
           title: "chore: bump version to ${{ steps.bump_version.outputs.new_version }}"
