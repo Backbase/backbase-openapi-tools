@@ -92,6 +92,8 @@ jobs:
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.target_commitish }}
 
       - name: Setup Java
         uses: actions/setup-java@v5
