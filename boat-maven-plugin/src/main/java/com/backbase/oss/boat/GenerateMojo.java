@@ -35,31 +35,6 @@ import com.google.common.io.Files;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.StandardCopyOption;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -68,16 +43,35 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.CodegenConfig;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.*;
 import org.openapitools.codegen.auth.AuthParser;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.utils.OptionUtils;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.*;
 
 /**
  * Generates client/server code from an OpenAPI json/yaml definition.
@@ -596,13 +590,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 java.nio.file.Files.copy(inputSpecFile.toPath(), copyTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // attempt to read from config file
-            CodegenConfigurator configurator = CodegenConfigurator.fromFile(configurationFile);
-
-            // if a config file wasn't specified or we were unable to read it
-            if (configurator == null) {
-                configurator = new CodegenConfigurator();
-            }
+            final CodegenConfigurator configurator = loadCodegenConfigurator();
 
             configurator.setVerbose(verbose);
 
@@ -880,7 +868,10 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             }
 
             if (openapiNormalizer != null && (configOptions == null || !configOptions.containsKey("openapi-normalizer"))) {
-                applyOpenAPINormalizerKvpList(openapiNormalizer, configurator);
+                for (String propString: openapiNormalizer) {
+                    OptionUtils.parseCommaSeparatedTuples(propString)
+                            .forEach(p -> configurator.addOpenapiNormalizer(p.getLeft(), p.getRight()));
+                }
             }
 
             // Apply Schema Mappings
@@ -984,6 +975,16 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             throw new MojoExecutionException(
                 "Code generation failed. See above for the full exception.");
         }
+    }
+
+    /**
+     * Attempt to read from config file, return default otherwise.
+     *
+     * @return The CodegenConfigurator loaded from file or a default.
+     */
+    private CodegenConfigurator loadCodegenConfigurator() {
+        CodegenConfigurator configurator = CodegenConfigurator.fromFile(configurationFile);
+        return configurator != null ? configurator : new CodegenConfigurator();
     }
 
     protected Collection<String> getGeneratorSpecificSupportingFiles() {
