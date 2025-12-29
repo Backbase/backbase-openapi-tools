@@ -26,7 +26,23 @@ jobs:
       with:
         distribution: temurin
         java-version: '21'
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+
+    # --- Replaced Autobuild with explicit, controlled build steps ---
+    - name: Print Java & Maven environment
+      run: |
+        java -version
+        mvn -v
+        echo "MAVEN_OPTS=$MAVEN_OPTS"
+
+    - name: Clear Kotlin build-tools (force re-download)
+      run: |
+        rm -rf ~/.m2/repository/org/jetbrains/kotlin/kotlin-build-tools-impl || true
+
+    - name: Build with Maven (disable Kotlin daemon)
+      env:
+        MAVEN_OPTS: "-Dkotlin.daemon.enabled=false -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false $MAVEN_OPTS"
+      run: |
+        mvn -B -V -DskipTests clean package
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
