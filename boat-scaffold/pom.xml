@@ -22,7 +22,7 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
         <embedded.maven.version>3.9.12</embedded.maven.version>
-        <maven.resolver.version>1.9.25</maven.resolver.version>
+        <maven.resolver.version>1.9.27</maven.resolver.version>
         <maven.wagon.version>3.5.3</maven.wagon.version>
     </properties>
 
@@ -165,7 +165,7 @@
         <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core</artifactId>
-            <version>3.27.1</version>
+            <version>3.28.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
