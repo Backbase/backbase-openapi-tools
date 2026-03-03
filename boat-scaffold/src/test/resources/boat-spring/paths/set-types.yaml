@@ -97,6 +97,16 @@ get:
           minLength: 1
           maxLength: 36
           pattern: '^[A-Z]+$'
+    - name: q-params-not-null
+      in: query
+      required: false
+      schema:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          x-not-null: true
+          pattern: '^[A-Z]+$'
     - name: q-params-set-req
       in: query
       required: true

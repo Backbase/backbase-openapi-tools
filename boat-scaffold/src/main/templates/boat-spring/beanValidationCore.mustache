@@ -1,4 +1,4 @@
-{{#vendorExtensions.x-not-null}}@jakarta.validation.constraints.NotNull{{/vendorExtensions.x-not-null}}
+{{#vendorExtensions.x-not-null}}@NotNull{{/vendorExtensions.x-not-null}}
 {{#pattern}}{{^isByteArray}}@Pattern(regexp = "{{{pattern}}}") {{/isByteArray}}{{/pattern}}{{!
 minLength && maxLength set
 }}{{#minLength}}{{#maxLength}}@Size(min = {{minLength}}, max = {{maxLength}}) {{/maxLength}}{{/minLength}}{{!
