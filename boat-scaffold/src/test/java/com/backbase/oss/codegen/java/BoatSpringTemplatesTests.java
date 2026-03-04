@@ -273,10 +273,7 @@ class BoatSpringTemplatesTests {
                 Object modelObject2 = constructor.newInstance("BAD_status", "ref456", "USD");
 
                 // Serialize using the parent (discriminated) type so that Jackson's
-                // @JsonTypeInfo writes the discriminator property into the JSON.
-                // With allowGetters=true removed from @JsonIgnoreProperties the getter
-                // is fully ignored, so the polymorphic type info is the only source of
-                // the discriminator during serialization.
+                // is aware of full polymorphic context
                 TypeFactory tf = TypeFactory.defaultInstance();
 
                 // serialize and deserialize list
@@ -316,7 +313,7 @@ class BoatSpringTemplatesTests {
 
         if (ignoreAnnotation != null) {
             assertFalse(ignoreAnnotation.allowGetters(),
-                "Class " + modelClass.getName() + " should not have allowGetters=true w @JsonIgnoreProperties!");
+                "Class " + modelClass.getName() + " should not have allowGetters=true in @JsonIgnoreProperties");
         }
     }
 
