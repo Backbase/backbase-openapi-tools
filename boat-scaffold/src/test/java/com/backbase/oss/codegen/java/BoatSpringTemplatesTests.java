@@ -12,11 +12,13 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import com.backbase.oss.codegen.java.VerificationRunner.Verification;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.TypeBindings;
@@ -260,21 +262,32 @@ class BoatSpringTemplatesTests {
 
     private void verifyReceivableRequestModelJsonConversion(ClassLoader classLoader) throws InterruptedException {
         String testedModelClassName = buildReceivableRequestModelClassName();
+        String parentModelClassName = buildPaymentRequestModelClassName();
         var objectMapper = new ObjectMapper();
         Runnable verificationRunnable = () -> {
             try {
                 Class<?> modelClass = classLoader.loadClass(testedModelClassName);
+                Class<?> parentClass = classLoader.loadClass(parentModelClassName);
                 Constructor<?> constructor = modelClass.getConstructor(String.class, String.class, String.class);
                 Object modelObject1 = constructor.newInstance("OK_status", "ref123", "EUR");
                 Object modelObject2 = constructor.newInstance("BAD_status", "ref456", "USD");
 
+                // Serialize using the parent (discriminated) type so that Jackson's
+                // @JsonTypeInfo writes the discriminator property into the JSON.
+                // With allowGetters=true removed from @JsonIgnoreProperties the getter
+                // is fully ignored, so the polymorphic type info is the only source of
+                // the discriminator during serialization.
+                TypeFactory tf = TypeFactory.defaultInstance();
+
                 // serialize and deserialize list
                 List<?> modelObjects = List.of(modelObject1, modelObject2);
-                String serializedObjects = objectMapper.writeValueAsString(modelObjects);
+                String serializedObjects = objectMapper.writerFor(
+                    tf.constructCollectionType(List.class, parentClass)
+                ).writeValueAsString(modelObjects);
                 Object[] deserializedModelObjects = objectMapper.readValue(
                     serializedObjects,
                     ArrayType.construct(
-                        TypeFactory.defaultInstance().constructFromCanonical(modelClass.getName()),
+                        tf.constructFromCanonical(parentClass.getName()),
                         TypeBindings.emptyBindings()
                     )
                 );
@@ -282,10 +295,12 @@ class BoatSpringTemplatesTests {
                 assertEquals(modelObject1.getClass(), deserializedModelObjects[0].getClass());
 
                 // serialize and deserialize single object
-                String serializedObject1 = objectMapper.writeValueAsString(modelObject1);
-                Object deserializedObject1 = objectMapper.readValue(serializedObject1, modelClass);
+                String serializedObject1 = objectMapper.writerFor(parentClass).writeValueAsString(modelObject1);
+                Object deserializedObject1 = objectMapper.readValue(serializedObject1, parentClass);
                 assertEquals(modelClass, deserializedObject1.getClass());
 
+                verifyJsonIgnoreAnnotation(modelClass);
+                verifyJsonIgnoreAnnotation(parentClass);
             } catch (Exception e) {
                 throw new UnhandledException(e);
             }
@@ -294,6 +309,15 @@ class BoatSpringTemplatesTests {
         verificationRunner.runVerification(
             Verification.builder().runnable(verificationRunnable).displayName(param.name).build()
         );
+    }
+
+    private void verifyJsonIgnoreAnnotation(Class<?> modelClass) {
+        JsonIgnoreProperties ignoreAnnotation = modelClass.getAnnotation(JsonIgnoreProperties.class);
+
+        if (ignoreAnnotation != null) {
+            assertFalse(ignoreAnnotation.allowGetters(),
+                "Class " + modelClass.getName() + " should not have allowGetters=true w @JsonIgnoreProperties!");
+        }
     }
 
     private void verifyMultiLineRequest(ClassLoader classLoader) throws InterruptedException {
@@ -319,23 +343,28 @@ class BoatSpringTemplatesTests {
      * Build proper class name for `ReceivableRequest`.
      */
     private String buildReceivableRequestModelClassName() {
+        return buildModelClassName("ReceivableRequest");
+    }
+
+    /**
+     * Build proper class name for `PaymentRequest` (parent/discriminator base).
+     */
+    private String buildPaymentRequestModelClassName() {
+        return buildModelClassName("PaymentRequest");
+    }
+
+    private String buildModelClassName(String baseName) {
         var modelPackage = param.name.replace('-', '.') + ".model";
         var classNameSuffix = org.apache.commons.lang3.StringUtils.capitalize(
             param.name.indexOf('-') > -1
                 ? CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, param.name)
                 : param.name
         );
-        return modelPackage + ".ReceivableRequest" + classNameSuffix;
+        return modelPackage + "." + baseName + classNameSuffix;
     }
 
     private String buildMultiLineRequestModelClassName() {
-        var modelPackage = param.name.replace('-', '.') + ".model";
-        var classNameSuffix = org.apache.commons.lang3.StringUtils.capitalize(
-            param.name.indexOf('-') > -1
-                ? CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, param.name)
-                : param.name
-        );
-        return modelPackage + ".MultiLinePaymentRequest" + classNameSuffix;
+        return buildModelClassName("MultiLinePaymentRequest");
     }
 
     private boolean findPattern(String filePattern, String linePattern) {
