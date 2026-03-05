@@ -192,13 +192,25 @@ class BoatSpringTemplatesTests {
     @Check
     void useBeanValidation() {
         assertThat(findPattern("/api/.+\\.java$", "@Valid"),
-            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
         assertThat(findPattern("/model/.+\\.java$", "@Valid"),
-            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
         assertThat(findPattern("/model/MultiLinePaymentRequest.*\\.java$", "List<@Pattern\\(regexp"),
-            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
         assertThat(findPattern("/model/MultiLinePaymentRequest.*\\.java$", "Map<String, @Size\\(min = 7, max = 10\\)"),
-            equalTo(this.param.useBeanValidation||this.param.addBindingResult));
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
+    }
+
+    @Check
+    void queryParamsCustomNotNullValidation() {
+        assertThat(findPattern("/api/ArrayTypesApi\\.java$", "List<@NotNull.*>\\s+qParamsNotNull"),
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
+        assertThat(findPattern("/api/SetTypesApi\\.java$", "Set\\s*<@NotNull.*>\\s+qParamsNotNull"),
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
+        assertThat(findPattern("/api/SimpleTypesApi\\.java$", "Set\\s*<@NotNull.*>\\s+qParamsNotNull"),
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
+        assertThat(findPattern("/api/MapTypesApi\\.java$", "List<@NotNull.*>\\s+qParamsNotNull"),
+            equalTo(this.param.useBeanValidation || this.param.addBindingResult));
     }
 
     @Check
