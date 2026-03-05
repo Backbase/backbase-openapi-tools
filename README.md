@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.76
+* In Spring generator added support for type-level validation in collections via the `x-not-null` vendor extension to allow `@NotNull` annotations on generic type arguments.
+
 ## 0.17.75
 * Fixed duplicate serialization of the discriminator property in Jackson-based Java models by removing allowGetters = true from the @JsonIgnoreProperties annotation.
 
