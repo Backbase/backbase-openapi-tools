@@ -16,6 +16,11 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.17.76
+* Updated RestTemplate Java client templates for Spring compatibility by using header APIs that work with both Spring 5 and Spring 7.
+* Updated bean validation templates (`boat-spring` and `boat-webhooks`) to generate Jakarta `@Email` annotations when `useJakartaEe=true`.
+* Updated `spring-core` in plugin IT examples to `6.2.11` to address CVE-2025-41249, with an explicit guard test to keep the patched version.
+
 ## 0.17.75
 * Fixed duplicate serialization of the discriminator property in Jackson-based Java models by removing allowGetters = true from the @JsonIgnoreProperties annotation.
 * In Spring generator added support for type-level validation in collections via the `x-not-null` vendor extension to allow `@NotNull` annotations on generic type arguments.
