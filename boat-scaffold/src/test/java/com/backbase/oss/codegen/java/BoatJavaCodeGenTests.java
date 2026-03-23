@@ -9,8 +9,10 @@ import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_PROTECTED_FIELDS
 import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_WITH_MODIFIERS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,6 +24,7 @@ import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -207,5 +210,38 @@ class BoatJavaCodeGenTests {
         assertThat("Expect Valid annotation.", getPojosMethod.getParameter(0).getType().toString().contains("@Valid"), is(useBeanValidation));
         assertThat("Expect jakarta Valid import", compilationUnit.getImports().stream().anyMatch(
                 id -> id.getNameAsString().equals("jakarta.validation.Valid")), is(useBeanValidation));
+    }
+
+    @Test
+    void shouldGenerateRestTemplateApiClientCompatibleWithSpring5AndSpring7() throws Exception {
+        var input = new File("src/test/resources/boat-spring/openapi.yaml");
+        var output = TEST_OUTPUT + "/shouldGenerateRestTemplateApiClientCompatibleWithSpring5AndSpring7";
+
+        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
+        gen.setOutputDir(output);
+        gen.setInputSpec(input.getAbsolutePath());
+        gen.setApiPackage("com.backbase.test.api");
+        gen.setModelPackage("com.backbase.test.api.model");
+        gen.setInvokerPackage("com.backbase.test.api.invoker");
+        gen.additionalProperties().put("library", "resttemplate");
+
+        var openApiInput = new OpenAPIParser()
+            .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+            .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(gen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+        File apiClientFile = files.stream()
+            .filter(file -> file.getName().equals("ApiClient.java"))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("ApiClient.java was not generated"));
+
+        String apiClientCode = Files.readString(apiClientFile.toPath());
+        assertThat(apiClientCode, containsString("defaultHeaders.toSingleValueMap().containsKey(name)"));
+        assertThat(apiClientCode, containsString("headers.forEach((key, values) -> {"));
+        assertThat(apiClientCode, not(containsString("containsHeader(")));
+        assertThat(apiClientCode, not(containsString("headerSet(")));
     }
 }
