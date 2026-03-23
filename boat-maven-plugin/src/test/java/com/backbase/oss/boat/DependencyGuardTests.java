@@ -44,6 +44,20 @@ class DependencyGuardTests {
         assertTrue(exclusions.contains("httpcore"), "httpcore must be excluded to avoid ClassRealm conflicts");
     }
 
+    @Test
+    void shouldKeepPatchedSpringCoreVersionInInvokerExample() throws Exception {
+        Document pom = readPom(Path.of("src/it/example/pom.xml"));
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        String springCoreVersion = xpath.evaluate(
+            "/project/dependencyManagement/dependencies/dependency[groupId='org.springframework' and artifactId='spring-core']/version/text()",
+            pom
+        );
+
+        assertEquals("6.2.11", springCoreVersion.trim(),
+            "Invoker example must keep patched spring-core version to avoid CVE-2025-41249");
+    }
+
     private static Document readPom(Path path) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
