@@ -16,8 +16,12 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 {{/additionalPropertiesType}}
 {{/model}}
 {{/models}}
+{{#supportUrlQuery}}
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.StringJoiner;
+{{/supportUrlQuery}}
 import java.util.Objects;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 {{#imports}}
@@ -36,23 +40,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 {{/vendorExtensions.x-has-readonly-properties}}
 {{/jackson}}
 {{#withXml}}
-import javax.xml.bind.annotation.*;
+import {{javaxPackage}}.xml.bind.annotation.*;
 {{/withXml}}
 {{#parcelableModel}}
 import android.os.Parcelable;
 import android.os.Parcel;
 {{/parcelableModel}}
 {{#useBeanValidation}}
-{{^useJakartaEe}}
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-{{/useJakartaEe}}
-{{#useJakartaEe}}
-import jakarta.validation.constraints.*;
-import jakarta.validation.Valid;
-{{/useJakartaEe}}
+import {{javaxPackage}}.validation.constraints.*;
+import {{javaxPackage}}.validation.Valid;
 {{/useBeanValidation}}
-
 {{#performBeanValidation}}
 import org.hibernate.validator.constraints.*;
 {{/performBeanValidation}}

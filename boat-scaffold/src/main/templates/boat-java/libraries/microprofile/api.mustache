@@ -12,17 +12,21 @@ import java.util.Set;
 import {{rootJavaEEPackage}}.ws.rs.*;
 import {{rootJavaEEPackage}}.ws.rs.core.Response;
 import {{rootJavaEEPackage}}.ws.rs.core.MediaType;
-{{^disableMultipart}}
-import org.apache.cxf.jaxrs.ext.multipart.*;
-{{/disableMultipart}}
+
+{{#microprofileMutiny}}
+import io.smallrye.mutiny.Uni;
+{{/microprofileMutiny}}
 
 {{#useBeanValidation}}
-import javax.validation.constraints.*;
-import javax.validation.Valid;
+import {{rootJavaEEPackage}}.validation.constraints.*;
+import {{rootJavaEEPackage}}.validation.Valid;
 {{/useBeanValidation}}
 
+{{#microprofileRegisterExceptionMapper}}
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
+{{/microprofileRegisterExceptionMapper}}
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
 
 {{#appName}}
 /**
@@ -35,8 +39,12 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
  */
 {{/appName}}
 
-@RegisterRestClient{{#configKey}}(configKey="{{configKey}}"){{/configKey}}
+{{^microprofileServer}}
+@RegisterRestClient{{#configKey}}(configKey="{{configKey}}"){{/configKey}}{{#configKeyFromClassName}}{{#operations}}(configKey="{{configKey}}"){{/operations}}{{/configKeyFromClassName}}
+{{/microprofileServer}}
+{{#microprofileRegisterExceptionMapper}}
 @RegisterProvider(ApiExceptionMapper.class)
+{{/microprofileRegisterExceptionMapper}}
 @Path("{{#useAnnotatedBasePath}}{{contextPath}}{{/useAnnotatedBasePath}}{{commonPath}}")
 public interface {{classname}}  {
 {{#operations}}
@@ -66,7 +74,53 @@ public interface {{classname}}  {
 {{#hasProduces}}
     @Produces({ {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} })
 {{/hasProduces}}
-    public {{{returnType}}}{{^returnType}}void{{/returnType}} {{nickname}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{^-last}}, {{/-last}}{{/allParams}}) throws ApiException, ProcessingException;
+{{^singleRequestParameter}}
+    {{^vendorExtensions.x-java-is-response-void}}{{#microprofileServer}}{{> server_operation}}{{/microprofileServer}}{{^microprofileServer}}{{> client_operation}}{{/microprofileServer}}{{/vendorExtensions.x-java-is-response-void}}{{#vendorExtensions.x-java-is-response-void}}{{#microprofileMutiny}}Uni<Void>{{/microprofileMutiny}}{{^microprofileMutiny}}void{{/microprofileMutiny}}{{/vendorExtensions.x-java-is-response-void}} {{nickname}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}}, {{/-last}}{{/allParams}}) throws ApiException, ProcessingException;
+{{/singleRequestParameter}}
+{{#singleRequestParameter}}
+    {{^vendorExtensions.x-java-is-response-void}}{{#microprofileMutiny}}Uni<{{{returnType}}}>{{/microprofileMutiny}}{{^microprofileMutiny}}{{{returnType}}}{{/microprofileMutiny}}{{/vendorExtensions.x-java-is-response-void}}{{#vendorExtensions.x-java-is-response-void}}{{#microprofileMutiny}}Uni<Void>{{/microprofileMutiny}}{{^microprofileMutiny}}void{{/microprofileMutiny}}{{/vendorExtensions.x-java-is-response-void}} {{nickname}}({{#hasNonBodyParams}}@BeanParam {{operationIdCamelCase}}Request request{{/hasNonBodyParams}}{{#bodyParams}}{{#hasNonBodyParams}}, {{/hasNonBodyParams}}{{>bodyParams}}{{/bodyParams}}) throws ApiException, ProcessingException;
+    {{#hasNonBodyParams}}
+    public class {{operationIdCamelCase}}Request {
+
+        {{#queryParams}}
+        private {{>queryParams}};
+        {{/queryParams}}
+        {{#headerParams}}
+        private {{>headerParams}};
+        {{/headerParams}}
+        {{#pathParams}}
+        private {{>pathParams}};
+        {{/pathParams}}
+        {{#formParams}}
+        private {{>formParams}};
+        {{/formParams}}
+        {{#cookieParams}}
+        private {{>cookieParams}};
+        {{/cookieParams}}
+
+        private {{operationIdCamelCase}}Request() {
+        }
+
+        public static {{operationIdCamelCase}}Request newInstance() {
+            return new {{operationIdCamelCase}}Request();
+        }
+
+        {{#allParams}}
+        {{^isBodyParam}}
+        /**
+         * Set {{paramName}}{{>formParamsNameSuffix}}
+         * @param {{paramName}}{{>formParamsNameSuffix}} {{description}} ({{^required}}optional{{^isContainer}}{{#defaultValue}}, default to {{.}}{{/defaultValue}}{{/isContainer}}{{/required}}{{#required}}required{{/required}})
+         * @return {{operationIdCamelCase}}Request
+         */
+        public {{operationIdCamelCase}}Request {{paramName}}{{>formParamsNameSuffix}}({{>queryParamsImpl}}{{>pathParamsImpl}}{{>headerParamsImpl}}{{>formParamsImpl}}{{>cookieParamsImpl}}) {
+            this.{{paramName}}{{>formParamsNameSuffix}} = {{paramName}}{{>formParamsNameSuffix}};
+            return this;
+        }
+        {{/isBodyParam}}
+        {{/allParams}}
+    }
+    {{/hasNonBodyParams}}
+{{/singleRequestParameter}}
 {{/operation}}
 }
 {{/operations}}
