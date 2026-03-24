@@ -1,9 +1,7 @@
 package com.backbase.oss.codegen.java;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
-import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
@@ -13,14 +11,10 @@ import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 
 public class BoatJavaCodeGen extends JavaClientCodegen {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(BoatJavaCodeGen.class);
 
     public static final String NAME = "boat-java";
 
@@ -113,22 +107,10 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
         if (!ModelUtils.isArraySchema(target)) {
             return false;
         }
-        Schema items = getSchemaItems((ArraySchema) target);
+        Schema items = ModelUtils.getSchemaItems(target);
         if (items.get$ref() != null) {
             items = openAPI.getComponents().getSchemas().get(ModelUtils.getSimpleRef(items.get$ref()));
         }
         return items.getEnum() != null;
     }
-
-    protected Schema<?> getSchemaItems(ArraySchema schema) {
-        Schema<?> items = schema.getItems();
-        if (items == null) {
-            this.LOGGER.error("Undefined array inner type for `{}`. Default to String.", schema.getName());
-            items = (new StringSchema()).description("TODO default missing array inner type to string");
-            schema.setItems(items);
-        }
-
-        return items;
-    }
-
 }
