@@ -15,7 +15,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyInst
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsv;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyLanguageSpecificPrimitivesCsvList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyNameMappingsKvpList;
-import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenAPINormalizerKvpList;
+import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyOpenapiNormalizerKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyReservedWordsMappingsKvpList;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applySchemaMappingsKvp;
@@ -880,7 +880,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             }
 
             if (openapiNormalizer != null && (configOptions == null || !configOptions.containsKey("openapi-normalizer"))) {
-                applyOpenAPINormalizerKvpList(openapiNormalizer, configurator);
+                applyOpenapiNormalizerKvpList(openapiNormalizer, configurator);
             }
 
             // Apply Schema Mappings

@@ -20,8 +20,6 @@ public class BoatWebhooksCodeGen extends BoatSpringCodeGen {
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String ADD_BINDING_RESULT = "addBindingResult";
     public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
-    public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
     public static final String  MUSTACHE_EXTENSION =".mustache";
     public static final String JAVA_EXTENSION =".java";
 
@@ -32,19 +30,11 @@ public class BoatWebhooksCodeGen extends BoatSpringCodeGen {
         this.embeddedTemplateDir = this.templateDir = NAME;
         this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
-        this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
-                "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
                 "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
                 "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
                 this.addBindingResult));
-        this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
-                "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
-        this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
-                "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
-        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
-                "Whether to use protected visibility for model fields"));
         supportedLibraries.put(NAME, "Boat Webhooks codegen");
         this.apiNameSuffix = "Api";
         this.apiNamePrefix = "Webhook";

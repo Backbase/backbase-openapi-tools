@@ -45,7 +45,6 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
         super.exclusiveMaximum =                   codegenProperty.exclusiveMaximum;
         super.required =                           codegenProperty.required;
         super.deprecated =                         codegenProperty.deprecated;
-        super.hasMoreNonReadOnly =                 codegenProperty.hasMoreNonReadOnly;
         super.isPrimitiveType =                    codegenProperty.isPrimitiveType;
         super.isModel =                            codegenProperty.isModel;
         super.isContainer =                        codegenProperty.isContainer;
@@ -100,6 +99,7 @@ public class BoatSpringCodegenProperty extends CodegenProperty {
         super.nameInLowerCase =                    codegenProperty.nameInLowerCase;
         super.nameInCamelCase =                    codegenProperty.nameInCamelCase;
         super.nameInSnakeCase =                    codegenProperty.nameInSnakeCase;
+        super.nameInPascalCase =                   codegenProperty.nameInPascalCase;
         super.enumName =                           codegenProperty.enumName;
         super.maxItems =                           codegenProperty.maxItems;
         super.minItems =                           codegenProperty.minItems;

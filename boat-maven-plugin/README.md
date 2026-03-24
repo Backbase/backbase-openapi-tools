@@ -37,7 +37,6 @@ Same with `generate` but with opinionated defaults for Spring
             <interfaceOnly>true</interfaceOnly>
             <skipDefaultInterface>true</skipDefaultInterface>
             <useBeanValidation>true</useBeanValidation>
-            <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
             <useTags>true</useTags>
             <java8>true</java8>
             <useOptional>false</useOptional>
@@ -78,7 +77,6 @@ It will generate webhook interfaces with prehook and posthook request mapping fo
             <interfaceOnly>true</interfaceOnly>
             <skipDefaultInterface>true</skipDefaultInterface>
             <useBeanValidation>true</useBeanValidation>
-            <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
             <useTags>true</useTags>
             <java8>true</java8>
             <useOptional>false</useOptional>
@@ -108,7 +106,6 @@ Same with `generate` but with opinionated defaults for Rest Template Client
             <interfaceOnly>true</interfaceOnly>
             <skipDefaultInterface>true</skipDefaultInterface>
             <useBeanValidation>true</useBeanValidation>
-            <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
             <useTags>true</useTags>
             <java8>true</java8>
             <useOptional>false</useOptional>
@@ -122,7 +119,7 @@ Same with `generate` but with opinionated defaults for Rest Template Client
     <configuration>
         ...
         <additionalProperties>
-            <additionalProperty>createApiComponent=false</additionalProperty>
+            <additionalProperty>restTemplateBeanName=interServiceRestTemplate</additionalProperty>
         </additionalProperties>
     </configuration>
 
@@ -198,7 +195,6 @@ Same with `generate` but with opinionated defaults for Web Client
             <interfaceOnly>true</interfaceOnly>
             <skipDefaultInterface>true</skipDefaultInterface>
             <useBeanValidation>true</useBeanValidation>
-            <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
             <useTags>true</useTags>
             <java8>true</java8>
             <useOptional>false</useOptional>

@@ -94,7 +94,7 @@ class GenerateMojoTests {
         );
         assertThat(
             mojo.getGeneratorSpecificSupportingFiles(),
-            containsInAnyOrder("BigDecimalCustomSerializer.java")
+            containsInAnyOrder("BigDecimalCustomSerializer.java", "BaseApi.java")
         );
     }
 
@@ -146,7 +146,6 @@ class GenerateMojoTests {
         expectedOpts.put("interfaceOnly", "true");
         expectedOpts.put("useTags", "true");
         expectedOpts.put("useBeanValidation", "true");
-        expectedOpts.put("useClassLevelBeanValidation", "false");
         expectedOpts.put("useOptional", "false");
         expectedOpts.put("useJakartaEe", "true");
         expectedOpts.put("useSpringBoot3", "true");
@@ -177,7 +176,6 @@ class GenerateMojoTests {
         expectedOpts.put("interfaceOnly", "true");
         expectedOpts.put("useTags", "true");
         expectedOpts.put("useBeanValidation", "true");
-        expectedOpts.put("useClassLevelBeanValidation", "false");
         expectedOpts.put("useOptional", "true");
         expectedOpts.put("useJakartaEe", "true");
         expectedOpts.put("useSpringBoot3", "true");

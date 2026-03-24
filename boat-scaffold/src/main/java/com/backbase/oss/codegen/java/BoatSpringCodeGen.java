@@ -46,12 +46,10 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     public static final String NAME = "boat-spring";
 
-    public static final String USE_CLASS_LEVEL_BEAN_VALIDATION = "useClassLevelBeanValidation";
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String ADD_BINDING_RESULT = "addBindingResult";
-    public static final String USE_LOMBOK_ANNOTATIONS = "useLombokAnnotations";
-    public static final String USE_WITH_MODIFIERS = "useWithModifiers";
-    public static final String USE_PROTECTED_FIELDS = "useProtectedFields";
+
+    private static final String VENDOR_EXTENSION_NOT_NULL = "x-not-null";
 
     static class NewLineIndent implements Mustache.Lambda {
 
@@ -150,13 +148,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
     }
 
     /**
-     * Add @Validated to class-level Api interfaces. Defaults to false
-     */
-    @Setter
-    @Getter
-    protected boolean useClassLevelBeanValidation;
-
-    /**
      * Adds a HttpServletRequest object to the API definition method.
      */
     @Setter
@@ -170,43 +161,16 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Getter
     protected boolean addBindingResult;
 
-    /**
-     * Add Lombok to class-level Api models. Defaults to false
-     */
-    @Setter
-    @Getter
-    protected boolean useLombokAnnotations;
-
-
-    /**
-     * Whether to use {@code with} prefix for pojos modifiers.
-     */
-    @Setter
-    @Getter
-    protected boolean useWithModifiers;
-
-    @Setter
-    @Getter
-    protected boolean useProtectedFields;
-
     public BoatSpringCodeGen() {
         super();
         this.embeddedTemplateDir = this.templateDir = NAME;
         this.openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true");
 
-        this.cliOptions.add(CliOption.newBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION,
-            "Add @Validated to class-level Api interfaces.", this.useClassLevelBeanValidation));
         this.cliOptions.add(CliOption.newBoolean(ADD_SERVLET_REQUEST,
             "Adds a HttpServletRequest object to the API definition method.", this.addServletRequest));
         this.cliOptions.add(CliOption.newBoolean(ADD_BINDING_RESULT,
             "Adds a Binding result as method perimeter. Only implemented if @validate is being used.",
             this.addBindingResult));
-        this.cliOptions.add(CliOption.newBoolean(USE_LOMBOK_ANNOTATIONS,
-            "Add Lombok to class-level Api models. Defaults to false.", this.useLombokAnnotations));
-        this.cliOptions.add(CliOption.newBoolean(USE_WITH_MODIFIERS,
-            "Whether to use \"with\" prefix for POJO modifiers.", this.useWithModifiers));
-        this.cliOptions.add(CliOption.newString(USE_PROTECTED_FIELDS,
-            "Whether to use protected visibility for model fields"));
 
         this.apiNameSuffix = "Api";
     }
@@ -245,23 +209,29 @@ public class BoatSpringCodeGen extends SpringCodegen {
      * "overridden" to fix invalid code when the data type is a collection of a fully qualified classname.
      * eg. <code>Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto></code>
      *
-     * @param codegenProperty
+     * @param itemsProperty
      * @param dataType
      * @return
      */
-    String replaceBeanValidationCollectionType(CodegenProperty codegenProperty, String dataType) {
-        if (!useBeanValidation || isEmpty(dataType) || !codegenProperty.isModel || isResponseType(codegenProperty)) {
+    String replaceBeanValidationCollectionType(CodegenProperty itemsProperty, String dataType) {
+        if (!useBeanValidation || isEmpty(dataType) || isResponseType(itemsProperty)) {
             return dataType;
         }
+
         String result = dataType;
-        if (!contains(dataType, "@Valid")) {
-            result = dataType.replace("<", "<@Valid ");
+        if (itemsProperty.isModel) {
+            if (!contains(dataType, "@Valid")) {
+                result = dataType.replace("<", "<@Valid ");
+            }
+            Matcher m = Pattern.compile("^(.+\\<)(@Valid) ([a-z\\.]+)([A-Z].*)(\\>)$").matcher(dataType);
+            if (m.matches()) {
+                // Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>
+                result = m.group(1) + m.group(3) + m.group(2) + " " + m.group(4) + m.group(5);
+            }
+        } else if (applyNotNullVendorExtension(itemsProperty, dataType)) {
+            result = dataType.replace("<", "<@NotNull ");
         }
-        Matcher m = Pattern.compile("^(.+\\<)(@Valid) ([a-z\\.]+)([A-Z].*)(\\>)$").matcher(dataType);
-        if (m.matches()) {
-            // Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto>
-            result = m.group(1) + m.group(3) + m.group(2) + " " + m.group(4) + m.group(5);
-        }
+
         return result;
     }
 
@@ -278,6 +248,61 @@ public class BoatSpringCodeGen extends SpringCodegen {
     // Copied, but not modified
     private static boolean isResponseType(CodegenProperty codegenProperty) {
         return codegenProperty.baseName.toLowerCase(Locale.ROOT).contains("response");
+    }
+
+    private boolean applyNotNullVendorExtension(CodegenProperty itemsProperty, String dataType) {
+        if (contains(dataType, "@NotNull")) {
+            return false;
+        }
+
+        return booleanExtension(itemsProperty, VENDOR_EXTENSION_NOT_NULL);
+    }
+
+    private boolean booleanExtension(CodegenProperty itemsProperty, String name) {
+        if (itemsProperty == null || itemsProperty.getVendorExtensions() == null) {
+            return false;
+        }
+
+        try {
+            return Boolean.parseBoolean(String.valueOf(itemsProperty.getVendorExtensions().getOrDefault(name, "false")));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean notNullVendorExtension(Schema<?> containerSchema, Schema<?> itemSchema) {
+        if (!useBeanValidation || itemSchema == null) {
+            return false;
+        }
+
+        // Prefer explicit item-level extension
+        Boolean itemExt = readBooleanExtension(itemSchema, VENDOR_EXTENSION_NOT_NULL);
+        if (itemExt != null) {
+            return itemExt;
+        }
+
+        // Optional fallback: allow container-level switch too
+        Boolean containerExt = readBooleanExtension(containerSchema, VENDOR_EXTENSION_NOT_NULL);
+        if (containerExt != null) {
+            return containerExt;
+        }
+
+        return false;
+    }
+
+    private Boolean readBooleanExtension(Schema<?> schema, String name) {
+        if (schema == null || schema.getExtensions() == null) {
+            return null;
+        }
+
+        Object value = schema.getExtensions().get(name);
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value instanceof String) {
+            return Boolean.parseBoolean(String.valueOf(value));
+        }
+        return null;
     }
 
     @Override
@@ -324,35 +349,17 @@ public class BoatSpringCodeGen extends SpringCodegen {
             serializerTemplate + ".java"
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
+        this.importMapping.put("JsonSerialize", "com.fasterxml.jackson.databind.annotation.JsonSerialize");
 
-        if (this.additionalProperties.containsKey(USE_CLASS_LEVEL_BEAN_VALIDATION)) {
-            this.useClassLevelBeanValidation = convertPropertyToBoolean(USE_CLASS_LEVEL_BEAN_VALIDATION);
-        }
         if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
             this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);
         }
         if (this.additionalProperties.containsKey(ADD_BINDING_RESULT)) {
             this.addBindingResult = convertPropertyToBoolean(ADD_BINDING_RESULT);
         }
-        if (this.additionalProperties.containsKey(USE_LOMBOK_ANNOTATIONS)) {
-            this.useLombokAnnotations = convertPropertyToBoolean(USE_LOMBOK_ANNOTATIONS);
-        }
-        if (this.additionalProperties.containsKey(USE_WITH_MODIFIERS)) {
-            this.useWithModifiers = convertPropertyToBoolean(USE_WITH_MODIFIERS);
-        }
-        if (this.additionalProperties.containsKey(USE_PROTECTED_FIELDS)) {
-            this.additionalProperties.put("modelFieldsVisibility", "protected");
-        } else {
-            this.additionalProperties.put("modelFieldsVisibility", "private");
-        }
 
-        writePropertyBack(USE_CLASS_LEVEL_BEAN_VALIDATION, this.useClassLevelBeanValidation);
         writePropertyBack(ADD_SERVLET_REQUEST, this.addServletRequest);
         writePropertyBack(ADD_BINDING_RESULT, this.addBindingResult);
-        writePropertyBack(USE_LOMBOK_ANNOTATIONS, this.useLombokAnnotations);
-        writePropertyBack(USE_WITH_MODIFIERS, this.useWithModifiers);
-        writePropertyBack(USE_PROTECTED_FIELDS, this.useProtectedFields);
-
 
         this.additionalProperties.put("indent4", new IndentedLambda(4, " ", true, true));
         this.additionalProperties.put("newLine4", new NewLineIndent(4, " "));

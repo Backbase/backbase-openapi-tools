@@ -147,7 +147,7 @@ paths:
                 InternalServerError:
                   $ref: "#/components/examples/BadRequestError"
                 OtherError:
-                  $ref: "#/components/examples/InvalidReference"
+                  $ref: "#/components/examples/BadRequestError"
         default:
           description: unexpected error
           content:

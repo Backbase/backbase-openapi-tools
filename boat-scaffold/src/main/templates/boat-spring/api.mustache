@@ -64,6 +64,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.http.codec.multipart.Part;
 {{/reactive}}
+{{#addServletRequest}}
+import {{javaxPackage}}.servlet.http.HttpServletRequest;
+{{/addServletRequest}}
+{{#addBindingResult}}
+import org.springframework.validation.BindingResult;
+{{/addBindingResult}}
 
 {{#useBeanValidation}}
 import {{javaxPackage}}.validation.Valid;
@@ -269,7 +275,7 @@ public interface {{classname}} {
     @ResponseBody
     {{/vendorExtensions.x-sse}}
     {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{>responseType}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}(
-        {{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
+        {{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{>httpServletParam}}{{^-last}},
         {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
         {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
         {{/hasParams}}{{^hasParams}}{{#reactive}},{{/reactive}}{{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}{{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},

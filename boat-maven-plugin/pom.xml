@@ -360,7 +360,7 @@
             <plugin>
                 <groupId>com.backbase.oss</groupId>
                 <artifactId>boat-maven-plugin</artifactId>
-                <version>0.18.0</version>
+                <version>0.17.74</version>
                 <executions>
                     <execution>
                         <goals>

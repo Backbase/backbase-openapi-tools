@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.openapitools.codegen.languages.SpringCodegen;
 
 @Slf4j
 public abstract class AbstractGenerateMojo extends GenerateMojo {
@@ -33,7 +34,6 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         options.put("interfaceOnly", TRUE);
         options.put("useTags", TRUE);
         options.put("useBeanValidation", TRUE);
-        options.put("useClassLevelBeanValidation", FALSE);
         options.put("useOptional", FALSE);
         options.put("useJakartaEe", TRUE);
         options.put("useSpringBoot3", TRUE);
@@ -64,7 +64,21 @@ public abstract class AbstractGenerateMojo extends GenerateMojo {
         var merged = new HashMap<>();
         merged.putAll(defaultOptions);
         merged.putAll(overrides);
+        boolean sb3 = propertyToBool(merged.get(SpringCodegen.USE_SPRING_BOOT3));
+        boolean sb4 = propertyToBool(merged.get(SpringCodegen.USE_SPRING_BOOT4));
+        if (sb3 && sb4) {
+            merged.put(SpringCodegen.USE_SPRING_BOOT3, FALSE);
+        }
         return merged;
+    }
+
+    private static boolean propertyToBool(Object value) {
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        } else if (value instanceof String) {
+            return Boolean.parseBoolean((String) value);
+        }
+        return false;
     }
 }
 

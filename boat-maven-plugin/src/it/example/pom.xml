@@ -11,10 +11,10 @@
     <properties>
 
         <boat-maven-plugin.version>@pom.version@</boat-maven-plugin.version>
-<!--        <boat-maven-plugin.version>0.12.0-SNAPS§HOT</boat-maven-plugin.version>-->
-        <jackson-databind-nullable-version>0.2.3</jackson-databind-nullable-version>
+        <!--        <boat-maven-plugin.version>0.12.0-SNAPS§HOT</boat-maven-plugin.version>-->
+        <jackson-databind-nullable-version>0.2.9</jackson-databind-nullable-version>
 
-        <jackson.version>2.13.3</jackson.version>
+        <jackson.version>2.18.2</jackson.version>
         <jackson.version.annotations>${jackson.version}</jackson.version.annotations>
         <jackson.version.core>${jackson.version}</jackson.version.core>
         <jackson.version.databind>${jackson.version}</jackson.version.databind>
@@ -135,7 +135,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-webflux</artifactId>
-                <version>2.7.2</version>
+                <version>3.3.13</version>
             </dependency>
 
             <dependency>
@@ -147,13 +147,13 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>2.7.2</version>
+                <version>3.3.13</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>6.1.14</version>
+                <version>6.1.21</version>
                 <scope>compile</scope>
             </dependency>
 
