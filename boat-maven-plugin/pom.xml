@@ -53,6 +53,18 @@
             <groupId>org.openapitools.openapidiff</groupId>
             <artifactId>openapi-diff-core</artifactId>
             <version>2.1.7</version>
+            <exclusions>
+                <!-- Avoid loading Apache HttpClient in plugin realm to prevent
+                     ClassRealm conflicts with Maven's own transport stack. -->
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

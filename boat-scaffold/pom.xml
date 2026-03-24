@@ -161,6 +161,7 @@
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>${maven.resolver.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.javaparser</groupId>
