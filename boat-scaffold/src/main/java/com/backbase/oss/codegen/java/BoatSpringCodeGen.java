@@ -270,41 +270,6 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
     }
 
-    private boolean notNullVendorExtension(Schema<?> containerSchema, Schema<?> itemSchema) {
-        if (!useBeanValidation || itemSchema == null) {
-            return false;
-        }
-
-        // Prefer explicit item-level extension
-        Boolean itemExt = readBooleanExtension(itemSchema, VENDOR_EXTENSION_NOT_NULL);
-        if (itemExt != null) {
-            return itemExt;
-        }
-
-        // Optional fallback: allow container-level switch too
-        Boolean containerExt = readBooleanExtension(containerSchema, VENDOR_EXTENSION_NOT_NULL);
-        if (containerExt != null) {
-            return containerExt;
-        }
-
-        return false;
-    }
-
-    private Boolean readBooleanExtension(Schema<?> schema, String name) {
-        if (schema == null || schema.getExtensions() == null) {
-            return null;
-        }
-
-        Object value = schema.getExtensions().get(name);
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        if (value instanceof String) {
-            return Boolean.parseBoolean(String.valueOf(value));
-        }
-        return null;
-    }
-
     @Override
     public String getName() {
         return NAME;

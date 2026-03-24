@@ -187,6 +187,36 @@ class GenerateMojoTests {
         });
     }
 
+    @Test
+    void shouldResolveSpringBootOptions() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = configure(new GenerateSpringBootEmbeddedMojo(), null);
+        // add overrides
+        mojo.configOptions = Map.of(
+            "useSpringBoot4", "true"
+        );
+
+        mojo.execute();
+
+        Map<String, String> expectedOpts = new HashMap<>();
+        expectedOpts.put("java8", "true");
+        expectedOpts.put("dateLibrary", "java8");
+        expectedOpts.put("performBeanValidation", "true");
+        expectedOpts.put("skipDefaultInterface", "true");
+        expectedOpts.put("interfaceOnly", "true");
+        expectedOpts.put("useTags", "true");
+        expectedOpts.put("useBeanValidation", "true");
+        expectedOpts.put("useOptional", "false");
+        expectedOpts.put("useJakartaEe", "true");
+        expectedOpts.put("useSpringBoot3", "false");
+        expectedOpts.put("useSpringBoot4", "true");
+        expectedOpts.put("containerDefaultToNull", "false");
+
+        assertNotNull(mojo.configOptions);
+        expectedOpts.forEach((key, value) -> {
+            assertEquals(value, mojo.configOptions.get(key));
+        });
+    }
+
     private <T extends GenerateMojo> T configure(T mojo, String generatorName) {
         mojo.buildContext = buildContext;
         mojo.project = project;
