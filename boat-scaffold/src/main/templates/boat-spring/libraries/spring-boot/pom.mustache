@@ -6,7 +6,12 @@
     <name>{{artifactId}}</name>
     <version>{{artifactVersion}}</version>
     <properties>
+        {{#useSealed}}
+        <java.version>17</java.version>
+        {{/useSealed}}
+        {{^useSealed}}
         <java.version>1.8</java.version>
+        {{/useSealed}}
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,7 +27,7 @@
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
         {{/swagger1AnnotationLibrary}}
         {{#swagger2AnnotationLibrary}}
-        <swagger-annotations.version>}2.2.7</swagger-annotations.version>
+        <swagger-annotations.version>2.2.7</swagger-annotations.version>
         {{/swagger2AnnotationLibrary}}
         {{/springDocDocumentationProvider}}
         {{/springFoxDocumentationProvider}}
@@ -30,7 +35,7 @@
         <virtualan.version>2.5.2</virtualan.version>
         {{/virtualService}}
         {{#useSwaggerUI}}
-        <swagger-ui.version>4.15.5</swagger-ui.version>
+        <swagger-ui.version>5.3.1</swagger-ui.version>
         {{/useSwaggerUI}}
     </properties>
 {{#parentOverridden}}
@@ -44,23 +49,46 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>{{#springFoxDocumentationProvider}}2.5.14{{/springFoxDocumentationProvider}}{{^springFoxDocumentationProvider}}2.7.6{{/springFoxDocumentationProvider}}</version>
+        <version>{{#springFoxDocumentationProvider}}2.5.14{{/springFoxDocumentationProvider}}{{^springFoxDocumentationProvider}}2.7.15{{/springFoxDocumentationProvider}}</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 {{/parentOverridden}}
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        {{^interfaceOnly}}
         <plugins>
+            {{^interfaceOnly}}
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                {{#classifier}}
                 <configuration>
+                {{#classifier}}
                   <classifier>{{{classifier}}}</classifier>
-                </configuration>
                 {{/classifier}}
+                {{#lombok}}
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                {{/lombok}}
+                </configuration>
             </plugin>
+            {{/interfaceOnly}}
+            {{#interfaceOnly}}
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            {{/interfaceOnly}}
             {{#apiFirst}}
             <plugin>
                 <groupId>org.openapitools</groupId>
@@ -94,50 +122,8 @@
             </plugin>
             {{/apiFirst}}
         </plugins>
-        {{/interfaceOnly}}
     </build>
     <dependencies>
-      {{#useJakartaEe}}
-      <dependency>
-          <groupId>jakarta.persistence</groupId>
-          <artifactId>jakarta.persistence-api</artifactId>
-          <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.servlet</groupId>
-        <artifactId>jakarta.servlet-api</artifactId>
-        <version>6.0.0</version>
-      </dependency>
-      <dependency>
-          <groupId>jakarta.annotation</groupId>
-          <artifactId>jakarta.annotation-api</artifactId>
-          <version>2.1.1</version>
-      </dependency>
-      <dependency>
-          <groupId>jakarta.validation</groupId>
-          <artifactId>jakarta.validation-api</artifactId>
-          <version>3.0.2</version>
-      </dependency>
-      {{/useJakartaEe}}
-      {{^useJakartaEe}}
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>javax.persistence-api</artifactId>
-        <version>2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>4.0.1</version>
-      </dependency>
-      {{/useJakartaEe}}
-      {{#useLombokAnnotations}}
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-          <version>1.18.30</version>
-        </dependency>
-      {{/useLombokAnnotations}}
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web{{#reactive}}flux{{/reactive}}</artifactId>
@@ -208,10 +194,6 @@
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
         {{#withXml}}
         <!-- XML processing: Jackson -->
         <dependency>
@@ -237,7 +219,7 @@
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.8</version>
         </dependency>
         {{/openApiNullable}}
 {{#useBeanValidation}}
@@ -268,6 +250,13 @@
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
 {{/hateoas}}
+{{#lombok}}
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+{{/lombok}}
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

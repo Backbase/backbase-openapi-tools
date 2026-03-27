@@ -16,6 +16,16 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.18.0
+* openapi-generator `7.20.0` baseline (Spring Boot 4, Jackson 3)
+* moved Java and JavaSpring templates to `7.20.0` adding remaing custom features
+* removed custom `createApiComponent` in favor of the standard `generateClientAsBean` with default set to `true`
+* removed custom `useLombokAnnotations` in favor of built-in `lombokAnnotation` template
+* removed custom `useClassLevelBeanValidation` in favor of the standard `useSpringBuiltInValidation` property
+* removed custom `useWithModifiers`, fluent setters already included in generated classes (property name methods)
+* removed unused `useProtectedFields` property
+* removed unused `useDefaultApiClient` property
+
 ## 0.17.75
 * Fixed duplicate serialization of the discriminator property in Jackson-based Java models by removing allowGetters = true from the @JsonIgnoreProperties annotation.
 * In Spring generator added support for type-level validation in collections via the `x-not-null` vendor extension to allow `@NotNull` annotations on generic type arguments.
@@ -725,7 +735,6 @@ For the `spring` generator, the additional configuration options are:
 | `useTags` | use tags for creating interface and controller classnames (Default: false) |
 | `useBeanValidation` | Use BeanValidation API annotations (Default: true) |
 | `performBeanValidation` | Use Bean Validation Impl. to perform BeanValidation (Default: false) |
-| `useClassLevelBeanValidation` | Adds @Validated annotation to API interfaces (Default: false) |
 | `useLombokAnnotations` | Use Lombok annotations to generate properties accessors and `hashCode`/`equals` methods (Default: false) |
 | `addServletRequest` | Adds ServletRequest objects to API method definitions (Default: false) |
 | `addBindingResult` | Adds BindingResult to Api method definitions' request bodies if UseBeanValidation true, for this to be effective you must configure UseBeanValidation, this is not done automatically (Default: false)|

@@ -20,6 +20,6 @@ public class GenerateRestTemplateEmbeddedMojo extends AbstractGenerateMojo {
 
     @Override
     protected Collection<String> getGeneratorSpecificSupportingFiles() {
-        return Set.of("BigDecimalCustomSerializer.java");
+        return Set.of("BigDecimalCustomSerializer.java", "BaseApi.java");
     }
 }

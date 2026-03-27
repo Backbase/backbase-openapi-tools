@@ -10663,7 +10663,7 @@ function crawl (obj, path, pathFromRoot, parents, $refs, options) {
 /**
  * Dereferences the given JSON Reference, and then crawls the resulting value.
  *
- * @param {{$ref: string}} $ref - The JSON Reference to resolve
+ * @param $ref - The JSON Reference to resolve
  * @param {string} path - The full path of `$ref`, possibly with a JSON Pointer in the hash
  * @param {string} pathFromRoot - The path of `$ref` from the schema root
  * @param {object[]} parents - An array of the parent objects that have already been dereferenced
@@ -12487,7 +12487,7 @@ function crawl (obj, path, $refs, options) {
 /**
  * Resolves the given JSON Reference, and then crawls the resulting value.
  *
- * @param {{$ref: string}} $ref - The JSON Reference to resolve
+ * @param $ref - The JSON Reference to resolve
  * @param {string} path - The full path of `$ref`, possibly with a JSON Pointer in the hash
  * @param {$Refs} $refs
  * @param {$RefParserOptions} options

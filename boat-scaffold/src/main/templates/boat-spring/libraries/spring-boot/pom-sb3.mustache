@@ -7,22 +7,21 @@
     <version>{{artifactVersion}}</version>
     <properties>
         <java.version>17</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         {{#springDocDocumentationProvider}}
-        <springdoc.version>2.0.2</springdoc.version>
+        <springdoc.version>2.6.0</springdoc.version>
         {{/springDocDocumentationProvider}}
         {{^springDocDocumentationProvider}}
         {{#swagger2AnnotationLibrary}}
-        <swagger-annotations.version>}2.2.7</swagger-annotations.version>
+        <swagger-annotations.version>2.2.42</swagger-annotations.version>
         {{/swagger2AnnotationLibrary}}
         {{/springDocDocumentationProvider}}
         {{#useSwaggerUI}}
-        <swagger-ui.version>4.15.5</swagger-ui.version>
+        <swagger-ui.version>5.17.14</swagger-ui.version>
         {{/useSwaggerUI}}
         {{#virtualService}}
-        <virtualan.version>2.5.2</virtualan.version>
+        <virtualan.version>2.5.5</virtualan.version>
         {{/virtualService}}
     </properties>
 {{#parentOverridden}}
@@ -36,38 +35,47 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.3.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 {{/parentOverridden}}
 
-    <repositories>
-        <repository>
-            <id>repository.spring.milestone</id>
-            <name>Spring Milestone Repository</name>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <url>https://repo.spring.io/milestone</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        {{^interfaceOnly}}
         <plugins>
+            {{^interfaceOnly}}
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                {{#classifier}}
                 <configuration>
+                    {{#classifier}}
                   <classifier>{{{classifier}}}</classifier>
+                    {{/classifier}}
+                    {{#lombok}}
+                  <excludes>
+                    <exclude>
+                      <groupId>org.projectlombok</groupId>
+                      <artifactId>lombok</artifactId>
+                    </exclude>
+                  </excludes>
+                    {{/lombok}}
                 </configuration>
-                {{/classifier}}
             </plugin>
+            {{/interfaceOnly}}
+            {{#interfaceOnly}}
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            {{/interfaceOnly}}
             {{#apiFirst}}
             <plugin>
                 <groupId>org.openapitools</groupId>
@@ -101,7 +109,6 @@
             </plugin>
             {{/apiFirst}}
         </plugins>
-        {{/interfaceOnly}}
     </build>
     <dependencies>
         <dependency>
@@ -157,10 +164,6 @@
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
         {{#withXml}}
         <!-- XML processing: Jackson -->
         <dependency>
@@ -186,7 +189,7 @@
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.9</version>
         </dependency>
         {{/openApiNullable}}
 {{#useBeanValidation}}
@@ -217,6 +220,13 @@
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
 {{/hateoas}}
+{{#lombok}}
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+{{/lombok}}
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -226,13 +236,5 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-{{#useLombokAnnotations}}
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-          <version>1.18.30</version>
-          <scope>provided</scope>
-        </dependency>
-{{/useLombokAnnotations}}
     </dependencies>
 </project>

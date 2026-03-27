@@ -17,6 +17,17 @@ import java.io.Serializable;
 {{#jackson}}
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+{{#models}}
+{{#model}}
+{{#additionalPropertiesType}}
+import java.util.Map;
+import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+{{/additionalPropertiesType}}
+{{/model}}
+{{/models}}
 {{#withXml}}
 import com.fasterxml.jackson.dataformat.xml.annotation.*;
 {{/withXml}}
@@ -25,23 +36,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 {{/vendorExtensions.x-has-readonly-properties}}
 {{/jackson}}
 {{#withXml}}
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.*;
+import {{javaxPackage}}.xml.bind.annotation.*;
+import {{javaxPackage}}.xml.bind.annotation.adapters.*;
 import io.github.threetenjaxb.core.*;
 {{/withXml}}
 {{#jsonb}}
 import java.lang.reflect.Type;
-import javax.json.bind.annotation.JsonbTypeDeserializer;
-import javax.json.bind.annotation.JsonbTypeSerializer;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.bind.annotation.JsonbProperty;
+import {{javaxPackage}}.json.bind.annotation.JsonbTypeDeserializer;
+import {{javaxPackage}}.json.bind.annotation.JsonbTypeSerializer;
+import {{javaxPackage}}.json.bind.serializer.DeserializationContext;
+import {{javaxPackage}}.json.bind.serializer.JsonbDeserializer;
+import {{javaxPackage}}.json.bind.serializer.JsonbSerializer;
+import {{javaxPackage}}.json.bind.serializer.SerializationContext;
+import {{javaxPackage}}.json.stream.JsonGenerator;
+import {{javaxPackage}}.json.stream.JsonParser;
+import {{javaxPackage}}.json.bind.annotation.JsonbProperty;
 {{#vendorExtensions.x-has-readonly-properties}}
-import javax.json.bind.annotation.JsonbCreator;
+import {{javaxPackage}}.json.bind.annotation.JsonbCreator;
 {{/vendorExtensions.x-has-readonly-properties}}
 {{/jsonb}}
 {{#parcelableModel}}
@@ -49,22 +60,16 @@ import android.os.Parcelable;
 import android.os.Parcel;
 {{/parcelableModel}}
 {{#useBeanValidation}}
-{{^useJakartaEe}}
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-{{/useJakartaEe}}
-{{#useJakartaEe}}
-import jakarta.validation.constraints.*;
-import jakarta.validation.Valid;
-{{/useJakartaEe}}
+import {{javaxPackage}}.validation.constraints.*;
+import {{javaxPackage}}.validation.Valid;
 {{/useBeanValidation}}
 {{#performBeanValidation}}
 import org.hibernate.validator.constraints.*;
 {{/performBeanValidation}}
 {{#supportUrlQuery}}
-  import java.io.UnsupportedEncodingException;
-  import java.net.URLEncoder;
-  import java.util.StringJoiner;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.StringJoiner;
 {{/supportUrlQuery}}
 
 {{#models}}

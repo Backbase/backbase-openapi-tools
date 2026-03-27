@@ -6,16 +6,15 @@
     <name>{{artifactId}}</name>
     <version>{{artifactVersion}}</version>
     <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         {{#springDocDocumentationProvider}}
-        <springdoc.version>2.0.0-M3</springdoc.version>
+        <springdoc.version>2.2.0</springdoc.version>
         {{/springDocDocumentationProvider}}
         {{^springDocDocumentationProvider}}
         {{#swagger2AnnotationLibrary}}
-        <swagger-annotations.version>}2.2.0</swagger-annotations.version>
+        <swagger-annotations.version>2.2.15</swagger-annotations.version>
         {{/swagger2AnnotationLibrary}}
         {{/springDocDocumentationProvider}}
     </properties>
@@ -30,21 +29,27 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.3.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 {{/parentOverridden}}
 
-    <repositories>
-        <repository>
-            <id>repository.spring.milestone</id>
-            <name>Spring Milestone Repository</name>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-    </repositories>
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+        {{#interfaceOnly}}<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>{{/interfaceOnly}}
     </build>
 
 {{^parentOverridden}}
@@ -53,7 +58,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-parent</artifactId>
-                <version>2022.0.0-M2</version>
+                <version>2023.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -92,11 +97,8 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-oauth2</artifactId>
-            {{^parentOverridden}}
-            <version>2.2.5.RELEASE</version>
-            {{/parentOverridden}}
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
         </dependency>
         {{#withXml}}
         <!-- XML processing: Jackson -->
@@ -120,7 +122,7 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
         {{^parentOverridden}}
-            <version>0.2.2</version>
+            <version>0.2.9</version>
         {{/parentOverridden}}
         </dependency>
         {{/openApiNullable}}
@@ -130,6 +132,13 @@
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
         {{/hateoas}}
+        {{#lombok}}
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <optional>true</optional>
+            </dependency>
+        {{/lombok}}
         {{#useBeanValidation}}
         <dependency>
             <groupId>org.springframework.boot</groupId>

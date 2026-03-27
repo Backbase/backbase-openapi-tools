@@ -1,3 +1,5 @@
+{{>licenseInfo}}
+
 package {{invokerPackage}};
 
 import java.io.File;
@@ -35,22 +37,22 @@ import {{invokerPackage}}.auth.Authentication;
 public class ApiClient {
 
     /** Underlying HTTP-client */
-    private WSClient wsClient;
+    protected WSClient wsClient;
 
     /** Creates HTTP call instances */
-    private Play26CallFactory callFactory;
+    protected Play26CallFactory callFactory;
 
     /** Create {@link java.util.concurrent.CompletionStage} instances from HTTP calls */
-    private Play26CallAdapterFactory callAdapterFactory;
+    protected Play26CallAdapterFactory callAdapterFactory;
 
     /** Supported auths */
-    private Map<String, Authentication> authentications;
+    protected Map<String, Authentication> authentications;
 
     /** API base path */
-    private String basePath = "{{{basePath}}}";
+    protected String basePath = "{{{basePath}}}";
 
     /** Default ObjectMapper */
-    private ObjectMapper defaultMapper;
+    protected ObjectMapper defaultMapper;
 
     public ApiClient(WSClient wsClient) {
         this();
@@ -59,8 +61,8 @@ public class ApiClient {
 
     public ApiClient() {
         // Setup authentications (key: authentication name, value: authentication).
-        authentications = new HashMap<>();{{#authMethods}}{{#isBasic}}
-        // authentications.put("{{name}}", new HttpBasicAuth());{{/isBasic}}{{#isApiKey}}
+        authentications = new HashMap<>();{{#authMethods}}{{#isBasicBasic}}
+        // authentications.put("{{name}}", new HttpBasicAuth());{{/isBasicBasic}}{{#isApiKey}}
         authentications.put("{{name}}", new ApiKeyAuth({{#isKeyInHeader}}"header"{{/isKeyInHeader}}{{#isKeyInQuery}}"query"{{/isKeyInQuery}}{{#isKeyInCookie}}"cookie"{{/isKeyInCookie}}, "{{keyParamName}}"));{{/isApiKey}}{{#isOAuth}}
         // authentications.put("{{name}}", new OAuth());{{/isOAuth}}{{/authMethods}}
         // Prevent the authentications from being modified.

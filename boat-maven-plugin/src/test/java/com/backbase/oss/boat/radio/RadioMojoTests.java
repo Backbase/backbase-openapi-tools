@@ -588,9 +588,10 @@ class RadioMojoTests {
         boatLintReport.setId(BigDecimal.TEN);
         boatLintReport.setGrade(reportGrade);
         boatLintReport.violations(
-                List.of(BoatViolation.builder().severity(sampleSeverityInResponse).build()));
+            List.of(new BoatViolation().severity(sampleSeverityInResponse)));
         boatLintReport.setSpec(
-                BoatSpec.builder().key(expectedDefaultKey).description(description).changes(typeOfChange).build());
+            new BoatSpec().key(expectedDefaultKey).description(description).changes(typeOfChange));
+
         return List.of(boatLintReport);
     }
 

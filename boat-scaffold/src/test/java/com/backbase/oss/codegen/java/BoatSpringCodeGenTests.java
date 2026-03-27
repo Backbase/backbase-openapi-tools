@@ -1,10 +1,8 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatSpringCodeGen.USE_PROTECTED_FIELDS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,20 +83,6 @@ class BoatSpringCodeGenTests {
             .collect(groupingBy(CliOption::getOpt))
             .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
-
-
-    @Test
-    void processOptsUseProtectedFields() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        final Map<String, Object> options = gen.additionalProperties();
-
-        options.put(USE_PROTECTED_FIELDS, "true");
-
-        gen.processOpts();
-
-        assertThat(gen.additionalProperties(), hasEntry("modelFieldsVisibility", "protected"));
-    }
-
 
     @Test
     void newLineIndent() throws IOException {
@@ -189,11 +173,9 @@ class BoatSpringCodeGenTests {
         codegen.setInputSpec(input.getAbsolutePath());
         codegen.setContainerDefaultToNull(true);
         codegen.setSerializeBigDecimalAsString(bigDecimalsAsStrings);
-        codegen.setUseLombokAnnotations(useLombok);
         codegen.schemaMapping().put("ValidatedPojo", REFERENCED_CLASS_NAME);
         codegen.schemaMapping().put("CommonEnum", REFERENCED_ENUM_NAME);
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
-        codegen.additionalProperties().put(BoatSpringCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION, Boolean.TRUE.toString());
         codegen.setModelPackage(modelPackage);
 
         var openApiInput = new OpenAPIParser()
@@ -244,24 +226,24 @@ class BoatSpringCodeGenTests {
             .findFirst()
             .get();
         CompilationUnit paymentRequestUnit = StaticJavaParser.parse(paymentRequest);
-        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "Pattern");
-        assertFieldAnnotation(paymentRequestUnit, "currencyCode", "NotNull");
-        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "Size");
-        assertFieldAnnotation(paymentRequestUnit, "referenceNumber", "NotNull");
-        assertFieldAnnotation(paymentRequestUnit, "requestLine", "Valid");
+        assertFieldGetterAnnotation(paymentRequestUnit, "currencyCode", "Pattern");
+        assertFieldGetterAnnotation(paymentRequestUnit, "currencyCode", "NotNull");
+        assertFieldGetterAnnotation(paymentRequestUnit, "referenceNumber", "Size");
+        assertFieldGetterAnnotation(paymentRequestUnit, "referenceNumber", "NotNull");
+        assertFieldGetterAnnotation(paymentRequestUnit, "requestLine", "Valid");
 
         File multiLinePaymentRequest = files.stream().filter(f -> f.getName().equals("MultiLinePaymentRequest.java"))
                 .findFirst()
                 .get();
         CompilationUnit multiLinePaymentRequestUnit = StaticJavaParser.parse(multiLinePaymentRequest);
 
-        assertFieldAnnotation(multiLinePaymentRequestUnit, "arrangementIds", "NotNull");
+        assertFieldGetterAnnotation(multiLinePaymentRequestUnit, "arrangementIds", "NotNull");
         assertFieldValueAssignment(
-                multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
-        assertFieldAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
-        assertFieldAnnotation(multiLinePaymentRequestUnit, "name", "Pattern", "@Pattern(regexp = \"^[^\\\\r\\\\n]{1,64}$\")");
+            multiLinePaymentRequestUnit, "arrangementIds", "new ArrayList<>()");
+        assertFieldGetterAnnotation(multiLinePaymentRequestUnit, "uniqueLines", "NotNull");
+        assertFieldGetterAnnotation(multiLinePaymentRequestUnit, "name", "Pattern", "@Pattern(regexp = \"^[^\\\\r\\\\n]{1,64}$\")");
         assertFieldValueAssignment(
-                multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
+            multiLinePaymentRequestUnit, "uniqueArrangementIds", null);
 
         // assert annotation
 
@@ -461,6 +443,24 @@ class BoatSpringCodeGenTests {
         assertThat(annotation.toString(), equalTo(value));
     }
 
+    private static void assertFieldGetterAnnotation(
+        CompilationUnit unit, String fieldName, String annotationName) throws FileNotFoundException {
+        String getterName = "get" + fieldName;
+        MethodDeclaration methodDeclaration = findMethodDeclaration(unit, getterName);
+        assertThat("Expect annotation to be present on field: " + annotationName + " " + fieldName,
+            methodDeclaration.getAnnotationByName(annotationName).isPresent(), is(true));
+    }
+
+    private static void assertFieldGetterAnnotation(
+        CompilationUnit unit, String fieldName, String annotationName, String value) throws FileNotFoundException {
+        String getterName = "get" + fieldName;
+        MethodDeclaration methodDeclaration = findMethodDeclaration(unit, getterName);
+        AnnotationExpr annotation = methodDeclaration.getAnnotationByName(annotationName)
+            .orElseThrow(() -> new AssertionError(
+                "Expect annotation to be present on method: " + annotationName + " " + getterName));
+        assertThat(annotation.toString(), equalTo(value));
+    }
+
     private static void assertFieldValueAssignment(
             CompilationUnit unit, String fieldName, String valueAssignment) throws FileNotFoundException {
         FieldDeclaration fieldDeclaration = findFieldDeclaration(unit, fieldName);
@@ -488,6 +488,17 @@ class BoatSpringCodeGenTests {
                 .findFirst();
         assertThat("Expect field declaration to be present: " + fieldName,
                 result.isPresent(), is(true));
+        return result.get();
+    }
+
+    private static MethodDeclaration findMethodDeclaration(CompilationUnit unit, String methodName) {
+        Optional<MethodDeclaration> result = unit
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(m -> m.getName().getIdentifier().equalsIgnoreCase(methodName))
+            .findFirst();
+        assertThat("Expect method declaration to be present: " + methodName,
+            result.isPresent(), is(true));
         return result.get();
     }
 

@@ -1,18 +1,13 @@
 package com.backbase.oss.codegen.java;
 
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.CREATE_API_COMPONENT;
 import static com.backbase.oss.codegen.java.BoatJavaCodeGen.REST_TEMPLATE_BEAN_NAME;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_CLASS_LEVEL_BEAN_VALIDATION;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_DEFAULT_API_CLIENT;
 import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_JACKSON_CONVERSION;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_PROTECTED_FIELDS;
-import static com.backbase.oss.codegen.java.BoatJavaCodeGen.USE_WITH_MODIFIERS;
 import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.openapitools.codegen.languages.JavaClientCodegen.GENERATE_CLIENT_AS_BEAN;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -52,13 +47,8 @@ class BoatJavaCodeGenTests {
         gen.setLibrary("resttemplate");
         gen.processOpts();
 
-        assertThat(gen.useWithModifiers, is(false));
-        assertThat(gen.useClassLevelBeanValidation, is(false));
-
         assertThat(gen.useJacksonConversion, is(false));
-        assertThat(gen.useDefaultApiClient, is(true));
         assertThat(gen.restTemplateBeanName, is(nullValue()));
-        assertThat(gen.createApiComponent, is(true));
     }
 
     @Test
@@ -67,23 +57,14 @@ class BoatJavaCodeGenTests {
         final Map<String, Object> options = gen.additionalProperties();
 
         gen.setLibrary("resttemplate");
-        options.put(USE_WITH_MODIFIERS, "true");
-        options.put(USE_CLASS_LEVEL_BEAN_VALIDATION, "true");
 
         options.put(USE_JACKSON_CONVERSION, "true");
-        options.put(USE_DEFAULT_API_CLIENT, "false");
         options.put(REST_TEMPLATE_BEAN_NAME, "the-coolest-rest-template-in-this-universe");
-        options.put(CREATE_API_COMPONENT, "false");
 
         gen.processOpts();
 
-        assertThat(gen.useWithModifiers, is(true));
-        assertThat(gen.useClassLevelBeanValidation, is(true));
-
         assertThat(gen.useJacksonConversion, is(true));
-        assertThat(gen.useDefaultApiClient, is(false));
         assertThat(gen.restTemplateBeanName, is("the-coolest-rest-template-in-this-universe"));
-        assertThat(gen.createApiComponent, is(false));
     }
 
     @Test
@@ -91,33 +72,13 @@ class BoatJavaCodeGenTests {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
         final Map<String, Object> options = gen.additionalProperties();
 
-        options.put(USE_WITH_MODIFIERS, "true");
-        options.put(USE_CLASS_LEVEL_BEAN_VALIDATION, "true");
-
         options.put(USE_JACKSON_CONVERSION, "true");
-        options.put(USE_DEFAULT_API_CLIENT, "false");
         options.put(REST_TEMPLATE_BEAN_NAME, "the-coolest-rest-template-in-this-universe");
 
         gen.processOpts();
 
-        assertThat(gen.useWithModifiers, is(true));
-        assertThat(gen.useClassLevelBeanValidation, is(false));
-
         assertThat(gen.useJacksonConversion, is(false));
-        assertThat(gen.useDefaultApiClient, is(true));
         assertThat(gen.restTemplateBeanName, is(nullValue()));
-    }
-
-    @Test
-    void processOptsUseProtectedFields() {
-        final BoatJavaCodeGen gen = new BoatJavaCodeGen();
-        final Map<String, Object> options = gen.additionalProperties();
-
-        options.put(USE_PROTECTED_FIELDS, "true");
-
-        gen.processOpts();
-
-        assertThat(gen.additionalProperties(), hasEntry("modelFieldsVisibility", "protected"));
     }
 
     @ParameterizedTest
@@ -137,7 +98,7 @@ class BoatJavaCodeGenTests {
 
         final Map<String, Object> options = gen.additionalProperties();
         options.put("library", "resttemplate");
-        options.put(CREATE_API_COMPONENT, String.valueOf(generate));
+        options.put(GENERATE_CLIENT_AS_BEAN, String.valueOf(generate));
 
         var openApiInput = new OpenAPIParser()
                 .readLocation(input.getAbsolutePath(), null, new ParseOptions())
@@ -163,7 +124,6 @@ class BoatJavaCodeGenTests {
             .findFirst(TypeDeclaration.class).get();
         assertThat(apiClientType.getAnnotationByName("Component").isPresent(), is(generate));
 
-        assertThat(gen.createApiComponent, is(generate));
         assertThat(gen.getLibrary(), is("resttemplate"));
     }
 

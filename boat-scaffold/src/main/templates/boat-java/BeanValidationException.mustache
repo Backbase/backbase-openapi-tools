@@ -1,15 +1,12 @@
+{{>licenseInfo}}
+
 package {{invokerPackage}};
 
 import java.util.Set;
 
-{{^useJakartaEe}}
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-{{/useJakartaEe}}
-{{#useJakartaEe}}
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ValidationException;
-{{/useJakartaEe}}
+import {{javaxPackage}}.validation.ConstraintViolation;
+import {{javaxPackage}}.validation.ValidationException;
+
 public class BeanValidationException extends ValidationException {
     /**
      *
