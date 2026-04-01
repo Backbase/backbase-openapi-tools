@@ -187,7 +187,7 @@ public interface {{classname}} {
                 {{#examples}}
                     @ExampleObject(
                         name = "{{{exampleName}}}",
-                        value = "{{{exampleValue}}}"
+                        value = "{{#unwrapEscapedQuotes}}{{{exampleValue}}}{{/unwrapEscapedQuotes}}"
                     ){{^-last}},{{/-last}}
                 {{/examples}}
                 {{#-last}}

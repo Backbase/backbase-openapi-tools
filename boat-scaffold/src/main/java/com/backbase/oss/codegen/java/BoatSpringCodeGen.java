@@ -48,6 +48,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
 
     public static final String ADD_SERVLET_REQUEST = "addServletRequest";
     public static final String ADD_BINDING_RESULT = "addBindingResult";
+    public static final String UNWRAP_ESCAPED_QUOTES = "unwrapEscapedQuotes";
 
     private static final String VENDOR_EXTENSION_NOT_NULL = "x-not-null";
 
@@ -144,6 +145,23 @@ public class BoatSpringCodeGen extends SpringCodegen {
         @Override
         protected String postProcessLine(String line) {
             return line.trim();
+        }
+    }
+
+    static class UnwrapEscapedQuotes implements Mustache.Lambda {
+
+        @Override
+        public void execute(Fragment frag, Writer out) throws IOException {
+            String text = frag.execute();
+            if (text == null) {
+                return;
+            }
+            String normalized = text.replace("\\\\\"", "\\\"");
+            if (normalized.length() >= 4 && normalized.startsWith("\\\"") && normalized.endsWith("\\\"")) {
+                out.write(normalized.substring(2, normalized.length() - 2));
+                return;
+            }
+            out.write(normalized);
         }
     }
 
@@ -332,6 +350,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.additionalProperties.put("newLine8", new NewLineIndent(8, " "));
         this.additionalProperties.put("toOneLine", new FormatToOneLine());
         this.additionalProperties.put("trimAndIndent4", new TrimAndIndent(4, " "));
+        this.additionalProperties.put(UNWRAP_ESCAPED_QUOTES, new UnwrapEscapedQuotes());
     }
 
     @Override
