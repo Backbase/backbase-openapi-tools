@@ -99,6 +99,58 @@ class BoatSpringCodeGenTests {
     }
 
     @Test
+    void unwrapEscapedQuotes_withNullInput_shouldWriteNothing() throws IOException {
+        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
+        final StringWriter output = new StringWriter();
+        final Fragment frag = mock(Fragment.class);
+
+        when(frag.execute()).thenReturn(null);
+
+        lambda.execute(frag, output);
+
+        assertThat(output.toString(), equalTo(""));
+    }
+
+    @Test
+    void unwrapEscapedQuotes_withWrappedEscapedQuotes_shouldRemoveOuterEscapedQuotes() throws IOException {
+        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
+        final StringWriter output = new StringWriter();
+        final Fragment frag = mock(Fragment.class);
+
+        when(frag.execute()).thenReturn("\\\"{\\\"message\\\":\\\"Bad Request\\\"}\\\"");
+
+        lambda.execute(frag, output);
+
+        assertThat(output.toString(), equalTo("{\\\"message\\\":\\\"Bad Request\\\"}"));
+    }
+
+    @Test
+    void unwrapEscapedQuotes_withDoubleEscapedQuotesAndNoWrapper_shouldOnlyNormalize() throws IOException {
+        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
+        final StringWriter output = new StringWriter();
+        final Fragment frag = mock(Fragment.class);
+
+        when(frag.execute()).thenReturn("prefix\\\\\"quoted\\\\\"suffix");
+
+        lambda.execute(frag, output);
+
+        assertThat(output.toString(), equalTo("prefix\\\"quoted\\\"suffix"));
+    }
+
+    @Test
+    void unwrapEscapedQuotes_withShortEscapedQuoteToken_shouldNotUnwrap() throws IOException {
+        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
+        final StringWriter output = new StringWriter();
+        final Fragment frag = mock(Fragment.class);
+
+        when(frag.execute()).thenReturn("\\\"");
+
+        lambda.execute(frag, output);
+
+        assertThat(output.toString(), equalTo("\\\""));
+    }
+
+    @Test
     void addServletRequestTestFromOperation(){
         final BoatSpringCodeGen gen = new BoatSpringCodeGen();
         gen.addServletRequest = true;
