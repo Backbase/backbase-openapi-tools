@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -56,7 +57,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
@@ -98,56 +101,18 @@ class BoatSpringCodeGenTests {
         assertThat(output.toString(), equalTo(String.format("__%n__Good%n__  morning,%n__ Dave%n")));
     }
 
-    @Test
-    void unwrapEscapedQuotes_withNullInput_shouldWriteNothing() throws IOException {
+    @ParameterizedTest
+    @MethodSource("unwrapEscapedQuotesCases")
+    void unwrapEscapedQuotes_execute_shouldHandleAllScenarios(String input, String expectedOutput) throws IOException {
         final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
         final StringWriter output = new StringWriter();
         final Fragment frag = mock(Fragment.class);
 
-        when(frag.execute()).thenReturn(null);
+        when(frag.execute()).thenReturn(input);
 
         lambda.execute(frag, output);
 
-        assertThat(output.toString(), equalTo(""));
-    }
-
-    @Test
-    void unwrapEscapedQuotes_withWrappedEscapedQuotes_shouldRemoveOuterEscapedQuotes() throws IOException {
-        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
-        final StringWriter output = new StringWriter();
-        final Fragment frag = mock(Fragment.class);
-
-        when(frag.execute()).thenReturn("\\\"{\\\"message\\\":\\\"Bad Request\\\"}\\\"");
-
-        lambda.execute(frag, output);
-
-        assertThat(output.toString(), equalTo("{\\\"message\\\":\\\"Bad Request\\\"}"));
-    }
-
-    @Test
-    void unwrapEscapedQuotes_withDoubleEscapedQuotesAndNoWrapper_shouldOnlyNormalize() throws IOException {
-        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
-        final StringWriter output = new StringWriter();
-        final Fragment frag = mock(Fragment.class);
-
-        when(frag.execute()).thenReturn("prefix\\\\\"quoted\\\\\"suffix");
-
-        lambda.execute(frag, output);
-
-        assertThat(output.toString(), equalTo("prefix\\\"quoted\\\"suffix"));
-    }
-
-    @Test
-    void unwrapEscapedQuotes_withShortEscapedQuoteToken_shouldNotUnwrap() throws IOException {
-        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
-        final StringWriter output = new StringWriter();
-        final Fragment frag = mock(Fragment.class);
-
-        when(frag.execute()).thenReturn("\\\"");
-
-        lambda.execute(frag, output);
-
-        assertThat(output.toString(), equalTo("\\\""));
+        assertThat(output.toString(), equalTo(expectedOutput));
     }
 
     @Test
@@ -643,5 +608,13 @@ class BoatSpringCodeGenTests {
         ClassOrInterfaceType collectionItemType = (ClassOrInterfaceType) ((ClassOrInterfaceType) method.getType())
             .getTypeArguments().get().getFirst().get();
         assertEquals(itemType, collectionItemType.getName().toString());
+    }
+
+    static Stream<Arguments> unwrapEscapedQuotesCases() {
+        return Stream.of(
+                Arguments.of((String) null, ""),
+                Arguments.of("\\\"{\\\"message\\\":\\\"Bad Request\\\"}\\\"", "{\\\"message\\\":\\\"Bad Request\\\"}"),
+                Arguments.of("prefix\\\\\"quoted\\\\\"suffix", "prefix\\\"quoted\\\"suffix"),
+                Arguments.of("\\\"", "\\\""));
     }
 }
