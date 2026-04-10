@@ -206,8 +206,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     }
 
     /**
-     * "overridden" to fix invalid code when the data type is a collection of a fully qualified classname.
-     * eg. <code>Set<@Valid com.backbase.dbs.arrangement.commons.model.TranslationItemDto></code>
+     * "overridden" to fix invalid code when the data type is a collection of a fully qualified classname. eg. <code>Set<@Valid
+     * com.backbase.dbs.arrangement.commons.model.TranslationItemDto></code>
      *
      * @param itemsProperty
      * @param dataType
@@ -314,7 +314,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
             serializerTemplate + ".java"
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
-        this.importMapping.put("JsonSerialize", "com.fasterxml.jackson.databind.annotation.JsonSerialize");
+
+        if (this.additionalProperties.containsKey(USE_JACKSON_3)) {
+            this.importMapping.put("JsonSerialize", "tools.jackson.databind.annotation.JsonSerialize");
+        } else {
+            this.importMapping.put("JsonSerialize", "com.fasterxml.jackson.databind.annotation.JsonSerialize");
+        }
 
         if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
             this.addServletRequest = convertPropertyToBoolean(ADD_SERVLET_REQUEST);

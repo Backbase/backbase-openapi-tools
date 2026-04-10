@@ -1,6 +1,11 @@
 package {{modelPackage}};
 
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializerBase;
+{{#useJackson3}}
+  import tools.jackson.databind.ser.std.ToStringSerializerBase;
+{{/useJackson3}}
+{{^useJackson3}}
+  import com.fasterxml.jackson.databind.ser.std.ToStringSerializerBase;
+{{/useJackson3}}
 import java.math.BigDecimal;
 
 public class BigDecimalCustomSerializer extends ToStringSerializerBase {
