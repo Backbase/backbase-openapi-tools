@@ -50,6 +50,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     public static final String ADD_BINDING_RESULT = "addBindingResult";
 
     private static final String VENDOR_EXTENSION_NOT_NULL = "x-not-null";
+    private static final String JSON_SERIALIZE = "JsonSerialize";
 
     static class NewLineIndent implements Mustache.Lambda {
 
@@ -316,9 +317,9 @@ public class BoatSpringCodeGen extends SpringCodegen {
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
         if (this.additionalProperties.containsKey(USE_JACKSON_3)) {
-            this.importMapping.put("JsonSerialize", "tools.jackson.databind.annotation.JsonSerialize");
+            this.importMapping.put(JSON_SERIALIZE, "tools.jackson.databind.annotation.JsonSerialize");
         } else {
-            this.importMapping.put("JsonSerialize", "com.fasterxml.jackson.databind.annotation.JsonSerialize");
+            this.importMapping.put(JSON_SERIALIZE, "com.fasterxml.jackson.databind.annotation.JsonSerialize");
         }
 
         if (this.additionalProperties.containsKey(ADD_SERVLET_REQUEST)) {
@@ -391,7 +392,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (shouldSerializeBigDecimalAsString(property)) {
             property.vendorExtensions.put("x-extra-annotation", "@JsonSerialize(using = BigDecimalCustomSerializer.class)");
             model.imports.add("BigDecimalCustomSerializer");
-            model.imports.add("JsonSerialize");
+            model.imports.add(JSON_SERIALIZE);
         }
     }
 
