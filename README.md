@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.18.1
+* Use Jackson3 imports in `BigDecimalCustomSerializer.class` when using `useJackson3` set to `true`
+
 ## 0.18.0
 * openapi-generator `7.20.0` baseline (Spring Boot 4, Jackson 3)
 * moved Java and JavaSpring templates to `7.20.0` adding remaing custom features
