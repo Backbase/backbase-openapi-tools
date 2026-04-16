@@ -16,6 +16,11 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.18.2
+* Spring generator: fixed `@ExampleObject` rendering in `api.mustache` by unwrapping escaped quotes in example payloads.
+* Added `unwrapEscapedQuotes` lambda to `boat-spring` generator templates to prevent malformed annotation values (for example `value = "\"{...}"`).
+* Added a regression test to verify generated Spring API interfaces include valid `@ExampleObject` annotation values and remain parseable Java code.
+
 ## 0.18.1
 * Use Jackson3 imports in `BigDecimalCustomSerializer.class` when using `useJackson3` set to `true`
 

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,6 +49,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.hamcrest.Matchers;
@@ -55,7 +57,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenOperation;
@@ -95,6 +99,20 @@ class BoatSpringCodeGenTests {
         indent.execute(frag, output);
 
         assertThat(output.toString(), equalTo(String.format("__%n__Good%n__  morning,%n__ Dave%n")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("unwrapEscapedQuotesCases")
+    void unwrapEscapedQuotes_execute_shouldHandleAllScenarios(String input, String expectedOutput) throws IOException {
+        final BoatSpringCodeGen.UnwrapEscapedQuotes lambda = new BoatSpringCodeGen.UnwrapEscapedQuotes();
+        final StringWriter output = new StringWriter();
+        final Fragment frag = mock(Fragment.class);
+
+        when(frag.execute()).thenReturn(input);
+
+        lambda.execute(frag, output);
+
+        assertThat(output.toString(), equalTo(expectedOutput));
     }
 
     @Test
@@ -137,6 +155,45 @@ class BoatSpringCodeGenTests {
         assertTrue(contentParam.getAnnotationByName("RequestPart").isPresent());
         assertThat(contentParam.getTypeAsString(), equalTo("TestObjectPart"));
         assertThat(filesParam.getTypeAsString(), equalTo("List<MultipartFile>"));
+    }
+
+    @Test
+    void shouldGenerateValidExampleObjectAnnotation() throws IOException {
+        var codegen = new BoatSpringCodeGen();
+        var input = new File("src/test/resources/openapi-with-examples/openapi-with-multiple-permissions.yaml");
+        codegen.setLibrary("spring-boot");
+        codegen.setInterfaceOnly(true);
+        codegen.setSkipDefaultInterface(true);
+        codegen.setOutputDir(TEST_OUTPUT + "/example-object");
+        codegen.setInputSpec(input.getAbsolutePath());
+        codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
+
+        var openApiInput = new OpenAPIParser().readLocation(input.getAbsolutePath(), null, new ParseOptions())
+                .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        File apiFile = files.stream()
+                .filter(file -> file.getName().endsWith("Api.java"))
+                .filter(file -> {
+                    try {
+                        return Files.readString(file.toPath()).contains("@ExampleObject(");
+                    } catch (IOException e) {
+                        throw new UnhandledException(e);
+                    }
+                })
+                .findFirst()
+                .orElseThrow();
+
+        String apiContent = Files.readString(apiFile.toPath());
+        assertTrue(apiContent.contains("@ExampleObject("));
+        assertTrue(apiContent.contains("Value Exceeded. Must be between {min} and {max}."));
+        assertTrue(apiContent.contains("Bad Request"));
+        assertFalse(apiContent.contains("value = \"\\\"{"));
+        StaticJavaParser.parse(apiFile);
     }
 
     @Test
@@ -551,5 +608,13 @@ class BoatSpringCodeGenTests {
         ClassOrInterfaceType collectionItemType = (ClassOrInterfaceType) ((ClassOrInterfaceType) method.getType())
             .getTypeArguments().get().getFirst().get();
         assertEquals(itemType, collectionItemType.getName().toString());
+    }
+
+    static Stream<Arguments> unwrapEscapedQuotesCases() {
+        return Stream.of(
+                Arguments.of((String) null, ""),
+                Arguments.of("\\\"{\\\"message\\\":\\\"Bad Request\\\"}\\\"", "{\\\"message\\\":\\\"Bad Request\\\"}"),
+                Arguments.of("prefix\\\\\"quoted\\\\\"suffix", "prefix\\\"quoted\\\"suffix"),
+                Arguments.of("\\\"", "\\\""));
     }
 }
