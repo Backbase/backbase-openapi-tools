@@ -58,8 +58,6 @@
         <snakeyaml.version>2.6</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
-        <!-- Skip GPG signing by default for local development -->
-        <gpg.skip>true</gpg.skip>
     </properties>
 
     <profiles>
