@@ -41,7 +41,6 @@ public class ApiClient {
             {{^failOnUnknownProperties}}
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             {{/failOnUnknownProperties}}
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .setDateFormat(new RFC3339DateFormat());
         {{#joda}}
         objectMapper.registerModule(new JodaModule());

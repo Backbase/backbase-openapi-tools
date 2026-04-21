@@ -84,9 +84,6 @@ public class ApiClient{{#jsr310}} extends JavaTimeFormatter{{/jsr310}} {
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, {{failOnUnknownProperties}});
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        this.objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-        this.objectMapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
         this.objectMapper.registerModule(new JavaTimeModule());
         this.objectMapper.setDateFormat(dateFormat);
         {{#openApiNullable}}

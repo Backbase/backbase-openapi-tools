@@ -38,9 +38,6 @@ public class JSON {
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         {{/failOnUnknownProperties}}
         .enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-        .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING)
         .defaultDateFormat(new RFC3339DateFormat())
         .addModule(new JavaTimeModule())
         .build();

@@ -479,6 +479,55 @@ class BoatSpringCodeGenTests {
         );
     }
 
+    @Test
+    void shouldGenerateValidJackson3ImportsAndConfiguration() throws IOException {
+        var codegen = new BoatSpringCodeGen();
+        var input = new File("src/test/resources/boat-spring/openapi.yaml");
+        codegen.setLibrary("spring-boot");
+        codegen.setInterfaceOnly(true);
+        codegen.setOutputDir(TEST_OUTPUT + "/jackson3-test");
+        codegen.setInputSpec(input.getAbsolutePath());
+        
+        // Enable Jackson 3
+        codegen.additionalProperties().put(SpringCodegen.USE_JACKSON_3, Boolean.TRUE.toString());
+        codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT4, Boolean.TRUE.toString());
+        codegen.additionalProperties().put(BoatSpringCodeGen.OPENAPI_NULLABLE, Boolean.FALSE.toString());
+
+        var openApiInput = new OpenAPIParser().readLocation(input.getAbsolutePath(), null, new ParseOptions())
+                .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        // Verify generated support code uses tools.jackson imports in Jackson 3 mode
+        File serializerFile = files.stream()
+                .filter(file -> file.getName().equals("BigDecimalCustomSerializer.java"))
+                .findFirst()
+                .orElseThrow();
+
+        String serializerContent = Files.readString(serializerFile.toPath());
+        assertTrue(serializerContent.contains("import tools.jackson.databind.ser.std.ToStringSerializerBase;"),
+                "BigDecimalCustomSerializer should use tools.jackson imports for Jackson 3");
+        assertFalse(serializerContent.contains("import com.fasterxml.jackson.databind.ser.std.ToStringSerializerBase;"),
+                "BigDecimalCustomSerializer should NOT use com.fasterxml imports when Jackson 3 is enabled");
+
+        // Verify pom.xml contains tools.jackson dependencies
+        File pomFile = files.stream()
+                .filter(file -> file.getName().equals("pom.xml"))
+                .findFirst()
+                .orElseThrow();
+
+        String pomContent = Files.readString(pomFile.toPath());
+        assertTrue(pomContent.contains("<groupId>tools.jackson.datatype</groupId>"),
+                "pom.xml should include tools.jackson.datatype dependencies for Jackson 3");
+        assertTrue(pomContent.contains("<artifactId>jackson-datatype-jsr310</artifactId>"),
+                "pom.xml should include jackson-datatype-jsr310 for Jackson 3");
+        assertFalse(pomContent.contains("<artifactId>jackson-databind-nullable</artifactId>"),
+                "pom.xml should not include jackson-databind-nullable because openApiNullable is incompatible with Jackson 3");
+    }
+
     private static Object newInstanceOf(String className, ClassLoader classLoader) throws Exception {
         Class<?> requestClass = classLoader.loadClass(className);
         return requestClass.getConstructor().newInstance();

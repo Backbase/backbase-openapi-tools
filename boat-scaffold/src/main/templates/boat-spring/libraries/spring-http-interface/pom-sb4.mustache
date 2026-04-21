@@ -84,11 +84,17 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
         {{/useJackson3}}
+        {{#useJackson3}}
+        <dependency>
+            <groupId>{{jacksonPackage}}.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        {{/useJackson3}}
         {{#openApiNullable}}
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.8</version>
+            <version>0.2.9</version>
         </dependency>
         {{/openApiNullable}}
         {{#lombok}}

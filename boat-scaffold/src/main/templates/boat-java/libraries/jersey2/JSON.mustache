@@ -32,9 +32,6 @@ public class JSON implements ContextResolver<ObjectMapper> {
             .configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, {{failOnUnknownProperties}})
             .configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, true)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-            .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING)
             .defaultDateFormat(new RFC3339DateFormat())
             .addModule(new JavaTimeModule())
             {{#joda}}

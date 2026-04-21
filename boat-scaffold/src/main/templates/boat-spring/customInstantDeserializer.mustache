@@ -1,14 +1,14 @@
 package {{configPackage}};
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.datatype.threetenbp.DecimalUtils;
-import com.fasterxml.jackson.datatype.threetenbp.deser.ThreeTenDateTimeDeserializerBase;
-import com.fasterxml.jackson.datatype.threetenbp.function.BiFunction;
-import com.fasterxml.jackson.datatype.threetenbp.function.Function;
+import {{jacksonPackage}}.core.JsonParser;
+import {{jacksonPackage}}.core.JsonTokenId;
+import {{jacksonPackage}}.databind.DeserializationContext;
+import {{jacksonPackage}}.databind.DeserializationFeature;
+import {{jacksonPackage}}.databind.JsonDeserializer;
+import {{jacksonPackage}}.datatype.threetenbp.DecimalUtils;
+import {{jacksonPackage}}.datatype.threetenbp.deser.ThreeTenDateTimeDeserializerBase;
+import {{jacksonPackage}}.datatype.threetenbp.function.BiFunction;
+import {{jacksonPackage}}.datatype.threetenbp.function.Function;
 import org.threeten.bp.DateTimeException;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;

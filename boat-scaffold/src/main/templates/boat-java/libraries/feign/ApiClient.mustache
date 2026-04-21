@@ -194,8 +194,6 @@ public class ApiClient {
   {{#jackson}}
   protected ObjectMapper createObjectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-    objectMapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
     {{#failOnUnknownProperties}}
     objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     {{/failOnUnknownProperties}}
@@ -203,7 +201,6 @@ public class ApiClient {
     objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     {{/failOnUnknownProperties}}
     objectMapper.disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     objectMapper.setDateFormat(new RFC3339DateFormat());
     {{#joda}}
     objectMapper.registerModule(new JodaModule());

@@ -120,6 +120,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
         {{/useJackson3}}
+        {{#useJackson3}}
+        <dependency>
+            <groupId>{{jacksonPackage}}.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        {{/useJackson3}}
         {{#joda}}
         <dependency>
             <groupId>{{jacksonPackage}}.datatype</groupId>
@@ -131,7 +137,7 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
         {{^parentOverridden}}
-            <version>0.2.8</version>
+            <version>0.2.9</version>
         {{/parentOverridden}}
         </dependency>
         {{/openApiNullable}}

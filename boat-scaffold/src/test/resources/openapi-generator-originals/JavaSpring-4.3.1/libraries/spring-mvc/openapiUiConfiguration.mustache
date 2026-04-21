@@ -94,7 +94,6 @@ public class OpenAPIUiConfiguration extends WebMvcConfigurerAdapter {
     {{/threetenbp}}
     return new Jackson2ObjectMapperBuilder()
         .indentOutput(true)
-        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .modulesToInstall({{#threetenbp}}module, {{/threetenbp}}new JsonNullableModule())
         .dateFormat(new RFC3339DateFormat());
   }

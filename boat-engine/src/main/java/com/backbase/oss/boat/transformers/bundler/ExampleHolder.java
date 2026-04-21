@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @SuppressWarnings({"rawtypes","java:S3740"})
 public abstract class ExampleHolder<T> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleHolder.class);
 
     private static final String FIXING_INVALID_EXAMPLE_WARNING = "%1$s is an invalid example. \n"
         + "You've got:\n"
@@ -36,7 +38,7 @@ public abstract class ExampleHolder<T> {
                 && example.getValue() instanceof ObjectNode
                 && ((ObjectNode) example.getValue()).get(REF_KEY) != null) {
                 String ref = ((ObjectNode) example.getValue()).get(REF_KEY).asText();
-                log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, name, ref));
+                LOG.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, name, ref));
                 example.set$ref(ref);
                 example.setValue(null);
             }
@@ -66,7 +68,7 @@ public abstract class ExampleHolder<T> {
                 && objectNode.get(VALUE) != null
                 && objectNode.get(VALUE).get(REF_KEY) != null) {
                 String ref = objectNode.get(VALUE).get(REF_KEY).asText();
-                log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, "?", ref));
+                LOG.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, "?", ref));
                 objectNode.set(REF_KEY, objectNode.get(VALUE).get(REF_KEY));
                 objectNode.remove(VALUE);
             }

@@ -334,7 +334,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
         ));
         this.importMapping.put(serializerTemplate, modelPackage + "." + serializerTemplate);
 
-        if (this.additionalProperties.containsKey(USE_JACKSON_3)) {
+        final boolean useJackson3 = convertPropertyToBoolean(USE_JACKSON_3);
+        if (useJackson3) {
             this.importMapping.put(JSON_SERIALIZE, "tools.jackson.databind.annotation.JsonSerialize");
         } else {
             this.importMapping.put(JSON_SERIALIZE, "com.fasterxml.jackson.databind.annotation.JsonSerialize");
