@@ -63,6 +63,7 @@ public class Utils {
     }
 
     // Ensure that each name resolved from a json reference is unique
+    @SneakyThrows
     static String getSchemaNameFromReference(String reference, String parentSchemaName,
         BiMap<String, String> referenceNames) {
         String proposedName = getProposedSchemaName(reference);
