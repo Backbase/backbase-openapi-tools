@@ -15,7 +15,7 @@
     <description>Open API Converter</description>
 
     <properties>
-        <maven.api.version>3.9.12</maven.api.version>
+        <maven.api.version>3.9.15</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
             src/main/java/com/backbase/oss/codegen/*.java
@@ -24,7 +24,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <feign-version>13.9.1</feign-version>
+        <feign-version>13.12</feign-version>
         <feign-form-version>3.8.0</feign-form-version>
         <jackson-threetenbp-version>2.18.2</jackson-threetenbp-version>
         <scribejava-version>8.3.3</scribejava-version>
