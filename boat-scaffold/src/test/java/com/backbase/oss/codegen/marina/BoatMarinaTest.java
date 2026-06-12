@@ -31,6 +31,15 @@ class BoatMarinaTest {
     }
 
     @Test
+    void testGenerateDocsWithDateTimeExamples() throws IOException {
+        generateDocs(getFile("/openapi-with-examples/openapi-with-multiple-permissions.yaml"));
+
+        File index = new File("target/marina-docs/api.js");
+        String generated = String.join(" ", Files.readAllLines(Paths.get(index.getPath())));
+        assertTrue(generated.contains("2017-10-04T14:54:36Z"));
+    }
+
+    @Test
     void testGenerateDocs() throws IOException {
         generateDocs(getFile("/openapi-with-examples/openapi-with-json.yaml"));
 
