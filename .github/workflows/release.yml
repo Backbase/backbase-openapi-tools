@@ -5,6 +5,10 @@ on:
     types:
       - published
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sonar:
     if: "!contains(github.event.head_commit.message, '[version bump]')"
@@ -49,21 +53,23 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
-      - name: Get version from POM without SNAPSHOT
+      - name: Setup release version from tag
         run: |
-          VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout |  cut -d- -f1 |  tr "." "\n"))
-          echo "MAJOR=${VERSION_PARTS[0]}" >> $GITHUB_ENV
-          echo "MINOR=${VERSION_PARTS[1]}" >> $GITHUB_ENV
-          echo "PATCH=${VERSION_PARTS[2]}" >> $GITHUB_ENV
-
-      - name: Setup release version
-        run: |
-          NEW_VERSION="$((MAJOR)).$((MINOR)).$((PATCH))"
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          NEW_VERSION="${RELEASE_TAG#v}"
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+
+      - name: Validate POM version matches release tag
+        run: |
+          POM_BASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | cut -d- -f1)
+          if [ "${POM_BASE_VERSION}" != "${NEW_VERSION}" ]; then
+            echo "::error::GitHub release tag v${NEW_VERSION} does not match POM version ${POM_BASE_VERSION}-SNAPSHOT. Bump the POM before publishing."
+            exit 1
+          fi
 
       - name: Update POM Version
         run: |
-          echo "New version  is: $NEW_VERSION"
+          echo "New version is: $NEW_VERSION"
           mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false -B
 
       - name: Build and Publish
@@ -90,10 +96,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ publish ]
     steps:
+      - name: Resolve base branch
+        id: base
+        run: |
+          REF="${{ github.event.release.target_commitish }}"
+          REF="${REF#refs/heads/}"
+          echo "branch=${REF}" >> $GITHUB_OUTPUT
+
       - name: Checkout Branch
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: ${{ steps.base.outputs.branch }}
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -107,17 +120,13 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
-      - name: Get version from POM without SNAPSHOT
-        run: |
-          VERSION_PARTS=($(mvn help:evaluate -Dexpression=project.version -q -DforceStdout |  cut -d- -f1 |  tr "." "\n"))
-          echo "MAJOR=${VERSION_PARTS[0]}" >> $GITHUB_ENV
-          echo "MINOR=${VERSION_PARTS[1]}" >> $GITHUB_ENV
-          echo "PATCH=${VERSION_PARTS[2]}" >> $GITHUB_ENV
-
       - name: Bump And Update POM Version to new Development version
         id: bump_version
         run: |
-          NEW_VERSION="$((MAJOR)).$((MINOR)).$((PATCH+1))-SNAPSHOT"
+          RELEASE_VERSION="${{ github.event.release.tag_name }}"
+          RELEASE_VERSION="${RELEASE_VERSION#v}"
+          VERSION_PARTS=($(echo "$RELEASE_VERSION" | tr "." "\n"))
+          NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((VERSION_PARTS[2]+1))-SNAPSHOT"
           echo "New development version is: $NEW_VERSION"
           mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -129,5 +138,5 @@ jobs:
           title: "chore: bump version to ${{ steps.bump_version.outputs.new_version }}"
           body: "Bumps the version to the next development version."
           branch: "chore/bump-version-${{ steps.bump_version.outputs.new_version }}"
-          base: ${{ github.event.release.target_commitish || 'main' }}
+          base: ${{ steps.base.outputs.branch }}
           labels: automerge
