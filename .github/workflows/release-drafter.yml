@@ -18,6 +18,6 @@ jobs:
     needs: correct_repository
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter@00ce30b0ce8a4d67bccfca59421cdf6c55dd0784
+      - uses: release-drafter/release-drafter@73b95fa1c286dfd6802a4f949b07dad6149f2b0f
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
