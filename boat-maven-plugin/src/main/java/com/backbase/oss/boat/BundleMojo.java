@@ -9,6 +9,7 @@ import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
+import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
 import com.backbase.oss.boat.transformers.SetVersion;
 import com.backbase.oss.boat.transformers.ExtensionFilter;
 
@@ -70,6 +71,16 @@ public class BundleMojo extends AbstractMojo {
     private List<String> removeExtensions;
 
     /**
+     * Merge components/schemas entries that are structurally identical but registered under different names
+     * (e.g. because the same model file is $ref'd both by its component name and directly). Disable this
+     * only if you rely on the current, duplicated output and are not ready for the breaking change to
+     * generated model names yet.
+     */
+    @Parameter(name = "deduplicateSchemas", property = "openapi.generator.maven.plugin.deduplicateSchemas",
+        defaultValue = "true")
+    private boolean deduplicateSchemas = true;
+
+    /**
      * Skip the execution.
      */
     @Parameter(name = "skip", property = "bundle.skip", defaultValue = "false", alias = "codegen.skip")
@@ -129,6 +140,11 @@ public class BundleMojo extends AbstractMojo {
 
             openAPI = new Bundler(inputFile)
                 .transform(openAPI);
+
+            if (deduplicateSchemas) {
+                openAPI = new DeduplicateSchemasTransformer()
+                    .transform(openAPI);
+            }
 
             if (isNotEmpty(removeExtensions)) {
                 openAPI = new ExtensionFilter()

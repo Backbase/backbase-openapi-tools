@@ -1,0 +1,19 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Duplicate Schema Test
+paths:
+  '/currency-exchange-arrangements':
+    get:
+      operationId: getCurrencyExchangeArrangement
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./arrangement.yaml"
+components:
+  schemas:
+    CurrencyExchangeArrangement:
+      $ref: "./arrangement.yaml"
