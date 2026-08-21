@@ -1,5 +1,6 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.loader.OpenAPILoader;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -168,6 +170,49 @@ class BundleMojoTest {
 
         String outputApi = String.join( " ", Files.readAllLines(Paths.get(output.getPath())));
         assertTrue(outputApi.contains("version: 3.0.0"));
+    }
+
+    @Test
+    @SneakyThrows
+    void testBundleFolder_deduplicatesSchemasByDefault() {
+        File output = new File("target/test-bundle-duplicate-schema-dedup.yaml");
+
+        BundleMojo mojo = new BundleMojo();
+        mojo.setInput(getFile("/bundler/duplicate-schema/api.yaml"));
+        mojo.setOutput(output);
+        // deduplicateSchemas is left unset, exercising the default (true).
+        mojo.execute();
+
+        OpenAPI bundled = OpenAPILoader.load(output);
+        Set<String> schemaNames = bundled.getComponents().getSchemas().keySet();
+
+        assertEquals(1, schemaNames.size(), "The duplicate schema should have been merged away.");
+        assertTrue(schemaNames.contains("CurrencyExchangeArrangement"),
+            "The properly named (PascalCase) schema should be kept as the canonical one.");
+
+        String responseRef = bundled.getPaths().get("/currency-exchange-arrangements").getGet()
+            .getResponses().get("200").getContent().get("application/json").getSchema().get$ref();
+        assertEquals("#/components/schemas/CurrencyExchangeArrangement", responseRef,
+            "The response schema $ref should be rewritten to point at the canonical schema.");
+    }
+
+    @Test
+    @SneakyThrows
+    void testBundleFolder_keepsDuplicateSchemasWhenOptedOut() {
+        File output = new File("target/test-bundle-duplicate-schema-no-dedup.yaml");
+
+        BundleMojo mojo = new BundleMojo();
+        mojo.setInput(getFile("/bundler/duplicate-schema/api.yaml"));
+        mojo.setOutput(output);
+        mojo.setDeduplicateSchemas(false);
+        mojo.execute();
+
+        OpenAPI bundled = OpenAPILoader.load(output);
+        Set<String> schemaNames = bundled.getComponents().getSchemas().keySet();
+
+        assertEquals(2, schemaNames.size(),
+            "With deduplication opted out, both the canonical and the synthesized duplicate should remain.");
+        assertTrue(schemaNames.contains("CurrencyExchangeArrangement"));
     }
 
     @Test

@@ -16,6 +16,18 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.18.3
+* **Breaking change**: `boat:bundle` and `boat:generate` (when `bundleSpecs` is enabled) now de-duplicate
+  `components/schemas` entries that are structurally identical but were registered under different names
+  (e.g. because the same model file was reachable both via its canonical component name and via a direct
+  `$ref` to the file). Previously this produced two field-for-field identical models; now only one is kept
+  and every `$ref` to the discarded duplicate is rewritten to the surviving one.
+  * This can rename or remove generated types (Java, Angular/TypeScript, Swift, Android/Kotlin) for specs
+    that were affected by the duplication - consumers depending on the previously duplicated type name will
+    need to update their references.
+  * Added a new `deduplicateSchemas` plugin parameter (default `true`) on `boat:bundle` and `boat:generate`
+    to opt out and keep the previous (duplicated) behaviour while migrating.
+
 ## 0.18.2
 * Spring generator: fixed `@ExampleObject` rendering in `api.mustache` by unwrapping escaped quotes in example payloads.
 * Added `unwrapEscapedQuotes` lambda to `boat-spring` generator templates to prevent malformed annotation values (for example `value = "\"{...}"`).

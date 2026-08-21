@@ -1,0 +1,8 @@
+type: object
+properties:
+  id:
+    type: string
+    description: The id of this currency exchange arrangement.
+  rate:
+    type: number
+    description: The exchange rate.

@@ -26,6 +26,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
 import com.backbase.oss.boat.transformers.Bundler;
+import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
@@ -486,6 +487,15 @@ public class GenerateMojo extends InputMavenArtifactMojo {
      */
     @Parameter(property = "openapi.generator.maven.plugin.bundlesSpecs")
     protected boolean bundleSpecs;
+
+    /**
+     * Merge components/schemas entries that are structurally identical but registered under different names
+     * (e.g. because the same model file is $ref'd both by its component name and directly). Only takes effect
+     * when {@code bundleSpecs} is enabled. Disable this only if you rely on the current, duplicated output
+     * and are not ready for the breaking change to generated model names yet.
+     */
+    @Parameter(property = "openapi.generator.maven.plugin.deduplicateSchemas", defaultValue = "true")
+    protected boolean deduplicateSchemas = true;
 
     @Parameter(name = "writeDebugFiles")
     protected boolean writeDebugFiles = false;
@@ -950,6 +960,10 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
             if(bundleSpecs) {
                 new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
+
+                if (deduplicateSchemas) {
+                    new DeduplicateSchemasTransformer().transform(input.getOpenAPI(), Collections.emptyMap());
+                }
 
                 if(writeDebugFiles) {
                     java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
