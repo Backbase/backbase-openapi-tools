@@ -49,11 +49,11 @@
         <sonar.coverage.jacoco.xmlReportPaths>${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 
         <lombok.version>1.18.46</lombok.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <mockito.version>5.23.0</mockito.version>
 
         <slf4j.version>1.7.30</slf4j.version>
-        <swagger-core.version>2.2.53</swagger-core.version>
+        <swagger-core.version>2.2.54</swagger-core.version>
         <swagger-parser.version>2.1.46</swagger-parser.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.3</version>
             </dependency>
 
             <dependency>
