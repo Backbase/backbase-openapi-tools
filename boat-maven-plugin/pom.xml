@@ -15,7 +15,7 @@
     <description>Open API Converter</description>
 
     <properties>
-        <maven.api.version>3.9.12</maven.api.version>
+        <maven.api.version>3.9.16</maven.api.version>
         <sonar.coverage.exclusions>
             src/main/java/com/backbase/oss/boat/GenerateMojo.java,
             src/main/java/com/backbase/oss/codegen/*.java
@@ -24,7 +24,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <feign-version>13.9.1</feign-version>
+        <feign-version>13.13</feign-version>
         <feign-form-version>3.8.0</feign-form-version>
         <jackson-threetenbp-version>2.18.2</jackson-threetenbp-version>
         <scribejava-version>8.3.3</scribejava-version>
@@ -32,7 +32,16 @@
     </properties>
 
     <dependencyManagement>
-        <dependencies/>
+        <dependencies>
+            <!-- Force alignment with the kotlin-reflect version pulled in via boat-quay-rules;
+                 otherwise okhttp/mockwebserver pull an older kotlin-stdlib that is binary
+                 incompatible with it, causing NoClassDefFoundError: KotlinGenericDeclaration. -->
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>2.4.10</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -107,7 +116,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>4.11.0</version>
+            <version>4.12.0</version>
         </dependency>
 
         <dependency>
@@ -243,7 +252,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>5.3.2</version>
+            <version>5.4.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -251,7 +260,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>5.3.2</version>
+            <version>5.4.0</version>
         </dependency>
 
     </dependencies>
