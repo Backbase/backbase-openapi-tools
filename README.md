@@ -18,6 +18,11 @@ BOAT is still under development and subject to change.
 
 See also: https://github.com/Backbase/backbase-openapi-tools/releases
 
+
+## 0.18.6
+ * * Java RestTemplate generator: added `useSingleRequestParameter` support to replace positional parameter lists with named `*Param` objects for multi-parameter operations,
+     see [boat-maven-plugin README](boat-maven-plugin/README.md#single-request-parameter).
+
 ## 0.18.4
 * **Breaking change**: `boat:bundle` and `boat:generate` (when `bundleSpecs` is enabled) now de-duplicate
   `components/schemas` entries that are structurally identical but were registered under different names
