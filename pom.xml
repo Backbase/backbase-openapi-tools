@@ -54,7 +54,7 @@
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.2.54</swagger-core.version>
-        <swagger-parser.version>2.1.46</swagger-parser.version>
+        <swagger-parser.version>2.1.47</swagger-parser.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     </properties>
@@ -151,12 +151,12 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>4.0.3</version>
+                <version>4.1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-xml</artifactId>
-                <version>4.1.1</version>
+                <version>4.2.0</version>
             </dependency>
 
             <dependency>
