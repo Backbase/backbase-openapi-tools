@@ -7,30 +7,41 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openapitools.codegen.languages.JavaClientCodegen.GENERATE_CLIENT_AS_BEAN;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.config.CodegenConfigurator;
 
 class BoatJavaCodeGenTests {
 
     static final String PROP_BASE = BoatJavaCodeGenTests.class.getSimpleName() + ".";
     static final String TEST_OUTPUT = System.getProperty(PROP_BASE + "output", "target/boat-java-codegen-tests");
+
     @Test
     void clientOptsUnicity() {
         final BoatJavaCodeGen gen = new BoatJavaCodeGen();
@@ -167,5 +178,119 @@ class BoatJavaCodeGenTests {
         assertThat("Expect Valid annotation.", getPojosMethod.getParameter(0).getType().toString().contains("@Valid"), is(useBeanValidation));
         assertThat("Expect jakarta Valid import", compilationUnit.getImports().stream().anyMatch(
                 id -> id.getNameAsString().equals("jakarta.validation.Valid")), is(useBeanValidation));
+    }
+
+    @Test
+    void shouldGenerateBackwardCompatibleSingleRequestParameterOverloads(@TempDir Path temporaryDirectory) throws FileNotFoundException {
+        ClassOrInterfaceDeclaration api = generateRestTemplateClient(
+            temporaryDirectory.resolve("generated-enabled"),
+            true
+        );
+
+        ClassOrInterfaceDeclaration parameters = findNestedClass(api, "ListPetsParam").orElseThrow();
+        assertTrue(parameters.isStatic());
+        assertTrue(findNestedClass(api, "ShowPetByIdParam").isEmpty());
+
+        findMethod(api, "listPets", "Integer", "String");
+        findMethod(api, "listPetsWithHttpInfo", "Integer", "String");
+
+        MethodDeclaration listPets = findMethod(api, "listPets", "ListPetsParam");
+        assertEquals("listPetsWithHttpInfo(params).getBody()", returnExpression(listPets));
+
+        MethodDeclaration listPetsWithHttpInfo = findMethod(api, "listPetsWithHttpInfo", "ListPetsParam");
+        assertEquals(
+            "listPetsWithHttpInfo(params.getLimit(), params.getStatus())",
+            returnExpression(listPetsWithHttpInfo)
+        );
+    }
+
+    @Test
+    void shouldNotGenerateSingleRequestParameterOverloadsByDefault(
+        @TempDir Path temporaryDirectory
+    ) throws FileNotFoundException {
+        ClassOrInterfaceDeclaration api = generateRestTemplateClient(
+            temporaryDirectory.resolve("generated-disabled"),
+            false
+        );
+
+        assertFalse(findNestedClass(api, "ListPetsParam").isPresent());
+        assertEquals(1, api.getMethodsByName("listPets").size());
+        assertEquals(1, api.getMethodsByName("listPetsWithHttpInfo").size());
+        findMethod(api, "listPets", "Integer", "String");
+        findMethod(api, "listPetsWithHttpInfo", "Integer", "String");
+    }
+
+    private ClassOrInterfaceDeclaration generateRestTemplateClient(Path outputDirectory, boolean useSingleRequestParameter)
+        throws FileNotFoundException {
+        CodegenConfigurator configurator = getCodegenConfigurator(outputDirectory);
+
+        if (useSingleRequestParameter) {
+            configurator.addAdditionalProperty("useSingleRequestParameter", true);
+        }
+
+        File generatedApi = new DefaultGenerator()
+            .opts(configurator.toClientOptInput())
+            .generate()
+            .stream()
+            .filter(file -> file.getName().equals("PetsApi.java"))
+            .findFirst()
+            .orElseThrow();
+
+        return StaticJavaParser.parse(generatedApi)
+            .getClassByName("PetsApi")
+            .orElseThrow();
+    }
+
+    private CodegenConfigurator getCodegenConfigurator(Path outputDirectory) {
+        CodegenConfigurator configurator = new CodegenConfigurator();
+        configurator.setGeneratorName("boat-java");
+        configurator.setLibrary("resttemplate");
+        configurator.setInputSpec(
+            getFile("/boat-java/petstore-single-request-parameter.yaml")
+                .getAbsolutePath()
+        );
+        configurator.setOutputDir(outputDirectory.toAbsolutePath().toString());
+        configurator.setApiPackage("com.example.api");
+        configurator.setModelPackage("com.example.model");
+        return configurator;
+    }
+
+    private static MethodDeclaration findMethod(ClassOrInterfaceDeclaration api, String name, String... parameterTypes) {
+        List<MethodDeclaration> methods = api.getMethodsBySignature(name, parameterTypes);
+
+        assertEquals(1, methods.size(),
+            () -> "Expected exactly one method " + name + List.of(parameterTypes) + ", but found " + methods.size()
+        );
+
+        return methods.get(0);
+    }
+
+    private static Optional<ClassOrInterfaceDeclaration> findNestedClass(ClassOrInterfaceDeclaration api, String name) {
+        return api.getMembers()
+            .stream()
+            .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+            .map(BodyDeclaration::asClassOrInterfaceDeclaration)
+            .filter(type -> type.getNameAsString().equals(name))
+            .findFirst();
+    }
+
+    private static String returnExpression(MethodDeclaration method) {
+        return method.getBody()
+            .orElseThrow()
+            .getStatements()
+            .stream()
+            .filter(Statement::isReturnStmt)
+            .map(Statement::asReturnStmt)
+            .map(ReturnStmt::getExpression)
+            .flatMap(Optional::stream)
+            .map(Object::toString)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError(
+                "No direct return statement found in " + method.getSignature()
+            ));
+    }
+
+    private File getFile(String fileName) {
+        return new File(getClass().getResource(fileName).getFile());
     }
 }
