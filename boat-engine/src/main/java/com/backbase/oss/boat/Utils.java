@@ -28,7 +28,7 @@ public class Utils {
 
 
     @SneakyThrows
-    static boolean isDirectory(URL base, String ref) throws java.net.URISyntaxException {
+    static boolean isDirectory(URL base, String ref) {
         URI uri = base.toURI().resolve(ref);
         File file = new File(uri.toURL().getFile());
 
