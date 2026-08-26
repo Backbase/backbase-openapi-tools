@@ -10,10 +10,8 @@ import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
-import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformerV31;
 import com.backbase.oss.boat.transformers.SetVersion;
 import com.backbase.oss.boat.transformers.ExtensionFilter;
-import com.backbase.oss.boat.transformers.Transformer;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -88,13 +86,6 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "skip", property = "bundle.skip", defaultValue = "false", alias = "codegen.skip")
     private boolean skip;
 
-    private static Transformer selectDeduplicatorForVersion(String openAPIVersion) {
-        if (openAPIVersion != null && openAPIVersion.startsWith("3.1")) {
-            return new DeduplicateSchemasTransformerV31();
-        }
-        return new DeduplicateSchemasTransformer();
-    }
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
@@ -151,8 +142,8 @@ public class BundleMojo extends AbstractMojo {
                 .transform(openAPI);
 
             if (deduplicateSchemas) {
-                Transformer deduplicator = selectDeduplicatorForVersion(openAPI.getOpenapi());
-                openAPI = deduplicator.transform(openAPI);
+                openAPI = new DeduplicateSchemasTransformer()
+                    .transform(openAPI);
             }
 
             if (isNotEmpty(removeExtensions)) {

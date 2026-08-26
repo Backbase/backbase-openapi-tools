@@ -27,9 +27,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyType
 
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
-import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformerV31;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
-import com.backbase.oss.boat.transformers.Transformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
@@ -99,13 +97,6 @@ public class GenerateMojo extends InputMavenArtifactMojo {
         } else {
             return "";
         }
-    }
-
-    private static Transformer selectDeduplicatorForVersion(String openAPIVersion) {
-        if (openAPIVersion != null && openAPIVersion.startsWith("3.1")) {
-            return new DeduplicateSchemasTransformerV31();
-        }
-        return new DeduplicateSchemasTransformer();
     }
 
     static String uniqueJoin(Collection<String> values) {
@@ -971,8 +962,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
 
                 if (deduplicateSchemas) {
-                    Transformer deduplicator = selectDeduplicatorForVersion(input.getOpenAPI().getOpenapi());
-                    deduplicator.transform(input.getOpenAPI(), Collections.emptyMap());
+                    new DeduplicateSchemasTransformer().transform(input.getOpenAPI(), Collections.emptyMap());
                 }
 
                 if(writeDebugFiles) {
