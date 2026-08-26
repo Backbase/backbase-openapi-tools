@@ -14,8 +14,11 @@ class SerializerUtilsTest {
 
     @Test
     void preservesPropertyTypesInOpenAPI31YamlSerialization() {
+        // A 3.1 document carries the type keyword in Schema#types, which is what the parser populates and
+        // what only the 3.1 mapper writes back out. setType() would fill Schema#type instead, a field the
+        // 3.1 mapper ignores.
         Schema<?> messageRequest = new Schema<>();
-        messageRequest.setType("object");
+        messageRequest.addType("object");
 
         Schema<?> deliveryChannelProp = new StringSchema();
         deliveryChannelProp.setMaxLength(64);
