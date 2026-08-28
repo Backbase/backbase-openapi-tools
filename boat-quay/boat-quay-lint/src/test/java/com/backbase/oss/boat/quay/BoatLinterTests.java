@@ -79,4 +79,40 @@ class BoatLinterTests {
         assertFalse(availableRules.isEmpty());
 
     }
+
+    /**
+     * Zally's rule 219 validates every OpenAPI 3 document against the OAS 3.0 JSON schema, so on a 3.1
+     * document it reports violations that are false positives by construction. They must not reach the
+     * report.
+     */
+    @Test
+    void doesNotReportSchemaViolationsThatCannotApplyToOpenApi31() throws IOException, OpenAPILoaderException {
+        String openApiContents = IOUtils.resourceToString("/openapi/openapi-3-1/openapi.yaml", Charset.defaultCharset());
+
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
+
+        assertFalse(hasViolationOfRule(boatLintReport, "219"),
+            "Rule 219 cannot validate a 3.1 document and must be skipped for one.");
+        assertFalse(hasViolationOfRule(boatLintReport, "M0012"),
+            "3.1.x must be an accepted OpenAPI version.");
+    }
+
+    @Test
+    void stillReportsSchemaViolationsForOpenApi30() throws IOException, OpenAPILoaderException {
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
+
+        assertTrue(boatLintReport.hasViolations());
+        // 3.0 documents keep going through every rule, rule 219 included.
+        assertTrue(boatLintReport.getAvailableRules().stream().anyMatch(rule -> "219".equals(rule.getId())),
+            "Rule 219 must remain registered for 3.0 documents.");
+    }
+
+    private boolean hasViolationOfRule(BoatLintReport report, String ruleId) {
+        return report.getViolations().stream()
+            .map(BoatViolation::getRule)
+            .filter(java.util.Objects::nonNull)
+            .anyMatch(rule -> ruleId.equals(rule.getId()));
+    }
 }

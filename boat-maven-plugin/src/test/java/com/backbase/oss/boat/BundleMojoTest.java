@@ -2,10 +2,12 @@ package com.backbase.oss.boat;
 
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Info;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -286,5 +288,37 @@ class BundleMojoTest {
         URL resource = getClass().getResource(name);
         assert resource != null;
         return new File(resource.getFile());
+    }
+
+    /**
+     * End-to-end guard for OpenAPI 3.1 support: bundling used to write the document back out through the
+     * 3.0 serializer, producing a file that still declared {@code openapi: 3.1.0} while {@code webhooks} and
+     * every 3.1-only schema keyword had been silently stripped.
+     */
+    @Test
+    @SneakyThrows
+    void testBundleOpenApi31() {
+        File output = new File("target/test-bundle-openapi-3-1.yaml");
+        Files.deleteIfExists(output.toPath());
+
+        BundleMojo mojo = new BundleMojo();
+        mojo.setInput(new File(getClass().getResource("/oas-examples/petstore-3.1.yaml").getFile()));
+        mojo.setOutput(output);
+        mojo.execute();
+
+        assertTrue(output.exists());
+        String bundled = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
+
+        assertTrue(bundled.contains("openapi: 3.1.0"), "The spec version must be preserved.");
+        assertTrue(bundled.contains("webhooks:"), "3.1 webhooks must survive bundling.");
+        assertTrue(bundled.contains("petAdded:"));
+        assertTrue(bundled.contains("const: pet"), "3.1 const must survive bundling.");
+        assertTrue(bundled.contains("exclusiveMinimum: 0"), "3.1 numeric exclusiveMinimum must survive bundling.");
+        assertTrue(bundled.contains("- \"null\""), "3.1 type arrays must survive bundling.");
+        assertFalse(bundled.contains("nickname: {}"), "3.1 schemas must not be flattened by the 3.0 mapper.");
+
+        // and the bundled result must still be loadable as 3.1
+        OpenAPI reloaded = OpenAPILoader.load(output);
+        assertEquals(SpecVersion.V31, reloaded.getSpecVersion());
     }
 }
