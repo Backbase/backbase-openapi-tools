@@ -71,15 +71,16 @@ class OpenApiVersionRuleTest {
     }
 
     @Test
-    fun `accepts any 3 1 patch version`() {
+    fun `accepts every explicitly allowed 3 1 version`() {
         listOf("3.1.0", "3.1.1", "3.1.2").forEach { version ->
             ZallyAssertions.assertThat(cut.validate(contextFor(version))).isEmpty()
         }
     }
 
     @Test
-    fun `reports a violation for a 3 0 version that is not allowed`() {
-        listOf("3.0.0", "3.0.1", "3.0.2").forEach { version ->
+    fun `reports a violation for a version that is not allowed`() {
+        // 3.1.3 pins the boundary: the allowed versions are an explicit list, not the whole 3.1 line.
+        listOf("3.0.0", "3.0.1", "3.0.2", "3.1.3").forEach { version ->
             ZallyAssertions
                     .assertThat(cut.validate(contextFor(version)))
                     .pointersEqualTo("/openapi")
