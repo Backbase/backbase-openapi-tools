@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +92,9 @@ public class BoatLinter {
     }
 
     public BoatLintReport lint(String openApiContent) throws OpenAPILoaderException {
-        OpenAPI openAPI = OpenAPILoader.parse(openApiContent);
+        // OpenAPILoader.parse throws rather than returning null; stating that here keeps the document
+        // non-null for the null-tolerant SerializerUtils calls below.
+        OpenAPI openAPI = Objects.requireNonNull(OpenAPILoader.parse(openApiContent));
         boolean openApi31 = SerializerUtils.isOpenApi31(openAPI);
 
         List<Result> validate = validator.validate(openApiContent, rulesPolicy, null);

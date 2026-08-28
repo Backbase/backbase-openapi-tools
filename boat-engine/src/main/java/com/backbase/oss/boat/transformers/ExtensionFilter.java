@@ -49,7 +49,7 @@ public class ExtensionFilter implements Transformer {
     }
 
     @SneakyThrows
-    private OpenAPI transform(OpenAPI source, Collection<String> remove) {
+    private OpenAPI transform(@NonNull OpenAPI source, Collection<String> remove) {
         final ObjectMapper mapper = SerializerUtils.yamlMapper(source);
         final JsonNode tree = mapper.valueToTree(source);
 
