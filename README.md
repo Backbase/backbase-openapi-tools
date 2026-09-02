@@ -16,6 +16,11 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.19.0
+* **Feature**: Added support for OpenAPI 3.1.x specifications alongside existing 3.0.x support
+  * Explicitly allows OpenAPI 3.1.0, 3.1.1, and 3.1.2 instead of regex-based matching
+* Added Lombok to fix local build issues
+
 ## 0.18.3
 * **Breaking change**: `boat:bundle` and `boat:generate` (when `bundleSpecs` is enabled) now de-duplicate
   `components/schemas` entries that are structurally identical but were registered under different names
