@@ -670,8 +670,9 @@ class BoatSpringCodeGenTests {
             .orElseThrow();
         assertTrue(getDescriptionMethod.isAnnotationPresent("Deprecated"),
             "getDescription should have @Deprecated annotation");
-        String getDescriptionContent = getDescriptionMethod.getJavadoc().orElseThrow().toText();
-        assertTrue(getDescriptionContent.contains("@deprecated") && getDescriptionContent.contains("will be removed on 2026-12-31"),
+        int getDescriptionStart = itemContent.indexOf("public String getDescription()");
+        String getDescriptionBlock = itemContent.substring(itemContent.lastIndexOf("/**", getDescriptionStart), getDescriptionStart);
+        assertTrue(getDescriptionBlock.contains("@deprecated") && getDescriptionBlock.contains("will be removed on 2026-12-31"),
             "getDescription Javadoc should contain @deprecated with sunset date");
     }
 }

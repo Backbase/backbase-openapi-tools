@@ -43,6 +43,8 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 import org.openapitools.codegen.utils.ModelUtils;
 
@@ -434,8 +436,8 @@ public class BoatSpringCodeGen extends SpringCodegen {
     }
 
     @Override
-    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
-        Map<String, Object> result = super.postProcessAllModels(objs);
+    public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        Map<String, ModelsMap> result = super.postProcessAllModels(objs);
         applyDeprecationToAllModelsIfNeeded(result);
         return result;
     }
@@ -476,13 +478,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
         }
     }
 
-    private void applyDeprecationToAllModelsIfNeeded(Map<String, Object> objs) {
+    private void applyDeprecationToAllModelsIfNeeded(Map<String, ModelsMap> objs) {
         Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
         if (specDeprecated != null && specDeprecated) {
             String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            for (Map.Entry<String, Object> entry : objs.entrySet()) {
-                if (entry.getValue() instanceof CodegenModel) {
-                    CodegenModel model = (CodegenModel) entry.getValue();
+            for (ModelsMap modelsMap : objs.values()) {
+                for (ModelMap modelMap : modelsMap.getModels()) {
+                    CodegenModel model = modelMap.getModel();
                     model.isDeprecated = true;
                     if (message != null && !model.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
                         model.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
