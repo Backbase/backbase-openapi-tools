@@ -8,8 +8,10 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
+import com.backbase.oss.codegen.utils.DeprecationExtensions;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -17,9 +19,12 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -372,6 +377,16 @@ public class BoatSpringCodeGen extends SpringCodegen {
             && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
     }
 
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
+        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
+        additionalProperties.put("boatApiDeprecated", specDeprecated);
+        additionalProperties.put("boatApiDeprecationMessage",
+            DeprecationExtensions.buildDeprecationMessage(sunsetDate));
+    }
+
     /**
         This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
         the service interface. There is a relevant httpServletParam.mustache file.
@@ -392,6 +407,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (codegenOperation.returnType != null) {
             codegenOperation.returnType = codegenOperation.returnType.replace("@Valid", "");
         }
+        applyDeprecationIfNeeded(codegenOperation);
         return codegenOperation;
     }
 
@@ -413,6 +429,15 @@ public class BoatSpringCodeGen extends SpringCodegen {
             model.imports.add("BigDecimalCustomSerializer");
             model.imports.add(JSON_SERIALIZE);
         }
+
+        applyDeprecationToPropertyIfNeeded(property);
+    }
+
+    @Override
+    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
+        Map<String, Object> result = super.postProcessAllModels(objs);
+        applyDeprecationToAllModelsIfNeeded(result);
+        return result;
     }
 
     private boolean shouldSerializeBigDecimalAsString(CodegenProperty property) {
@@ -427,5 +452,43 @@ public class BoatSpringCodeGen extends SpringCodegen {
     private boolean isDataTypeString(CodegenProperty property) {
         return Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
             .anyMatch("string"::equalsIgnoreCase);
+    }
+
+    private void applyDeprecationIfNeeded(CodegenOperation codegenOperation) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            codegenOperation.isDeprecated = true;
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            if (message != null && !codegenOperation.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                codegenOperation.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+            }
+        }
+    }
+
+    private void applyDeprecationToPropertyIfNeeded(CodegenProperty property) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            property.deprecated = true;
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            if (message != null && !property.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                property.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+            }
+        }
+    }
+
+    private void applyDeprecationToAllModelsIfNeeded(Map<String, Object> objs) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            for (Map.Entry<String, Object> entry : objs.entrySet()) {
+                if (entry.getValue() instanceof CodegenModel) {
+                    CodegenModel model = (CodegenModel) entry.getValue();
+                    model.isDeprecated = true;
+                    if (message != null && !model.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                        model.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+                    }
+                }
+            }
+        }
     }
 }

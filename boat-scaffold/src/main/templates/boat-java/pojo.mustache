@@ -1,6 +1,6 @@
 /**
  * {{description}}{{^description}}{{classname}}{{/description}}{{#isDeprecated}}
- * @deprecated{{/isDeprecated}}
+ * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}
  */{{#isDeprecated}}
 @Deprecated{{/isDeprecated}}
 {{#swagger1AnnotationLibrary}}
@@ -215,7 +215,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{/maximum}}
    * @return {{name}}
    {{#deprecated}}
-   * @deprecated
+   * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
    {{/deprecated}}
    */
 {{#deprecated}}

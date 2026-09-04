@@ -1,16 +1,23 @@
 package com.backbase.oss.codegen.java;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
+import com.backbase.oss.codegen.utils.DeprecationExtensions;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 
@@ -40,6 +47,75 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
         // change default to match creating @Component
         this.setGenerateClientAsBean(true);
+    }
+
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
+        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
+        additionalProperties.put("boatApiDeprecated", specDeprecated);
+        additionalProperties.put("boatApiDeprecationMessage",
+            DeprecationExtensions.buildDeprecationMessage(sunsetDate));
+    }
+
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, io.swagger.v3.oas.models.Operation operation,
+                                          java.util.List<io.swagger.v3.oas.models.servers.Server> servers) {
+        CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        applyDeprecationIfNeeded(codegenOperation);
+        return codegenOperation;
+    }
+
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+        super.postProcessModelProperty(model, property);
+        applyDeprecationToPropertyIfNeeded(property);
+    }
+
+    @Override
+    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
+        Map<String, Object> result = super.postProcessAllModels(objs);
+        applyDeprecationToAllModelsIfNeeded(result);
+        return result;
+    }
+
+    private void applyDeprecationIfNeeded(CodegenOperation codegenOperation) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            codegenOperation.isDeprecated = true;
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            if (message != null && !codegenOperation.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                codegenOperation.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+            }
+        }
+    }
+
+    private void applyDeprecationToPropertyIfNeeded(CodegenProperty property) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            property.deprecated = true;
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            if (message != null && !property.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                property.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+            }
+        }
+    }
+
+    private void applyDeprecationToAllModelsIfNeeded(Map<String, Object> objs) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            for (Map.Entry<String, Object> entry : objs.entrySet()) {
+                if (entry.getValue() instanceof CodegenModel) {
+                    CodegenModel model = (CodegenModel) entry.getValue();
+                    model.isDeprecated = true;
+                    if (message != null && !model.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                        model.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+                    }
+                }
+            }
+        }
     }
 
     @Override
