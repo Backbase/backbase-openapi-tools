@@ -1,14 +1,14 @@
 extends: spectral:oas
 rules:
   openapi-spec-version:
-    description: "OpenAPI specification version must be 3.0.3."
+    description: "OpenAPI specification version must be 3.0.3, 3.0.4, 3.1.0, 3.1.1 or 3.1.2."
     severity: error
     given: "$"
     then:
       field: openapi
       function: pattern
       functionOptions:
-        match: "3.0.3"
+        match: "^3\\.(0\\.[34]|1\\.[0-2])$"
   no-license-allowed:
     description: "No license information allowed because it's covered by the License Agreement we already negotiate with customers."
     given: "$.info"

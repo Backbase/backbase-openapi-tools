@@ -6,6 +6,7 @@ import com.backbase.oss.boat.quay.configuration.RulesValidatorConfiguration;
 import com.backbase.oss.boat.quay.model.BoatLintReport;
 import com.backbase.oss.boat.quay.model.BoatLintRule;
 import com.backbase.oss.boat.quay.model.BoatViolation;
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.typesafe.config.Config;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
@@ -15,9 +16,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -32,6 +36,16 @@ import org.zalando.zally.rule.api.RuleSet;
 
 @Slf4j
 public class BoatLinter {
+
+    /**
+     * Rules that cannot be evaluated against an OpenAPI 3.1 document, and whose violations are therefore
+     * dropped for such documents.
+     *
+     * <p>Zally's {@code 219} ({@code UseOpenApiRule}) validates every OpenAPI 3 document against the OAS
+     * <b>3.0</b> JSON schema, and only one schema can be configured at a time. On a 3.1 document every
+     * violation it reports is a false positive.
+     */
+    private static final Set<String> RULES_WITHOUT_OPENAPI_31_SUPPORT = Collections.singleton("219");
 
     private final ApiValidator validator;
 
@@ -78,12 +92,16 @@ public class BoatLinter {
     }
 
     public BoatLintReport lint(String openApiContent) throws OpenAPILoaderException {
+        // OpenAPILoader.parse throws rather than returning null; stating that here keeps the document
+        // non-null for the null-tolerant SerializerUtils calls below.
+        OpenAPI openAPI = Objects.requireNonNull(OpenAPILoader.parse(openApiContent));
+        boolean openApi31 = SerializerUtils.isOpenApi31(openAPI);
+
         List<Result> validate = validator.validate(openApiContent, rulesPolicy, null);
         List<BoatViolation> violations = validate.stream()
+            .filter(result -> !(openApi31 && RULES_WITHOUT_OPENAPI_31_SUPPORT.contains(result.getId())))
             .map(this::transformResult)
             .collect(Collectors.toList());
-
-        OpenAPI openAPI = OpenAPILoader.parse(openApiContent);
 
         BoatLintReport boatLintReport = new BoatLintReport();
         boatLintReport.setOpenApi(openApiContent);

@@ -1,0 +1,59 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+x-remove: remove
+x-keep: keep
+info:
+  title: Thing API 3.1
+  version: 1.0.0
+  x-remove: remove
+  x-keep: keep
+servers:
+  - url: http://localhost
+paths:
+  /things:
+    get:
+      operationId: getThings
+      x-remove: remove
+      x-keep: keep
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+webhooks:
+  thingChanged:
+    post:
+      operationId: thingChanged
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Thing"
+      responses:
+        "200":
+          description: ok
+components:
+  schemas:
+    Thing:
+      type: object
+      properties:
+        # 3.1 type array: dropped by the 3.0 mapper, which keeps only a single type.
+        nickname:
+          type:
+            - string
+            - "null"
+        # 3.1 const: has no 3.0 equivalent at all.
+        kind:
+          const: thing
+        # In 3.1 exclusiveMinimum is a number; in 3.0 it is a boolean companion to minimum.
+        theNumber:
+          type: integer
+          format: int32
+          exclusiveMinimum: 0
+          maximum: 10
+        # 3.1 contentMediaType, replacing the 3.0 string/binary format.
+        payload:
+          type: string
+          contentMediaType: application/octet-stream
