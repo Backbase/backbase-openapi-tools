@@ -12,14 +12,11 @@ import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
-import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 
@@ -54,70 +51,28 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
-        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
-        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
-        additionalProperties.put("boatApiDeprecated", specDeprecated);
-        additionalProperties.put("boatApiDeprecationMessage",
-            DeprecationExtensions.buildDeprecationMessage(sunsetDate));
+        DeprecationExtensions.populateDeprecationAdditionalProperties(openAPI, additionalProperties);
     }
 
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, io.swagger.v3.oas.models.Operation operation,
                                           java.util.List<io.swagger.v3.oas.models.servers.Server> servers) {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
-        applyDeprecationIfNeeded(codegenOperation);
+        BoatCodeGenUtils.applyDeprecationIfNeeded(codegenOperation, additionalProperties);
         return codegenOperation;
     }
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
-        applyDeprecationToPropertyIfNeeded(property);
+        BoatCodeGenUtils.applyDeprecationToPropertyIfNeeded(property, additionalProperties);
     }
 
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         Map<String, ModelsMap> result = super.postProcessAllModels(objs);
-        applyDeprecationToAllModelsIfNeeded(result);
+        BoatCodeGenUtils.applyDeprecationToAllModelsIfNeeded(result, additionalProperties);
         return result;
-    }
-
-    private void applyDeprecationIfNeeded(CodegenOperation codegenOperation) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            codegenOperation.isDeprecated = true;
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            if (message != null && !codegenOperation.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                codegenOperation.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-            }
-        }
-    }
-
-    private void applyDeprecationToPropertyIfNeeded(CodegenProperty property) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            property.deprecated = true;
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            if (message != null && !property.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                property.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-            }
-        }
-    }
-
-    private void applyDeprecationToAllModelsIfNeeded(Map<String, ModelsMap> objs) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            for (ModelsMap modelsMap : objs.values()) {
-                for (ModelMap modelMap : modelsMap.getModels()) {
-                    CodegenModel model = modelMap.getModel();
-                    model.isDeprecated = true;
-                    if (message != null && !model.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                        model.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-                    }
-                }
-            }
-        }
     }
 
     @Override

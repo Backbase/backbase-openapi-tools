@@ -5,15 +5,33 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Optional;
+
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 
 public final class DeprecationExtensions {
     public static final String X_DEPRECATED = "x-deprecated";
     public static final String X_SUNSET_DATE = "x-sunset-date";
     public static final String X_BOAT_DEPRECATION_MESSAGE = "x-boat-deprecation-message";
+    private static final String BOAT_API_DEPRECATED = "boatApiDeprecated";
+    private static final String BOAT_API_DEPRECATION_MESSAGE = "boatApiDeprecationMessage";
 
     private DeprecationExtensions() {
         // utility class
+    }
+
+    /**
+     * Sets the deprecation related additional properties.
+     *
+     * @param openAPI The spec.
+     * @param properties The additional properties to populate.
+     */
+    public static void populateDeprecationAdditionalProperties(OpenAPI openAPI, Map<String, Object> properties) {
+        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
+        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
+        properties.put(BOAT_API_DEPRECATED, specDeprecated);
+        properties.put(BOAT_API_DEPRECATION_MESSAGE,
+                DeprecationExtensions.buildDeprecationMessage(sunsetDate));
     }
 
     public static boolean isSpecDeprecated(Info info) {

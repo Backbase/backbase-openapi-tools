@@ -19,12 +19,10 @@ import io.swagger.v3.oas.models.servers.Server;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +41,6 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
-import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 import org.openapitools.codegen.utils.ModelUtils;
@@ -382,11 +379,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
     @Override
     public void preprocessOpenAPI(OpenAPI openAPI) {
         super.preprocessOpenAPI(openAPI);
-        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
-        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
-        additionalProperties.put("boatApiDeprecated", specDeprecated);
-        additionalProperties.put("boatApiDeprecationMessage",
-            DeprecationExtensions.buildDeprecationMessage(sunsetDate));
+        DeprecationExtensions.populateDeprecationAdditionalProperties(openAPI, additionalProperties);
     }
 
     /**
@@ -409,7 +402,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (codegenOperation.returnType != null) {
             codegenOperation.returnType = codegenOperation.returnType.replace("@Valid", "");
         }
-        applyDeprecationIfNeeded(codegenOperation);
+        BoatCodeGenUtils.applyDeprecationIfNeeded(codegenOperation, additionalProperties);
         return codegenOperation;
     }
 
@@ -432,13 +425,13 @@ public class BoatSpringCodeGen extends SpringCodegen {
             model.imports.add(JSON_SERIALIZE);
         }
 
-        applyDeprecationToPropertyIfNeeded(property);
+        BoatCodeGenUtils.applyDeprecationToPropertyIfNeeded(property, additionalProperties);
     }
 
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         Map<String, ModelsMap> result = super.postProcessAllModels(objs);
-        applyDeprecationToAllModelsIfNeeded(result);
+        BoatCodeGenUtils.applyDeprecationToAllModelsIfNeeded(result, additionalProperties);
         return result;
     }
 
@@ -456,41 +449,4 @@ public class BoatSpringCodeGen extends SpringCodegen {
             .anyMatch("string"::equalsIgnoreCase);
     }
 
-    private void applyDeprecationIfNeeded(CodegenOperation codegenOperation) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            codegenOperation.isDeprecated = true;
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            if (message != null && !codegenOperation.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                codegenOperation.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-            }
-        }
-    }
-
-    private void applyDeprecationToPropertyIfNeeded(CodegenProperty property) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            property.deprecated = true;
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            if (message != null && !property.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                property.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-            }
-        }
-    }
-
-    private void applyDeprecationToAllModelsIfNeeded(Map<String, ModelsMap> objs) {
-        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
-        if (specDeprecated != null && specDeprecated) {
-            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
-            for (ModelsMap modelsMap : objs.values()) {
-                for (ModelMap modelMap : modelsMap.getModels()) {
-                    CodegenModel model = modelMap.getModel();
-                    model.isDeprecated = true;
-                    if (message != null && !model.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
-                        model.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
-                    }
-                }
-            }
-        }
-    }
 }
