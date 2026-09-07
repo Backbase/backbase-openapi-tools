@@ -109,7 +109,7 @@ public class {{classname}}Controller implements {{classname}} {
      * @return {{#responses}}{{message}} (status code {{code}}){{^-last}}
      *         or {{/-last}}{{/responses}}
     {{#isDeprecated}}
-     * @deprecated
+     * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
     {{/isDeprecated}}
     {{#externalDocs}}
      * {{description}}

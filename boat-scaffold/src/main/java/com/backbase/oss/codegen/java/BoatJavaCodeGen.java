@@ -1,16 +1,22 @@
 package com.backbase.oss.codegen.java;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
+import com.backbase.oss.codegen.utils.DeprecationExtensions;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
+import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 
 import java.io.File;
+import java.util.Map;
 
 import static com.backbase.oss.codegen.java.BoatCodeGenUtils.getCollectionCodegenValue;
 
@@ -40,6 +46,33 @@ public class BoatJavaCodeGen extends JavaClientCodegen {
 
         // change default to match creating @Component
         this.setGenerateClientAsBean(true);
+    }
+
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        DeprecationExtensions.populateDeprecationAdditionalProperties(openAPI, additionalProperties);
+    }
+
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, io.swagger.v3.oas.models.Operation operation,
+                                          java.util.List<io.swagger.v3.oas.models.servers.Server> servers) {
+        CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
+        BoatCodeGenUtils.applyDeprecationIfNeeded(codegenOperation, additionalProperties);
+        return codegenOperation;
+    }
+
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+        super.postProcessModelProperty(model, property);
+        BoatCodeGenUtils.applyDeprecationToPropertyIfNeeded(property, additionalProperties);
+    }
+
+    @Override
+    public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        Map<String, ModelsMap> result = super.postProcessAllModels(objs);
+        BoatCodeGenUtils.applyDeprecationToAllModelsIfNeeded(result, additionalProperties);
+        return result;
     }
 
     @Override

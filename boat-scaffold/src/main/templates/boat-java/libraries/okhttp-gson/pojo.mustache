@@ -23,17 +23,17 @@ import {{invokerPackage}}.JSON;
 
 /**
  * {{description}}{{^description}}{{classname}}{{/description}}{{#isDeprecated}}
- * @deprecated{{/isDeprecated}}
+ * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}
  */{{#isDeprecated}}
 @Deprecated{{/isDeprecated}}
 {{#swagger1AnnotationLibrary}}
 {{#description}}
-@ApiModel(description = "{{{.}}}")
+@ApiModel(description = "{{{.}}}{{#isDeprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}")
 {{/description}}
 {{/swagger1AnnotationLibrary}}
 {{#swagger2AnnotationLibrary}}
 {{#description}}
-@Schema(description = "{{{.}}}")
+@Schema(description = "{{{.}}}{{#isDeprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}})
 {{/description}}
 {{/swagger2AnnotationLibrary}}
 {{>additionalModelTypeAnnotations}}{{>generatedAnnotation}}{{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{>xmlAnnotation}}
@@ -155,7 +155,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{/maximum}}
    * @return {{name}}
    {{#deprecated}}
-   * @deprecated
+   * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
    {{/deprecated}}
    */
 {{#deprecated}}
@@ -167,10 +167,10 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
 
 {{/useBeanValidation}}
 {{#swagger1AnnotationLibrary}}
-  @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}value = "{{{description}}}")
+  @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}value = "{{{description}}}{{#deprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/deprecated}}")
 {{/swagger1AnnotationLibrary}}
 {{#swagger2AnnotationLibrary}}
-  @Schema({{#example}}example = "{{{.}}}", {{/example}}requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}}, description = "{{{description}}}")
+  @Schema({{#example}}example = "{{{.}}}", {{/example}}requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}}, description = "{{{description}}}{{#deprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/deprecated}}"{{#deprecated}}, deprecated = true{{/deprecated}})
 {{/swagger2AnnotationLibrary}}
 {{#vendorExtensions.x-extra-annotation}}
   {{{vendorExtensions.x-extra-annotation}}}

@@ -617,4 +617,62 @@ class BoatSpringCodeGenTests {
                 Arguments.of("prefix\\\\\"quoted\\\\\"suffix", "prefix\\\"quoted\\\"suffix"),
                 Arguments.of("\\\"", "\\\""));
     }
+
+    @Test
+    void shouldGenerateDeprecationAnnotationsFromSpecLevel() throws IOException {
+        var modelPackage = "com.backbase.model";
+        var apiPackage = "com.backbase.api";
+        var input = new File("src/test/resources/boat-spring/deprecated-spec.yaml");
+        var output = TEST_OUTPUT + "/shouldGenerateDeprecationAnnotationsFromSpecLevel";
+
+        var codegen = new BoatSpringCodeGen();
+        codegen.setLibrary("spring-boot");
+        codegen.setInterfaceOnly(true);
+        codegen.setSkipDefaultInterface(true);
+        codegen.setOutputDir(output);
+        codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setModelPackage(modelPackage);
+        codegen.setApiPackage(apiPackage);
+        codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, Boolean.TRUE.toString());
+
+        var openApiInput = new OpenAPIParser()
+            .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+            .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        // Verify API interface has @Deprecated and deprecation message
+        File apiFile = files.stream().filter(file -> file.getName().equals("ItemsApi.java"))
+            .findFirst()
+            .orElseThrow();
+        String apiContent = Files.readString(apiFile.toPath());
+        assertTrue(apiContent.contains("@Deprecated"), "API should have @Deprecated annotation");
+        assertTrue(apiContent.contains("@deprecated"), "API should have @deprecated Javadoc tag");
+        assertTrue(apiContent.contains("will be removed on 2026-12-31"), "API should have sunset date in message");
+
+        // Verify model with deprecated property
+        File itemFile = files.stream().filter(file -> file.getName().equals("Item.java"))
+            .findFirst()
+            .orElseThrow();
+        String itemContent = Files.readString(itemFile.toPath());
+        assertTrue(itemContent.contains("@Deprecated"), "Item model should have @Deprecated annotation");
+        assertTrue(itemContent.contains("will be removed on 2026-12-31"), "Item model should have sunset date in message");
+
+        // Verify getDescription property is marked deprecated (it has deprecated: true in spec)
+        MethodDeclaration getDescriptionMethod = StaticJavaParser.parse(itemFile)
+            .findAll(MethodDeclaration.class)
+            .stream()
+            .filter(it -> "getDescription".equals(it.getName().toString()))
+            .findFirst()
+            .orElseThrow();
+        assertTrue(getDescriptionMethod.isAnnotationPresent("Deprecated"),
+            "getDescription should have @Deprecated annotation");
+        int getDescriptionStart = itemContent.indexOf("public String getDescription()");
+        String getDescriptionBlock = itemContent.substring(itemContent.lastIndexOf("/**", getDescriptionStart), getDescriptionStart);
+        assertTrue(getDescriptionBlock.contains("@deprecated") && getDescriptionBlock.contains("will be removed on 2026-12-31"),
+            "getDescription Javadoc should contain @deprecated with sunset date");
+    }
 }
