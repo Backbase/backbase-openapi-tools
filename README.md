@@ -16,6 +16,9 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+## 0.18.5
+ * Java RestTemplate generator: added `useSingleRequestParameter` support to generate named `*Param` overloads for multi-parameter operations, see [boat-maven-plugin README](boat-maven-plugin/README.md#single-request-parameter).
+
 ## 0.18.3
 * **Breaking change**: `boat:bundle` and `boat:generate` (when `bundleSpecs` is enabled) now de-duplicate
   `components/schemas` entries that are structurally identical but were registered under different names

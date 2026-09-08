@@ -1,0 +1,146 @@
+/**
+* Parameters for the {@link #{{operationId}}({{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param)}
+* operation.
+*/
+public static class {{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param {
+{{#allParams}}
+  private {{#isFile}}{{#useAbstractionForFiles}}{{#collectionFormat}}java.util.Collection<org.springframework.core.io.Resource>{{/collectionFormat}}{{^collectionFormat}}org.springframework.core.io.Resource{{/collectionFormat}}{{/useAbstractionForFiles}}{{^useAbstractionForFiles}}{{{dataType}}}{{/useAbstractionForFiles}}{{/isFile}}{{^isFile}}{{{dataType}}}{{/isFile}} {{paramName}};
+{{/allParams}}
+
+  public {{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param() {
+  }
+
+{{#allParams}}
+    public {{#isFile}}{{#useAbstractionForFiles}}{{#collectionFormat}}java.util.Collection<org.springframework.core.io.Resource>{{/collectionFormat}}{{^collectionFormat}}org.springframework.core.io.Resource{{/collectionFormat}}{{/useAbstractionForFiles}}{{^useAbstractionForFiles}}{{{dataType}}}{{/useAbstractionForFiles}}{{/isFile}}{{^isFile}}{{{dataType}}}{{/isFile}} get{{#lambda.titlecase}}{{paramName}}{{/lambda.titlecase}}() {
+    return this.{{paramName}};
+    }
+
+    public {{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param {{paramName}}(
+  {{#isFile}}{{#useAbstractionForFiles}}{{#collectionFormat}}java.util.Collection<org.springframework.core.io.Resource>{{/collectionFormat}}{{^collectionFormat}}org.springframework.core.io.Resource{{/collectionFormat}}{{/useAbstractionForFiles}}{{^useAbstractionForFiles}}{{{dataType}}}{{/useAbstractionForFiles}}{{/isFile}}{{^isFile}}{{{dataType}}}{{/isFile}} {{paramName}}
+    ) {
+    this.{{paramName}} = {{paramName}};
+    return this;
+    }
+
+{{/allParams}}
+  @Override
+  public boolean equals(Object o) {
+  if (this == o) {
+  return true;
+  }
+
+  if (o == null || getClass() != o.getClass()) {
+  return false;
+  }
+
+{{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param param =
+  ({{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param) o;
+
+  return {{#allParams}}{{#isByteArray}}java.util.Arrays.equals(this.{{paramName}}, param.{{paramName}}){{/isByteArray}}{{^isByteArray}}java.util.Objects.equals(this.{{paramName}}, param.{{paramName}}){{/isByteArray}}{{^-last}}
+    && {{/-last}}{{/allParams}};
+  }
+
+  @Override
+  public int hashCode() {
+  return java.util.Objects.hash(
+{{#allParams}}
+  {{#isByteArray}}java.util.Arrays.hashCode({{paramName}}){{/isByteArray}}{{^isByteArray}}{{paramName}}{{/isByteArray}}{{^-last}},{{/-last}}
+{{/allParams}}
+  );
+  }
+
+  @Override
+  public String toString() {
+  StringBuilder sb = new StringBuilder();
+
+  sb.append(
+  "class {{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param {\n"
+  );
+{{#allParams}}
+    sb.append("    {{paramName}}: ")
+    .append(toIndentedString({{paramName}}))
+    .append("\n");
+{{/allParams}}
+  sb.append("}");
+
+  return sb.toString();
+  }
+
+  private String toIndentedString(Object value) {
+  if (value == null) {
+  return "null";
+  }
+
+  return value.toString().replace("\n", "\n    ");
+  }
+  }
+
+  /**
+  * {{summary}}
+  * {{notes}}
+{{#responses}}
+    * <p><b>{{code}}</b>{{#message}} - {{.}}{{/message}}
+{{/responses}}
+  *
+  * @param params parameters for the {{operationId}} operation
+{{#returnType}}
+    * @return {{.}}
+{{/returnType}}
+  * @throws RestClientException if an error occurs while attempting to invoke the API
+{{#externalDocs}}
+    * {{description}}
+    * @see <a href="{{url}}">{{summary}} Documentation</a>
+{{/externalDocs}}
+{{#isDeprecated}}
+    * @deprecated
+{{/isDeprecated}}
+  */
+{{#isDeprecated}}
+    @Deprecated
+{{/isDeprecated}}
+  public {{#returnType}}{{#isResponseFile}}{{#useAbstractionForFiles}}org.springframework.core.io.Resource{{/useAbstractionForFiles}}{{^useAbstractionForFiles}}{{{.}}}{{/useAbstractionForFiles}}{{/isResponseFile}}{{^isResponseFile}}{{{.}}}{{/isResponseFile}} {{/returnType}}{{^returnType}}void {{/returnType}}{{operationId}}(
+{{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param params
+  ) throws RestClientException {
+{{#returnType}}
+    return {{operationId}}WithHttpInfo(params).getBody();
+{{/returnType}}
+{{^returnType}}
+  {{operationId}}WithHttpInfo(params);
+{{/returnType}}
+  }
+
+  /**
+  * {{summary}}
+  * {{notes}}
+{{#responses}}
+    * <p><b>{{code}}</b>{{#message}} - {{.}}{{/message}}
+{{/responses}}
+  *
+  * @param params parameters for the {{operationId}} operation
+  * @return ResponseEntity&lt;{{returnType}}{{^returnType}}Void{{/returnType}}&gt;
+  * @throws RestClientException if an error occurs while attempting to invoke the API
+{{#externalDocs}}
+    * {{description}}
+    * @see <a href="{{url}}">{{summary}} Documentation</a>
+{{/externalDocs}}
+{{#isDeprecated}}
+    * @deprecated
+{{/isDeprecated}}
+  */
+{{#isDeprecated}}
+    @Deprecated
+{{/isDeprecated}}
+  public ResponseEntity<{{#returnType}}{{#isResponseFile}}{{#useAbstractionForFiles}}org.springframework.core.io.Resource{{/useAbstractionForFiles}}{{^useAbstractionForFiles}}{{{.}}}{{/useAbstractionForFiles}}{{/isResponseFile}}{{^isResponseFile}}{{{.}}}{{/isResponseFile}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}WithHttpInfo(
+  {{#lambda.titlecase}}{{operationId}}{{/lambda.titlecase}}Param params
+  ) throws RestClientException {
+  java.util.Objects.requireNonNull(
+  params,
+  "params must not be null"
+  );
+
+  return {{operationId}}WithHttpInfo(
+  {{#allParams}}
+    params.get{{#lambda.titlecase}}{{paramName}}{{/lambda.titlecase}}(){{^-last}},{{/-last}}
+  {{/allParams}}
+  );
+  }
