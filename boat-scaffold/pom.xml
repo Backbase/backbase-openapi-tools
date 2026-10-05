@@ -21,7 +21,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <embedded.maven.version>3.9.16</embedded.maven.version>
+        <embedded.maven.version>3.10.0</embedded.maven.version>
         <maven.resolver.version>1.9.27</maven.resolver.version>
         <maven.wagon.version>3.5.3</maven.wagon.version>
     </properties>
@@ -177,7 +177,7 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>9.1.3.Final</version>
+            <version>9.1.4.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
