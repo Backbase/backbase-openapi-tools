@@ -123,6 +123,19 @@ Same with `generate` but with opinionated defaults for Rest Template Client
         </additionalProperties>
     </configuration>
 
+### Single request parameter
+
+When enabled, BOAT generates a `*Param` inner class for multi-parameter API operations and uses it as
+the method's single argument instead of a positional parameter list. Operations with zero or one parameter
+remain unchanged.
+
+    <configuration>
+        ...
+        <configOptions>
+            <useSingleRequestParameter>true</useSingleRequestParameter>
+        </configOptions>
+    </configuration>
+
 ### Property & Enum Name Mappings (new)
 
 Two new optional parameters are supported by the BOAT plugin (mirroring OpenAPI Generator capabilities) to rename generated members without post-processing:
