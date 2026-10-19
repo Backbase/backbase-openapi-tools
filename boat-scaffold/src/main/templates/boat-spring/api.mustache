@@ -151,7 +151,7 @@ public interface {{classname}} {
      * @return {{#responses}}{{message}} (status code {{code}}){{^-last}}
      *         or {{/-last}}{{/responses}}
     {{#isDeprecated}}
-     * @deprecated
+     * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
     {{/isDeprecated}}
     {{#externalDocs}}
      * {{description}}
@@ -171,7 +171,12 @@ public interface {{classname}} {
         summary = "{{{.}}}",
         {{/summary}}
         {{#notes}}
-        description = "{{{.}}}",
+        description = "{{{.}}}{{#isDeprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}",
+        {{/notes}}
+        {{^notes}}
+        {{#isDeprecated}}
+        description = "{{#vendorExtensions.x-boat-deprecation-message}}{{.}}{{/vendorExtensions.x-boat-deprecation-message}}",
+        {{/isDeprecated}}
         {{/notes}}
         {{#isDeprecated}}
         deprecated = true,

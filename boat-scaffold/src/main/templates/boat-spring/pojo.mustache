@@ -1,6 +1,6 @@
 /**
  * {{description}}{{^description}}{{classname}}{{/description}}{{#isDeprecated}}
- * @deprecated{{/isDeprecated}}
+ * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}
  */
 {{>additionalModelTypeAnnotations}}
 
@@ -9,10 +9,17 @@
 {{/isDeprecated}}
 {{#description}}
 {{#swagger1AnnotationLibrary}}
-@ApiModel(description = "{{{description}}}")
+@ApiModel(description = "{{{description}}}{{#isDeprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}")
 {{/swagger1AnnotationLibrary}}
 {{#swagger2AnnotationLibrary}}
-@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}"{{#deprecated}}, deprecated = true{{/deprecated}})
+@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}{{#isDeprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/isDeprecated}}"{{#deprecated}}, deprecated = true{{/deprecated}})
+{{/swagger2AnnotationLibrary}}
+{{/description}}
+{{^description}}
+{{#swagger2AnnotationLibrary}}
+{{#isDeprecated}}
+@Schema(description = "{{#vendorExtensions.x-boat-deprecation-message}}{{.}}{{/vendorExtensions.x-boat-deprecation-message}}", deprecated = true)
+{{/isDeprecated}}
 {{/swagger2AnnotationLibrary}}
 {{/description}}
 {{#discriminator}}
@@ -208,7 +215,7 @@ public {{>sealed}}class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}
   {{/maximum}}
    * @return {{name}}
   {{#deprecated}}
-   * @deprecated
+   * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
   {{/deprecated}}
    */
   {{#vendorExtensions.x-extra-annotation}}
@@ -221,7 +228,7 @@ public {{>sealed}}class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}
   {{#required}}@NotNull{{/required}}
   {{/useBeanValidation}}
   {{#swagger2AnnotationLibrary}}
-  @Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}"{{/description}}{{#deprecated}}, deprecated = true{{/deprecated}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}})
+  @Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}{{#deprecated}}{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}{{/deprecated}}"{{/description}}{{^description}}{{#deprecated}}, description = "{{#vendorExtensions.x-boat-deprecation-message}}{{.}}{{/vendorExtensions.x-boat-deprecation-message}}"{{/deprecated}}{{/description}}{{#deprecated}}, deprecated = true{{/deprecated}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}})
   {{/swagger2AnnotationLibrary}}
   {{#swagger1AnnotationLibrary}}
   @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")
@@ -252,7 +259,7 @@ public {{>sealed}}class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}
   {{^lombok.Setter}}
   {{#deprecated}}
   /**
-   * @deprecated
+   * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
    */
   {{/deprecated}}
   {{#vendorExtensions.x-setter-extra-annotation}}

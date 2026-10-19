@@ -21,6 +21,11 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 20
+    ignore:
+      # CodeQL 2.27.0's Kotlin interceptor only supports versions below 2.4.20;
+      # bumping past that breaks the CodeQL Analyze (java) workflow.
+      - dependency-name: "org.jetbrains.kotlin:*"
+        versions: [ ">=2.4.20" ]
     groups:
       # Specific group for org.openapitools.* artifacts.
       # For Maven, patterns are matched against "groupId:artifactId",

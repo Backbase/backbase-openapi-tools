@@ -168,4 +168,44 @@ class BoatCommonJavaCodeGenTests {
             assertFalse(listDeclarator.getInitializer().isPresent());
         }
     }
+
+    @Test
+    void shouldGenerateDeprecationAnnotationsFromSpecLevel() throws IOException {
+        var modelPackage = "com.backbase.model";
+        var apiPackage = "com.backbase.api";
+        var input = new File("src/test/resources/boat-spring/deprecated-spec.yaml");
+        var output = TEST_OUTPUT + "/shouldGenerateDeprecationAnnotationsFromSpecLevel";
+
+        var codegen = new BoatJavaCodeGen();
+        codegen.setOutputDir(output);
+        codegen.setInputSpec(input.getAbsolutePath());
+        codegen.setModelPackage(modelPackage);
+        codegen.setApiPackage(apiPackage);
+
+        var openApiInput = new OpenAPIParser()
+            .readLocation(input.getAbsolutePath(), null, new ParseOptions())
+            .getOpenAPI();
+        var clientOptInput = new ClientOptInput();
+        clientOptInput.config(codegen);
+        clientOptInput.openAPI(openApiInput);
+
+        List<File> files = new DefaultGenerator().opts(clientOptInput).generate();
+
+        // Verify API class has @Deprecated and deprecation message
+        File apiFile = files.stream().filter(file -> file.getName().equals("ItemsApi.java"))
+            .findFirst()
+            .orElseThrow();
+        String apiContent = Files.readString(apiFile.toPath());
+        assertTrue(apiContent.contains("@Deprecated"), "API should have @Deprecated annotation");
+        assertTrue(apiContent.contains("@deprecated"), "API should have @deprecated Javadoc tag");
+        assertTrue(apiContent.contains("will be removed on 2026-12-31"), "API should have sunset date in message");
+
+        // Verify model with deprecated property
+        File itemFile = files.stream().filter(file -> file.getName().equals("Item.java"))
+            .findFirst()
+            .orElseThrow();
+        String itemContent = Files.readString(itemFile.toPath());
+        assertTrue(itemContent.contains("@Deprecated"), "Item model should have @Deprecated annotation");
+        assertTrue(itemContent.contains("will be removed on 2026-12-31"), "Item model should have sunset date in message");
+    }
 }

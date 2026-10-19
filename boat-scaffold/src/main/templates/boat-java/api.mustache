@@ -52,7 +52,7 @@ public class {{classname}} {
    {{/returnType}}
    * @throws ApiException if fails to make API call
    {{#isDeprecated}}
-   * @deprecated
+   * @deprecated{{#vendorExtensions.x-boat-deprecation-message}} {{.}}{{/vendorExtensions.x-boat-deprecation-message}}
    {{/isDeprecated}}
    {{#externalDocs}}
    * {{description}}

@@ -1,9 +1,13 @@
 package com.backbase.oss.codegen.doc;
 
+import com.backbase.oss.codegen.utils.DeprecationExtensions;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.servers.Server;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -31,6 +35,16 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
     }
 
     @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        boolean specDeprecated = DeprecationExtensions.isSpecDeprecated(openAPI.getInfo());
+        Optional<LocalDate> sunsetDate = DeprecationExtensions.getSunsetDate(openAPI.getInfo());
+        additionalProperties.put("boatApiDeprecated", specDeprecated);
+        additionalProperties.put("boatApiDeprecationMessage",
+            DeprecationExtensions.buildDeprecationMessage(sunsetDate));
+    }
+
+    @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
         CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, servers);
         boolean isMultipleAccessControlPermission = codegenOperation.vendorExtensions.containsKey("x-BbAccessControls");
@@ -51,7 +65,19 @@ public class BoatDocsGenerator extends com.backbase.oss.codegen.BoatStaticDocsGe
             }
         }
 
+        applyDeprecationIfNeeded(codegenOperation);
         return codegenOperation;
+    }
+
+    private void applyDeprecationIfNeeded(CodegenOperation codegenOperation) {
+        Boolean specDeprecated = (Boolean) additionalProperties.get("boatApiDeprecated");
+        if (specDeprecated != null && specDeprecated) {
+            codegenOperation.isDeprecated = true;
+            String message = (String) additionalProperties.get("boatApiDeprecationMessage");
+            if (message != null && !codegenOperation.vendorExtensions.containsKey(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE)) {
+                codegenOperation.vendorExtensions.put(DeprecationExtensions.X_BOAT_DEPRECATION_MESSAGE, message);
+            }
+        }
     }
 
     @Override

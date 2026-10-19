@@ -55,7 +55,7 @@
                     </div>
                 </div>
             {{/isEnum}}
-   {{#deprecated}} <span class="deprecated">Deprecated</span> {{/deprecated}}
+   {{#deprecated}} <span class="deprecated">Deprecated{{#vendorExtensions.x-boat-deprecation-message}}: {{.}}{{/vendorExtensions.x-boat-deprecation-message}}</span> {{/deprecated}}
         </div>
         {{#hasExamples}}
             <div class="examples">

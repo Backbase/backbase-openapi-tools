@@ -16,12 +16,19 @@ It currently consists of
 # Release Notes
 BOAT is still under development and subject to change.
 
+See also: https://github.com/Backbase/backbase-openapi-tools/releases
+
+
 ## 0.19.0
 * **Feature**: Added support for OpenAPI 3.1.x specifications alongside existing 3.0.x support
   * Explicitly allows OpenAPI 3.1.0, 3.1.1, and 3.1.2 instead of regex-based matching
 * Added Lombok to fix local build issues
 
-## 0.18.3
+## 0.18.6
+ * * Java RestTemplate generator: added `useSingleRequestParameter` support to replace positional parameter lists with named `*Param` objects for multi-parameter operations,
+     see [boat-maven-plugin README](boat-maven-plugin/README.md#single-request-parameter).
+
+## 0.18.4
 * **Breaking change**: `boat:bundle` and `boat:generate` (when `bundleSpecs` is enabled) now de-duplicate
   `components/schemas` entries that are structurally identical but were registered under different names
   (e.g. because the same model file was reachable both via its canonical component name and via a direct
@@ -32,6 +39,8 @@ BOAT is still under development and subject to change.
     need to update their references.
   * Added a new `deduplicateSchemas` plugin parameter (default `true`) on `boat:bundle` and `boat:generate`
     to opt out and keep the previous (duplicated) behaviour while migrating.
+
+## 0.18.3
 
 ## 0.18.2
 * Spring generator: fixed `@ExampleObject` rendering in `api.mustache` by unwrapping escaped quotes in example payloads.

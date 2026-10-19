@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: Deprecated API Spec
+  version: 1.0.0
+  description: Test spec with x-deprecated and x-sunset-date
+  x-deprecated: true
+  x-sunset-date: 2026-12-31
+
+servers:
+  - url: https://api.example.com
+
+paths:
+  /items:
+    get:
+      operationId: getItems
+      summary: Get all items
+      tags:
+        - Items
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      operationId: createItem
+      summary: Create an item
+      tags:
+        - Items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+  /items/{id}:
+    get:
+      operationId: getItem
+      summary: Get item by ID
+      tags:
+        - Items
+      deprecated: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Item ID
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+          deprecated: true

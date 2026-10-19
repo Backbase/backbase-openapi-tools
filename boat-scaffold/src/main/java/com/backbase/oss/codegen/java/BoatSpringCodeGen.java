@@ -8,8 +8,10 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 import com.backbase.oss.codegen.java.BoatCodeGenUtils.CodegenValueType;
+import com.backbase.oss.codegen.utils.DeprecationExtensions;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template.Fragment;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -20,6 +22,7 @@ import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +41,7 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.templating.mustache.IndentedLambda;
 import org.openapitools.codegen.utils.ModelUtils;
 
@@ -372,6 +376,12 @@ public class BoatSpringCodeGen extends SpringCodegen {
             && this.apiTemplateFiles.containsKey("apiDelegate.mustache");
     }
 
+    @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+        super.preprocessOpenAPI(openAPI);
+        DeprecationExtensions.populateDeprecationAdditionalProperties(openAPI, additionalProperties);
+    }
+
     /**
         This method has been overridden in order to add a parameter to codegen operation for adding HttpServletRequest to
         the service interface. There is a relevant httpServletParam.mustache file.
@@ -392,6 +402,7 @@ public class BoatSpringCodeGen extends SpringCodegen {
         if (codegenOperation.returnType != null) {
             codegenOperation.returnType = codegenOperation.returnType.replace("@Valid", "");
         }
+        BoatCodeGenUtils.applyDeprecationIfNeeded(codegenOperation, additionalProperties);
         return codegenOperation;
     }
 
@@ -413,6 +424,15 @@ public class BoatSpringCodeGen extends SpringCodegen {
             model.imports.add("BigDecimalCustomSerializer");
             model.imports.add(JSON_SERIALIZE);
         }
+
+        BoatCodeGenUtils.applyDeprecationToPropertyIfNeeded(property, additionalProperties);
+    }
+
+    @Override
+    public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        Map<String, ModelsMap> result = super.postProcessAllModels(objs);
+        BoatCodeGenUtils.applyDeprecationToAllModelsIfNeeded(result, additionalProperties);
+        return result;
     }
 
     private boolean shouldSerializeBigDecimalAsString(CodegenProperty property) {
@@ -428,4 +448,5 @@ public class BoatSpringCodeGen extends SpringCodegen {
         return Stream.of(property.baseType, property.dataType, property.datatypeWithEnum)
             .anyMatch("string"::equalsIgnoreCase);
     }
+
 }
