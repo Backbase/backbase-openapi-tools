@@ -57,6 +57,13 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
+      # Maven 3.10 (default on ubuntu runners since 2026-10-04) makes central-publishing-maven-plugin
+      # bundle local-repo metadata files, which Maven Central rejects ("content that does NOT have a .pom file").
+      - name: Setup Maven 3.9
+        uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
+        with:
+          maven-version: 3.9.16
+
       - name: Configure Git user
         run: |
           git config user.email "actions@github.com"
