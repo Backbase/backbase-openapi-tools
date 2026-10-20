@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -79,5 +80,32 @@ class DeduplicateSchemasTransformerTests {
         assertEquals(2, result.getComponents().getSchemas().size());
         assertNull(result.getComponents().getSchemas().get("First").get$ref());
         assertNull(result.getComponents().getSchemas().get("Second").get$ref());
+    }
+
+    /**
+     * Duplicate detection keys schemas on their serialized form. Serialized with the 3.0 mapper, two 3.1
+     * schemas differing only in a 3.1-only keyword both flatten to {@code {}} and are wrongly merged.
+     */
+    @Test
+    void doesNotMergeOpenApi31SchemasThatDifferOnlyInA31Keyword() {
+        Schema<?> thing = new Schema<>();
+        thing.setConst("thing");
+
+        Schema<?> other = new Schema<>();
+        other.setConst("other");
+
+        OpenAPI openAPI = new OpenAPI(SpecVersion.V31);
+        openAPI.setOpenapi("3.1.0");
+        openAPI.setComponents(new Components()
+            .addSchemas("Thing", thing)
+            .addSchemas("Other", other));
+        openAPI.setPaths(new Paths());
+
+        OpenAPI result = new DeduplicateSchemasTransformer().transform(openAPI, emptyMap());
+
+        assertEquals(2, result.getComponents().getSchemas().size(),
+            "Schemas with different const values are distinct and must not be merged.");
+        assertTrue(result.getComponents().getSchemas().containsKey("Thing"));
+        assertTrue(result.getComponents().getSchemas().containsKey("Other"));
     }
 }

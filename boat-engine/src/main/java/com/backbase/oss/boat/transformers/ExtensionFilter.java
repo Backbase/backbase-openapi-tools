@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.transformers;
 
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ContainerNode;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
 
-import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,15 +49,18 @@ public class ExtensionFilter implements Transformer {
     }
 
     @SneakyThrows
-    private OpenAPI transform(OpenAPI source, Collection<String> remove) {
-        final ObjectMapper mapper = Yaml.mapper();
+    private OpenAPI transform(@NonNull OpenAPI source, Collection<String> remove) {
+        final ObjectMapper mapper = SerializerUtils.yamlMapper(source);
         final JsonNode tree = mapper.valueToTree(source);
 
         if (tree instanceof ContainerNode) {
             removeExtensions((ContainerNode) tree, remove);
         }
 
-        return mapper.treeToValue(tree, OpenAPI.class);
+        final OpenAPI result = mapper.treeToValue(tree, OpenAPI.class);
+        // treeToValue builds a fresh OpenAPI, whose spec version defaults to 3.0 regardless of the source.
+        result.setSpecVersion(source.getSpecVersion());
+        return result;
     }
 
     private void removeExtensions(ContainerNode node, Collection<String> remove) {

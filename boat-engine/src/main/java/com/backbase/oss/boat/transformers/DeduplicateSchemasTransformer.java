@@ -1,9 +1,10 @@
 package com.backbase.oss.boat.transformers;
 
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -60,7 +61,8 @@ public class DeduplicateSchemasTransformer implements Transformer {
         }
 
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
-        Map<String, String> renames = findDuplicateRenames(schemas);
+        ObjectMapper mapper = SerializerUtils.jsonMapper(openAPI);
+        Map<String, String> renames = findDuplicateRenames(schemas, mapper);
 
         if (renames.isEmpty()) {
             log.debug("No duplicate schemas found.");
@@ -70,7 +72,7 @@ public class DeduplicateSchemasTransformer implements Transformer {
         renames.forEach((duplicate, canonical) ->
             log.info("Merging duplicate schema '{}' into '{}'.", duplicate, canonical));
 
-        rewriteReferences(openAPI, renames);
+        rewriteReferences(openAPI, renames, mapper);
         // rewriteReferences() replaces components with a freshly deserialized instance, so the removal
         // must happen against the new schemas map, not the one captured before the rewrite.
         renames.keySet().forEach(openAPI.getComponents().getSchemas()::remove);
@@ -82,11 +84,11 @@ public class DeduplicateSchemasTransformer implements Transformer {
      * Groups schemas by structural equality (their serialized JSON representation) and, for every group with
      * more than one member, maps every non-canonical member's name onto the canonical one.
      */
-    private Map<String, String> findDuplicateRenames(Map<String, Schema> schemas) {
+    private Map<String, String> findDuplicateRenames(Map<String, Schema> schemas, ObjectMapper mapper) {
         Map<JsonNode, List<String>> byContent = new LinkedHashMap<>();
 
         schemas.forEach((name, schema) -> {
-            JsonNode node = Json.mapper().valueToTree(schema);
+            JsonNode node = mapper.valueToTree(schema);
             byContent.computeIfAbsent(node, key -> new ArrayList<>()).add(name);
         });
 
@@ -105,14 +107,14 @@ public class DeduplicateSchemasTransformer implements Transformer {
         return renames;
     }
 
-    private void rewriteReferences(OpenAPI openAPI, Map<String, String> renames) {
-        JsonNode pathsNode = Json.mapper().valueToTree(openAPI.getPaths());
+    private void rewriteReferences(OpenAPI openAPI, Map<String, String> renames, ObjectMapper mapper) {
+        JsonNode pathsNode = mapper.valueToTree(openAPI.getPaths());
         rewriteRefs(pathsNode, renames);
-        openAPI.setPaths(Json.mapper().convertValue(pathsNode, Paths.class));
+        openAPI.setPaths(mapper.convertValue(pathsNode, Paths.class));
 
-        JsonNode componentsNode = Json.mapper().valueToTree(openAPI.getComponents());
+        JsonNode componentsNode = mapper.valueToTree(openAPI.getComponents());
         rewriteRefs(componentsNode, renames);
-        openAPI.setComponents(Json.mapper().convertValue(componentsNode, Components.class));
+        openAPI.setComponents(mapper.convertValue(componentsNode, Components.class));
     }
 
     private void rewriteRefs(JsonNode node, Map<String, String> renames) {

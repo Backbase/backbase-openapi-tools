@@ -25,6 +25,7 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServ
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
+import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
@@ -33,7 +34,6 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
-import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
 import io.swagger.v3.parser.util.ClasspathHelper;
 import java.io.File;
@@ -948,13 +948,13 @@ public class GenerateMojo extends InputMavenArtifactMojo {
             if (unAlias) {
                 new UnAliasTransformer().transform(input.getOpenAPI(), emptyMap());
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
+                    java.nio.file.Files.write(new File(output, "openapi-unaliased.yaml").toPath(), SerializerUtils.toYamlString(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
             if (dereferenceComponents) {
                 new DereferenceComponentsPropertiesTransformer().transform(input.getOpenAPI(), emptyMap());
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
+                    java.nio.file.Files.write(new File(output, "openapi-dereferenced.yaml").toPath(), SerializerUtils.toYamlString(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
 
@@ -966,7 +966,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 }
 
                 if(writeDebugFiles) {
-                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), Yaml.pretty(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
+                    java.nio.file.Files.write(new File(output, "openapi-bundled.yaml").toPath(), SerializerUtils.toYamlString(input.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
                 }
             }
 
