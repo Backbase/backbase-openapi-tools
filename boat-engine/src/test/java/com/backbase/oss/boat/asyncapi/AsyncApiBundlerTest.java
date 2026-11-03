@@ -77,6 +77,28 @@ class AsyncApiBundlerTest {
     }
 
     @Test
+    void bundlesSeveralEventsWithSharedSchemasAndChannelExtensions() throws Exception {
+        JsonNode bundled = new AsyncApiBundler().setOpenApiVersion("3.1.0")
+            .bundle(AsyncApiTestFiles.CLOUD_EVENTS);
+
+        assertEquals("ums", bundled.at("/channels/approvalRequested/x-producers/0").asText());
+        assertEquals("approval", bundled.at("/channels/approvalRequested/x-consumers/0").asText());
+        assertEquals("approval", bundled.at("/channels/approvalDecision/x-producers/0").asText());
+        assertEquals("ums", bundled.at("/channels/approvalDecision/x-consumers/0").asText());
+        assertEquals(Set.of("ApprovalRequestedCloudEvent", "ApprovalRequestedData", "ApprovalDecisionCloudEvent",
+            "ApprovalDecisionData", "RequestType", "Scope"), fieldNames(bundled.at("/components/schemas")));
+        for (String data : List.of("ApprovalRequestedData", "ApprovalDecisionData")) {
+            JsonNode properties = bundled.at("/components/schemas/" + data + "/schema/properties");
+            assertEquals("#/components/schemas/Scope", properties.at("/scope/$ref").asText(), data);
+            assertEquals("#/components/schemas/RequestType", properties.at("/requestType/$ref").asText(), data);
+        }
+
+        File output = AsyncApiTestFiles.write(dir, "bundled/approval-events-v1.yaml", AsyncApiBundler.toYaml(bundled));
+        AsyncApiValidationResult validation = new AsyncApiValidator().validate(output);
+        assertTrue(validation.isValid(), () -> "errors: " + validation.getErrors());
+    }
+
+    @Test
     void copiesComponentsInUnsupportedFormats() throws Exception {
         File file = AsyncApiTestFiles.asyncApi(dir, "asyncapi.yaml",
             "components:",
@@ -115,6 +137,12 @@ class AsyncApiBundlerTest {
         assertEquals("2.1.0", bundled.at("/info/version").asText());
         assertFalse(bundled.at("/info").has("x-internal"));
         assertFalse(bundled.at("/channels/events").has("x-audience"));
+    }
+
+    private static Set<String> fieldNames(JsonNode node) {
+        Set<String> names = new TreeSet<>();
+        node.fieldNames().forEachRemaining(names::add);
+        return names;
     }
 
     private static Set<String> schemaNames(AsyncApiDocument document) throws AsyncApiLoaderException {

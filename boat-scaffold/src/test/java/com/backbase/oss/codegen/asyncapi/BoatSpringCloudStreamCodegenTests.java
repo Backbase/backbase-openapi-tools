@@ -41,6 +41,8 @@ class BoatSpringCloudStreamCodegenTests {
         new File("../boat-trail-resources/src/main/resources/asyncapi/shared-events/asyncapi.yaml");
     static final File CLOUD_EVENT = new File(
         "../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/approval-decision-v1/asyncapi.yaml");
+    static final File CLOUD_EVENTS = new File(
+        "../boat-trail-resources/src/main/resources/asyncapi/cloud-events/approval-events-v1.yaml");
     static final String API_PACKAGE = "com.example.orders.events";
     static final String MODEL_PACKAGE = "com.example.orders.model";
 
@@ -161,6 +163,38 @@ class BoatSpringCloudStreamCodegenTests {
         CompilationUnit publisher = parse(new File(apiDir(output), "ApprovalDecisionPublisher.java"));
         assertThat(parameterTypes(publisher.findAll(MethodDeclaration.class).get(0)),
             hasItem("ApprovalDecisionCloudEvent"));
+
+        compile(output);
+    }
+
+    @Test
+    void generatesHandlerAndPublisherPerChannelOfUntaggedOperations() throws Exception {
+        File output = new File(TEST_OUTPUT, "cloud-events");
+        OpenAPI openAPI = new AsyncApiOpenApiProjector().setOpenApiVersion("3.1.0")
+            .project(AsyncApiLoader.load(CLOUD_EVENTS)).getOpenAPI();
+        generate(output, CLOUD_EVENTS, openAPI, Map.of());
+        File api = apiDir(output);
+
+        assertThat(List.of(api.list()), containsInAnyOrder("ApprovalRequestedHandler.java",
+            "ApprovalRequestedFunctionsConfiguration.java", "ApprovalDecisionPublisher.java",
+            "ApprovalDecisionFunctionsConfiguration.java", "AsyncApiHeaders.java"));
+        assertThat(methodNames(parse(new File(api, "ApprovalRequestedHandler.java"))),
+            equalTo(List.of("receiveApprovalRequested")));
+        assertThat(parameterTypes(method(parse(new File(api, "ApprovalDecisionPublisher.java")),
+            "sendApprovalDecision")), hasItem("ApprovalDecisionCloudEvent"));
+
+        File model = new File(output, "src/main/java/" + MODEL_PACKAGE.replace('.', '/'));
+        assertThat(List.of(model.list()), containsInAnyOrder("ApprovalRequestedCloudEvent.java",
+            "ApprovalRequestedData.java", "ApprovalDecisionCloudEvent.java", "ApprovalDecisionData.java",
+            "RequestType.java", "Scope.java", "BigDecimalCustomSerializer.java"));
+
+        String bindings = read(new File(output, "src/main/resources/asyncapi-bindings.properties"));
+        assertThat(bindings, containsString("spring.cloud.function.definition=receiveApprovalRequested\n"));
+        assertThat(bindings, containsString("spring.cloud.stream.output-bindings=sendApprovalDecision\n"));
+        assertThat(bindings, containsString(
+            "spring.cloud.stream.bindings.receiveApprovalRequested-in-0.destination=approval-requested"));
+        assertThat(bindings, containsString(
+            "spring.cloud.stream.bindings.sendApprovalDecision-out-0.destination=approval-decision"));
 
         compile(output);
     }

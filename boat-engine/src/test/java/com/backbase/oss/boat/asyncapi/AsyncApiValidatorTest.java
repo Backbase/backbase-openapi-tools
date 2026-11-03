@@ -210,6 +210,15 @@ class AsyncApiValidatorTest {
     }
 
     @Test
+    void acceptsSeveralEventsWithChannelExtensions() {
+        AsyncApiValidationResult result = validator.validate(AsyncApiTestFiles.CLOUD_EVENTS);
+
+        assertTrue(result.isValid(), () -> "errors: " + result.getErrors());
+        assertFalse(result.hasWarnings(), () -> "warnings: " + result.getWarnings());
+        assertEquals("Approval Events", result.getTitle());
+    }
+
+    @Test
     void warnsAboutUnsupportedComponentSchemaFormats() {
         File file = asyncApi(dir, "asyncapi.yaml",
             "components:",

@@ -266,6 +266,24 @@ class AsyncApiOpenApiProjectorTest {
     }
 
     @Test
+    void untaggedOperationsAreTaggedWithTheirChannel() throws Exception {
+        AsyncApiProjection projection = new AsyncApiOpenApiProjector().setOpenApiVersion("3.1.0")
+            .project(AsyncApiLoader.load(AsyncApiTestFiles.CLOUD_EVENTS));
+        OpenAPI openAPI = projection.getOpenAPI();
+
+        Operation receive = openAPI.getPaths().get("/receiveApprovalRequested").getPost();
+        assertEquals(List.of("approvalRequested"), receive.getTags());
+        assertEquals("receive", receive.getExtensions().get(AsyncApiExtensions.ACTION));
+        Operation send = openAPI.getPaths().get("/sendApprovalDecision").getPost();
+        assertEquals(List.of("approvalDecision"), send.getTags());
+        assertEquals("send", send.getExtensions().get(AsyncApiExtensions.ACTION));
+        assertEquals(Set.of("ApprovalRequestedCloudEvent", "ApprovalRequestedData", "ApprovalDecisionCloudEvent",
+            "ApprovalDecisionData", "RequestType", "Scope"), openAPI.getComponents().getSchemas().keySet(),
+            "schemas both events reference exist once");
+        assertTrue(projection.getWarnings().isEmpty(), projection.getWarnings()::toString);
+    }
+
+    @Test
     void warnsAboutJsonSchema2020OnOpenApi30() throws Exception {
         AsyncApiProjection projection = project(AsyncApiTestFiles.CLOUD_EVENT);
         String warnings = String.join("\n", projection.getWarnings());

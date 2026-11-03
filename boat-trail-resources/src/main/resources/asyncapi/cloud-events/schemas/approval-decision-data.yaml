@@ -1,0 +1,12 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: ApprovalDecisionData
+type: object
+required: [requestType, scope, status]
+properties:
+  requestType:
+    $ref: ../shared/schemas/request-type.yaml
+  scope:
+    $ref: ../shared/schemas/scope.yaml
+  status:
+    type: string
+    enum: [approved, rejected]
