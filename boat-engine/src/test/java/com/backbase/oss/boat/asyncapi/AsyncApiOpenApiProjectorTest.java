@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.backbase.oss.boat.asyncapi.model.AsyncApiDocument;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
@@ -368,9 +369,10 @@ class AsyncApiOpenApiProjectorTest {
     }
 
     @Test
-    void rejectsUnsupportedProjectionVersions() {
+    void rejectsUnsupportedProjectionVersions() throws AsyncApiLoaderException {
+        AsyncApiDocument document = AsyncApiLoader.load(SHARED_EVENTS);
         AsyncApiOpenApiProjector projector = new AsyncApiOpenApiProjector().setOpenApiVersion("2.0");
-        assertThrows(AsyncApiLoaderException.class, () -> projector.project(AsyncApiLoader.load(SHARED_EVENTS)));
+        assertThrows(AsyncApiLoaderException.class, () -> projector.project(document));
     }
 
     private static AsyncApiProjection project(File file) throws AsyncApiLoaderException {

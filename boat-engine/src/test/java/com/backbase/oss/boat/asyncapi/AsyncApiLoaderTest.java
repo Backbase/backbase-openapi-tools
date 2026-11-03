@@ -37,14 +37,34 @@ class AsyncApiLoaderTest {
 
         AsyncApiLoaderException e = assertThrows(AsyncApiLoaderException.class, () -> AsyncApiLoader.load(file));
         assertThat(e.getMessage(), containsString("2.6.0"));
-        assertThat(e.getMessage(), containsString("3.0"));
+        assertThat(e.getMessage(), containsString("Migrate the document to AsyncAPI 3"));
+    }
+
+    @Test
+    void loadsAsyncApi31() throws Exception {
+        File file = AsyncApiTestFiles.write(dir, "asyncapi.yaml",
+            "asyncapi: 3.1.0",
+            "info: {title: x, version: '1'}",
+            "channels:",
+            "  events:",
+            "    messages:",
+            "      event: {payload: {type: object}}",
+            "operations:",
+            "  onEvent:",
+            "    action: receive",
+            "    channel: {$ref: '#/channels/events'}");
+
+        AsyncApiDocument document = AsyncApiLoader.load(file);
+
+        assertEquals("3.1.0", document.getAsyncapi());
+        assertSame(document.getChannels().get("events"), document.getOperations().get("onEvent").getChannel());
     }
 
     @Test
     void rejectsOtherVersionsAndDocuments() {
-        File future = AsyncApiTestFiles.write(dir, "future.yaml", "asyncapi: 3.1.0", "info: {title: x, version: '1'}");
+        File future = AsyncApiTestFiles.write(dir, "future.yaml", "asyncapi: 3.2.0", "info: {title: x, version: '1'}");
         assertThat(assertThrows(AsyncApiLoaderException.class, () -> AsyncApiLoader.load(future)).getMessage(),
-            containsString("expected 3.0.x"));
+            containsString("AsyncAPI 3.2.0 is not supported, expected 3.0.x or 3.1.x"));
 
         File openApi = AsyncApiTestFiles.write(dir, "openapi.yaml", "openapi: 3.0.3", "info: {title: x, version: '1'}");
         assertThat(assertThrows(AsyncApiLoaderException.class, () -> AsyncApiLoader.load(openApi)).getMessage(),

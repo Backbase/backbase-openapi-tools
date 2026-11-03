@@ -18,7 +18,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
- * Validates OpenAPI and AsyncAPI 3.0 specs.
+ * Validates OpenAPI and AsyncAPI 3.0 and 3.1 specs.
  */
 @Mojo(name = "validate", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j

@@ -87,6 +87,11 @@ class BoatSpringCloudStreamCodegenTests {
         assertThat(List.of(model.list()), hasItem("OrderPlacedHeaders.java"));
         assertThat(List.of(model.list()), hasItem("PaymentSettledPayload.java"));
 
+        assertActionBindings(output);
+        compile(output);
+    }
+
+    private static void assertActionBindings(File output) throws IOException {
         String bindings = read(new File(output, "src/main/resources/asyncapi-bindings.properties"));
         assertThat(bindings, containsString(
             "spring.cloud.function.definition=onOrderStatusChanged;validateOrder;onPaymentSettled"));
@@ -97,8 +102,6 @@ class BoatSpringCloudStreamCodegenTests {
             "spring.cloud.stream.bindings.onOrderStatusChanged-in-0.destination=orders.*.status"));
         assertThat(bindings, containsString(
             "spring.cloud.stream.bindings.validateOrder-in-0.destination=orders.validation.requests"));
-
-        compile(output);
     }
 
     @Test
@@ -183,8 +186,7 @@ class BoatSpringCloudStreamCodegenTests {
         return generate(output, SHARED_EVENTS, openAPI, options);
     }
 
-    private static List<File> generate(File output, File spec, OpenAPI openAPI, Map<String, String> options)
-        throws Exception {
+    private static List<File> generate(File output, File spec, OpenAPI openAPI, Map<String, String> options) {
         BoatSpringCloudStreamCodegen codegen = new BoatSpringCloudStreamCodegen();
         codegen.setOutputDir(output.getAbsolutePath());
         codegen.setInputSpec(spec.getAbsolutePath());

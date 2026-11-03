@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.openapitools.codegen.languages.SpringCodegen;
 
 /**
- * Generating Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 document.
+ * Generating Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 or 3.1 document.
  */
 @Mojo(name = "generate-spring-cloud-stream-embedded", threadSafe = true)
 public class GenerateSpringCloudStreamEmbeddedMojo extends AbstractGenerateMojo {

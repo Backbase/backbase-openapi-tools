@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * An AsyncAPI 3.0 document with its structural references resolved.
+ * An AsyncAPI 3.0 or 3.1 document with its structural references resolved.
  *
  * <p>Schemas (component schemas, message payloads and headers) are kept as raw JSON so that their {@code $ref}s can
  * be resolved by the OpenAPI bundler.

@@ -115,7 +115,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-asyncapi-schema</id>
+                        <id>unpack-asyncapi-schemas</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -126,12 +126,12 @@
                                     <groupId>org.webjars.npm</groupId>
                                     <artifactId>asyncapi__specs</artifactId>
                                     <version>${asyncapi-specs.version}</version>
-                                    <includes>**/schemas/3.0.0-without-$id.json</includes>
+                                    <includes>**/schemas/3.0.0-without-$id.json,**/schemas/3.1.0-without-$id.json</includes>
                                     <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                                            <pattern>^.*/schemas/3\.0\.0-without-\$id\.json$</pattern>
-                                            <replacement>asyncapi/asyncapi-3.0.0-schema.json</replacement>
+                                            <pattern>^.*/schemas/(3\.[01]\.0)-without-\$id\.json$</pattern>
+                                            <replacement>asyncapi/asyncapi-$1-schema.json</replacement>
                                         </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                     </fileMappers>
                                 </artifactItem>

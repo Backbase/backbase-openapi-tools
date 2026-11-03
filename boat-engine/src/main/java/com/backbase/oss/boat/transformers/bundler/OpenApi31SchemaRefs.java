@@ -187,7 +187,7 @@ final class OpenApi31SchemaRefs {
     @SuppressWarnings("rawtypes")
     private static void forEach(Collection<? extends Schema> schemas, Consumer<Schema<?>> action) {
         if (schemas != null) {
-            schemas.stream().filter(Objects::nonNull).forEach(subschema -> action.accept(subschema));
+            schemas.stream().filter(Objects::nonNull).forEach(action::accept);
         }
     }
 }

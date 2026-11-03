@@ -32,7 +32,7 @@ import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 
 /**
- * Generates Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 document projected onto OpenAPI by
+ * Generates Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 or 3.1 document projected onto OpenAPI by
  * {@code AsyncApiOpenApiProjector}.
  *
  * <p>Models come from the {@code boat-spring} templates, so they are identical to the models generated from an
@@ -83,7 +83,7 @@ public class BoatSpringCloudStreamCodegen extends BoatSpringCodeGen {
     @Setter
     protected boolean generateBindingProperties = true;
 
-    private boolean constructed;
+    private final boolean constructed;
     private final Map<String, Set<String>> rolesByClassname = new LinkedHashMap<>();
     private final List<File> roleLessFiles = new ArrayList<>();
     private final List<BoatAsyncOperation> asyncOperations = new ArrayList<>();
@@ -122,7 +122,7 @@ public class BoatSpringCloudStreamCodegen extends BoatSpringCodeGen {
 
     @Override
     public String getHelp() {
-        return "Generates Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 document.";
+        return "Generates Spring Cloud Stream producers and consumers from an AsyncAPI 3.0 or 3.1 document.";
     }
 
     /**

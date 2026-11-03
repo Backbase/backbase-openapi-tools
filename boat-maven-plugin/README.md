@@ -11,8 +11,8 @@ Boat maven plugin uses slightly modified templates for html, java and webclient 
 
 All inputSpec parameters for this goal may additionally be configured as an artifact. See [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter) or [integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-artifact-input) for examples.
 
-The input spec may also be an AsyncAPI 3.0 document, see [AsyncAPI 3.0](#asyncapi-30) and the `projectionOpenApiVersion`
-parameter.
+The input spec may also be an AsyncAPI 3.0 or 3.1 document, see [AsyncAPI 3.0 and 3.1](#asyncapi-30-and-31) and the
+`projectionOpenApiVersion` parameter.
 
 ## boat:generate-spring-boot-embedded
 
@@ -222,7 +222,8 @@ Same with `generate` but with opinionated defaults for Web Client
 ## boat:generate-spring-cloud-stream-embedded
 
 Generates [Spring Cloud Stream](https://spring.io/projects/spring-cloud-stream) producers and consumers from an
-[AsyncAPI 3.0](https://www.asyncapi.com/docs/reference/specification/v3.0.0) document. It uses the `boat-spring-cloud-stream`
+[AsyncAPI 3.0](https://www.asyncapi.com/docs/reference/specification/v3.0.0) or
+[3.1](https://www.asyncapi.com/docs/reference/specification/v3.1.0) document. It uses the `boat-spring-cloud-stream`
 generator with the same opinionated defaults as `generate-spring-boot-embedded` (Spring Boot 3, Jakarta EE, bean validation,
 `useTags`), except that `interfaceOnly` defaults to `false`.
 
@@ -278,11 +279,11 @@ Notes on Spring Cloud Stream:
 See the [AsyncAPI integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-generate/asyncapi)
 for working examples.
 
-## AsyncAPI 3.0
+## AsyncAPI 3.0 and 3.1
 
-The plugin recognizes AsyncAPI 3.0 documents (a root `asyncapi` field) wherever it reads specs. AsyncAPI 2.x documents
-are rejected. For code generation the AsyncAPI document must be a local file or come from `inputMavenArtifact`; an
-`inputSpec` URL is always read as OpenAPI.
+The plugin recognizes AsyncAPI 3.0 and 3.1 documents (a root `asyncapi` field) wherever it reads specs. AsyncAPI 2.x
+documents are rejected. For code generation the AsyncAPI document must be a local file or come from
+`inputMavenArtifact`; an `inputSpec` URL is always read as OpenAPI.
 
 * Message payloads and headers, and component schemas declared as Multi Format Schema Object, may use the AsyncAPI and
   OpenAPI 3.0 schema formats, or JSON Schema: `application/schema+json` or `application/schema+yaml`, with `version`
@@ -387,14 +388,15 @@ Removes deprecated elements in an OpenAPI spec.
 
 ## boat:validate
 
-Validates OpenAPI and AsyncAPI 3.0 specs.
+Validates OpenAPI and AsyncAPI 3.0 and 3.1 specs.
 
 Configuration can point to a specific file, or a directory. When a directory is specified all files with a `.yaml` 
 extension are validated. `failOnWarning` specifies whether to fail the build when validation violations are found,
 otherwise, warnings are written to the log for everyone to ignore.
 
-AsyncAPI documents are validated against the AsyncAPI 3.0 JSON Schema, after which BOAT checks that operations reference
-declared channels and messages, that address parameters are declared and that schema formats are supported.
+AsyncAPI documents are validated against the official AsyncAPI JSON Schema of their version, after which BOAT checks
+that operations reference declared channels and messages, that address parameters are declared and that schema formats
+are supported.
 
     <configuration>
         <input>${project.build.outputDirectory}/specs/</input>
@@ -498,7 +500,7 @@ Available parameters:
 
 Examples in `json` files are parsed to objects.
 
-AsyncAPI 3.0 documents are bundled too: external references are inlined, payload and header schemas are moved to
+AsyncAPI documents are bundled too: external references are inlined, payload and header schemas are moved to
 `components/schemas` (de-duplicated when `deduplicateSchemas` is `true`) and messages reference them. `version`,
 `versionFileName` and `removeExtensions` apply as for OpenAPI. The default `includes` already match `asyncapi.yaml`.
 Set `projectionOpenApiVersion` to the value used for generation, for example `3.1.0` for JSON Schema 2020-12 schemas,

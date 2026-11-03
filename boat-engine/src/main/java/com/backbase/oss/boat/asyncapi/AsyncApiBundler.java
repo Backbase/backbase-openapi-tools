@@ -28,7 +28,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Bundles an AsyncAPI 3.0 document and everything it references into a single self-contained document.
+ * Bundles an AsyncAPI 3.0 or 3.1 document and everything it references into a single self-contained document.
  *
  * <p>Schemas are bundled through the OpenAPI projection, with the same {@link com.backbase.oss.boat.transformers.Bundler}
  * and {@link com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer} as {@code boat:bundle} uses for
@@ -44,6 +44,10 @@ import lombok.extern.slf4j.Slf4j;
 public class AsyncApiBundler {
 
     private static final String REF = "$ref";
+    private static final String SCHEMA = "schema";
+    private static final String SCHEMA_FORMAT = "schemaFormat";
+    private static final String PAYLOAD = "payload";
+    private static final String HEADERS = "headers";
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory()
         .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
         .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
@@ -111,28 +115,36 @@ public class AsyncApiBundler {
             throw new AsyncApiLoaderException("External references nested deeper than " + MAX_DEPTH + " levels");
         }
         if (node instanceof ObjectNode) {
-            ObjectNode object = (ObjectNode) node;
-            List<String> fieldNames = new ArrayList<>();
-            object.fieldNames().forEachRemaining(fieldNames::add);
-            for (String field : fieldNames) {
-                if ("payload".equals(field) || "headers".equals(field)) {
-                    continue;
-                }
-                JsonNode value = object.get(field);
-                if (isExternalRef(value)) {
-                    object.set(field, inline(value, resolver, base, depth));
-                } else {
-                    inlineExternalRefs(value, resolver, base, depth + 1);
-                }
-            }
+            inlineObjectRefs((ObjectNode) node, resolver, base, depth);
         } else if (node instanceof ArrayNode) {
-            ArrayNode array = (ArrayNode) node;
-            for (int i = 0; i < array.size(); i++) {
-                if (isExternalRef(array.get(i))) {
-                    array.set(i, inline(array.get(i), resolver, base, depth));
-                } else {
-                    inlineExternalRefs(array.get(i), resolver, base, depth + 1);
-                }
+            inlineArrayRefs((ArrayNode) node, resolver, base, depth);
+        }
+    }
+
+    private void inlineObjectRefs(ObjectNode object, RefResolver resolver, URI base, int depth)
+        throws AsyncApiLoaderException {
+        List<String> fieldNames = new ArrayList<>();
+        object.fieldNames().forEachRemaining(fieldNames::add);
+        for (String field : fieldNames) {
+            if (PAYLOAD.equals(field) || HEADERS.equals(field)) {
+                continue;
+            }
+            JsonNode value = object.get(field);
+            if (isExternalRef(value)) {
+                object.set(field, inline(value, resolver, base, depth));
+            } else {
+                inlineExternalRefs(value, resolver, base, depth + 1);
+            }
+        }
+    }
+
+    private void inlineArrayRefs(ArrayNode array, RefResolver resolver, URI base, int depth)
+        throws AsyncApiLoaderException {
+        for (int i = 0; i < array.size(); i++) {
+            if (isExternalRef(array.get(i))) {
+                array.set(i, inline(array.get(i), resolver, base, depth));
+            } else {
+                inlineExternalRefs(array.get(i), resolver, base, depth + 1);
             }
         }
     }
@@ -165,8 +177,8 @@ public class AsyncApiBundler {
                 schemas.set(name, source);
             } else if (schemas.has(name)) {
                 ObjectNode wrapper = schemas.objectNode();
-                wrapper.put("schemaFormat", entry.getValue());
-                wrapper.set("schema", schemas.get(name));
+                wrapper.put(SCHEMA_FORMAT, entry.getValue());
+                wrapper.set(SCHEMA, schemas.get(name));
                 schemas.set(name, wrapper);
             }
         }
@@ -186,8 +198,8 @@ public class AsyncApiBundler {
             return;
         }
         ObjectNode messageNode = (ObjectNode) message;
-        setSchemaRef(messageNode, "payload", schemas.getPayloadRef());
-        setSchemaRef(messageNode, "headers", schemas.getHeadersRef());
+        setSchemaRef(messageNode, PAYLOAD, schemas.getPayloadRef());
+        setSchemaRef(messageNode, HEADERS, schemas.getHeadersRef());
     }
 
     private static void setSchemaRef(ObjectNode message, String field, String ref) {
@@ -196,8 +208,8 @@ public class AsyncApiBundler {
         }
         JsonNode existing = message.get(field);
         ObjectNode refNode = message.objectNode().put(REF, ref);
-        if (existing != null && existing.isObject() && existing.has("schemaFormat") && existing.has("schema")) {
-            ((ObjectNode) existing).set("schema", refNode);
+        if (existing != null && existing.isObject() && existing.has(SCHEMA_FORMAT) && existing.has(SCHEMA)) {
+            ((ObjectNode) existing).set(SCHEMA, refNode);
         } else {
             message.set(field, refNode);
         }

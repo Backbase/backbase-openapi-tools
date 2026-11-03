@@ -33,22 +33,20 @@ class SchemaFormatsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"application/schema+json", "application/schema+yaml"})
-    void acceptsJsonSchemaWithoutVersion(String format) {
-        assertTrue(SchemaFormats.isSupported(format));
-        assertEquals(Optional.empty(), SchemaFormats.draft(format));
-    }
-
-    @ParameterizedTest
     @ValueSource(strings = {
+        "application/schema+json",
+        "application/schema+yaml",
         "application/vnd.aai.asyncapi;version=3.0.0",
         "application/vnd.aai.asyncapi+json;version=3.0.0",
         "application/vnd.aai.asyncapi+yaml;version=3.0.0",
+        "application/vnd.aai.asyncapi;version=3.1.0",
+        "application/vnd.aai.asyncapi+json;version=3.1.0",
+        "application/vnd.aai.asyncapi+yaml;version=3.1.0",
         "application/vnd.oai.openapi;version=3.0.0",
         "application/vnd.oai.openapi+json;version=3.0.0",
         "application/vnd.oai.openapi+yaml;version=3.0.0"
     })
-    void acceptsAsyncApiAndOpenApiSchemas(String format) {
+    void acceptsFormatsWithoutDraft(String format) {
         assertTrue(SchemaFormats.isSupported(format));
         assertEquals(Optional.empty(), SchemaFormats.draft(format));
     }

@@ -60,6 +60,32 @@ class AsyncApiValidatorTest {
     }
 
     @Test
+    void validatesAgainstTheSchemaOfTheDocumentVersion() {
+        // ROS 2 bindings were added in AsyncAPI 3.1.
+        String[] lines = {
+            "info: {title: x, version: '1'}",
+            "servers:",
+            "  robot:",
+            "    host: localhost",
+            "    protocol: ros2",
+            "    bindings:",
+            "      ros2: {domainId: 0}"};
+        String[] v30 = new String[lines.length + 1];
+        String[] v31 = new String[lines.length + 1];
+        v30[0] = "asyncapi: 3.0.0";
+        v31[0] = "asyncapi: 3.1.0";
+        System.arraycopy(lines, 0, v30, 1, lines.length);
+        System.arraycopy(lines, 0, v31, 1, lines.length);
+
+        AsyncApiValidationResult result30 = validator.validate(AsyncApiTestFiles.write(dir, "v30.yaml", v30));
+        AsyncApiValidationResult result31 = validator.validate(AsyncApiTestFiles.write(dir, "v31.yaml", v31));
+
+        assertThat(String.join("\n", result30.getErrors()),
+            containsString("$.servers.robot.bindings: property 'ros2' is not defined in the schema"));
+        assertTrue(result31.isValid(), () -> "errors: " + result31.getErrors());
+    }
+
+    @Test
     void reportsVersionErrors() {
         File file = AsyncApiTestFiles.write(dir, "asyncapi.yaml", "asyncapi: 2.6.0", "info: {title: x, version: '1'}");
 

@@ -14,7 +14,7 @@ import org.openapitools.codegen.CodegenOperation;
  * A {@link CodegenOperation} for an AsyncAPI operation, carrying the role and channel details read from the
  * {@code x-boat-async-*} extensions of the projected OpenAPI operation.
  */
-@SuppressWarnings("java:S1104")
+@SuppressWarnings({"java:S1104", "java:S2160"})
 public class BoatAsyncOperation extends CodegenOperation {
 
     public boolean isSend;

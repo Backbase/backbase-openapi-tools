@@ -14,15 +14,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Loads AsyncAPI 3.0 documents into an {@link AsyncApiDocument}.
+ * Loads AsyncAPI 3.0 and 3.1 documents into an {@link AsyncApiDocument}.
  *
  * <p>Structural references (channels, operations, messages, parameters, traits, replies) are resolved, also when they
  * point at external files. Schema references are kept as-is, but rebased to the root document when the schema was
@@ -31,7 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class AsyncApiLoader {
 
-    public static final String SUPPORTED_VERSION_PREFIX = "3.0.";
+    /**
+     * AsyncAPI versions that can be loaded. A document is read as the version with the same major and minor version.
+     */
+    public static final List<String> SUPPORTED_VERSIONS = Collections.unmodifiableList(Arrays.asList("3.0.0", "3.1.0"));
 
     private static final String REF = "$ref";
     private static final String MESSAGES = "messages";
@@ -40,6 +46,13 @@ public final class AsyncApiLoader {
     private static final String HEADERS = "headers";
     private static final String SCHEMA_FORMAT = "schemaFormat";
     private static final String SCHEMA = "schema";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
+    private static final String SUMMARY = "summary";
+    private static final String ADDRESS = "address";
+    private static final String BINDINGS = "bindings";
+    private static final String LOCATION = "location";
+    private static final String CORRELATION_ID = "correlationId";
 
     private static final Pattern CHANNEL_POINTER = Pattern.compile("^/channels/([^/]+)$");
     private static final Pattern CHANNEL_MESSAGE_POINTER = Pattern.compile("^/channels/([^/]+)/messages/([^/]+)$");
@@ -72,7 +85,12 @@ public final class AsyncApiLoader {
         return new Builder(raw, location).build();
     }
 
-    static void checkVersion(JsonNode raw) throws AsyncApiLoaderException {
+    /**
+     * Checks the {@code asyncapi} field of the document.
+     *
+     * @return the {@link #SUPPORTED_VERSIONS supported version} the document is read as
+     */
+    static String checkVersion(JsonNode raw) throws AsyncApiLoaderException {
         if (raw == null || !raw.isObject()) {
             throw new AsyncApiLoaderException("AsyncAPI document must be a YAML or JSON object");
         }
@@ -83,11 +101,20 @@ public final class AsyncApiLoader {
         String value = version.asText();
         if (value.startsWith("2.")) {
             throw new AsyncApiLoaderException("AsyncAPI " + value + " is not supported. Migrate the document to "
-                + "AsyncAPI 3.0 (https://www.asyncapi.com/docs/migration/migrating-to-v3)");
+                + "AsyncAPI 3 (https://www.asyncapi.com/docs/migration/migrating-to-v3)");
         }
-        if (!value.startsWith(SUPPORTED_VERSION_PREFIX)) {
-            throw new AsyncApiLoaderException("AsyncAPI " + value + " is not supported, expected 3.0.x");
+        for (String supported : SUPPORTED_VERSIONS) {
+            if (value.startsWith(minorVersion(supported) + ".")) {
+                return supported;
+            }
         }
+        throw new AsyncApiLoaderException("AsyncAPI " + value + " is not supported, expected "
+            + SUPPORTED_VERSIONS.stream().map(supported -> minorVersion(supported) + ".x")
+            .collect(Collectors.joining(" or ")));
+    }
+
+    private static String minorVersion(String version) {
+        return version.substring(0, version.lastIndexOf('.'));
     }
 
     private static final class Builder {
@@ -112,9 +139,9 @@ public final class AsyncApiLoader {
             document.setDefaultContentType(text(raw, "defaultContentType"));
 
             JsonNode info = raw.path("info");
-            document.getInfo().setTitle(text(info, "title"));
+            document.getInfo().setTitle(text(info, TITLE));
             document.getInfo().setVersion(text(info, "version"));
-            document.getInfo().setDescription(text(info, "description"));
+            document.getInfo().setDescription(text(info, DESCRIPTION));
 
             parseServers();
 
@@ -152,7 +179,7 @@ public final class AsyncApiLoader {
                 server.setProtocol(text(node, "protocol"));
                 server.setProtocolVersion(text(node, "protocolVersion"));
                 server.setPathname(text(node, "pathname"));
-                server.setDescription(text(node, "description"));
+                server.setDescription(text(node, DESCRIPTION));
                 document.getServers().put(entry.getKey(), server);
             }
         }
@@ -163,11 +190,11 @@ public final class AsyncApiLoader {
 
             Channel channel = new Channel();
             channel.setKey(key);
-            channel.setAddress(text(channelNode, "address"));
-            channel.setTitle(text(channelNode, "title"));
-            channel.setSummary(text(channelNode, "summary"));
-            channel.setDescription(text(channelNode, "description"));
-            channel.setBindings(channelNode.get("bindings"));
+            channel.setAddress(text(channelNode, ADDRESS));
+            channel.setTitle(text(channelNode, TITLE));
+            channel.setSummary(text(channelNode, SUMMARY));
+            channel.setDescription(text(channelNode, DESCRIPTION));
+            channel.setBindings(channelNode.get(BINDINGS));
 
             for (Map.Entry<String, JsonNode> entry : fields(channelNode.path("parameters"))) {
                 channel.getParameters().put(entry.getKey(),
@@ -203,9 +230,9 @@ public final class AsyncApiLoader {
             JsonNode parameterNode = resolver.resolve(node, base).getNode();
             ChannelParameter parameter = new ChannelParameter();
             parameter.setName(name);
-            parameter.setDescription(text(parameterNode, "description"));
+            parameter.setDescription(text(parameterNode, DESCRIPTION));
             parameter.setDefaultValue(text(parameterNode, "default"));
-            parameter.setLocation(text(parameterNode, "location"));
+            parameter.setLocation(text(parameterNode, LOCATION));
             parameterNode.path("enum").forEach(value -> parameter.getEnumValues().add(value.asText()));
             parameterNode.path("examples").forEach(value -> parameter.getExamples().add(value.asText()));
             return parameter;
@@ -224,11 +251,11 @@ public final class AsyncApiLoader {
                 name = target.getName() != null ? target.getName() : key;
             }
             message.setName(name);
-            message.setTitle(text(messageNode, "title"));
-            message.setSummary(text(messageNode, "summary"));
-            message.setDescription(text(messageNode, "description"));
+            message.setTitle(text(messageNode, TITLE));
+            message.setSummary(text(messageNode, SUMMARY));
+            message.setDescription(text(messageNode, DESCRIPTION));
             message.setContentType(text(messageNode, "contentType"));
-            message.setBindings(messageNode.get("bindings"));
+            message.setBindings(messageNode.get(BINDINGS));
 
             JsonNode payload = messageNode.get(PAYLOAD);
             if (isMultiFormatSchema(payload)) {
@@ -244,12 +271,12 @@ public final class AsyncApiLoader {
             }
             message.setHeaders(headers);
 
-            JsonNode correlationIdNode = messageNode.get("correlationId");
+            JsonNode correlationIdNode = messageNode.get(CORRELATION_ID);
             if (correlationIdNode != null) {
                 JsonNode resolved = resolver.resolve(correlationIdNode, root).getNode();
                 Message.CorrelationId correlationId = new Message.CorrelationId();
-                correlationId.setLocation(text(resolved, "location"));
-                correlationId.setDescription(text(resolved, "description"));
+                correlationId.setLocation(text(resolved, LOCATION));
+                correlationId.setDescription(text(resolved, DESCRIPTION));
                 message.setCorrelationId(correlationId);
             }
             return message;
@@ -267,10 +294,10 @@ public final class AsyncApiLoader {
             } catch (IllegalArgumentException e) {
                 throw new AsyncApiLoaderException("Operation '" + key + "': " + e.getMessage());
             }
-            operation.setTitle(text(operationNode, "title"));
-            operation.setSummary(text(operationNode, "summary"));
-            operation.setDescription(text(operationNode, "description"));
-            operation.setBindings(operationNode.get("bindings"));
+            operation.setTitle(text(operationNode, TITLE));
+            operation.setSummary(text(operationNode, SUMMARY));
+            operation.setDescription(text(operationNode, DESCRIPTION));
+            operation.setBindings(operationNode.get(BINDINGS));
             for (JsonNode tag : operationNode.path("tags")) {
                 String tagName = text(resolver.resolve(tag, base).getNode(), "name");
                 if (tagName != null) {
@@ -297,9 +324,9 @@ public final class AsyncApiLoader {
                 reply.setChannel(resolveChannelRef(replyNode.get(CHANNEL), target.getBaseUri(),
                     "Reply of operation '" + operationKey + "'"));
             }
-            if (replyNode.has("address")) {
-                JsonNode address = resolver.resolve(replyNode.get("address"), target.getBaseUri()).getNode();
-                reply.setAddressLocation(text(address, "location"));
+            if (replyNode.has(ADDRESS)) {
+                JsonNode address = resolver.resolve(replyNode.get(ADDRESS), target.getBaseUri()).getNode();
+                reply.setAddressLocation(text(address, LOCATION));
             }
             reply.setMessages(resolveMessages(replyNode.get(MESSAGES), target.getBaseUri(), reply.getChannel()));
             return reply;
@@ -388,41 +415,41 @@ public final class AsyncApiLoader {
 
         private ObjectNode rebased(Target target) {
             ObjectNode copy = (ObjectNode) target.getNode().deepCopy();
-            for (String field : new String[]{PAYLOAD, HEADERS, "correlationId", "bindings"}) {
+            for (String field : new String[]{PAYLOAD, HEADERS, CORRELATION_ID, BINDINGS}) {
                 if (copy.has(field)) {
                     copy.set(field, resolver.rebase(copy.get(field), target.getBaseUri()));
                 }
             }
             return copy;
         }
-    }
 
-    static void mergePatch(ObjectNode target, JsonNode patch) {
-        Iterator<Map.Entry<String, JsonNode>> fields = patch.fields();
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> field = fields.next();
-            JsonNode existing = target.get(field.getKey());
-            if (field.getValue().isNull()) {
-                target.remove(field.getKey());
-            } else if (existing instanceof ObjectNode && field.getValue().isObject()) {
-                mergePatch((ObjectNode) existing, field.getValue());
-            } else {
-                target.set(field.getKey(), field.getValue().deepCopy());
+        private static void mergePatch(ObjectNode target, JsonNode patch) {
+            Iterator<Map.Entry<String, JsonNode>> fields = patch.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                JsonNode existing = target.get(field.getKey());
+                if (field.getValue().isNull()) {
+                    target.remove(field.getKey());
+                } else if (existing instanceof ObjectNode && field.getValue().isObject()) {
+                    mergePatch((ObjectNode) existing, field.getValue());
+                } else {
+                    target.set(field.getKey(), field.getValue().deepCopy());
+                }
             }
         }
-    }
 
-    private static boolean isMultiFormatSchema(JsonNode node) {
-        return node != null && node.isObject() && node.has(SCHEMA_FORMAT) && node.has(SCHEMA);
-    }
+        private static boolean isMultiFormatSchema(JsonNode node) {
+            return node != null && node.isObject() && node.has(SCHEMA_FORMAT) && node.has(SCHEMA);
+        }
 
-    private static Iterable<Map.Entry<String, JsonNode>> fields(JsonNode node) {
-        return node::fields;
-    }
+        private static Iterable<Map.Entry<String, JsonNode>> fields(JsonNode node) {
+            return node::fields;
+        }
 
-    private static String text(JsonNode node, String field) {
-        JsonNode value = node == null ? null : node.get(field);
-        return value == null || value.isNull() ? null : value.asText();
+        private static String text(JsonNode node, String field) {
+            JsonNode value = node == null ? null : node.get(field);
+            return value == null || value.isNull() ? null : value.asText();
+        }
     }
 
     static String escape(String segment) {

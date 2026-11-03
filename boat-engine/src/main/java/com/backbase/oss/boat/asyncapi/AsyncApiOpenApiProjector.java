@@ -35,7 +35,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Projects an AsyncAPI 3.0 document onto an OpenAPI document, so the existing OpenAPI tooling (bundler, schema
+ * Projects an AsyncAPI 3.0 or 3.1 document onto an OpenAPI document, so the existing OpenAPI tooling (bundler, schema
  * de-duplication, code generators) can process its schemas.
  *
  * <ul>
@@ -67,6 +67,9 @@ public class AsyncApiOpenApiProjector {
     private static final String CONTENT = "content";
     private static final String SCHEMA = "schema";
     private static final String NAME = "name";
+    private static final String HEADERS = "headers";
+    private static final String WHICH_OPENAPI = ", which OpenAPI ";
+    private static final String PATH_SEPARATOR = "/";
 
     private static final JsonNodeFactory NODES = JsonNodeFactory.instance;
 
@@ -283,46 +286,56 @@ public class AsyncApiOpenApiProjector {
             for (Message message : messages) {
                 String operationId = messages.size() == 1 ? operation.getKey()
                     : operation.getKey() + AsyncApiNames.toTypeName(message.getName());
-                ObjectNode post = NODES.objectNode();
-                post.put("operationId", operationId);
-                ArrayNode tagsNode = post.putArray("tags");
-                tags.forEach(tagsNode::add);
-                putIfNotNull(post, "summary", operation.getSummary() != null ? operation.getSummary()
-                    : operation.getTitle());
-                putIfNotNull(post, DESCRIPTION, operation.getDescription());
-
-                post.put(AsyncApiExtensions.ACTION, operation.getAction().getValue());
-                post.put(AsyncApiExtensions.OPERATION, operation.getKey());
-                if (operation.getChannel() != null) {
-                    post.set(AsyncApiExtensions.CHANNEL, channelNode(operation.getChannel()));
-                }
-                post.set(AsyncApiExtensions.MESSAGE, messageNode(message));
-
-                MessageSchemas schemasOfMessage = messageSchemas.get(message);
-                String contentType = contentType(message);
-                if (schemasOfMessage != null && schemasOfMessage.getPayloadRef() != null) {
-                    ObjectNode requestBody = post.putObject("requestBody");
-                    requestBody.put("required", true);
-                    requestBody.putObject(CONTENT).putObject(contentType).putObject(SCHEMA)
-                        .put(REF, schemasOfMessage.getPayloadRef());
-                }
-
-                ObjectNode responses = post.putObject("responses");
-                Reply reply = operation.getReply();
-                if (reply != null) {
-                    post.set(AsyncApiExtensions.REPLY, replyNode(operation, reply, responses));
-                }
-                if (responses.isEmpty()) {
-                    responses.putObject("202").put(DESCRIPTION, "Accepted");
-                }
-
-                String path = "/" + operationId;
+                String path = PATH_SEPARATOR + operationId;
                 if (paths.has(path)) {
                     warnings.add("Duplicate operation id '" + operationId + "', skipping message '"
                         + message.getName() + "'");
                     continue;
                 }
-                paths.putObject(path).set("post", post);
+                paths.putObject(path).set("post", operationPost(operation, message, operationId, tags));
+            }
+        }
+
+        private ObjectNode operationPost(Operation operation, Message message, String operationId,
+            List<String> tags) {
+            ObjectNode post = NODES.objectNode();
+            post.put("operationId", operationId);
+            ArrayNode tagsNode = post.putArray("tags");
+            tags.forEach(tagsNode::add);
+            putIfNotNull(post, "summary", operation.getSummary() != null ? operation.getSummary()
+                : operation.getTitle());
+            putIfNotNull(post, DESCRIPTION, operation.getDescription());
+
+            post.put(AsyncApiExtensions.ACTION, operation.getAction().getValue());
+            post.put(AsyncApiExtensions.OPERATION, operation.getKey());
+            if (operation.getChannel() != null) {
+                post.set(AsyncApiExtensions.CHANNEL, channelNode(operation.getChannel()));
+            }
+            post.set(AsyncApiExtensions.MESSAGE, messageNode(message));
+            addRequestBody(post, message);
+            addResponses(post, operation);
+            return post;
+        }
+
+        private void addRequestBody(ObjectNode post, Message message) {
+            MessageSchemas schemasOfMessage = messageSchemas.get(message);
+            if (schemasOfMessage == null || schemasOfMessage.getPayloadRef() == null) {
+                return;
+            }
+            ObjectNode requestBody = post.putObject("requestBody");
+            requestBody.put("required", true);
+            requestBody.putObject(CONTENT).putObject(contentType(message)).putObject(SCHEMA)
+                .put(REF, schemasOfMessage.getPayloadRef());
+        }
+
+        private void addResponses(ObjectNode post, Operation operation) {
+            ObjectNode responses = post.putObject("responses");
+            Reply reply = operation.getReply();
+            if (reply != null) {
+                post.set(AsyncApiExtensions.REPLY, replyNode(operation, reply, responses));
+            }
+            if (responses.isEmpty()) {
+                responses.putObject("202").put(DESCRIPTION, "Accepted");
             }
         }
 
@@ -382,7 +395,7 @@ public class AsyncApiOpenApiProjector {
             node.put("contentType", contentType(message));
             MessageSchemas schemasOfMessage = messageSchemas.get(message);
             if (schemasOfMessage != null && schemasOfMessage.getHeadersRef() != null) {
-                node.putObject("headers").put(REF, schemasOfMessage.getHeadersRef());
+                node.putObject(HEADERS).put(REF, schemasOfMessage.getHeadersRef());
             }
             if (message.getCorrelationId() != null) {
                 ObjectNode correlationId = node.putObject("correlationId");
@@ -411,7 +424,7 @@ public class AsyncApiOpenApiProjector {
                     node.putObject("payload").put(REF, refs.getPayloadRef());
                 }
                 if (refs.getHeadersRef() != null) {
-                    node.putObject("headers").put(REF, refs.getHeadersRef());
+                    node.putObject(HEADERS).put(REF, refs.getHeadersRef());
                 }
             });
             return extension;
@@ -447,7 +460,7 @@ public class AsyncApiOpenApiProjector {
             }
             ((Map<String, Object>) extension).forEach((pointer, value) -> {
                 Map<String, Object> refs = (Map<String, Object>) value;
-                result.put(pointer, new MessageSchemas(refOf(refs.get("payload")), refOf(refs.get("headers"))));
+                result.put(pointer, new MessageSchemas(refOf(refs.get("payload")), refOf(refs.get(HEADERS))));
             });
             if (openAPI.getComponents().getExtensions().isEmpty()) {
                 openAPI.getComponents().setExtensions(null);
@@ -464,18 +477,18 @@ public class AsyncApiOpenApiProjector {
             URI base = document.getLocation();
             if (openApiVersion.startsWith("3.0.")) {
                 if (draft.filter(Draft::isOpenApi31).isPresent()) {
-                    warnings.add(owner + " is JSON Schema " + draft.get().getVersion() + ", which OpenAPI "
+                    warnings.add(owner + " is JSON Schema " + draft.get().getVersion() + WHICH_OPENAPI
                         + openApiVersion + " only partly supports. Set the projection OpenAPI version to 3.1.0.");
                 }
                 Set<String> found = SchemaKeywords.notInOpenApi30(schema, base, resolver);
                 if (!found.isEmpty()) {
-                    warnings.add(owner + " uses " + found + ", which OpenAPI " + openApiVersion + " cannot express; "
+                    warnings.add(owner + " uses " + found + WHICH_OPENAPI + openApiVersion + " cannot express; "
                         + "these keywords are ignored. Set the projection OpenAPI version to 3.1.0 to keep them.");
                 }
             } else if (draft.filter(Draft.DRAFT_04::equals).isPresent()) {
                 Set<String> found = SchemaKeywords.draft04Only(schema, base, resolver);
                 if (!found.isEmpty()) {
-                    warnings.add(owner + " is JSON Schema draft-04 and uses " + found + ", which OpenAPI "
+                    warnings.add(owner + " is JSON Schema draft-04 and uses " + found + WHICH_OPENAPI
                         + openApiVersion + " reads differently. Set the projection OpenAPI version to 3.0.3.");
                 }
             }

@@ -17,27 +17,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Validates AsyncAPI 3.0 documents against the official JSON Schema and checks the references between operations,
- * channels, messages and replies.
+ * Validates AsyncAPI 3.0 and 3.1 documents against the official JSON Schema of their version and checks the references
+ * between operations, channels, messages and replies.
  *
- * <p>The JSON Schema is bundled with all definitions inlined and remote {@code $ref} loading is disabled, so
+ * <p>The JSON Schemas are bundled with all definitions inlined and remote {@code $ref} loading is disabled, so
  * validation works offline.
  */
 @Slf4j
 public class AsyncApiValidator {
 
-    private static final String SCHEMA_RESOURCE = "/asyncapi/asyncapi-3.0.0-schema.json";
+    private static final String SCHEMA_RESOURCE = "/asyncapi/asyncapi-%s-schema.json";
     private static final Pattern ADDRESS_PARAMETER = Pattern.compile("\\{([^}]+)}");
     private static final Pattern RUNTIME_EXPRESSION = Pattern.compile("^\\$message\\.(header|payload)(#(/.*)?)?$");
 
-    private static JsonSchema schema;
+    private static final Map<String, JsonSchema> SCHEMAS = new HashMap<>();
 
     public AsyncApiValidationResult validate(File file) {
         return validate(file.toURI());
@@ -60,15 +62,16 @@ public class AsyncApiValidator {
     }
 
     private AsyncApiValidationResult validate(JsonNode raw, URI location, AsyncApiValidationResult result) {
+        String version;
         try {
-            AsyncApiLoader.checkVersion(raw);
+            version = AsyncApiLoader.checkVersion(raw);
         } catch (AsyncApiLoaderException e) {
             result.error(e.getMessage());
             return result;
         }
         result.setTitle(raw.path("info").path("title").asText(null));
 
-        getSchema().validate(raw).stream()
+        getSchema(version).validate(raw).stream()
             .sorted(Comparator.comparing(message -> message.getInstanceLocation().toString()))
             .map(AsyncApiValidator::format)
             .collect(Collectors.toCollection(LinkedHashSet::new))
@@ -175,31 +178,33 @@ public class AsyncApiValidator {
         return text.startsWith(location) ? text : location + ": " + text;
     }
 
-    private static synchronized JsonSchema getSchema() {
-        if (schema == null) {
-            JsonMetaSchema draft7 = JsonMetaSchema.builder(JsonMetaSchema.getV7())
-                .keyword(new NonValidationKeyword("example"))
-                .build();
-            JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V7, builder -> builder
-                .metaSchema(draft7)
-                .schemaLoaders(loaders -> loaders.add(iri -> {
-                    String value = iri.toString();
-                    if (value.startsWith("http:") || value.startsWith("https:")) {
-                        return () -> {
-                            throw new IOException("Remote schema loading is disabled: " + value);
-                        };
-                    }
-                    return null;
-                })));
-            try (InputStream in = AsyncApiValidator.class.getResourceAsStream(SCHEMA_RESOURCE)) {
-                if (in == null) {
-                    throw new IllegalStateException("Missing AsyncAPI schema resource " + SCHEMA_RESOURCE);
+    private static synchronized JsonSchema getSchema(String version) {
+        return SCHEMAS.computeIfAbsent(version, AsyncApiValidator::loadSchema);
+    }
+
+    private static JsonSchema loadSchema(String version) {
+        JsonMetaSchema draft7 = JsonMetaSchema.builder(JsonMetaSchema.getV7())
+            .keyword(new NonValidationKeyword("example"))
+            .build();
+        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V7, builder -> builder
+            .metaSchema(draft7)
+            .schemaLoaders(loaders -> loaders.add(iri -> {
+                String value = iri.toString();
+                if (value.startsWith("http:") || value.startsWith("https:")) {
+                    return () -> {
+                        throw new IOException("Remote schema loading is disabled: " + value);
+                    };
                 }
-                schema = factory.getSchema(in);
-            } catch (IOException e) {
-                throw new IllegalStateException("Cannot read AsyncAPI schema resource " + SCHEMA_RESOURCE, e);
+                return null;
+            })));
+        String resource = String.format(SCHEMA_RESOURCE, version);
+        try (InputStream in = AsyncApiValidator.class.getResourceAsStream(resource)) {
+            if (in == null) {
+                throw new IllegalStateException("Missing AsyncAPI schema resource " + resource);
             }
+            return factory.getSchema(in);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read AsyncAPI schema resource " + resource, e);
         }
-        return schema;
     }
 }
