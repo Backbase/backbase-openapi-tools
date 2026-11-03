@@ -25,11 +25,21 @@ import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyServ
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvp;
 import static org.openapitools.codegen.config.CodegenConfiguratorUtils.applyTypeMappingsKvpList;
 
+import com.backbase.oss.boat.asyncapi.AsyncApiLoader;
+import com.backbase.oss.boat.asyncapi.AsyncApiLoaderException;
+import com.backbase.oss.boat.asyncapi.AsyncApiOpenApiProjector;
+import com.backbase.oss.boat.asyncapi.AsyncApiProjection;
+import com.backbase.oss.boat.asyncapi.AsyncApiValidationResult;
+import com.backbase.oss.boat.asyncapi.AsyncApiValidator;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import com.backbase.oss.boat.transformers.Bundler;
 import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
 import com.backbase.oss.boat.transformers.DereferenceComponentsPropertiesTransformer;
 import com.backbase.oss.boat.transformers.UnAliasTransformer;
+import com.backbase.oss.codegen.asyncapi.BoatSpringCloudStreamCodegen;
+import com.backbase.oss.codegen.java.BoatJavaCodeGen;
+import com.backbase.oss.codegen.java.BoatSpringCodeGen;
+import com.backbase.oss.codegen.java.BoatWebhooksCodeGen;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
@@ -87,6 +97,13 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 @Slf4j
 public class GenerateMojo extends InputMavenArtifactMojo {
+
+    private static final String ASYNCAPI_GENERATOR = BoatSpringCloudStreamCodegen.NAME;
+    private static final String DEFAULT_COPY_TO_SUFFIX = "META-INF/openapi/openapi.yaml";
+    private static final String ASYNCAPI_COPY_TO_SUFFIX = "META-INF/asyncapi/asyncapi.yaml";
+    private static final Set<String> BOAT_JAVA_GENERATORS =
+        Set.of(BoatSpringCodeGen.NAME, BoatJavaCodeGen.NAME, BoatWebhooksCodeGen.NAME);
+    private static final String ASYNCAPI_MODEL_SUPPORTING_FILES = "BigDecimalCustomSerializer.java";
 
     private static String trimCSV(String text) {
         if (isNotEmpty(text)) {
@@ -500,6 +517,15 @@ public class GenerateMojo extends InputMavenArtifactMojo {
     @Parameter(name = "writeDebugFiles")
     protected boolean writeDebugFiles = false;
 
+    /**
+     * OpenAPI version of the document an AsyncAPI input spec is projected onto before generation. Use the version the
+     * shared schemas are written for: {@code 3.0.3} for OpenAPI 3.0 schemas (e.g. using {@code nullable}),
+     * {@code 3.1.0} for plain JSON Schema payloads.
+     */
+    @Parameter(name = "projectionOpenApiVersion", property = "openapi.generator.maven.plugin.projectionOpenApiVersion",
+        defaultValue = AsyncApiOpenApiProjector.DEFAULT_OPENAPI_VERSION)
+    protected String projectionOpenApiVersion = AsyncApiOpenApiProjector.DEFAULT_OPENAPI_VERSION;
+
     @Parameter(name = "openapiNormalizer", property = "openapi.generator.maven.plugin.openapiNormalizer")
     private List<String> openapiNormalizer;
 
@@ -577,6 +603,11 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
         addCompileSourceRootIfConfigured();
 
+        final boolean asyncApi = inputSpecFile.isFile() && SpecFormat.detect(inputSpecFile).isAsyncApi();
+        if (asyncApi) {
+            copyTo = asyncApiCopyTo(copyTo);
+        }
+
         try {
             if (buildContext != null && buildContext.isIncremental() && inputSpec != null && inputSpecFile.exists()
                 && !buildContext.hasDelta(inputSpecFile)) {
@@ -624,7 +655,9 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 configurator.setRemoveOperationIdPrefix(removeOperationIdPrefix);
             }
 
-            if (isNotEmpty(inputSpec)) {
+            if (asyncApi) {
+                configurator.setInputSpec(projectAsyncApi(inputSpecFile).toURI().toString());
+            } else if (isNotEmpty(inputSpec)) {
                 if (isValidURI(inputSpec)) {
                     configurator.setInputSpec(inputSpec);
                 } else if (inputSpecFile.exists()) {
@@ -693,6 +726,9 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
                 configurator.setGeneratorName(generatorName);
 
+                if (asyncApi && !ASYNCAPI_GENERATOR.equals(generatorName)) {
+                    restrictToAsyncApiModels();
+                }
 
                 // check if generatorName & language are set together, inform user this needs to be updated to prevent future issues.
                 if (isNotEmpty(language)) {
@@ -958,7 +994,7 @@ public class GenerateMojo extends InputMavenArtifactMojo {
                 }
             }
 
-            if(bundleSpecs) {
+            if (bundleSpecs && !asyncApi) {
                 new Bundler(inputSpecFile).transform(input.getOpenAPI(), Collections.emptyMap());
 
                 if (deduplicateSchemas) {
@@ -1002,6 +1038,73 @@ public class GenerateMojo extends InputMavenArtifactMojo {
 
     protected Collection<String> getGeneratorSpecificSupportingFiles() {
         return Collections.emptySet();
+    }
+
+    /**
+     * Generators other than {@code boat-spring-cloud-stream} would turn the projected operations into HTTP APIs, and their
+     * supporting files (application class, controllers, {@code openapi.yaml}) would describe those. The BOAT Java
+     * generators only keep the supporting files their models use.
+     */
+    private void restrictToAsyncApiModels() {
+        if (Boolean.TRUE.equals(generateApis)) {
+            getLog().info(format("Generator %s does not support AsyncAPI operations; generating models only. "
+                + "Use %s to generate producers and consumers.", generatorName, ASYNCAPI_GENERATOR));
+            generateApis = false;
+        }
+        if (BOAT_JAVA_GENERATORS.contains(generatorName) && Boolean.TRUE.equals(generateSupportingFiles)
+            && StringUtils.isBlank(supportingFilesToGenerate)) {
+            getLog().info(format("Generating only %s of the %s supporting files for AsyncAPI input",
+                ASYNCAPI_MODEL_SUPPORTING_FILES, generatorName));
+            supportingFilesToGenerate = ASYNCAPI_MODEL_SUPPORTING_FILES;
+        }
+    }
+
+    /**
+     * Keeps an AsyncAPI spec from overwriting the OpenAPI spec of the same jar: the default location
+     * {@code META-INF/openapi/openapi.yaml} becomes {@code META-INF/asyncapi/asyncapi.yaml}.
+     */
+    static File asyncApiCopyTo(File copyTo) {
+        if (copyTo == null) {
+            return null;
+        }
+        String path = copyTo.getPath().replace(File.separatorChar, '/');
+        if (!path.endsWith(DEFAULT_COPY_TO_SUFFIX)) {
+            return copyTo;
+        }
+        String base = path.substring(0, path.length() - DEFAULT_COPY_TO_SUFFIX.length());
+        return new File((base + ASYNCAPI_COPY_TO_SUFFIX).replace('/', File.separatorChar));
+    }
+
+    /**
+     * Validates an AsyncAPI document and projects it onto the OpenAPI document generators work on, with the message
+     * schemas bundled and deduplicated like {@code bundleSpecs} does for OpenAPI.
+     */
+    private File projectAsyncApi(File asyncApiFile) throws MojoExecutionException {
+        try {
+            AsyncApiValidationResult validation = new AsyncApiValidator().validate(asyncApiFile);
+            validation.getWarnings().forEach(warning -> getLog().warn(asyncApiFile.getName() + ": " + warning));
+            if (!validation.isValid()) {
+                validation.getErrors().forEach(error -> getLog().error(asyncApiFile.getName() + ": " + error));
+                throw new MojoExecutionException("Invalid AsyncAPI document " + asyncApiFile);
+            }
+
+            AsyncApiProjection projection = new AsyncApiOpenApiProjector()
+                .setOpenApiVersion(projectionOpenApiVersion)
+                .setDeduplicateSchemas(deduplicateSchemas)
+                .project(AsyncApiLoader.load(asyncApiFile));
+
+            File projected = new File(output, ".boat/asyncapi-projected.yaml");
+            java.nio.file.Files.createDirectories(projected.getParentFile().toPath());
+            java.nio.file.Files.write(projected.toPath(),
+                SerializerUtils.toYamlString(projection.getOpenAPI()).getBytes(StandardCharsets.UTF_8));
+            getLog().info("Projected AsyncAPI " + asyncApiFile.getName() + " onto " + projected);
+            return projected;
+        } catch (AsyncApiLoaderException e) {
+            e.getMessages().forEach(message -> getLog().error(asyncApiFile.getName() + ": " + message));
+            throw new MojoExecutionException("Cannot load AsyncAPI document " + asyncApiFile + ": " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Cannot write projected AsyncAPI document", e);
+        }
     }
 
     /**

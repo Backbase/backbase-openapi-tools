@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.oss.boat.example</groupId>
+        <artifactId>asyncapi</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>asyncapi-reuse</artifactId>
+
+    <name>BOAT :: Generate :: AsyncAPI :: Reused Schemas</name>
+
+    <description>
+        Generates the event handlers against the model classes of the REST API, which can also come from another
+        artifact. Only the message specific models are generated in the events model package.
+    </description>
+
+    <packaging>jar</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.backbase.oss</groupId>
+                <artifactId>boat-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>rest</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-spring-boot-embedded</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${specs.directory}/openapi.yaml</inputSpec>
+                            <modelPackage>com.backbase.oss.boat.example.orders.model</modelPackage>
+                            <apiPackage>com.backbase.oss.boat.example.orders.api</apiPackage>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>events</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-spring-cloud-stream-embedded</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${specs.directory}/asyncapi.yaml</inputSpec>
+                            <modelPackage>com.backbase.oss.boat.example.orders.events.model</modelPackage>
+                            <apiPackage>com.backbase.oss.boat.example.orders.events</apiPackage>
+                            <schemaMappings>
+                                <schemaMapping>Order=com.backbase.oss.boat.example.orders.model.Order</schemaMapping>
+                                <schemaMapping>Money=com.backbase.oss.boat.example.orders.model.Money</schemaMapping>
+                                <schemaMapping>OrderStatus=com.backbase.oss.boat.example.orders.model.OrderStatus</schemaMapping>
+                            </schemaMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

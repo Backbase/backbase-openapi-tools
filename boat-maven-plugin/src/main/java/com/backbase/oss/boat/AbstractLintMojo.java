@@ -60,6 +60,10 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
         }
 
         for (File inputFile : inputFiles) {
+            if (SpecFormat.detect(inputFile).isAsyncApi()) {
+                log.warn("Skipping lint of {}: AsyncAPI not supported yet", inputFile.getName());
+                continue;
+            }
             boatLintReports.add(lintOpenAPI(inputFile));
         }
         return boatLintReports;

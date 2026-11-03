@@ -1,6 +1,7 @@
 package com.backbase.oss.boat.diff;
 
 import com.backbase.oss.boat.DiffMojo;
+import com.backbase.oss.boat.SpecFormat;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -95,7 +96,14 @@ public class BatchOpenApiDiff {
     }
 
     private static boolean isOpenApiSpec(Path path) {
-        return path.toString().endsWith(".yaml");
+        if (!path.toString().endsWith(".yaml")) {
+            return false;
+        }
+        if (SpecFormat.detect(path.toFile()).isAsyncApi()) {
+            log.warn("Skipping diff of {}: AsyncAPI not supported yet", path.getFileName());
+            return false;
+        }
+        return true;
     }
 
     private static boolean isValidOpenApiSpec(Pair<Path, SwaggerParseResult> pair) {

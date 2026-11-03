@@ -1,0 +1,19 @@
+type: object
+description: An order placed by a customer.
+required:
+  - id
+  - total
+  - status
+properties:
+  id:
+    type: string
+    description: Order identifier.
+  customerId:
+    type: string
+  total:
+    $ref: money.yaml
+  status:
+    $ref: order-status.yaml
+  placedAt:
+    type: string
+    format: date-time

@@ -1,0 +1,22 @@
+type: object
+required:
+  - type
+properties:
+  type:
+    const: access
+  roles:
+    type: array
+    items:
+      type: object
+      properties:
+        role:
+          $ref: lib/role.yaml
+  subject:
+    oneOf:
+      - $ref: lib/user.yaml
+      - $ref: lib/group.yaml
+    discriminator:
+      propertyName: kind
+      mapping:
+        user: lib/user.yaml
+        group: lib/group.yaml

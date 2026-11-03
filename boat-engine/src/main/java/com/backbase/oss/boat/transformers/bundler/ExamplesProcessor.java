@@ -96,7 +96,7 @@ public class ExamplesProcessor {
                 processMediaType(mediaType, null, false);
             });
         } else {
-            log.warn("Content is null for: {}", response);
+            log.debug("Content is null for: {}", response);
         }
     }
 

@@ -5,6 +5,9 @@ import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import com.backbase.oss.boat.asyncapi.AsyncApiBundler;
+import com.backbase.oss.boat.asyncapi.AsyncApiLoaderException;
+import com.backbase.oss.boat.asyncapi.AsyncApiOpenApiProjector;
 import com.backbase.oss.boat.loader.OpenAPILoader;
 import com.backbase.oss.boat.loader.OpenAPILoaderException;
 import com.backbase.oss.boat.serializer.SerializerUtils;
@@ -13,6 +16,7 @@ import com.backbase.oss.boat.transformers.DeduplicateSchemasTransformer;
 import com.backbase.oss.boat.transformers.SetVersion;
 import com.backbase.oss.boat.transformers.ExtensionFilter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
 import io.swagger.v3.oas.models.OpenAPI;
 import java.io.File;
@@ -40,7 +44,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 @Mojo(name = "bundle", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
 /**
-  Bundles all references in the OpenAPI specification into one file.
+  Bundles all references in the OpenAPI or AsyncAPI specification into one file.
  */
 @Getter
 @Setter
@@ -79,6 +83,15 @@ public class BundleMojo extends AbstractMojo {
     @Parameter(name = "deduplicateSchemas", property = "openapi.generator.maven.plugin.deduplicateSchemas",
         defaultValue = "true")
     private boolean deduplicateSchemas = true;
+
+    /**
+     * OpenAPI version of the document an AsyncAPI input spec is projected onto to bundle its schemas. Use the version
+     * the shared schemas are written for: {@code 3.0.3} for OpenAPI 3.0 schemas (e.g. using {@code nullable}),
+     * {@code 3.1.0} for plain JSON Schema payloads.
+     */
+    @Parameter(name = "projectionOpenApiVersion", property = "openapi.generator.maven.plugin.projectionOpenApiVersion",
+        defaultValue = AsyncApiOpenApiProjector.DEFAULT_OPENAPI_VERSION)
+    private String projectionOpenApiVersion = AsyncApiOpenApiProjector.DEFAULT_OPENAPI_VERSION;
 
     /**
      * Skip the execution.
@@ -124,7 +137,38 @@ public class BundleMojo extends AbstractMojo {
         }
 
         for (int i = 0; i < inputFiles.length; i++) {
-            bundleOpenAPI(inputFiles[i], outputFiles[i]);
+            if (SpecFormat.detect(inputFiles[i]).isAsyncApi()) {
+                bundleAsyncAPI(inputFiles[i], outputFiles[i]);
+            } else {
+                bundleOpenAPI(inputFiles[i], outputFiles[i]);
+            }
+        }
+    }
+
+    private void bundleAsyncAPI(File inputFile, File outputFile) throws MojoExecutionException {
+        try {
+            log.info("Bundling {} into a single AsyncAPI file: {}", inputFile, outputFile);
+            AsyncApiBundler bundler = new AsyncApiBundler()
+                .setOpenApiVersion(projectionOpenApiVersion)
+                .setDeduplicateSchemas(deduplicateSchemas)
+                .setVersion(version)
+                .setRemoveExtensions(removeExtensions);
+            JsonNode asyncApi = bundler.bundle(inputFile);
+            bundler.getWarnings().forEach(warning -> log.warn("{}: {}", inputFile.getName(), warning));
+
+            File directory = outputFile.getParentFile();
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            if (versionFileName) {
+                String asyncApiVersion = asyncApi.path("info").path("version").asText(null);
+                outputFile = Paths.get(versionFileName(outputFile.getAbsolutePath(), asyncApiVersion)).toFile();
+            }
+
+            Files.write(outputFile.toPath(), AsyncApiBundler.toYaml(asyncApi).getBytes(StandardCharsets.UTF_8));
+            log.info("Bundled: {} into: {}", inputFile, outputFile);
+        } catch (AsyncApiLoaderException | IOException e) {
+            throw new MojoExecutionException("Error bundling AsyncAPI: " + inputFile, e);
         }
     }
 
@@ -169,9 +213,13 @@ public class BundleMojo extends AbstractMojo {
 
     @VisibleForTesting
     String versionFileName(String originalFileName, OpenAPI openAPI) throws MojoExecutionException {
-        String openApiVersion = Optional.ofNullable(openAPI.getInfo())
-            .map(Info::getVersion)
-            .orElseThrow(() -> new MojoExecutionException("Configured to use version in filename, but no version set."));
+        return versionFileName(originalFileName, Optional.ofNullable(openAPI.getInfo()).map(Info::getVersion).orElse(null));
+    }
+
+    private String versionFileName(String originalFileName, String openApiVersion) throws MojoExecutionException {
+        if (openApiVersion == null) {
+            throw new MojoExecutionException("Configured to use version in filename, but no version set.");
+        }
 
         if (!openApiVersion.matches("^\\d\\..*")) {
             throw new MojoExecutionException(

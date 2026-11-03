@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Orders API
+  version: 1.0.0
+  description: REST API of the order service. Shares its schemas with the order events (asyncapi.yaml).
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: orders
+paths:
+  /orders:
+    post:
+      tags:
+        - orders
+      operationId: placeOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '201':
+          description: Order placed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The order.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+components:
+  schemas:
+    Order:
+      $ref: lib/schemas/order.yaml
+    Money:
+      $ref: lib/schemas/money.yaml
+    OrderStatus:
+      $ref: lib/schemas/order-status.yaml

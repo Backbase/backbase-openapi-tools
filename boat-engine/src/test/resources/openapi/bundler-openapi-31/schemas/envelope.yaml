@@ -1,0 +1,17 @@
+type: object
+properties:
+  change:
+    $ref: change.yaml
+  tags:
+    type: array
+    items:
+      $ref: lib/tag.yaml
+not:
+  $ref: lib/forbidden.yaml
+if:
+  properties:
+    tags:
+      minItems: 1
+then:
+  required:
+    - change

@@ -11,6 +11,9 @@ Boat maven plugin uses slightly modified templates for html, java and webclient 
 
 All inputSpec parameters for this goal may additionally be configured as an artifact. See [Example inputMavenArtifact parameter](#example-inputMavenArtifact-parameter) or [integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-artifact-input) for examples.
 
+The input spec may also be an AsyncAPI 3.0 document, see [AsyncAPI 3.0](#asyncapi-30) and the `projectionOpenApiVersion`
+parameter.
+
 ## boat:generate-spring-boot-embedded
 
 Same with `generate` but with opinionated defaults for Spring
@@ -216,6 +219,160 @@ Same with `generate` but with opinionated defaults for Web Client
         </configOptions>
     </configuration>
 
+## boat:generate-spring-cloud-stream-embedded
+
+Generates [Spring Cloud Stream](https://spring.io/projects/spring-cloud-stream) producers and consumers from an
+[AsyncAPI 3.0](https://www.asyncapi.com/docs/reference/specification/v3.0.0) document. It uses the `boat-spring-cloud-stream`
+generator with the same opinionated defaults as `generate-spring-boot-embedded` (Spring Boot 3, Jakarta EE, bean validation,
+`useTags`), except that `interfaceOnly` defaults to `false`.
+
+    <configuration>
+        <inputSpec>${project.basedir}/src/main/resources/asyncapi.yaml</inputSpec>
+        <apiPackage>com.backbase.orders.events</apiPackage>
+        <modelPackage>com.backbase.orders.model</modelPackage>
+    </configuration>
+
+The document does not say whether it describes a producer or a consumer: the `action` of every operation decides what
+is generated. Classes are grouped by the operation tags, or by the channel when an operation has no tags.
+
+* `receive` operations become methods of the `{Tag}Handler` interface. Implement it as a Spring bean;
+  `{Tag}FunctionsConfiguration` registers a `Consumer<Message<T>>` bean per operation, named after the operation id, so its
+  binding is `{operationId}-in-0`. When the operation has a `reply`, the handler method returns the reply and the bean is a
+  `Function` that sends it on `{operationId}-out-0`, or to the address in the reply `address.location` header through the
+  `spring.cloud.stream.sendto.destination` header. Returning `null` sends no reply. The correlation id header is copied to
+  the reply.
+* `send` operations become methods of `{Tag}Publisher`, which sends through `StreamBridge` to the output binding
+  `{operationId}-out-0`. For a channel with address parameters, such as `orders.{region}.status`, the method takes the
+  parameters and sends to the resolved address. A `send` operation with a `reply` also gets a
+  `{operationId}Reply` method in the handler for the replies.
+* Message payloads and headers become models. A payload that references `#/components/schemas/X` uses model `X`; other
+  payloads become `{MessageName}Payload` and headers become `{MessageName}Headers`. Typed headers are read from and
+  written to the message headers by the generated `AsyncApiHeaders`.
+* `src/main/resources/asyncapi-bindings.properties` lists `spring.cloud.function.definition`,
+  `spring.cloud.stream.output-bindings` and the destination of every binding. Import it in the application configuration
+  with `spring.config.import=classpath:asyncapi-bindings.properties` and add the generated resources directory as a
+  resource root, or copy the values.
+
+Additional `configOptions`:
+
+    inverseOperations (Default: false)
+        Generate the other party of the document: send operations become receive operations and vice versa.
+        Use it to generate a consumer from the document of a producer, or a test double.
+
+    generateBindingProperties (Default: true)
+        Generate asyncapi-bindings.properties.
+
+    interfaceOnly (Default: false)
+        Only generate the handler interfaces and the models.
+
+Notes on Spring Cloud Stream:
+
+* A receive operation on a parameterized address subscribes to a wildcard destination, e.g. `orders.*.status`. Configure
+  the binder to treat it as a pattern (Kafka: `destination-is-pattern` with a regular expression, RabbitMQ:
+  `binding-routing-key`). The generator logs a warning for these operations.
+* Replies to an address taken from a message header use `spring.cloud.stream.sendto.destination`, which the binder must
+  be allowed to create (dynamic destinations).
+* A reply address that comes from the payload cannot be resolved by the generated code; the generator logs a warning
+  and the reply goes to `{operationId}-out-0`.
+
+See the [AsyncAPI integration tests](https://github.com/Backbase/backbase-openapi-tools/tree/main/boat-maven-plugin/src/it/example/boat-generate/asyncapi)
+for working examples.
+
+## AsyncAPI 3.0
+
+The plugin recognizes AsyncAPI 3.0 documents (a root `asyncapi` field) wherever it reads specs. AsyncAPI 2.x documents
+are rejected. For code generation the AsyncAPI document must be a local file or come from `inputMavenArtifact`; an
+`inputSpec` URL is always read as OpenAPI.
+
+* Message payloads and headers, and component schemas declared as Multi Format Schema Object, may use the AsyncAPI and
+  OpenAPI 3.0 schema formats, or JSON Schema: `application/schema+json` or `application/schema+yaml`, with `version`
+  `draft-04`, `draft-06`, `draft-07`, `draft-2019-09` or `draft-2020-12`, or without a version. Other formats, such as
+  Avro, fail the generation when an operation uses them.
+* For code generation the document is projected onto an OpenAPI document with one operation per AsyncAPI operation and
+  message, which BOAT bundles and de-duplicates as usual. The projection is written to
+  `${output}/.boat/asyncapi-projected.yaml` for troubleshooting. The `projectionOpenApiVersion` parameter (default
+  `3.0.3`) sets its OpenAPI version. Use `3.1.0` for JSON Schema 2019-09 and 2020-12, and for keywords OpenAPI 3.0
+  cannot express, such as `const`, `if`/`then` or a numeric `exclusiveMinimum`. Keep `3.0.x` for draft-04, whose boolean
+  `exclusiveMinimum`/`exclusiveMaximum` and `id` mean something else in OpenAPI 3.1. Warnings name the schemas that
+  need another version; schema files referenced from a schema are checked too.
+* `boat:generate` with any other generator (`spring`, `java`, ...) generates only the models of an AsyncAPI document;
+  `generateApis` is turned off with a log message. The BOAT Java generators (`spring`, `java`, `boat-webhooks`) also
+  generate only `BigDecimalCustomSerializer.java` of their supporting files, unless `supportingFilesToGenerate` is set.
+  For other generators, configure `supportingFilesToGenerate` or `generateSupportingFiles` yourself.
+* `copyTo` locations ending in `META-INF/openapi/openapi.yaml` are changed to `META-INF/asyncapi/asyncapi.yaml` for AsyncAPI
+  input, so a module can ship both documents.
+
+### Sharing schemas between OpenAPI and AsyncAPI
+
+An OpenAPI and an AsyncAPI document can reference the same schema files. Register them under `components/schemas` with
+the same keys in both documents, and let payloads reference the components rather than the files:
+
+    # openapi.yaml                          # asyncapi.yaml
+    components:                             components:
+      schemas:                                schemas:
+        Order:                                  Order:
+          $ref: lib/schemas/order.yaml            $ref: lib/schemas/order.yaml
+                                                messages:
+                                                  OrderPlaced:
+                                                    payload:
+                                                      $ref: '#/components/schemas/Order'
+
+Schema files written for another JSON Schema draft are registered as Multi Format Schema Objects; the component key
+still names the model, and files they reference resolve to the components registered for them:
+
+    components:
+      schemas:
+        Order:
+          schemaFormat: application/schema+yaml;version=draft-2020-12
+          schema:
+            $ref: lib/schemas/order.yaml
+
+`boat:bundle` keeps the `schemaFormat` of these components.
+
+Both documents then produce a model named `Order`. Generate them with generators of the same family (for example
+`generate-spring-boot-embedded` and `generate-spring-cloud-stream-embedded`) so the model classes are identical. There
+are two ways to use the shared models.
+
+Inline: generate both documents into the same `modelPackage` and output directory. The embedded goals don't overwrite
+existing files, so each shared model is generated once:
+
+    <execution>
+        <id>rest</id>
+        <goals><goal>generate-spring-boot-embedded</goal></goals>
+        <configuration>
+            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+            <apiPackage>com.backbase.orders.api</apiPackage>
+            <modelPackage>com.backbase.orders.model</modelPackage>
+        </configuration>
+    </execution>
+    <execution>
+        <id>events</id>
+        <goals><goal>generate-spring-cloud-stream-embedded</goal></goals>
+        <configuration>
+            <inputSpec>${project.basedir}/src/main/resources/asyncapi.yaml</inputSpec>
+            <apiPackage>com.backbase.orders.events</apiPackage>
+            <modelPackage>com.backbase.orders.model</modelPackage>
+        </configuration>
+    </execution>
+
+Reuse: map the shared schemas to existing classes, for example from the REST API models in the same module or in a
+dependency. Mapped schemas are not generated again; only the message specific models are generated in the events
+`modelPackage`:
+
+    <execution>
+        <id>events</id>
+        <goals><goal>generate-spring-cloud-stream-embedded</goal></goals>
+        <configuration>
+            <inputSpec>${project.basedir}/src/main/resources/asyncapi.yaml</inputSpec>
+            <apiPackage>com.backbase.orders.events</apiPackage>
+            <modelPackage>com.backbase.orders.events.model</modelPackage>
+            <schemaMappings>
+                <schemaMapping>Order=com.backbase.orders.model.Order</schemaMapping>
+                <schemaMapping>Money=com.backbase.orders.model.Money</schemaMapping>
+            </schemaMappings>
+        </configuration>
+    </execution>
+
 ## boat:decompose
 
 Merges any components using allOf references.
@@ -230,11 +387,14 @@ Removes deprecated elements in an OpenAPI spec.
 
 ## boat:validate
 
-Validates OpenAPI specs.
+Validates OpenAPI and AsyncAPI 3.0 specs.
 
 Configuration can point to a specific file, or a directory. When a directory is specified all files with a `.yaml` 
 extension are validated. `failOnWarning` specifies whether to fail the build when validation violations are found,
 otherwise, warnings are written to the log for everyone to ignore.
+
+AsyncAPI documents are validated against the AsyncAPI 3.0 JSON Schema, after which BOAT checks that operations reference
+declared channels and messages, that address parameters are declared and that schema formats are supported.
 
     <configuration>
         <input>${project.build.outputDirectory}/specs/</input>
@@ -244,6 +404,9 @@ otherwise, warnings are written to the log for everyone to ignore.
 ## boat:lint
 
 API lint which provides checks for compliance with many of Backbase's API standards
+
+AsyncAPI documents are not linted; they are skipped with a warning. `boat:doc` (for directories) and `boat:diff` (for
+batches) skip them in the same way.
 
 Available parameters:
 
@@ -329,7 +492,17 @@ Available parameters:
         Required: false
         Optional parameter to remove extensions from the bundled spec.
 
+    projectionOpenApiVersion (Default: 3.0.3)
+        Required: false
+        OpenAPI version the schemas of an AsyncAPI document are bundled with, as for boat:generate.
+
 Examples in `json` files are parsed to objects.
+
+AsyncAPI 3.0 documents are bundled too: external references are inlined, payload and header schemas are moved to
+`components/schemas` (de-duplicated when `deduplicateSchemas` is `true`) and messages reference them. `version`,
+`versionFileName` and `removeExtensions` apply as for OpenAPI. The default `includes` already match `asyncapi.yaml`.
+Set `projectionOpenApiVersion` to the value used for generation, for example `3.1.0` for JSON Schema 2020-12 schemas,
+so keywords such as `const` are kept.
 
     <configuration>
         <skip>${bundle.skip}</skip>
