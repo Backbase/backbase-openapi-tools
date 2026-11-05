@@ -1,11 +1,14 @@
 package com.backbase.oss.boat;
 
+import com.backbase.oss.boat.asyncapi.AsyncApiValidationResult;
+import com.backbase.oss.boat.asyncapi.AsyncApiValidator;
 import com.backbase.oss.boat.serializer.SerializerUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -15,7 +18,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
- * Validates OpenAPI specs.
+ * Validates OpenAPI and AsyncAPI 3.0 and 3.1 specs.
  */
 @Mojo(name = "validate", requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true)
 @Slf4j
@@ -55,6 +58,11 @@ public class ValidateMojo extends AbstractMojo {
 
         log.info("Validating {}", inputFile);
 
+        if (SpecFormat.detect(inputFile).isAsyncApi()) {
+            validateAsyncApi(inputFile);
+            return;
+        }
+
         OpenAPIParser openAPIParser = new OpenAPIParser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setFlatten(true);
@@ -73,6 +81,28 @@ public class ValidateMojo extends AbstractMojo {
             if (failOnWarning) {
                 throw new MojoFailureException("Validation errors validating OpenAPI");
             }
+        }
+    }
+
+    private void validateAsyncApi(File inputFile) throws MojoFailureException {
+        AsyncApiValidationResult result = new AsyncApiValidator().validate(inputFile);
+        if (result.isValid() && !result.hasWarnings()) {
+            log.info("AsyncAPI: {} is valid", result.getTitle());
+            return;
+        }
+        List<String> messages = new ArrayList<>(result.getErrors());
+        messages.addAll(result.getWarnings());
+        for (String message : messages) {
+            if (failOnWarning) {
+                log.error("Validation errors while parsing AsyncAPI: {}", inputFile.getName());
+                log.error(message);
+            } else {
+                log.warn("Validation errors while parsing AsyncAPI: {}", inputFile.getName());
+                log.warn(message);
+            }
+        }
+        if (failOnWarning) {
+            throw new MojoFailureException("Validation errors validating AsyncAPI");
         }
     }
 

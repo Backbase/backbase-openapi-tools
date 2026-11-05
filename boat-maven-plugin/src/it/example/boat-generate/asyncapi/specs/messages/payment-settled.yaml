@@ -1,0 +1,16 @@
+name: PaymentSettled
+title: Payment settled
+summary: A payment for an order was settled.
+payload:
+  type: object
+  required:
+    - orderId
+    - amount
+  properties:
+    orderId:
+      type: string
+    amount:
+      $ref: '../asyncapi.yaml#/components/schemas/Money'
+    settledAt:
+      type: string
+      format: date-time

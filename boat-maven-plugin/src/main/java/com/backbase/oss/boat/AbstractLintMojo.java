@@ -38,7 +38,7 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
      * List of rules ids which will be ignored.
      */
     @Parameter(name = "ignoreRules")
-    protected String[] ignoreRules = new String[]{"150","219","215","218","166","136","174","235","107","171","224","143",
+    protected String[] ignoreRules = {"150","219","215","218","166","136","174","235","107","171","224","143",
         "151","129","146","147","172","145","115","132","120", "134","183","154","105","104","130","118","110","153",
         "101","176","116","M009","H002","M010","H001","M008","S005","S006","S007","M011","B007U","B009U"};
 
@@ -60,6 +60,10 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
         }
 
         for (File inputFile : inputFiles) {
+            if (SpecFormat.detect(inputFile).isAsyncApi()) {
+                log.warn("Skipping lint of {}: AsyncAPI not supported yet", inputFile.getName());
+                continue;
+            }
             boatLintReports.add(lintOpenAPI(inputFile));
         }
         return boatLintReports;

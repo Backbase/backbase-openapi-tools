@@ -1,0 +1,138 @@
+asyncapi: 3.0.0
+info:
+  title: Order Events
+  version: 1.0.0
+  description: Events sent and received by the order service. Shares its schemas with the REST API (openapi.yaml).
+defaultContentType: application/json
+servers:
+  production:
+    host: kafka.example.com:9092
+    protocol: kafka
+channels:
+  orderPlaced:
+    address: orders.placed
+    messages:
+      orderPlaced:
+        $ref: '#/components/messages/OrderPlaced'
+  orderStatus:
+    address: 'orders.{region}.status'
+    parameters:
+      region:
+        description: Region the order belongs to.
+        enum:
+          - eu
+          - us
+    messages:
+      orderStatusChanged:
+        $ref: '#/components/messages/OrderStatusChanged'
+  paymentSettled:
+    address: payments.settled
+    messages:
+      paymentSettled:
+        $ref: 'messages/payment-settled.yaml'
+  orderValidation:
+    address: orders.validation.requests
+    messages:
+      validateOrder:
+        $ref: '#/components/messages/ValidateOrder'
+  orderValidationReplies:
+    address: null
+    messages:
+      orderValidated:
+        $ref: '#/components/messages/OrderValidated'
+operations:
+  publishOrderPlaced:
+    action: send
+    summary: Publish that an order was placed.
+    channel:
+      $ref: '#/channels/orderPlaced'
+    tags:
+      - name: orders
+    messages:
+      - $ref: '#/channels/orderPlaced/messages/orderPlaced'
+  onOrderStatusChanged:
+    action: receive
+    summary: React to order status changes.
+    channel:
+      $ref: '#/channels/orderStatus'
+    tags:
+      - name: orders
+    messages:
+      - $ref: '#/channels/orderStatus/messages/orderStatusChanged'
+  onPaymentSettled:
+    action: receive
+    summary: React to settled payments.
+    channel:
+      $ref: '#/channels/paymentSettled'
+    tags:
+      - name: payments
+  validateOrder:
+    action: receive
+    summary: Validate an order and reply with the outcome.
+    channel:
+      $ref: '#/channels/orderValidation'
+    tags:
+      - name: orders
+    messages:
+      - $ref: '#/channels/orderValidation/messages/validateOrder'
+    reply:
+      address:
+        location: '$message.header#/replyTo'
+      channel:
+        $ref: '#/channels/orderValidationReplies'
+      messages:
+        - $ref: '#/channels/orderValidationReplies/messages/orderValidated'
+components:
+  schemas:
+    Order:
+      $ref: lib/schemas/order.yaml
+    Money:
+      $ref: lib/schemas/money.yaml
+    OrderStatus:
+      $ref: lib/schemas/order-status.yaml
+  messages:
+    OrderPlaced:
+      name: OrderPlaced
+      title: Order placed
+      payload:
+        $ref: '#/components/schemas/Order'
+      headers:
+        type: object
+        properties:
+          correlationId:
+            type: string
+          tenantId:
+            type: string
+      correlationId:
+        location: '$message.header#/correlationId'
+    OrderStatusChanged:
+      payload:
+        type: object
+        required:
+          - orderId
+          - status
+        properties:
+          orderId:
+            type: string
+          status:
+            $ref: '#/components/schemas/OrderStatus'
+          changedAt:
+            type: string
+            format: date-time
+    ValidateOrder:
+      payload:
+        schemaFormat: 'application/vnd.oai.openapi;version=3.0.0'
+        schema:
+          $ref: '#/components/schemas/Order'
+    OrderValidated:
+      payload:
+        type: object
+        properties:
+          orderId:
+            type: string
+          valid:
+            type: boolean
+          reasons:
+            type: array
+            items:
+              type: string

@@ -1,0 +1,8 @@
+oneOf:
+  - $ref: access-change.yaml
+  - $ref: deploy-change.yaml
+discriminator:
+  propertyName: type
+  mapping:
+    access: access-change.yaml
+    deploy: deploy-change.yaml

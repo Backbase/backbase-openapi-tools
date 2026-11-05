@@ -1,0 +1,44 @@
+asyncapi: 3.0.0
+info:
+  title: Approval Decision
+  version: 1.0.0
+  description: >-
+    A CloudEvent in JSON Schema 2020-12. The envelope, its data and the schemas shared with the REST API
+    (../../openapi/schemas) are registered as Multi Format Schema Objects, so generated classes are named after the
+    component keys.
+channels:
+  approvalDecision:
+    address: approval-decision
+    messages:
+      ApprovalDecision:
+        $ref: '#/components/messages/ApprovalDecision'
+operations:
+  sendApprovalDecision:
+    action: send
+    channel:
+      $ref: '#/channels/approvalDecision'
+    messages:
+      - $ref: '#/channels/approvalDecision/messages/ApprovalDecision'
+components:
+  schemas:
+    ApprovalDecisionCloudEvent:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: cloudevent.schema.yaml
+    ApprovalDecisionData:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: specification.yaml
+    RequestType:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: ../../openapi/schemas/request-type.yaml
+    Scope:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: ../../openapi/schemas/scope.yaml
+  messages:
+    ApprovalDecision:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ApprovalDecisionCloudEvent'

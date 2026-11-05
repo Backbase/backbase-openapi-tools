@@ -1,0 +1,58 @@
+# Spring Cloud Stream bindings for {{#appName}}{{{appName}}}{{/appName}}{{#appVersion}} {{{appVersion}}}{{/appVersion}}, generated from its AsyncAPI document.
+# Merge these into the application configuration, for example with
+# spring.config.import=classpath:asyncapi-bindings.properties, and add your own functions to the definition.
+{{#functionDefinition}}
+spring.cloud.function.definition={{{.}}}
+{{/functionDefinition}}
+{{#outputBindings}}
+spring.cloud.stream.output-bindings={{{.}}}
+{{/outputBindings}}
+{{#asyncOperations}}
+
+# {{operationId}}: {{#isReceive}}receive from{{/isReceive}}{{#isSend}}send to{{/isSend}} channel {{channelName}}{{#channelAddress}} ({{{.}}}){{/channelAddress}}
+{{#isReceive}}
+{{#channelParameterized}}
+# The address is parameterized, so the destination uses a wildcard. Kafka: set
+# spring.cloud.stream.kafka.bindings.{{bindingName}}.consumer.destination-is-pattern=true and use a regular expression.
+# RabbitMQ: use spring.cloud.stream.rabbit.bindings.{{bindingName}}.consumer.binding-routing-key.
+{{/channelParameterized}}
+{{#destination}}
+spring.cloud.stream.bindings.{{bindingName}}.destination={{{.}}}
+{{/destination}}
+{{^destination}}
+#spring.cloud.stream.bindings.{{bindingName}}.destination=
+{{/destination}}
+{{#hasReply}}
+{{#replyAddressHeader}}
+# Replies go to the address in message header {{{.}}} when it is present.
+{{/replyAddressHeader}}
+{{#replyDestination}}
+spring.cloud.stream.bindings.{{replyBindingName}}.destination={{{.}}}
+{{/replyDestination}}
+{{^replyDestination}}
+#spring.cloud.stream.bindings.{{replyBindingName}}.destination=
+{{/replyDestination}}
+{{/hasReply}}
+{{/isReceive}}
+{{#isSend}}
+{{#destinationExpression}}
+# The address is parameterized; the publisher sends to the resolved address.
+{{/destinationExpression}}
+{{^destinationExpression}}
+{{#destination}}
+spring.cloud.stream.bindings.{{bindingName}}.destination={{{.}}}
+{{/destination}}
+{{^destination}}
+#spring.cloud.stream.bindings.{{bindingName}}.destination=
+{{/destination}}
+{{/destinationExpression}}
+{{#hasReply}}
+{{#replyDestination}}
+spring.cloud.stream.bindings.{{replyBindingName}}.destination={{{.}}}
+{{/replyDestination}}
+{{^replyDestination}}
+#spring.cloud.stream.bindings.{{replyBindingName}}.destination=
+{{/replyDestination}}
+{{/hasReply}}
+{{/isSend}}
+{{/asyncOperations}}

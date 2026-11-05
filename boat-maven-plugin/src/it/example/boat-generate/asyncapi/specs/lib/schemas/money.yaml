@@ -1,0 +1,15 @@
+type: object
+description: An amount of money in a currency.
+required:
+  - amount
+  - currencyCode
+properties:
+  amount:
+    type: string
+    description: Decimal amount, as a string to avoid rounding.
+    pattern: '^-?[0-9]+(\.[0-9]+)?$'
+  currencyCode:
+    type: string
+    description: ISO 4217 currency code.
+    minLength: 3
+    maxLength: 3
