@@ -47,7 +47,7 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
      * <code>failOnWarning</code>. Remove a rule from this list to make it fail the build.
      */
     @Parameter(name = "previewRules")
-    protected String[] previewRules = {"B004", "M010"};
+    protected String[] previewRules = {"B004", "B016", "B017", "B018", "B019", "B020", "B021", "B022", "B023", "B024", "M010"};
 
     protected List<BoatLintReport> lint() throws MojoExecutionException, MojoFailureException {
 

@@ -12,10 +12,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +27,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class BoatLinterTests {
+
+    private static final List<String> GUIDELINE_PREVIEW_RULES = Arrays.asList(
+        "B004", "B016", "B017", "B018", "B019", "B020", "B021", "B022", "B023", "B024", "M010");
+
+    private static final List<String> GUIDELINE_RULES = Stream.concat(
+        GUIDELINE_PREVIEW_RULES.stream(), Stream.of("B014")).collect(Collectors.toList());
 
     BoatLinter boatLinter;
 
@@ -147,6 +157,57 @@ class BoatLinterTests {
             .collect(Collectors.toList());
         assertEquals(1, caseViolations.size(), caseViolations::toString);
         assertTrue(caseViolations.get(0).startsWith("Path parameter 'payment-order-id' does not match camelCase"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"3.0.3", "3.1.0"})
+    void specFollowingTheGuidelineHasNoGuidelineViolations(String openApiVersion) throws IOException, OpenAPILoaderException {
+        BoatLintReport boatLintReport = guidelineLinter().lint(guidelineSpec("follows-guideline.yaml", openApiVersion));
+
+        List<String> violations = boatLintReport.getViolations().stream()
+            .filter(violation -> GUIDELINE_RULES.contains(violation.getRule().getId()))
+            .map(BoatViolation::displayString)
+            .collect(Collectors.toList());
+        assertTrue(violations.isEmpty(), violations::toString);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"3.0.3", "3.1.0"})
+    void specViolatingTheGuidelineIsReportedByEveryGuidelineRule(String openApiVersion) throws IOException, OpenAPILoaderException {
+        BoatLintReport boatLintReport = guidelineLinter().lint(guidelineSpec("violates-guideline.yaml", openApiVersion));
+
+        List<BoatViolation> violations = guidelineViolations(boatLintReport);
+        Set<String> violatedRules = violations.stream().map(violation -> violation.getRule().getId()).collect(Collectors.toSet());
+        assertEquals(new HashSet<>(GUIDELINE_PREVIEW_RULES), violatedRules);
+        assertTrue(violations.stream().allMatch(violation -> violation.getRule().isPreview()));
+    }
+
+    @Test
+    void guidelineRulesReportTheSameViolationsOnOpenApi30And31() throws IOException, OpenAPILoaderException {
+        List<String> openApi30 = guidelineViolations(guidelineLinter().lint(guidelineSpec("violates-guideline.yaml", "3.0.3")))
+            .stream().map(violation -> violation.getPointer() + " " + violation.displayString()).collect(Collectors.toList());
+        List<String> openApi31 = guidelineViolations(guidelineLinter().lint(guidelineSpec("violates-guideline.yaml", "3.1.0")))
+            .stream().map(violation -> violation.getPointer() + " " + violation.displayString()).collect(Collectors.toList());
+
+        assertEquals(openApi30, openApi31);
+    }
+
+    private BoatLinter guidelineLinter() {
+        return new BoatLinter(Collections.emptyList(), GUIDELINE_PREVIEW_RULES);
+    }
+
+    private List<BoatViolation> guidelineViolations(BoatLintReport report) {
+        return report.getViolations().stream()
+            .filter(violation -> GUIDELINE_PREVIEW_RULES.contains(violation.getRule().getId()))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * The fixtures follow and violate the "RESTful API in Backbase v3" guideline.
+     */
+    private static String guidelineSpec(String name, String openApiVersion) throws IOException {
+        return IOUtils.resourceToString("/guideline/" + name, Charset.defaultCharset())
+            .replace("openapi: 3.1.0", "openapi: " + openApiVersion);
     }
 
     private boolean hasViolationOfRule(BoatLintReport report, String ruleId) {

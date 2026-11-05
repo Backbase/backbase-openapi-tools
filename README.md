@@ -19,6 +19,34 @@ BOAT is still under development and subject to change.
 See also: https://github.com/Backbase/backbase-openapi-tools/releases
 
 
+## 0.19.2
+* **Feature**: `boat:lint` rules for the
+  [RESTful API in Backbase v3](https://backbase.atlassian.net/wiki/spaces/GUIL/pages/3446899327/RESTful+API+in+Backbase+v3)
+  guideline, all with severity `SHOULD`:
+  * `B016` no `405`, `408`, `422` or `5xx` responses.
+  * `B017` no verbs in paths, except after `webhooks`.
+  * `B018` the path version (`/v2/`) matches the major version of `info.version`.
+  * `B019` `application/json` without parameters such as `charset`.
+  * `B020` response bodies are objects, list responses have an `items` array and top-level lists do not return `404`.
+  * `B021` list endpoints declare an integer `size` query parameter (default 20, maximum 100 for `client-api` and 1000
+    otherwise) and a `page` (minimum 0) or `cursor` query parameter.
+  * `B022` date and time properties have format `date-time`, `date` or `time`.
+  * `B023` amounts are strings with format `number`, currencies are strings with pattern `^[A-Z]{3}$` and no `enum`.
+  * `B024` `4xx` `application/json` responses use the Service SDK error body: a string `message`, an optional string
+    `key` and optional `errors` objects.
+* **Feature**: `boat:lint` has a `previewRules` parameter. Violations of preview rules are reported and marked
+  `(preview)`, but never fail the build, even with `failOnWarning`. The new rules, `B004` and `M010` are preview rules
+  by default; remove a rule from the list to make it fail the build, see
+  [boat-maven-plugin README](boat-maven-plugin/README.md#boatlint).
+* **Change**: `M010` follows the guideline casing: camelCase properties (and `_links`, `_metadata`) and path
+  parameters, Hyphenated-Pascal-Case headers (and the Service SDK `X-CXT-RequestUUID` and `X-B3-*` headers), and
+  snake_case or SCREAMING_SNAKE_CASE enum values. `M010` is no longer ignored by default.
+* **Change**: `B004` checks the optional `info.x-api-dashboard-tags` instead of the top-level `tags`.
+* **Fix**: `B014` no longer fails with a `ClassCastException` on OpenAPI 3.1 specs, and reads the types of OpenAPI 3.1
+  schemas.
+* If you redefine `ignoreRules` or `previewRules` in your project, your list replaces the default one: add the rules
+  you want to keep ignored or in preview.
+
 ## 0.19.0
 * **Feature**: Added support for OpenAPI 3.1.x specifications alongside existing 3.0.x support
   * Explicitly allows OpenAPI 3.1.0, 3.1.1, and 3.1.2 instead of regex-based matching

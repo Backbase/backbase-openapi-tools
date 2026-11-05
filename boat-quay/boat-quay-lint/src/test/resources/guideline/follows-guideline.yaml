@@ -1,0 +1,238 @@
+openapi: 3.1.0
+info:
+  title: Contact Manager Client API
+  description: Manage contacts of the current user.
+  version: 2.0.0
+  x-icon: contacts
+servers:
+  - url: http://localhost:4010
+    description: Prism mock server
+tags:
+  - name: contacts
+paths:
+  /client-api/v2/contacts:
+    get:
+      tags: [contacts]
+      summary: List contacts
+      description: List contacts. Default page size 20, maximum 100.
+      operationId: listContacts
+      x-BbAccessControl-resource: Contacts
+      x-BbAccessControl-function: Manage Contacts
+      x-BbAccessControl-privilege: view
+      parameters:
+        - name: fromUser
+          in: query
+          description: Filter by creating user.
+          schema:
+            type: string
+        - name: productKindUris
+          in: query
+          description: Filter by product kinds.
+          schema:
+            type: array
+            items:
+              type: string
+        - name: page
+          in: query
+          description: Zero-based page number.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Page size.
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Page of contacts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactList'
+              examples:
+                example:
+                  value:
+                    totalCount: 1
+                    items:
+                      - id: 0b2f6c9e-3d2a-4c1e-9a55-0b6e1f3b9d11
+                        name: Jane Doe
+                        balance: '12.95'
+                        currency: EUR
+                        createdAt: '2017-03-31T07:48:23Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: [contacts]
+      summary: Create contact
+      description: Create a contact.
+      operationId: createContact
+      x-BbAccessControl-resource: Contacts
+      x-BbAccessControl-function: Manage Contacts
+      x-BbAccessControl-privilege: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactBase'
+            examples:
+              example:
+                value:
+                  name: Jane Doe
+                  balance: '12.95'
+                  currency: EUR
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactId'
+              examples:
+                example:
+                  value:
+                    id: 0b2f6c9e-3d2a-4c1e-9a55-0b6e1f3b9d11
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /client-api/v2/contacts/{contactId}:
+    put:
+      tags: [contacts]
+      summary: Replace contact
+      description: Replace a contact.
+      operationId: replaceContact
+      x-BbAccessControl-resource: Contacts
+      x-BbAccessControl-function: Manage Contacts
+      x-BbAccessControl-privilege: edit
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          description: Contact identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactBase'
+            examples:
+              example:
+                value:
+                  name: Jane Doe
+                  balance: '12.95'
+                  currency: EUR
+      responses:
+        '204':
+          description: Replaced.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  responses:
+    BadRequest:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+          examples:
+            example:
+              value:
+                key: common.api.shoesize
+                message: Bad Request
+                errors:
+                  - key: common.api.shoesize
+                    message: Value Exceeded. Must be between {min} and {max}.
+                    context:
+                      max: '50'
+                      min: '1'
+    NotFound:
+      description: Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+          examples:
+            example:
+              value:
+                key: CONTACT_NOT_FOUND
+                message: Contact with id ... not found.
+  schemas:
+    ContactId:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+    ContactBase:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        balance:
+          type: string
+          format: number
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+    Contact:
+      allOf:
+        - $ref: '#/components/schemas/ContactId'
+        - $ref: '#/components/schemas/ContactBase'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+    ContactList:
+      type: object
+      required: [items]
+      properties:
+        totalCount:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+    ErrorItem:
+      type: object
+      properties:
+        key:
+          type: string
+        message:
+          type: string
+        context:
+          type: object
+          additionalProperties:
+            type: string
+    BadRequestError:
+      type: object
+      required: [message]
+      properties:
+        key:
+          type: string
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    NotFoundError:
+      type: object
+      properties:
+        key:
+          type: string
+        message:
+          type: string

@@ -418,6 +418,10 @@ Available parameters:
     ignoreRules
         List of rules ids which will be ignored.
 
+    previewRules (Default: B004, B016, B017, B018, B019, B020, B021, B022, B023, B024, M010)
+        List of rule ids whose violations are reported, marked as preview, but never fail the build,
+        even with failOnWarning. Remove a rule from the list to make it fail the build.
+
     inputSpec
         Required: true
         Input spec directory or file.
@@ -443,6 +447,17 @@ Example:
         <writeLintReport>true</writeLintReport>
         <ignoreRules>${ignored-lint-rules}</ignoreRules>
         <showIgnoredRules>true</showIgnoredRules>
+    </configuration>
+
+The rules `B016` to `B024` check the
+[RESTful API in Backbase v3](https://backbase.atlassian.net/wiki/spaces/GUIL/pages/3446899327/RESTful+API+in+Backbase+v3)
+guideline and are preview rules. Setting `previewRules` or `ignoreRules` replaces the default list, so this makes the
+guideline rules fail the build with `failOnWarning` while keeping `B004` and `M010` in preview:
+
+    <configuration>
+        <inputSpec>${unversioned-filename-spec-dir}/</inputSpec>
+        <failOnWarning>true</failOnWarning>
+        <previewRules>B004,M010</previewRules>
     </configuration>
     
 To see details and an example of inputMavenArtifact:
