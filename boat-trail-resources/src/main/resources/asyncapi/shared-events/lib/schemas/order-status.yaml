@@ -1,0 +1,7 @@
+type: string
+description: Lifecycle status of an order.
+enum:
+  - PLACED
+  - VALIDATED
+  - SHIPPED
+  - CANCELLED

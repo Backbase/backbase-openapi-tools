@@ -1,0 +1,14 @@
+allOf:
+  - $ref: '#/$defs/Run'
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        const: deploy
+$defs:
+  Run:
+    type: object
+    properties:
+      runId:
+        type: string

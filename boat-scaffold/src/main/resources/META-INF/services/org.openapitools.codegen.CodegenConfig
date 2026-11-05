@@ -6,3 +6,4 @@ com.backbase.oss.codegen.marina.BoatMarinaGenerator
 org.openapitools.codegen.languages.BoatSwift5Codegen
 org.openapitools.codegen.languages.BoatAndroidClientCodegen
 com.backbase.oss.codegen.java.BoatWebhooksCodeGen
+com.backbase.oss.codegen.asyncapi.BoatSpringCloudStreamCodegen

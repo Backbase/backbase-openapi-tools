@@ -1,0 +1,28 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: ApprovalRequestedCloudEvent
+type: object
+required: [specversion, id, type, data]
+properties:
+  specversion:
+    type: string
+    const: '1.0'
+  id:
+    type: string
+    format: uuid
+  type:
+    type: string
+    const: approval.requested
+  actortype:
+    type: string
+    enum: [employee, system]
+  actorid:
+    type: string
+  data:
+    $ref: approval-requested-data.yaml
+if:
+  properties:
+    actortype:
+      const: employee
+then:
+  required: [actorid]
+additionalProperties: false

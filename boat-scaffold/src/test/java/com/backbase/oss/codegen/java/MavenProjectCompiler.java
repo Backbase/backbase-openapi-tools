@@ -16,14 +16,15 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.platform.commons.util.StringUtils;
 
 @Slf4j
-class MavenProjectCompiler {
+public class MavenProjectCompiler {
 
     private static final File GH_ACTIONS_M2_SETTINGS_FILE = new File("/home/runner/.m2/settings.xml");
     private static final File GH_ACTIONS_M2_REPOSITORY_DIR = new File("/home/runner/.m2/repository");
 
     private final ClassLoader contextClassLoader;
     private final File mavenRepositoryDir;
-    private final File mavenSettingsFile = GH_ACTIONS_M2_SETTINGS_FILE;
+    private final File mavenSettingsFile = new File(
+        System.getProperty("MavenProjectCompiler.settings", GH_ACTIONS_M2_SETTINGS_FILE.getPath()));
 
     public MavenProjectCompiler(ClassLoader contextClassLoader) {
         this.contextClassLoader = contextClassLoader;

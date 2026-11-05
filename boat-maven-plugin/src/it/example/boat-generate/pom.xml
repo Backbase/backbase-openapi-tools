@@ -24,6 +24,7 @@
         <module>angular</module>
         <module>java-clients</module>
         <module>java-server</module>
+        <module>asyncapi</module>
     </modules>
 
 </project>

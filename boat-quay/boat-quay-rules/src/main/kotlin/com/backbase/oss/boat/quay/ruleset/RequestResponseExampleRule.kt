@@ -155,8 +155,9 @@ class RequestResponseExampleRule {
         return when {
             "array" == property?.type && fieldValue.isArray -> {
                 when {
-                    property.items.type == "object" -> {
-                        property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }!!
+                    property.items?.type == "object" -> {
+                        property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }
+                            .orEmpty()
                             .flatten()
                     }
 
@@ -177,7 +178,9 @@ class RequestResponseExampleRule {
                     }
 
                     else -> {
-                        property.properties?.map { prop -> objectTypeCheck(propertyName, prop, fieldValue) }!!.flatten()
+                        property.properties?.map { prop -> objectTypeCheck(propertyName, prop, fieldValue) }
+                            .orEmpty()
+                            .flatten()
                     }
                 }
             }

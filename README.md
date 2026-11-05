@@ -22,6 +22,23 @@ See also: https://github.com/Backbase/backbase-openapi-tools/releases
 ## 0.19.0
 * **Feature**: Added support for OpenAPI 3.1.x specifications alongside existing 3.0.x support
   * Explicitly allows OpenAPI 3.1.0, 3.1.1, and 3.1.2 instead of regex-based matching
+* **Feature**: Added AsyncAPI 3.0 and 3.1 support, see
+  [boat-maven-plugin README](boat-maven-plugin/README.md#asyncapi-30-and-31).
+  * New `boat:generate-spring-cloud-stream-embedded` goal (generator `boat-spring-cloud-stream`) generating Spring Cloud
+    Stream handlers, functions and `StreamBridge` publishers. Whether an operation is produced or consumed follows its
+    `action`; `inverseOperations` generates the other side of the same document.
+  * `boat:generate` accepts AsyncAPI documents with any generator. Other generators generate the models of the message
+    payloads and headers only, so OpenAPI and AsyncAPI documents that share schema files produce the same model classes.
+  * JSON Schema payloads in draft-04, draft-06, draft-07, 2019-09 and 2020-12, inline or as Multi Format Schema
+    Objects under `components/schemas`. Warnings name the schemas the `projectionOpenApiVersion` cannot express.
+  * `boat:validate` validates AsyncAPI documents against the official AsyncAPI JSON Schema of their version, taken from
+    the `@asyncapi/specs` WebJar at build time, plus reference checks, and
+    `boat:bundle` bundles them into a single document with de-duplicated `components/schemas`; its
+    `projectionOpenApiVersion` parameter matches the one of `boat:generate`.
+  * `boat:lint`, `boat:doc` and `boat:diff` skip AsyncAPI documents found in directories; `boat:ship` ships them as is.
+* **Fix**: Bundling OpenAPI 3.1 specs resolves external references under `allOf`, `anyOf`, `oneOf`, `items`, `not`,
+  `if`/`then`/`else` and the other JSON Schema keywords, and in the discriminator mappings of nested schemas.
+* **Fix**: `deduplicateSchemas` also rewrites discriminator mappings that pointed at a merged duplicate.
 * Added Lombok to fix local build issues
 
 ## 0.18.6

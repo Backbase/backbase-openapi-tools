@@ -7,12 +7,14 @@ import com.backbase.oss.boat.transformers.bundler.BoatCache;
 import com.backbase.oss.boat.transformers.bundler.ExamplesProcessor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Yaml;
+import io.swagger.v3.core.util.Yaml31;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.parser.models.RefFormat;
@@ -33,7 +35,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -86,6 +90,37 @@ class BundlerTests {
         log.info(Yaml.pretty(openAPI.getComponents().getExamples()));
         assertThat("Should not contain any json reference", Yaml.pretty(openAPI).indexOf(".json"), is(-1));
         assertEquals(openAPIUnproccessed, openAPI);
+    }
+
+    @Test
+    void bundlesTheReferencesOfOpenApi31Schemas() throws OpenAPILoaderException {
+        File input = new File("src/test/resources/openapi/bundler-openapi-31/openapi.yaml");
+        OpenAPI openAPI = OpenAPILoader.load(input);
+
+        new Bundler(input).transform(openAPI, Collections.emptyMap());
+
+        String bundled = Yaml31.pretty(openAPI);
+        log.debug(bundled);
+        assertThat("Should not contain any file reference", bundled, not(containsString(".yaml")));
+
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
+        Schema<?> envelope = schemas.get("Envelope");
+        assertEquals("#/components/schemas/tag", envelope.getProperties().get("tags").getItems().get$ref());
+        assertEquals("#/components/schemas/forbidden", envelope.getNot().get$ref());
+
+        Schema<?> change = schemas.get("change");
+        assertEquals("#/components/schemas/access-change", change.getOneOf().get(0).get$ref());
+        assertEquals("#/components/schemas/deploy-change", change.getDiscriminator().getMapping().get("deploy"));
+
+        Schema<?> accessChange = schemas.get("access-change");
+        Schema<?> role = accessChange.getProperties().get("roles").getItems();
+        assertEquals("#/components/schemas/role", role.getProperties().get("role").get$ref());
+        Schema<?> subject = accessChange.getProperties().get("subject");
+        assertEquals("#/components/schemas/user", subject.getDiscriminator().getMapping().get("user"));
+
+        Schema<?> deployChange = schemas.get("deploy-change");
+        assertEquals("#/components/schemas/Run", deployChange.getAllOf().get(0).get$ref());
+        assertThat(schemas.get("Run"), notNullValue());
     }
 
     @Test

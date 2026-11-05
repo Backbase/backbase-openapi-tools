@@ -19,6 +19,7 @@ import java.util.List;
 public class BoatOpenAPIResolver {
 
     private final OpenAPI openApi;
+    private final ResolverCache cache;
     private final ComponentsProcessor componentsProcessor;
     private final PathsProcessor pathProcessor;
     private final OperationProcessor operationsProcessor;
@@ -32,7 +33,7 @@ public class BoatOpenAPIResolver {
         this.openApi = openApi;
         OpenAPIResolver.Settings openApiResolverSettings = settings != null ? settings : new OpenAPIResolver.Settings();
         this.examplesProcessor = new ExamplesProcessor(openApi, parentFileLocation);
-        ResolverCache cache = new BoatCache(openApi, auths, parentFileLocation, examplesProcessor);
+        this.cache = new BoatCache(openApi, auths, parentFileLocation, examplesProcessor);
         this.componentsProcessor = new ComponentsProcessor(openApi, cache);
         this.pathProcessor = new PathsProcessor(cache, openApi, openApiResolverSettings);
         this.operationsProcessor = new OperationProcessor(cache, openApi);
@@ -43,6 +44,9 @@ public class BoatOpenAPIResolver {
             return null;
         }
         processOpenAPI();
+        if (OpenApi31SchemaRefs.isOpenApi31(openApi)) {
+            OpenApi31SchemaRefs.resolve(openApi, cache);
+        }
         return this.openApi;
     }
 

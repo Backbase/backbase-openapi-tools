@@ -127,6 +127,13 @@ public class GenerateFromDirectoryDocMojo extends GenerateMojo {
 
         String[] includedFiles = directoryScanner.getIncludedFiles();
         return Arrays.stream(includedFiles).map(pathname -> new File(specDirectory, pathname))
+                .filter(file -> {
+                    if (SpecFormat.detect(file).isAsyncApi()) {
+                        log.warn("Skipping docs for {}: AsyncAPI not supported yet", file.getName());
+                        return false;
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList()).toArray(new File[]{});
     }
 }

@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
  * two field-for-field identical schemas that show up as duplicate models/classes/doc pages downstream.
  *
  * <p>Of every group of duplicates, this transformer keeps a single canonical entry and rewrites every
- * {@code $ref} in {@code paths} and {@code components} that pointed at a discarded duplicate so it points at
- * the canonical entry instead. The discarded duplicate(s) are then removed from {@code components/schemas}.
+ * {@code $ref} and discriminator mapping in {@code paths} and {@code components} that pointed at a discarded
+ * duplicate so it points at the canonical entry instead. The discarded duplicate(s) are then removed from {@code components/schemas}.
  *
  * <p>The canonical name is picked with a heuristic: a name starting with an uppercase letter is preferred
  * (schema names are conventionally PascalCase, whereas a name synthesized from a {@code $ref} tends to keep
@@ -120,19 +120,26 @@ public class DeduplicateSchemasTransformer implements Transformer {
     private void rewriteRefs(JsonNode node, Map<String, String> renames) {
         if (node instanceof ObjectNode) {
             ObjectNode objectNode = (ObjectNode) node;
-            JsonNode ref = objectNode.get("$ref");
-            if (ref != null && ref.isTextual()) {
-                String refValue = ref.textValue();
-                if (refValue.startsWith(SCHEMA_REF_PREFIX)) {
-                    String canonical = renames.get(refValue.substring(SCHEMA_REF_PREFIX.length()));
-                    if (canonical != null) {
-                        objectNode.set("$ref", TextNode.valueOf(SCHEMA_REF_PREFIX + canonical));
-                    }
-                }
+            rewriteRef(objectNode, "$ref", renames);
+            JsonNode mapping = objectNode.path("discriminator").path("mapping");
+            if (mapping instanceof ObjectNode) {
+                List<String> keys = new ArrayList<>();
+                mapping.fieldNames().forEachRemaining(keys::add);
+                keys.forEach(key -> rewriteRef((ObjectNode) mapping, key, renames));
             }
             objectNode.elements().forEachRemaining(child -> rewriteRefs(child, renames));
         } else if (node.isArray()) {
             node.elements().forEachRemaining(child -> rewriteRefs(child, renames));
+        }
+    }
+
+    private void rewriteRef(ObjectNode node, String field, Map<String, String> renames) {
+        JsonNode ref = node.get(field);
+        if (ref != null && ref.isTextual() && ref.textValue().startsWith(SCHEMA_REF_PREFIX)) {
+            String canonical = renames.get(ref.textValue().substring(SCHEMA_REF_PREFIX.length()));
+            if (canonical != null) {
+                node.set(field, TextNode.valueOf(SCHEMA_REF_PREFIX + canonical));
+            }
         }
     }
 }

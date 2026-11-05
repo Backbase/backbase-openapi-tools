@@ -13,6 +13,7 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -57,6 +58,37 @@ class DeduplicateSchemasTransformerTests {
             .getResponses().get("200").getContent().get("application/json").getSchema().get$ref();
         assertEquals("#/components/schemas/CurrencyExchangeArrangement", rewrittenRef,
             "The response schema $ref should be rewritten to point at the canonical schema.");
+    }
+
+    @Test
+    void rewritesDiscriminatorMappingsOfMergedSchemas() {
+        Schema<?> canonical = new Schema<>();
+        canonical.setType("object");
+        canonical.addProperty("id", new StringSchema());
+
+        Schema<?> duplicate = new Schema<>();
+        duplicate.setType("object");
+        duplicate.addProperty("id", new StringSchema());
+
+        Schema<?> change = new Schema<>();
+        change.addOneOfItem(new Schema<>().$ref("#/components/schemas/access-change-v1"));
+        change.setDiscriminator(new Discriminator().propertyName("schema")
+            .mapping("access-change.v1", "#/components/schemas/access-change-v1"));
+
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.setComponents(new Components()
+            .addSchemas("AccessChangeV1", canonical)
+            .addSchemas("access-change-v1", duplicate)
+            .addSchemas("Change", change));
+        openAPI.setPaths(new Paths());
+
+        OpenAPI result = new DeduplicateSchemasTransformer().transform(openAPI, emptyMap());
+
+        Schema<?> rewritten = result.getComponents().getSchemas().get("Change");
+        assertFalse(result.getComponents().getSchemas().containsKey("access-change-v1"));
+        assertEquals("#/components/schemas/AccessChangeV1", rewritten.getOneOf().get(0).get$ref());
+        assertEquals("#/components/schemas/AccessChangeV1",
+            rewritten.getDiscriminator().getMapping().get("access-change.v1"));
     }
 
     @Test

@@ -64,6 +64,9 @@ public class ShipMojo extends AbstractMojo {
                 throw new MojoExecutionException("No API's found in directory: " + input + " with include patterns: " + Arrays.toString(includes));
             }
             log.info("Found " + inputFiles.length + " specs to sip");
+            Arrays.stream(inputFiles)
+                .filter(file -> SpecFormat.detect(new File(input, file)).isAsyncApi())
+                .forEach(file -> log.info("Shipping AsyncAPI {} as is", file));
         } else {
             inputFiles = new String[]{input.toPath().relativize(project.getBasedir().toPath()).toString()};
         }
