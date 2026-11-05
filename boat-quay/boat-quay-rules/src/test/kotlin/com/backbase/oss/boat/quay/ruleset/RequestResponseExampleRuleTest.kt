@@ -1,6 +1,7 @@
 package com.backbase.oss.boat.quay.ruleset
 
 import com.backbase.oss.boat.quay.ruleset.test.ZallyAssertions
+import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -69,6 +70,38 @@ class RequestResponseExampleRuleTest {
             .assertThat(violations)
             .isEmpty()
     }
+
+    @Test
+    fun `correct check if example fields are present on OpenAPI 3_1`() {
+        val context = DefaultContextFactory().getOpenApiContext(
+            openApi31({}.javaClass.getResource("/request-response-example-success-1.yaml").readText().trim())
+        )
+
+        val violations = cut.checkResponseExampleFulfill(context)
+
+        ZallyAssertions
+            .assertThat(violations)
+            .isEmpty()
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [EXAMPLE_TYPE_MISS_MATCH, EXAMPLE_INCORRECT_OBJECT, EXAMPLE_REQUEST_BODY_INCORRECT_OBJECT,
+            EXAMPLE_NO_PROPERTIES, EXAMPLE_NO_SCHEMA, EXAMPLE_OBJECT_WITHOUT_PROPERTIES,
+            EXAMPLE_ARRAY_OF_OBJECTS_WITHOUT_PROPERTIES, EXAMPLE_STRING_ARRAY, EXAMPLE_REFERENCED_SCHEMA]
+    )
+    fun `OpenAPI 3_1 reports the same violations as OpenAPI 3_0`(value: String) {
+        val violations30 = cut.checkResponseExampleFulfill(
+            DefaultContextFactory().getOpenApiContext(value.trimIndent())
+        )
+        val violations31 = cut.checkResponseExampleFulfill(
+            DefaultContextFactory().getOpenApiContext(openApi31(value.trimIndent()))
+        )
+
+        assertThat(violations31.map { it.description }).isEqualTo(violations30.map { it.description })
+    }
+
+    private fun openApi31(spec: String) = spec.replaceFirst("openapi: 3.0.3", "openapi: 3.1.0")
 
     companion object {
 
@@ -338,6 +371,80 @@ class RequestResponseExampleRuleTest {
                                   - ccc 
                                   
                 """
+
+        // On OpenAPI 3.1 the parser returns the repeated request body example as a Java map instead of a JsonNode
+        @Language("YAML")
+        const val EXAMPLE_REFERENCED_SCHEMA: String = """
+            openapi: 3.0.3
+            info:
+              title: Thing API
+              version: 1.0.0
+            paths:
+              /contacts:
+                post:
+                  operationId: createContact
+                  requestBody:
+                    content:
+                      application/json:
+                        schema:
+                          ${'$'}ref: '#/components/schemas/Contact'
+                        examples:
+                          example:
+                            value:
+                              name: Jane Doe
+                              address:
+                                city: Amsterdam
+                  responses:
+                    201:
+                      description: Created
+                    400:
+                      ${'$'}ref: '#/components/responses/BadRequest'
+              /contacts/{contactId}:
+                put:
+                  operationId: replaceContact
+                  requestBody:
+                    content:
+                      application/json:
+                        schema:
+                          ${'$'}ref: '#/components/schemas/Contact'
+                        examples:
+                          example:
+                            value:
+                              name: Jane Doe
+                              address:
+                                city: Amsterdam
+                  responses:
+                    204:
+                      description: Replaced
+                    400:
+                      ${'$'}ref: '#/components/responses/BadRequest'
+            components:
+              responses:
+                BadRequest:
+                  description: Bad request
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                      examples:
+                        example:
+                          value:
+                            message: Bad Request
+              schemas:
+                Contact:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    address:
+                      type: object
+                      properties:
+                        city:
+                          type: string
+            """
 
     }
 }
