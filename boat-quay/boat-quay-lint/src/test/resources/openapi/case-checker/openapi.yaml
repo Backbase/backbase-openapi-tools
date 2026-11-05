@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: Casing API
+  version: 1.0.0
+paths:
+  /client-api/v1/payment-orders/{paymentOrderId}:
+    get:
+      operationId: getPaymentOrder
+      parameters:
+        - name: paymentOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-CXT-RequestUUID
+          in: header
+          schema:
+            type: string
+        - name: X-B3-TraceId
+          in: header
+          schema:
+            type: string
+        - name: X-B3-SpanId
+          in: header
+          schema:
+            type: string
+        - name: X-B3-ParentSpanId
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [READY_FOR_APPROVAL, processed]
+                  _metadata:
+                    type: object
+                    properties:
+                      canEdit:
+                        type: boolean
+  /client-api/v1/payment-orders/{payment-order-id}/items:
+    get:
+      operationId: listItems
+      parameters:
+        - name: payment-order-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK

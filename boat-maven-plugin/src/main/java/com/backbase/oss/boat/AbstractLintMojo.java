@@ -40,7 +40,14 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
     @Parameter(name = "ignoreRules")
     protected String[] ignoreRules = {"150","219","215","218","166","136","174","235","107","171","224","143",
         "151","129","146","147","172","145","115","132","120", "134","183","154","105","104","130","118","110","153",
-        "101","176","116","M009","H002","M010","H001","M008","S005","S006","S007","M011","B007U","B009U"};
+        "101","176","116","M009","H002","H001","M008","S005","S006","S007","M011","B007U","B009U"};
+
+    /**
+     * List of rule ids whose violations are reported, but never fail the build, even with
+     * <code>failOnWarning</code>. Remove a rule from this list to make it fail the build.
+     */
+    @Parameter(name = "previewRules")
+    protected String[] previewRules = {"B004", "M010"};
 
     protected List<BoatLintReport> lint() throws MojoExecutionException, MojoFailureException {
 
@@ -75,7 +82,7 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
             if(showIgnoredRules) {
                 log.info("These rules will be ignored: {}", Arrays.toString(ignoreRules));
             }
-            BoatLinter boatLinter = new BoatLinter(ignoreRules);
+            BoatLinter boatLinter = new BoatLinter(Arrays.asList(ignoreRules), Arrays.asList(previewRules));
             return boatLinter.lint(inputFile);
         } catch (IOException e) {
             throw new MojoExecutionException("Error transforming OpenAPI: " + inputFile, e);
@@ -95,5 +102,9 @@ public abstract class AbstractLintMojo extends InputMavenArtifactMojo {
 
     public void setIgnoreRules(String[] ignoreRules) {
         this.ignoreRules = ignoreRules;
+    }
+
+    public void setPreviewRules(String[] previewRules) {
+        this.previewRules = previewRules;
     }
 }

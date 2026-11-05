@@ -28,6 +28,33 @@ class LintMojoTests {
     }
 
 
+    @Test
+    void testFailOnWarningOnlyPreviewViolations() {
+        LintMojo lintMojo = previewLintMojo();
+
+        assertDoesNotThrow(lintMojo::execute);
+    }
+
+    @Test
+    void testFailOnWarningWithoutPreviewRules() {
+        LintMojo lintMojo = previewLintMojo();
+        lintMojo.setPreviewRules(new String[0]);
+
+        assertThrows(MojoFailureException.class, lintMojo::execute);
+    }
+
+    /**
+     * The spec only violates B004, which is in the default preview rules.
+     */
+    private LintMojo previewLintMojo() {
+        LintMojo lintMojo = new LintMojo();
+        lintMojo.setIgnoreRules(Arrays.array("219", "105", "104", "151", "134", "115","M0012", "224", "B013", "B014", "B007U", "B009U"));
+        lintMojo.setInput(getFile("/oas-examples/preview-lint-warnings.yaml"));
+        lintMojo.setFailOnWarning(true);
+        lintMojo.setWriteLintReport(false);
+        return lintMojo;
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void testsFailOnWarningWithReport(boolean report) {

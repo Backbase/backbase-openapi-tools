@@ -22,6 +22,13 @@ public class BoatLintReport {
         return !violations.isEmpty();
     }
 
+    /**
+     * Whether any violation comes from a rule that is not in preview.
+     */
+    public boolean hasBlockingViolations() {
+        return violations.stream().anyMatch(violation -> violation.getRule() == null || !violation.getRule().isPreview());
+    }
+
     public String getFileName() {
         return StringUtils.substringBeforeLast(StringUtils.substringAfterLast(filePath, File.separator), ".");
     }

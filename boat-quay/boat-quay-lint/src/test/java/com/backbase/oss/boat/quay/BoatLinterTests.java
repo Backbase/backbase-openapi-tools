@@ -12,11 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class BoatLinterTests {
 
@@ -107,6 +111,42 @@ class BoatLinterTests {
         // 3.0 documents keep going through every rule, rule 219 included.
         assertTrue(boatLintReport.getAvailableRules().stream().anyMatch(rule -> "219".equals(rule.getId())),
             "Rule 219 must remain registered for 3.0 documents.");
+    }
+
+    @Test
+    void previewViolationsAreReportedButNotBlocking() throws IOException, OpenAPILoaderException {
+        String openApiContents = IOUtils.resourceToString("/openapi/presentation-client-api/openapi.yaml", Charset.defaultCharset());
+        List<String> allRules = boatLinter.getAvailableRules().stream().map(BoatLintRule::getId).collect(Collectors.toList());
+
+        BoatLintReport previewReport = new BoatLinter(Collections.emptyList(), allRules).lint(openApiContents);
+        BoatLintReport blockingReport = new BoatLinter(Collections.emptyList(), Collections.emptyList()).lint(openApiContents);
+
+        assertTrue(previewReport.hasViolations());
+        assertFalse(previewReport.hasBlockingViolations());
+        assertTrue(previewReport.getViolations().stream().allMatch(violation -> violation.getRule().isPreview()));
+        assertTrue(previewReport.getViolations().stream().allMatch(violation -> violation.displayString().contains("(preview) - ")));
+        assertTrue(blockingReport.hasBlockingViolations());
+        assertTrue(blockingReport.getViolations().stream().noneMatch(violation -> violation.getRule().isPreview()));
+    }
+
+    /**
+     * M010 uses the CaseChecker block in boat.conf: camelCase path parameters, {@code _metadata}, SCREAMING_SNAKE_CASE
+     * enum values and the Service SDK headers follow the guideline.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"3.0.3", "3.1.0"})
+    void caseCheckerFollowsGuidelineNaming(String openApiVersion) throws IOException, OpenAPILoaderException {
+        String openApiContents = IOUtils.resourceToString("/openapi/case-checker/openapi.yaml", Charset.defaultCharset())
+            .replace("openapi: 3.1.0", "openapi: " + openApiVersion);
+
+        BoatLintReport boatLintReport = boatLinter.lint(openApiContents);
+
+        List<String> caseViolations = boatLintReport.getViolations().stream()
+            .filter(violation -> "M010".equals(violation.getRule().getId()))
+            .map(BoatViolation::getDescription)
+            .collect(Collectors.toList());
+        assertEquals(1, caseViolations.size(), caseViolations::toString);
+        assertTrue(caseViolations.get(0).startsWith("Path parameter 'payment-order-id' does not match camelCase"));
     }
 
     private boolean hasViolationOfRule(BoatLintReport report, String ruleId) {

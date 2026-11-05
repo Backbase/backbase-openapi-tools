@@ -54,7 +54,7 @@
                 <h2>Violations</h2>
                 {{#each violations}}
                     <div class="result" id="{{rule.id}}">
-                        <h3 class="title"><div class="severity {{severity}}">{{severity}}</div><span>{{rule.title}}</span></h3>
+                        <h3 class="title"><div class="severity {{severity}}">{{severity}}</div><span>{{rule.title}}</span>{{#if rule.preview}}<span class="preview" title="Preview rule: reported, but does not fail the build">preview</span>{{/if}}</h3>
                         <p class="description">{{description}}</p>
                         <a class="more" href="{{rule.url}}">More information</a>
                         <span class="location-handle"><span class="handle"></span>Location</span>
