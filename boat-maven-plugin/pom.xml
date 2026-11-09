@@ -294,6 +294,32 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>swagger-dependency-convergence</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!-- Mixed swagger-parser / swagger-core versions in the plugin realm corrupt
+                                     serialized specs, so every module must resolve to a single version. -->
+                                <dependencyConvergence>
+                                    <includes>
+                                        <include>io.swagger.parser.v3:*</include>
+                                        <include>io.swagger.core.v3:*</include>
+                                    </includes>
+                                </dependencyConvergence>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>11</source>

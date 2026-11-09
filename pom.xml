@@ -227,6 +227,49 @@
                 </exclusions>
             </dependency>
 
+            <!-- Pin the swagger-parser modules too: openapi-diff-core pulls in an older swagger-parser-v3 that,
+                 combined with swagger-models 2.2.54+, writes `default: null` on every schema. -->
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser-v3</artifactId>
+                <version>${swagger-parser.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.fge</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser-core</artifactId>
+                <version>${swagger-parser.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser-v2-converter</artifactId>
+                <version>${swagger-parser.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.fge</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser-safe-url-resolver</artifactId>
+                <version>${swagger-parser.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>jakarta.validation</groupId>
                 <artifactId>jakarta.validation-api</artifactId>
