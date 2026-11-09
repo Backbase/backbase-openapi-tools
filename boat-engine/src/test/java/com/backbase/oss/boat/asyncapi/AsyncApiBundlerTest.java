@@ -81,13 +81,13 @@ class AsyncApiBundlerTest {
         JsonNode bundled = new AsyncApiBundler().setOpenApiVersion("3.1.0")
             .bundle(AsyncApiTestFiles.CLOUD_EVENTS);
 
-        assertEquals("ums", bundled.at("/channels/approvalRequested/x-producers/0").asText());
-        assertEquals("approval", bundled.at("/channels/approvalRequested/x-consumers/0").asText());
+        assertEquals("ums", bundled.at("/channels/approvalRequests/x-producers/0").asText());
+        assertEquals("approval", bundled.at("/channels/approvalRequests/x-consumers/0").asText());
         assertEquals("approval", bundled.at("/channels/approvalDecision/x-producers/0").asText());
         assertEquals("ums", bundled.at("/channels/approvalDecision/x-consumers/0").asText());
-        assertEquals(Set.of("ApprovalRequestedCloudEvent", "ApprovalRequestedData", "ApprovalDecisionCloudEvent",
+        assertEquals(Set.of("ApprovalRequestCloudEvent", "ApprovalRequestData", "ApprovalDecisionCloudEvent",
             "ApprovalDecisionData", "RequestType", "Scope"), fieldNames(bundled.at("/components/schemas")));
-        for (String data : List.of("ApprovalRequestedData", "ApprovalDecisionData")) {
+        for (String data : List.of("ApprovalRequestData", "ApprovalDecisionData")) {
             JsonNode properties = bundled.at("/components/schemas/" + data + "/schema/properties");
             assertEquals("#/components/schemas/Scope", properties.at("/scope/$ref").asText(), data);
             assertEquals("#/components/schemas/RequestType", properties.at("/requestType/$ref").asText(), data);

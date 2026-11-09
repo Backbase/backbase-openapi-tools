@@ -175,24 +175,24 @@ class BoatSpringCloudStreamCodegenTests {
         generate(output, CLOUD_EVENTS, openAPI, Map.of());
         File api = apiDir(output);
 
-        assertThat(List.of(api.list()), containsInAnyOrder("ApprovalRequestedHandler.java",
-            "ApprovalRequestedFunctionsConfiguration.java", "ApprovalDecisionPublisher.java",
+        assertThat(List.of(api.list()), containsInAnyOrder("ApprovalRequestsHandler.java",
+            "ApprovalRequestsFunctionsConfiguration.java", "ApprovalDecisionPublisher.java",
             "ApprovalDecisionFunctionsConfiguration.java", "AsyncApiHeaders.java"));
-        assertThat(methodNames(parse(new File(api, "ApprovalRequestedHandler.java"))),
-            equalTo(List.of("receiveApprovalRequested")));
+        assertThat(methodNames(parse(new File(api, "ApprovalRequestsHandler.java"))),
+            equalTo(List.of("receiveApprovalRequest")));
         assertThat(parameterTypes(method(parse(new File(api, "ApprovalDecisionPublisher.java")),
             "sendApprovalDecision")), hasItem("ApprovalDecisionCloudEvent"));
 
         File model = new File(output, "src/main/java/" + MODEL_PACKAGE.replace('.', '/'));
-        assertThat(List.of(model.list()), containsInAnyOrder("ApprovalRequestedCloudEvent.java",
-            "ApprovalRequestedData.java", "ApprovalDecisionCloudEvent.java", "ApprovalDecisionData.java",
+        assertThat(List.of(model.list()), containsInAnyOrder("ApprovalRequestCloudEvent.java",
+            "ApprovalRequestData.java", "ApprovalDecisionCloudEvent.java", "ApprovalDecisionData.java",
             "RequestType.java", "Scope.java", "BigDecimalCustomSerializer.java"));
 
         String bindings = read(new File(output, "src/main/resources/asyncapi-bindings.properties"));
-        assertThat(bindings, containsString("spring.cloud.function.definition=receiveApprovalRequested\n"));
+        assertThat(bindings, containsString("spring.cloud.function.definition=receiveApprovalRequest\n"));
         assertThat(bindings, containsString("spring.cloud.stream.output-bindings=sendApprovalDecision\n"));
         assertThat(bindings, containsString(
-            "spring.cloud.stream.bindings.receiveApprovalRequested-in-0.destination=approval-requested"));
+            "spring.cloud.stream.bindings.receiveApprovalRequest-in-0.destination=approval-requests"));
         assertThat(bindings, containsString(
             "spring.cloud.stream.bindings.sendApprovalDecision-out-0.destination=approval-decision"));
 

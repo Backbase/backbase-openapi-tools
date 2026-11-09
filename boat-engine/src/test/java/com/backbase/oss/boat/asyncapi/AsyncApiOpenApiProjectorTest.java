@@ -271,13 +271,13 @@ class AsyncApiOpenApiProjectorTest {
             .project(AsyncApiLoader.load(AsyncApiTestFiles.CLOUD_EVENTS));
         OpenAPI openAPI = projection.getOpenAPI();
 
-        Operation receive = openAPI.getPaths().get("/receiveApprovalRequested").getPost();
-        assertEquals(List.of("approvalRequested"), receive.getTags());
+        Operation receive = openAPI.getPaths().get("/receiveApprovalRequest").getPost();
+        assertEquals(List.of("approvalRequests"), receive.getTags());
         assertEquals("receive", receive.getExtensions().get(AsyncApiExtensions.ACTION));
         Operation send = openAPI.getPaths().get("/sendApprovalDecision").getPost();
         assertEquals(List.of("approvalDecision"), send.getTags());
         assertEquals("send", send.getExtensions().get(AsyncApiExtensions.ACTION));
-        assertEquals(Set.of("ApprovalRequestedCloudEvent", "ApprovalRequestedData", "ApprovalDecisionCloudEvent",
+        assertEquals(Set.of("ApprovalRequestCloudEvent", "ApprovalRequestData", "ApprovalDecisionCloudEvent",
             "ApprovalDecisionData", "RequestType", "Scope"), openAPI.getComponents().getSchemas().keySet(),
             "schemas both events reference exist once");
         assertTrue(projection.getWarnings().isEmpty(), projection.getWarnings()::toString);

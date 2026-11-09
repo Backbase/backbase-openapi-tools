@@ -7,15 +7,15 @@ info:
     decisions. The operations have no tags, so each is grouped under its channel key. The envelopes, their data and
     the schemas both events use (shared/schemas) are registered as Multi Format Schema Objects.
 channels:
-  approvalRequested:
-    address: approval-requested
+  approvalRequests:
+    address: approval-requests
     x-producers:
       - ums
     x-consumers:
       - approval
     messages:
-      ApprovalRequested:
-        $ref: '#/components/messages/ApprovalRequested'
+      ApprovalRequest:
+        $ref: '#/components/messages/ApprovalRequest'
   approvalDecision:
     address: approval-decision
     x-producers:
@@ -26,12 +26,12 @@ channels:
       ApprovalDecision:
         $ref: '#/components/messages/ApprovalDecision'
 operations:
-  receiveApprovalRequested:
+  receiveApprovalRequest:
     action: receive
     channel:
-      $ref: '#/channels/approvalRequested'
+      $ref: '#/channels/approvalRequests'
     messages:
-      - $ref: '#/channels/approvalRequested/messages/ApprovalRequested'
+      - $ref: '#/channels/approvalRequests/messages/ApprovalRequest'
   sendApprovalDecision:
     action: send
     channel:
@@ -40,14 +40,14 @@ operations:
       - $ref: '#/channels/approvalDecision/messages/ApprovalDecision'
 components:
   schemas:
-    ApprovalRequestedCloudEvent:
+    ApprovalRequestCloudEvent:
       schemaFormat: application/schema+yaml;version=draft-2020-12
       schema:
-        $ref: schemas/approval-requested-cloud-event.yaml
-    ApprovalRequestedData:
+        $ref: schemas/approval-request-cloud-event.yaml
+    ApprovalRequestData:
       schemaFormat: application/schema+yaml;version=draft-2020-12
       schema:
-        $ref: schemas/approval-requested-data.yaml
+        $ref: schemas/approval-request-data.yaml
     ApprovalDecisionCloudEvent:
       schemaFormat: application/schema+yaml;version=draft-2020-12
       schema:
@@ -65,10 +65,10 @@ components:
       schema:
         $ref: shared/schemas/scope.yaml
   messages:
-    ApprovalRequested:
+    ApprovalRequest:
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/ApprovalRequestedCloudEvent'
+        $ref: '#/components/schemas/ApprovalRequestCloudEvent'
     ApprovalDecision:
       contentType: application/json
       payload:
