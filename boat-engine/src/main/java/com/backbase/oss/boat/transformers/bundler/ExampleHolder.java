@@ -39,6 +39,7 @@ public abstract class ExampleHolder<T> {
                 log.warn(String.format(FIXING_INVALID_EXAMPLE_WARNING, name, ref));
                 example.set$ref(ref);
                 example.setValue(null);
+                example.setValueSetFlag(false);
             }
         }
 
