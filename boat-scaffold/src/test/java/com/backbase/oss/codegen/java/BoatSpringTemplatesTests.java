@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.UnhandledException;
+import org.apache.commons.lang3.exception.UncheckedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
@@ -341,7 +341,7 @@ class BoatSpringTemplatesTests {
                 verifyJsonIgnoreAnnotation(modelClass);
                 verifyJsonIgnoreAnnotation(parentClass);
             } catch (Exception e) {
-                throw new UnhandledException(e);
+                throw new UncheckedException(e);
             }
         };
         var verificationRunner = new VerificationRunner(classLoader);
@@ -369,7 +369,7 @@ class BoatSpringTemplatesTests {
                 List<?> listProperty = (List<?>) modelClass.getDeclaredMethod("getLines").invoke(modelObject);
                 assertNotNull(listProperty);
             } catch (Exception e) {
-                throw new UnhandledException(e);
+                throw new UncheckedException(e);
             }
         };
         var verificationRunner = new VerificationRunner(classLoader);
