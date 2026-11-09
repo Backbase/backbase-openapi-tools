@@ -215,7 +215,7 @@ class AsyncApiValidatorTest {
 
         assertTrue(result.isValid(), () -> "errors: " + result.getErrors());
         assertFalse(result.hasWarnings(), () -> "warnings: " + result.getWarnings());
-        assertEquals("Approval Events", result.getTitle());
+        assertEquals("Adoption Events", result.getTitle());
     }
 
     @Test

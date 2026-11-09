@@ -40,9 +40,9 @@ class BoatSpringCloudStreamCodegenTests {
     static final File SHARED_EVENTS =
         new File("../boat-trail-resources/src/main/resources/asyncapi/shared-events/asyncapi.yaml");
     static final File CLOUD_EVENT = new File(
-        "../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/approval-decision-v1/asyncapi.yaml");
+        "../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/adoption-decision-v1/asyncapi.yaml");
     static final File CLOUD_EVENTS = new File(
-        "../boat-trail-resources/src/main/resources/asyncapi/cloud-events/approval-events-v1.yaml");
+        "../boat-trail-resources/src/main/resources/asyncapi/cloud-events/adoption-events-v1.yaml");
     static final String API_PACKAGE = "com.example.orders.events";
     static final String MODEL_PACKAGE = "com.example.orders.model";
 
@@ -158,11 +158,11 @@ class BoatSpringCloudStreamCodegenTests {
         generate(output, CLOUD_EVENT, openAPI, Map.of());
 
         File model = new File(output, "src/main/java/" + MODEL_PACKAGE.replace('.', '/'));
-        assertThat(List.of(model.list()), containsInAnyOrder("ApprovalDecisionCloudEvent.java",
-            "ApprovalDecisionData.java", "RequestType.java", "Scope.java", "BigDecimalCustomSerializer.java"));
-        CompilationUnit publisher = parse(new File(apiDir(output), "ApprovalDecisionPublisher.java"));
+        assertThat(List.of(model.list()), containsInAnyOrder("AdoptionDecisionCloudEvent.java",
+            "AdoptionDecisionData.java", "PetType.java", "Pet.java", "BigDecimalCustomSerializer.java"));
+        CompilationUnit publisher = parse(new File(apiDir(output), "AdoptionDecisionPublisher.java"));
         assertThat(parameterTypes(publisher.findAll(MethodDeclaration.class).get(0)),
-            hasItem("ApprovalDecisionCloudEvent"));
+            hasItem("AdoptionDecisionCloudEvent"));
 
         compile(output);
     }
@@ -175,26 +175,26 @@ class BoatSpringCloudStreamCodegenTests {
         generate(output, CLOUD_EVENTS, openAPI, Map.of());
         File api = apiDir(output);
 
-        assertThat(List.of(api.list()), containsInAnyOrder("ApprovalRequestsHandler.java",
-            "ApprovalRequestsFunctionsConfiguration.java", "ApprovalDecisionPublisher.java",
-            "ApprovalDecisionFunctionsConfiguration.java", "AsyncApiHeaders.java"));
-        assertThat(methodNames(parse(new File(api, "ApprovalRequestsHandler.java"))),
-            equalTo(List.of("receiveApprovalRequest")));
-        assertThat(parameterTypes(method(parse(new File(api, "ApprovalDecisionPublisher.java")),
-            "sendApprovalDecision")), hasItem("ApprovalDecisionCloudEvent"));
+        assertThat(List.of(api.list()), containsInAnyOrder("AdoptionRequestsHandler.java",
+            "AdoptionRequestsFunctionsConfiguration.java", "AdoptionDecisionPublisher.java",
+            "AdoptionDecisionFunctionsConfiguration.java", "AsyncApiHeaders.java"));
+        assertThat(methodNames(parse(new File(api, "AdoptionRequestsHandler.java"))),
+            equalTo(List.of("receiveAdoptionRequest")));
+        assertThat(parameterTypes(method(parse(new File(api, "AdoptionDecisionPublisher.java")),
+            "sendAdoptionDecision")), hasItem("AdoptionDecisionCloudEvent"));
 
         File model = new File(output, "src/main/java/" + MODEL_PACKAGE.replace('.', '/'));
-        assertThat(List.of(model.list()), containsInAnyOrder("ApprovalRequestCloudEvent.java",
-            "ApprovalRequestData.java", "ApprovalDecisionCloudEvent.java", "ApprovalDecisionData.java",
-            "RequestType.java", "Scope.java", "BigDecimalCustomSerializer.java"));
+        assertThat(List.of(model.list()), containsInAnyOrder("AdoptionRequestCloudEvent.java",
+            "AdoptionRequestData.java", "AdoptionDecisionCloudEvent.java", "AdoptionDecisionData.java",
+            "PetType.java", "Pet.java", "BigDecimalCustomSerializer.java"));
 
         String bindings = read(new File(output, "src/main/resources/asyncapi-bindings.properties"));
-        assertThat(bindings, containsString("spring.cloud.function.definition=receiveApprovalRequest\n"));
-        assertThat(bindings, containsString("spring.cloud.stream.output-bindings=sendApprovalDecision\n"));
+        assertThat(bindings, containsString("spring.cloud.function.definition=receiveAdoptionRequest\n"));
+        assertThat(bindings, containsString("spring.cloud.stream.output-bindings=sendAdoptionDecision\n"));
         assertThat(bindings, containsString(
-            "spring.cloud.stream.bindings.receiveApprovalRequest-in-0.destination=approval-requests"));
+            "spring.cloud.stream.bindings.receiveAdoptionRequest-in-0.destination=adoption-requests"));
         assertThat(bindings, containsString(
-            "spring.cloud.stream.bindings.sendApprovalDecision-out-0.destination=approval-decision"));
+            "spring.cloud.stream.bindings.sendAdoptionDecision-out-0.destination=adoption-decision"));
 
         compile(output);
     }

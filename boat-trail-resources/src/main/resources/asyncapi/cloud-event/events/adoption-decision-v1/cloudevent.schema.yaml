@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-title: ApprovalDecisionCloudEvent
+title: AdoptionDecisionCloudEvent
 type: object
 required: [specversion, id, data]
 properties:
@@ -9,17 +9,17 @@ properties:
   id:
     type: string
     format: uuid
-  actortype:
+  sourcetype:
     type: string
-    enum: [employee, system]
-  actorid:
+    enum: [store, web]
+  storeid:
     type: string
   data:
     $ref: specification.yaml
 if:
   properties:
-    actortype:
-      const: employee
+    sourcetype:
+      const: store
 then:
-  required: [actorid]
+  required: [storeid]
 additionalProperties: false

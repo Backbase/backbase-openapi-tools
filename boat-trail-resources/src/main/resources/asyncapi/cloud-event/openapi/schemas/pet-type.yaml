@@ -1,4 +1,4 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-title: RequestType
+title: PetType
 type: string
-enum: [access, deploy]
+enum: [cat, dog]

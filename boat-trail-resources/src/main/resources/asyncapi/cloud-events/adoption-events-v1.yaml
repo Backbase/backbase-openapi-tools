@@ -1,0 +1,75 @@
+asyncapi: 3.0.0
+info:
+  title: Adoption Events
+  version: 1.0.0
+  description: >-
+    Two CloudEvents in JSON Schema 2020-12 in one document: the shelter receives adoption requests and sends the
+    decisions. The operations have no tags, so each is grouped under its channel key. The envelopes, their data and
+    the schemas both events use (shared/schemas) are registered as Multi Format Schema Objects.
+channels:
+  adoptionRequests:
+    address: adoption-requests
+    x-producers:
+      - store
+    x-consumers:
+      - shelter
+    messages:
+      AdoptionRequest:
+        $ref: '#/components/messages/AdoptionRequest'
+  adoptionDecision:
+    address: adoption-decision
+    x-producers:
+      - shelter
+    x-consumers:
+      - store
+    messages:
+      AdoptionDecision:
+        $ref: '#/components/messages/AdoptionDecision'
+operations:
+  receiveAdoptionRequest:
+    action: receive
+    channel:
+      $ref: '#/channels/adoptionRequests'
+    messages:
+      - $ref: '#/channels/adoptionRequests/messages/AdoptionRequest'
+  sendAdoptionDecision:
+    action: send
+    channel:
+      $ref: '#/channels/adoptionDecision'
+    messages:
+      - $ref: '#/channels/adoptionDecision/messages/AdoptionDecision'
+components:
+  schemas:
+    AdoptionRequestCloudEvent:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: schemas/adoption-request-cloud-event.yaml
+    AdoptionRequestData:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: schemas/adoption-request-data.yaml
+    AdoptionDecisionCloudEvent:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: schemas/adoption-decision-cloud-event.yaml
+    AdoptionDecisionData:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: schemas/adoption-decision-data.yaml
+    PetType:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: shared/schemas/pet-type.yaml
+    Pet:
+      schemaFormat: application/schema+yaml;version=draft-2020-12
+      schema:
+        $ref: shared/schemas/pet.yaml
+  messages:
+    AdoptionRequest:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AdoptionRequestCloudEvent'
+    AdoptionDecision:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AdoptionDecisionCloudEvent'

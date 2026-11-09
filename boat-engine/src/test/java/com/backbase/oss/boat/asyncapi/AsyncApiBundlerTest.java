@@ -63,9 +63,9 @@ class AsyncApiBundlerTest {
         JsonNode bundled = new AsyncApiBundler().setOpenApiVersion("3.1.0")
             .bundle(AsyncApiTestFiles.CLOUD_EVENT);
 
-        JsonNode envelope = bundled.at("/components/schemas/ApprovalDecisionCloudEvent");
+        JsonNode envelope = bundled.at("/components/schemas/AdoptionDecisionCloudEvent");
         assertEquals("application/schema+yaml;version=draft-2020-12", envelope.path("schemaFormat").asText());
-        assertEquals("#/components/schemas/ApprovalDecisionData", envelope.at("/schema/properties/data/$ref").asText());
+        assertEquals("#/components/schemas/AdoptionDecisionData", envelope.at("/schema/properties/data/$ref").asText());
         assertEquals("1.0", envelope.at("/schema/properties/specversion/const").asText());
 
         File output = AsyncApiTestFiles.write(dir, "bundled/asyncapi.yaml", AsyncApiBundler.toYaml(bundled));
@@ -73,7 +73,7 @@ class AsyncApiBundlerTest {
         assertTrue(validation.isValid(), () -> "errors: " + validation.getErrors());
         AsyncApiDocument reloaded = AsyncApiLoader.load(output);
         assertEquals("application/schema+yaml;version=draft-2020-12",
-            reloaded.getComponentSchemaFormats().get("Scope"));
+            reloaded.getComponentSchemaFormats().get("Pet"));
     }
 
     @Test
@@ -81,19 +81,19 @@ class AsyncApiBundlerTest {
         JsonNode bundled = new AsyncApiBundler().setOpenApiVersion("3.1.0")
             .bundle(AsyncApiTestFiles.CLOUD_EVENTS);
 
-        assertEquals("ums", bundled.at("/channels/approvalRequests/x-producers/0").asText());
-        assertEquals("approval", bundled.at("/channels/approvalRequests/x-consumers/0").asText());
-        assertEquals("approval", bundled.at("/channels/approvalDecision/x-producers/0").asText());
-        assertEquals("ums", bundled.at("/channels/approvalDecision/x-consumers/0").asText());
-        assertEquals(Set.of("ApprovalRequestCloudEvent", "ApprovalRequestData", "ApprovalDecisionCloudEvent",
-            "ApprovalDecisionData", "RequestType", "Scope"), fieldNames(bundled.at("/components/schemas")));
-        for (String data : List.of("ApprovalRequestData", "ApprovalDecisionData")) {
+        assertEquals("store", bundled.at("/channels/adoptionRequests/x-producers/0").asText());
+        assertEquals("shelter", bundled.at("/channels/adoptionRequests/x-consumers/0").asText());
+        assertEquals("shelter", bundled.at("/channels/adoptionDecision/x-producers/0").asText());
+        assertEquals("store", bundled.at("/channels/adoptionDecision/x-consumers/0").asText());
+        assertEquals(Set.of("AdoptionRequestCloudEvent", "AdoptionRequestData", "AdoptionDecisionCloudEvent",
+            "AdoptionDecisionData", "PetType", "Pet"), fieldNames(bundled.at("/components/schemas")));
+        for (String data : List.of("AdoptionRequestData", "AdoptionDecisionData")) {
             JsonNode properties = bundled.at("/components/schemas/" + data + "/schema/properties");
-            assertEquals("#/components/schemas/Scope", properties.at("/scope/$ref").asText(), data);
-            assertEquals("#/components/schemas/RequestType", properties.at("/requestType/$ref").asText(), data);
+            assertEquals("#/components/schemas/Pet", properties.at("/pet/$ref").asText(), data);
+            assertEquals("#/components/schemas/PetType", properties.at("/petType/$ref").asText(), data);
         }
 
-        File output = AsyncApiTestFiles.write(dir, "bundled/approval-events-v1.yaml", AsyncApiBundler.toYaml(bundled));
+        File output = AsyncApiTestFiles.write(dir, "bundled/adoption-events-v1.yaml", AsyncApiBundler.toYaml(bundled));
         AsyncApiValidationResult validation = new AsyncApiValidator().validate(output);
         assertTrue(validation.isValid(), () -> "errors: " + validation.getErrors());
     }

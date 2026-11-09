@@ -1,9 +1,0 @@
-$schema: https://json-schema.org/draft/2020-12/schema
-title: ApprovalDecisionData
-type: object
-required: [requestType, scope]
-properties:
-  requestType:
-    $ref: ../../openapi/schemas/request-type.yaml
-  scope:
-    $ref: ../../openapi/schemas/scope.yaml
