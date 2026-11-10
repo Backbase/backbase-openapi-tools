@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Null defaults API
+  description: None of the schemas declare a default, so the bundled output must not contain one either.
+  version: 1.0.0
+paths:
+  /consents/{consentId}:
+    parameters:
+      - name: consentId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getConsent
+      parameters:
+        - name: expand
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: The consent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+              examples:
+                consent:
+                  $ref: examples/consent.json
+components:
+  schemas:
+    Consent:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - PENDING
+            - AUTHORISED
+        amount:
+          type: number
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string

@@ -1,0 +1,11 @@
+{
+  "id": "6b6fe1a0-7a43-4b1e-9d6e-1c6f3b0f8a51",
+  "status": "AUTHORISED",
+  "amount": 10.5,
+  "tags": [
+    "retail"
+  ],
+  "metadata": {
+    "channel": "web"
+  }
+}

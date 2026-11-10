@@ -117,6 +117,7 @@ public class ExamplesProcessor {
                 if (exampleHolder.getRef() != null) {
                     example.set$ref(exampleHolder.getRef());
                     example.setValue(null);
+                    example.setValueSetFlag(false);
                 } else {
                     example.setValue(exampleHolder.example());
                 }

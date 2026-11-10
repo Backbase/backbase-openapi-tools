@@ -217,6 +217,28 @@ class BundleMojoTest {
         assertTrue(schemaNames.contains("CurrencyExchangeArrangement"));
     }
 
+    /**
+     * Guards the plugin classpath: a swagger-parser-v3 older than the swagger-models it runs with writes
+     * {@code default: null} on every schema, which code generators reject on non-nullable schemas.
+     */
+    @Test
+    @SneakyThrows
+    void testBundleDoesNotAddNullDefaultsOrValues() {
+        File output = new File("target/test-bundle-null-defaults.yaml");
+        Files.deleteIfExists(output.toPath());
+
+        BundleMojo mojo = new BundleMojo();
+        mojo.setInput(getFile("/bundler/null-defaults/api.yaml"));
+        mojo.setOutput(output);
+        mojo.execute();
+
+        String bundled = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
+
+        assertFalse(bundled.contains("default: null"), "Schemas without a default must not get default: null.");
+        assertFalse(bundled.contains("value: null"), "An example $ref must not get value: null next to it.");
+        assertTrue(bundled.contains("#/components/examples/"), "The example must still be referenced.");
+    }
+
     @Test
     @SneakyThrows
     void testInvalidVersionInApi() {

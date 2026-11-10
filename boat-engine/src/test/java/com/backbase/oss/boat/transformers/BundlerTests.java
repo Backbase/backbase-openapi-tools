@@ -228,7 +228,10 @@ class BundlerTests {
         assertThat("value.$ref is cleaned up", exampleNoThree.get$ref(),
             is("#/components/examples/example-number-three"));
         assertThat("value.$ref is cleaned up", exampleNoThree.getValue(), nullValue());
+        assertFalse(exampleNoThree.getValueSetFlag(), "A cleaned up value must not be serialized as value: null");
 
+        assertThat("Examples next to a $ref are not serialized as value: null",
+            SerializerUtils.toYamlString(openAPI), not(containsString("value: null")));
     }
 
     /**

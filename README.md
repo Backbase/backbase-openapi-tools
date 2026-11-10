@@ -20,6 +20,16 @@ See also: https://github.com/Backbase/backbase-openapi-tools/releases
 
 
 ## 0.19.2
+* **Fix**: `boat:bundle` (and `boat:generate` with `bundleSpecs`) no longer writes `default: null` on every schema.
+  From 0.18.4 to 0.19.1 the plugin ran an older `swagger-parser-v3` (2.1.31, pulled in by `openapi-diff-core`) with
+  `swagger-models` 2.2.54+, which serializes the `null` default the old parser sets on each schema. Generators reject
+  such specs, for example with "default is not of type `object`". Specs bundled with 0.18.4 to 0.19.1 should be
+  re-bundled and republished. All swagger-parser modules are now aligned, and the build fails if they diverge again.
+* **Fix**: Bundling no longer writes `value: null` next to the `$ref` of an example that was moved to
+  `components/examples`.
+* **Feature**: New lint rule `B025` reports a `default: null` on a schema that does not allow null (no
+  `nullable: true` in OpenAPI 3.0, no `null` in `type` in OpenAPI 3.1). With `failOnWarning` enabled this fails the
+  build; add `B025` to `ignoreRules` to opt out.
 * **Feature**: `boat:lint` rules for the
   [RESTful API in Backbase v3](https://backbase.atlassian.net/wiki/spaces/GUIL/pages/3446899327/RESTful+API+in+Backbase+v3)
   guideline, all with severity `SHOULD`:

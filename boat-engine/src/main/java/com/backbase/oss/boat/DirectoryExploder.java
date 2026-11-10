@@ -73,6 +73,7 @@ public class DirectoryExploder {
                 }
                 Files.write(exampleFile, serializedValue.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
                 namedExample.getExample().setValue(null);
+                namedExample.getExample().setValueSetFlag(false);
                 String ref = EXAMPLES_DIR + File.separator + filename;
                 namedExample.getExample().set$ref(ref);
             } catch (JsonProcessingException e) {
