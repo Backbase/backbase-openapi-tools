@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: AdoptionRequestData
+type: object
+required: [petType, pet, applicationReference]
+properties:
+  petType:
+    $ref: ../shared/schemas/pet-type.yaml
+  pet:
+    $ref: ../shared/schemas/pet.yaml
+  applicationReference:
+    type: string

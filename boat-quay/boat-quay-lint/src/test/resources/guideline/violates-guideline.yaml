@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Payment Order Client API
+  description: Manage payment orders of the current user.
+  version: 1.0.0
+  x-icon: credit_card
+  # Guideline: x-api-dashboard-tags are optional, but each tag has a name
+  x-api-dashboard-tags:
+    - description: no name
+servers:
+  - url: http://localhost:4010
+    description: Prism mock server
+tags:
+  - name: paymentOrders
+paths:
+  # Guideline: no verbs in URI
+  /client-api/v1/payment-orders/update:
+    post:
+      tags: [paymentOrders]
+      operationId: updatePaymentOrderViaVerb
+      x-BbAccessControl: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrder'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrder'
+  # Guideline: list endpoints must paginate and return an object with items, not a bare array;
+  #            no 404 for empty list; no sensitive data in query; no request body on GET;
+  #            specs must not define 405/408/5xx; 422 not used in Backbase
+  /client-api/v1/payment-orders:
+    get:
+      tags: [paymentOrders]
+      operationId: listPaymentOrders
+      x-BbAccessControl: false
+      parameters:
+        - name: passportNumber
+          in: query
+          schema:
+            type: string
+        - name: X-Custom-Thing
+          in: header
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrder'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentOrder'
+        '404':
+          description: nothing found
+        '405':
+          description: method not allowed
+        '408':
+          description: timeout
+        '422':
+          description: unprocessable
+        '500':
+          description: boom
+        '503':
+          description: unavailable
+    # Guideline: Content-Type must be plain application/json (no charset)
+    post:
+      tags: [paymentOrders]
+      operationId: createPaymentOrder
+      x-BbAccessControl: false
+      requestBody:
+        content:
+          application/json; charset=utf-8:
+            schema:
+              $ref: '#/components/schemas/PaymentOrder'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/PaymentOrder'
+  # Guideline: path params camelCase; PUT payload must equal POST payload
+  /client-api/v1/payment-orders/{payment_order_id}:
+    put:
+      tags: [paymentOrders]
+      operationId: replacePaymentOrder
+      x-BbAccessControl: false
+      parameters:
+        - name: payment_order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SomethingElse'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorLike'
+  # Guideline: the path version follows the major version of the spec; list endpoints declare size and
+  #            page or cursor; 4xx responses use the SSDK error body
+  /client-api/v2/batches:
+    get:
+      tags: [paymentOrders]
+      operationId: listBatches
+      x-BbAccessControl: false
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorLike'
+components:
+  schemas:
+    BatchList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SomethingElse'
+    PaymentOrder:
+      type: object
+      properties:
+        # Guideline: properties camelCase
+        payment_reference:
+          type: string
+        # Guideline: money as string decimal, currency as ISO 4217 pattern
+        amount:
+          type: number
+        currency:
+          type: string
+        # Guideline: dates RFC3339 (format date-time)
+        executionDate:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, DONE]
+    SomethingElse:
+      type: object
+      properties:
+        foo:
+          type: string
+    # Guideline: error body uses key/message/errors
+    ErrorLike:
+      type: object
+      properties:
+        problem:
+          type: string

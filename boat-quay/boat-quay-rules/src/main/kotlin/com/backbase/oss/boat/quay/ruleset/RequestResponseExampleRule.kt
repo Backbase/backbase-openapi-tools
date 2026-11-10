@@ -1,5 +1,6 @@
 package com.backbase.oss.boat.quay.ruleset
 
+import com.backbase.oss.boat.quay.ruleset.util.SchemaUtil
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
@@ -108,7 +109,7 @@ class RequestResponseExampleRule {
             .ifEmpty {
                 val example = Example()
                 if (content.example != null) {
-                    val jsonNode = content.example as JsonNode
+                    val jsonNode: JsonNode = objectMapper.valueToTree(content.example)
                     jsonNode.update("value") { value -> example.value(value) }
                     jsonNode.update("\$ref") { ref -> example.`$ref`(ref.toString()) }
                 }
@@ -133,11 +134,9 @@ class RequestResponseExampleRule {
     private fun jsonObject(exampleObject: Example?): JsonNode {
         return when (val value = exampleObject?.value) {
             null -> JsonNodeFactory.instance.objectNode()
-            is String -> objectMapper.valueToTree(
-                value
-            )
-
-            else -> value as JsonNode
+            is JsonNode -> value
+            // OpenAPI 3.1 documents carry example values as plain Java maps, lists and scalars
+            else -> objectMapper.valueToTree(value)
         }
     }
 
@@ -153,9 +152,9 @@ class RequestResponseExampleRule {
     ): List<String> {
         val fieldValue = jsonObject.findValue(propertyName) ?: return listOf(missedProperty(parentName, propertyName))
         return when {
-            "array" == property?.type && fieldValue.isArray -> {
+            property != null && SchemaUtil.hasType(property, "array") && fieldValue.isArray -> {
                 when {
-                    property.items?.type == "object" -> {
+                    SchemaUtil.hasType(property.items, "object") -> {
                         property.items?.properties?.map { prop -> arrayTypeCheck(propertyName, prop, fieldValue) }
                             .orEmpty()
                             .flatten()
@@ -167,7 +166,7 @@ class RequestResponseExampleRule {
                 }
             }
 
-            "object" == property?.type && fieldValue.isObject -> {
+            property != null && SchemaUtil.hasType(property, "object") && fieldValue.isObject -> {
                 when {
                     property.additionalProperties != null -> {
                         if (fieldValue.isEmpty) {

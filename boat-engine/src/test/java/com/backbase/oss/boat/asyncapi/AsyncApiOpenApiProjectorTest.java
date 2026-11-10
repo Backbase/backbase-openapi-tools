@@ -252,16 +252,16 @@ class AsyncApiOpenApiProjectorTest {
         OpenAPI openAPI = projection.getOpenAPI();
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
 
-        assertEquals(Set.of("ApprovalDecisionCloudEvent", "ApprovalDecisionData", "RequestType", "Scope"),
+        assertEquals(Set.of("AdoptionDecisionCloudEvent", "AdoptionDecisionData", "PetType", "Pet"),
             schemas.keySet(), "file references reached through the envelope reuse the component keys");
-        assertEquals("#/components/schemas/ApprovalDecisionCloudEvent",
-            projection.getMessageSchemas().get("/components/messages/ApprovalDecision").getPayloadRef());
-        JsonNode envelope = json(openAPI, schemas.get("ApprovalDecisionCloudEvent"));
-        assertEquals("#/components/schemas/ApprovalDecisionData", envelope.at("/properties/data/$ref").asText());
+        assertEquals("#/components/schemas/AdoptionDecisionCloudEvent",
+            projection.getMessageSchemas().get("/components/messages/AdoptionDecision").getPayloadRef());
+        JsonNode envelope = json(openAPI, schemas.get("AdoptionDecisionCloudEvent"));
+        assertEquals("#/components/schemas/AdoptionDecisionData", envelope.at("/properties/data/$ref").asText());
         assertEquals("1.0", envelope.at("/properties/specversion/const").asText());
-        assertEquals("employee", envelope.at("/if/properties/actortype/const").asText());
-        assertEquals("#/components/schemas/RequestType", json(openAPI, schemas.get("ApprovalDecisionData"))
-            .at("/properties/requestType/$ref").asText());
+        assertEquals("store", envelope.at("/if/properties/sourcetype/const").asText());
+        assertEquals("#/components/schemas/PetType", json(openAPI, schemas.get("AdoptionDecisionData"))
+            .at("/properties/petType/$ref").asText());
         assertTrue(projection.getWarnings().isEmpty(), projection.getWarnings()::toString);
     }
 
@@ -271,14 +271,14 @@ class AsyncApiOpenApiProjectorTest {
             .project(AsyncApiLoader.load(AsyncApiTestFiles.CLOUD_EVENTS));
         OpenAPI openAPI = projection.getOpenAPI();
 
-        Operation receive = openAPI.getPaths().get("/receiveApprovalRequested").getPost();
-        assertEquals(List.of("approvalRequested"), receive.getTags());
+        Operation receive = openAPI.getPaths().get("/receiveAdoptionRequest").getPost();
+        assertEquals(List.of("adoptionRequests"), receive.getTags());
         assertEquals("receive", receive.getExtensions().get(AsyncApiExtensions.ACTION));
-        Operation send = openAPI.getPaths().get("/sendApprovalDecision").getPost();
-        assertEquals(List.of("approvalDecision"), send.getTags());
+        Operation send = openAPI.getPaths().get("/sendAdoptionDecision").getPost();
+        assertEquals(List.of("adoptionDecision"), send.getTags());
         assertEquals("send", send.getExtensions().get(AsyncApiExtensions.ACTION));
-        assertEquals(Set.of("ApprovalRequestedCloudEvent", "ApprovalRequestedData", "ApprovalDecisionCloudEvent",
-            "ApprovalDecisionData", "RequestType", "Scope"), openAPI.getComponents().getSchemas().keySet(),
+        assertEquals(Set.of("AdoptionRequestCloudEvent", "AdoptionRequestData", "AdoptionDecisionCloudEvent",
+            "AdoptionDecisionData", "PetType", "Pet"), openAPI.getComponents().getSchemas().keySet(),
             "schemas both events reference exist once");
         assertTrue(projection.getWarnings().isEmpty(), projection.getWarnings()::toString);
     }
@@ -288,8 +288,8 @@ class AsyncApiOpenApiProjectorTest {
         AsyncApiProjection projection = project(AsyncApiTestFiles.CLOUD_EVENT);
         String warnings = String.join("\n", projection.getWarnings());
 
-        assertThat(warnings, containsString("Schema 'ApprovalDecisionCloudEvent' is JSON Schema draft-2020-12"));
-        assertThat(warnings, containsString("Schema 'ApprovalDecisionCloudEvent' uses [const, if, then]"));
+        assertThat(warnings, containsString("Schema 'AdoptionDecisionCloudEvent' is JSON Schema draft-2020-12"));
+        assertThat(warnings, containsString("Schema 'AdoptionDecisionCloudEvent' uses [const, if, then]"));
         assertThat(warnings, containsString("Set the projection OpenAPI version to 3.1.0"));
     }
 

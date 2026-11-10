@@ -1,0 +1,12 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: AdoptionDecisionData
+type: object
+required: [petType, pet, status]
+properties:
+  petType:
+    $ref: ../shared/schemas/pet-type.yaml
+  pet:
+    $ref: ../shared/schemas/pet.yaml
+  status:
+    type: string
+    enum: [approved, rejected]

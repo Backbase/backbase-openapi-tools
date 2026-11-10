@@ -16,7 +16,8 @@ public class BoatViolation {
     private JsonPointer pointer;
 
     public String displayString() {
-        return "[" + rule.getId() + "] " + severity + " - " + rule.getTitle() + ": " + description;
+        String preview = rule.isPreview() ? " (preview)" : "";
+        return "[" + rule.getId() + "] " + severity + preview + " - " + rule.getTitle() + ": " + description;
     }
 
 }

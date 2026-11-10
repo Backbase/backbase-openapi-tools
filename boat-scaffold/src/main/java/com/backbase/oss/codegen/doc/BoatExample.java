@@ -6,8 +6,8 @@ import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.examples.Example;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.HashMap;
 
@@ -17,7 +17,7 @@ public class BoatExample {
 
     public static final Mustache.Lambda escapeJavascript = (fragment, writer) -> {
         String text = fragment.execute();
-        StringEscapeUtils.escapeJavaScript(writer, text);
+        StringEscapeUtils.ESCAPE_ECMASCRIPT.translate(text, writer);
     };
 
     private String key;

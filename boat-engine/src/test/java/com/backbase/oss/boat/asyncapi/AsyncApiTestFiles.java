@@ -14,9 +14,9 @@ final class AsyncApiTestFiles {
     static final File SHARED_EVENTS = new File(SHARED_EVENTS_DIR, "asyncapi.yaml");
     static final File SHARED_OPENAPI = new File(SHARED_EVENTS_DIR, "openapi.yaml");
     static final File CLOUD_EVENT = new File(
-        "../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/approval-decision-v1/asyncapi.yaml");
+        "../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/adoption-decision-v1/asyncapi.yaml");
     static final File CLOUD_EVENTS = new File(
-        "../boat-trail-resources/src/main/resources/asyncapi/cloud-events/approval-events-v1.yaml");
+        "../boat-trail-resources/src/main/resources/asyncapi/cloud-events/adoption-events-v1.yaml");
 
     private AsyncApiTestFiles() {
     }

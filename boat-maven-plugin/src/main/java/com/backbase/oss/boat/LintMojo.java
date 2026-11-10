@@ -55,7 +55,7 @@ public class LintMojo extends AbstractLintMojo {
             if (!report.hasViolations()) {
                 log.info("OpenAPI: {}, is valid! No warnings!", report.getFilePath());
             } else {
-                isFailed = true;
+                isFailed |= report.hasBlockingViolations();
                 log.warn("OpenAPI: {} has Linting issues: ", report.getFilePath());
                 report.getViolations().forEach(result -> log.warn("{}", result.displayString()));
             }

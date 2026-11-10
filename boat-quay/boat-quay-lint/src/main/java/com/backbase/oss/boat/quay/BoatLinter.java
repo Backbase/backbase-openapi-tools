@@ -16,7 +16,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,14 +54,24 @@ public class BoatLinter {
     private final URI documentationBaseUrl = URI.create("https://backbase.github.io/backbase-openapi-tools/rules.md");
     private final RulesManager rulesManager;
     private final RulesPolicy rulesPolicy;
+    private final Set<String> previewRules;
     private final Map<String, BoatLintRule> availableRules;
     private final Config config;
 
     public BoatLinter(String... ignoreRules) {
+        this(Arrays.asList(ignoreRules), Collections.emptyList());
+    }
+
+    /**
+     * @param ignoreRules  ids of rules that are not evaluated
+     * @param previewRules ids of rules whose violations are reported, but never fail the build
+     */
+    public BoatLinter(Collection<String> ignoreRules, Collection<String> previewRules) {
         RulesValidatorConfiguration rulesValidatorConfiguration = new RulesValidatorConfiguration();
         this.config = rulesValidatorConfiguration.config("boat.conf");
         this.rulesManager = rulesValidatorConfiguration.rulesManager(config);
-        this.rulesPolicy = new RulesPolicy(Arrays.asList(ignoreRules));
+        this.rulesPolicy = new RulesPolicy(new ArrayList<>(ignoreRules));
+        this.previewRules = new HashSet<>(previewRules);
         this.validator = rulesValidatorConfiguration.apiValidator(rulesManager, new DefaultContextFactory());
         this.availableRules = mapAvailableRules();
     }
@@ -148,6 +160,7 @@ public class BoatLinter {
                 boatLintRule.setTitle(rule.title());
                 boatLintRule.setSeverity(rule.severity());
                 boatLintRule.setIgnored(false);
+                boatLintRule.setPreview(previewRules.contains(rule.id()));
                 boatLintRule.setRuleSet(ruleSet.getId());
                 boatLintRule.setType(type);
                 boatLintRule.setEffortMinutes(effortInMinutes);

@@ -36,7 +36,7 @@ class AsyncApiMojoTests {
         new File("../boat-trail-resources/src/main/resources/asyncapi/shared-events");
     private static final File SHARED_EVENTS = new File(SHARED_EVENTS_DIR, "asyncapi.yaml");
     private static final File CLOUD_EVENT =
-        new File("../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/approval-decision-v1/asyncapi.yaml");
+        new File("../boat-trail-resources/src/main/resources/asyncapi/cloud-event/events/adoption-decision-v1/asyncapi.yaml");
 
     private final DefaultBuildContext buildContext = new DefaultBuildContext();
 

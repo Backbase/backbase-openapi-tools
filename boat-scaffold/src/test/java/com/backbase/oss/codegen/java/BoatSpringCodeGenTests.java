@@ -51,7 +51,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.UnhandledException;
+import org.apache.commons.lang3.exception.UncheckedException;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
@@ -182,7 +182,7 @@ class BoatSpringCodeGenTests {
                     try {
                         return Files.readString(file.toPath()).contains("@ExampleObject(");
                     } catch (IOException e) {
-                        throw new UnhandledException(e);
+                        throw new UncheckedException(e);
                     }
                 })
                 .findFirst()
@@ -349,7 +349,7 @@ class BoatSpringCodeGenTests {
                     Matchers.hasItems("{jakarta.validation.constraints.NotNull.message}")
                 );
             } catch (Exception e) {
-                throw new UnhandledException(e);
+                throw new UncheckedException(e);
             }
         };
         verificationRunner.runVerification(
@@ -428,7 +428,7 @@ class BoatSpringCodeGenTests {
                 assertViolationsCountByPath(violations, "mapObjects", 1);
 
             } catch (Exception e) {
-                throw new UnhandledException(e);
+                throw new UncheckedException(e);
             }
         };
         verificationRunner.runVerification(
@@ -471,7 +471,7 @@ class BoatSpringCodeGenTests {
                 assertEquals(new BigDecimal("200.123"), deserializedAmountNumberAsString);
 
             } catch (Exception e) {
-                throw new UnhandledException(e);
+                throw new UncheckedException(e);
             }
         };
         verificationRunner.runVerification(

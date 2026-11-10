@@ -1,0 +1,9 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: AdoptionDecisionData
+type: object
+required: [petType, pet]
+properties:
+  petType:
+    $ref: ../../openapi/schemas/pet-type.yaml
+  pet:
+    $ref: ../../openapi/schemas/pet.yaml

@@ -15,6 +15,10 @@ public class BoatLintRule {
     private String title;
     private Severity severity;
     private boolean ignored;
+    /**
+     * Violations of a preview rule are reported, but never fail the build.
+     */
+    private boolean preview;
     private URI url;
 
     private Long effortMinutes;
