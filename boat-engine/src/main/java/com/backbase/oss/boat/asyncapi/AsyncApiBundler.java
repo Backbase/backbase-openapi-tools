@@ -50,7 +50,8 @@ public class AsyncApiBundler {
     private static final String HEADERS = "headers";
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory()
         .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-        .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+        .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+        .enable(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS));
     private static final int MAX_DEPTH = 50;
 
     private boolean deduplicateSchemas = true;
