@@ -54,7 +54,10 @@
 
         <slf4j.version>1.7.30</slf4j.version>
         <swagger-core.version>2.2.55</swagger-core.version>
-        <swagger-parser.version>2.1.48</swagger-parser.version>
+        <!-- 2.1.48 looks up an external schema by file basename when a nested file refs the
+             root component, so a key such as PhoneNumberType backed by phone-number-type.yaml fails
+             to bundle (swagger-parser#2399). 2.1.47 resolves the declared key. -->
+        <swagger-parser.version>2.1.47</swagger-parser.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <networknt-json-schema-validator.version>1.5.9</networknt-json-schema-validator.version>
         <asyncapi-specs.version>6.11.1</asyncapi-specs.version>

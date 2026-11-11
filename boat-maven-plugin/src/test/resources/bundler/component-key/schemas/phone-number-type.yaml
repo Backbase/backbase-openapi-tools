@@ -1,0 +1,5 @@
+description: The nature of the phone number.
+type: string
+enum:
+  - Day
+  - Evening
