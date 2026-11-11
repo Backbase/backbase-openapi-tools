@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.backbase.oss.boat.asyncapi.model.AsyncApiDocument;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -96,6 +98,36 @@ class AsyncApiBundlerTest {
         File output = AsyncApiTestFiles.write(dir, "bundled/adoption-events-v1.yaml", AsyncApiBundler.toYaml(bundled));
         AsyncApiValidationResult validation = new AsyncApiValidator().validate(output);
         assertTrue(validation.isValid(), () -> "errors: " + validation.getErrors());
+    }
+
+    @Test
+    void keepsStringsThatLookLikeNumbersQuoted() throws Exception {
+        File file = AsyncApiTestFiles.asyncApi(dir, "asyncapi.yaml",
+            "components:",
+            "  schemas:",
+            "    Event:",
+            "      schemaFormat: application/schema+yaml;version=draft-2020-12",
+            "      schema:",
+            "        type: object",
+            "        properties:",
+            "          specversion:",
+            "            type: string",
+            "            const: '1.0'",
+            "          code:",
+            "            type: string",
+            "            enum: ['1', '2']",
+            "            examples: ['123']",
+            "            maxLength: 3");
+
+        String yaml = AsyncApiBundler.toYaml(new AsyncApiBundler().setOpenApiVersion("3.1.0").bundle(file));
+        JsonNode properties = new ObjectMapper(new YAMLFactory()).readTree(yaml)
+            .at("/components/schemas/Event/schema/properties");
+
+        assertTrue(properties.at("/specversion/const").isTextual(), yaml);
+        assertEquals("1.0", properties.at("/specversion/const").asText());
+        assertTrue(properties.at("/code/enum/0").isTextual(), yaml);
+        assertTrue(properties.at("/code/examples/0").isTextual(), yaml);
+        assertTrue(properties.at("/code/maxLength").isNumber(), yaml);
     }
 
     @Test
