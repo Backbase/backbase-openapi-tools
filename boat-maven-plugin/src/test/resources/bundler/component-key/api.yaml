@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: Component key API
+  description: The component key differs from the external file name, and a nested schema points back at that key.
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    PhoneNumber:
+      $ref: schemas/phone-number.yaml
+    PhoneNumberType:
+      $ref: schemas/phone-number-type.yaml

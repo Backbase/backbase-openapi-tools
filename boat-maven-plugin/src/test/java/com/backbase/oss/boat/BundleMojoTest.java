@@ -239,6 +239,31 @@ class BundleMojoTest {
         assertTrue(bundled.contains("#/components/examples/"), "The example must still be referenced.");
     }
 
+    /**
+     * A root component key that does not match the external file name, with a nested file pointing back at that
+     * key, must still bundle. swagger-parser 2.1.48 looks the schema up by file basename instead
+     * (swagger-parser#2399).
+     */
+    @Test
+    @SneakyThrows
+    void testBundleResolvesComponentKeyThatDiffersFromFileName() {
+        File output = new File("target/test-bundle-component-key.yaml");
+        Files.deleteIfExists(output.toPath());
+
+        BundleMojo mojo = new BundleMojo();
+        mojo.setInput(getFile("/bundler/component-key/api.yaml"));
+        mojo.setOutput(output);
+        mojo.execute();
+
+        OpenAPI bundled = OpenAPILoader.load(output);
+        Set<String> schemaNames = bundled.getComponents().getSchemas().keySet();
+
+        assertTrue(schemaNames.contains("PhoneNumberType"),
+            "The declared component key must be resolved, not the file basename phone-number-type.");
+        String yaml = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
+        assertTrue(yaml.contains("Day"), "The external enum must be part of the bundle.");
+    }
+
     @Test
     @SneakyThrows
     void testInvalidVersionInApi() {

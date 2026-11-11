@@ -1,0 +1,9 @@
+type: object
+properties:
+  numberType:
+    $ref: '../api.yaml#/components/schemas/PhoneNumberType'
+  number:
+    type: string
+required:
+  - numberType
+  - number
