@@ -59,7 +59,7 @@
              to bundle (swagger-parser#2399). 2.1.47 resolves the declared key. -->
         <swagger-parser.version>2.1.47</swagger-parser.version>
         <snakeyaml.version>2.7</snakeyaml.version>
-        <networknt-json-schema-validator.version>1.5.9</networknt-json-schema-validator.version>
+        <networknt-json-schema-validator.version>3.0.9</networknt-json-schema-validator.version>
         <asyncapi-specs.version>6.11.1</asyncapi-specs.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     </properties>
